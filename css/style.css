@@ -99,7 +99,6 @@ a img {
   width:750px;
   margin: 0 auto;
   padding-top:15px;
-  font-size:30px;
   background: #ccc;
   height: 700px;
   font-family: 'Roboto';
@@ -202,15 +201,13 @@ img.icon {
   background-color: #fff;
   opacity: 0.8;
   z-index: 0;
-  filter: grayscale(100%);
   -webkit-filter: grayscale(100%);   /*For Webkit browsers */
   filter: gray;  /* For IE 6 - 9 */
   -webkit-transition: all .4s ease;
 }
 
 img.icon:hover {
-  filter: grayscale(0%);
-  -webkit-filter: grayscale(0%);
+  -webkit-filter: #000000;
   filter: none;
 }
 
@@ -238,7 +235,7 @@ img.icon:hover {
 
 .portfolio-thumb p {
   font-size: 14px;
-  padding: 0px 25px 25px;
+  padding: 0 25px 25px;
   text-align: left;
   line-height: 24px;
 }
