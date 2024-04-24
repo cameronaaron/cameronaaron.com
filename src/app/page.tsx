@@ -121,7 +121,7 @@ export default function Home() {
       </div>
       <p className="text-gray-500">Biopsychology Teacher | Jun 2023 - Present</p>
       <ul className="list-disc pl-8">
-        <li>Teaching biopsychology, focusing on developing comprehensive curriculum.</li>
+        <li>Teaching biopsychology, focusing on developing comprehensive project based curriculum.</li>
       </ul>
       <p className="text-gray-500">Director of Information Technology Engineering | Mar 2023 - Present</p>
       <ul className="list-disc pl-8">
