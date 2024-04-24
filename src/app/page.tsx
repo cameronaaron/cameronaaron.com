@@ -230,6 +230,7 @@ export default function Home() {
     <li>Developed and managed the website and supported community partnerships.</li>
   </ul>
 </div>
+
 <div>
   <div className="flex items-center">
     <img src="/logos/google.png" alt="Google Logo" className="h-10 mr-4"/>
@@ -239,6 +240,8 @@ export default function Home() {
   <ul className="list-disc pl-8">
     <li>Mentored and supported a large group of students in their learning journey.</li>
   </ul>
+</div>
+
 <div>
   <div className="flex items-center">
     <img src="/logos/nu-school.png" alt="Nu School Logo" className="h-10 mr-4"/>
@@ -303,7 +306,6 @@ export default function Home() {
   <ul className="list-disc pl-8">
     <li>Participated as a panelist, discussing topics related to twice-exceptional education and leadership.</li>
   </ul>
-
 </div>
 
     </div>
