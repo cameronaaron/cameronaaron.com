@@ -264,7 +264,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/ted.ai" alt="TED Conferences Logo" className="h-10 mr-4"/>
+    <img src="/ted.png" alt="TED Conferences Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">TED Conferences</h3>
   </div>
   <p className="text-gray-500">Lead Organizer TEDxYouth@NewLondon | Jul 2018 - Dec 2019</p>
