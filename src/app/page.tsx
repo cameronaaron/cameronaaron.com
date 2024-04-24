@@ -126,10 +126,14 @@ export default function Home() {
       <p className="text-gray-500">Director of Information Technology Engineering | Mar 2023 - Present</p>
       <ul className="list-disc pl-8">
         <li>Established and managed the comprehensive IT infrastructure.</li>
+        <li>Provided responsive technical support, ensuring seamless operations and resolving IT-related issues promptly.</li>
+        <li>Fostered digital literacy and cybersecurity awareness through regular training sessions for staff and students.</li>
+        <li>Developed and enforced IT policies and procedures, establishing a strong foundation for IT governance and cybersecurity best practices.</li>
       </ul>
       <p className="text-gray-500">Engineering Teacher | Nov 2022 - Present</p>
       <ul className="list-disc pl-8">
         <li>Develop and implement a comprehensive software engineering curriculum.</li>
+        <li>Design project-based learning experiences that cater to students' high aptitude, challenging them to apply advanced programming concepts and create software solutions.</li>
       </ul>
       <p className="text-gray-500">Safety Team | Aug 2023 - Present</p>
       <ul className="list-disc pl-8">
@@ -144,18 +148,50 @@ export default function Home() {
       <p className="text-gray-500">Lead Systems Admin | Aug 2022 - Nov 2022</p>
       <ul className="list-disc pl-8">
         <li>Identified, diagnosed, and reported technical problems.</li>
+        <li>Translated functional requirements into technical requirements.</li>
+        <li>Established, implemented, and administered best practices, including systems configuration and light development as necessary.</li>
+        <li>Delivered solutions based on business requirements, clearly setting expectations and delivering work on agreed timelines.</li>
+        <li>Acted as the primary admin of one or many SaaS systems.</li>
+        <li>Cared about customer and employee experience and managed stakeholder expectations.</li>
+        <li>Was curious about measuring impact and assisted with analytics requests, building reports and dashboards.</li>
+        <li>Acted as a steward for key systems and created technical content to enable users with the platform.</li>
       </ul>
       <p className="text-gray-500">Lead Support Systems Analyst | Feb 2022 - Aug 2022</p>
       <ul className="list-disc pl-8">
-        <li>Develop data-driven systems-related projects.</li>
+        <li>Developed data-driven systems-related projects.</li>
+        <li>Developed thorough, professionally documented, data-driven systems-related projects including migrations and large overhauls or changes.</li>
+        <li>Identified data trends displaying systems needs to determine and develop prioritized goals for the Support team.</li>
+        <li>Prepared and presented systems status to all leadership and operations stakeholders and ensured the project aligned with organizational goals and operating principles.</li>
+        <li>Ensured projects remained on schedule, tested within the ticketing sandboxes when applicable, and documented to gauge impact and adoption.</li>
+        <li>Determined and kept system projects within the determined scope, whether budgetary or regarding deliverables.</li>
+        <li>Monitored and maintained the end results of all systems changes including rolling out change management with Support Leadership.</li>
       </ul>
       <p className="text-gray-500">Project Manager | Aug 2021 - Feb 2022</p>
       <ul className="list-disc pl-8">
         <li>Managed and lead projects across the organization.</li>
+        <li>Developed thorough, professionally documented, data-driven projects.</li>
+        <li>Analyzed team data to determine team necessities and develop prioritized goals.</li>
+        <li>Translated raw data to create cohesive, structured, and relevant analysis.</li>
+        <li>Prepared and presented project status to all project stakeholders and ensured the project aligned with organizational goals and operating principles.</li>
+        <li>Ensured projects remained on schedule, tested, and documented to gauge impact and adoption.</li>
+        <li>Designed project outlines including success markers, unique to project specifications.</li>
+        <li>Determined and kept projects within the determined scope, whether budgetary or regarding deliverables.</li> 
+        <li>Monitored and maintained the end results of all assigned projects including rolling out change management with Support Leadership.</li>
+        <li>Completed full-bodied project tasks and/or delegated them to help team members achieve goals and ensure successful completion.</li>
       </ul>
       <p className="text-gray-500">Product Support Specialist (Tier ll) | Jul 2021 - Aug 2021</p>
       <ul className="list-disc pl-8">
         <li>Explained workflows and product configurations to customers.</li>
+        <li>Troubleshooted and wrote bugs for unexpected behavior for Engineering.</li>
+        <li>Investigated discrepancies and explained findings and paths to resolution with customers.</li>
+        <li>Used SQL and Excel skills to create custom reports for customers.</li>
+        <li>Assisted in running incidents in cases of an outage.</li>
+        <li>Facilitated communication between engineering and the customer.</li>
+        <li>Troubleshooted issues with the platform, state traceability systems, 3rd party integrators, and various other external parties.</li>
+        <li>Provided basic and targeted training as needed for customers and Tier 1 Support Specialists.</li>
+        <li>Assisted teammates in solving new or unique problems and documenting these solutions for future accessibility.</li>
+        <li>Identified tools for new and existing products that assisted the teams in providing efficient support.</li>
+        <li>Assisted in providing feedback to Product and Engineering with issues, trends, platform workflow optimizations, etc.</li>
       </ul>
     </div>
     <div>
@@ -165,19 +201,23 @@ export default function Home() {
       </div>
       <p className="text-gray-500">Aerospace Medicine, Space Operations | Aug 2020 - Dec 2020</p>
       <ul className="list-disc pl-8">
-        <li>Assisted with SpaceX’s COVID response to keep operations running.</li>
+        <li>Assisted with SpaceX's COVID response to keep operations running.</li>
+        <li>Assisted with SpaceX's COVID response to keep employees and crewmembers safe while keeping operations running.</li>
+        <li>Collaborated with academic institutions and/or private organizations on medical research.</li>
+        <li>Assisted flight surgeons and medical fellows in research projects, data synthesis, and implementation of deliverables for Starship and Crew Dragon.</li>
+        <li>Worked with multidisciplinary teams to accomplish goals involving human spaceflight, public health, and occupational medicine involving SpaceX employees.</li>
+        <li>Collected data in occupational health surveillance and public health improvement projects for SpaceX sites.</li>
       </ul>
     </div>
-    
-    <div>
-      <div className="flex items-center">
-        <img src="/github.png" alt="GitHub Logo" className="h-10 mr-4"/>
-        <h3 className="text-2xl font-semibold">GitHub</h3>
-      </div>
-      <p className="text-gray-500">Software Engineer | Aug 2019 - Jan 2020</p>
-      <ul className="list-disc pl-8">
-        <li>Worked on internal tools to enhance product functionality and user experience.</li>
-      </ul>
+Copy code<div>
+  <div className="flex items-center">
+    <img src="/github.png" alt="GitHub Logo" className="h-10 mr-4"/>
+    <h3 className="text-2xl font-semibold">GitHub</h3>
+  </div>
+  <p className="text-gray-500">Software Engineer | Aug 2019 - Jan 2020</p>
+  <ul className="list-disc pl-8">
+    <li>Worked on internal tools to enhance product functionality and user experience.</li>
+  </ul>
 <div>
   <div className="flex items-center">
     <h3 className="text-2xl font-semibold">C19 BayShield</h3>
@@ -186,69 +226,103 @@ export default function Home() {
   <ul className="list-disc pl-8">
     <li>Led a team of UC Berkeley engineers.</li>
     <li>Led the backend engineering team that won the Jacobs prize at UC Berkeley.</li>
+    <li>Took ownership of the backend team.</li>
+    <li>Was in charge of hiring new devs.</li> 
+    <li>Successfully lead a team that won the Jacobs prize at UC Berkeley.</li>
+    <li>Helped engineer an app that helped supply much of central California with PPE.</li>
   </ul>
 </div>
-
 <div>
   <div className="flex items-center">
-    <img src="/conn.png" alt="Connecticut College Logo" className="h-10 mr-4"/>
-    <h3 className="text-2xl font-semibold">Connecticut College</h3>
-  </div>
-  <p className="text-gray-500">Computational Biology and Informatics Researcher | Jan 2020 - May 2021</p>
-  <ul className="list-disc pl-8">
-    <li>Developed algorithms to analyze medical imaging and genetic data.</li>
-  </ul>
-  <p className="text-gray-500">CameLAB Neuroscience Lab Research Assistant | Aug 2017 - May 2021</p>
-  <ul className="list-disc pl-8">
-    <li>Supported research using EEG and eye-tracking technology.</li>
-  </ul>
-</div>
-
-<div>
-  <div className="flex items-center">
-    <img src="/upkey.svg" alt="Upkey Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Upkey</h3>
   </div>
   <p className="text-gray-500">Program Mentor | Jun 2020 - Feb 2021</p>
   <ul className="list-disc pl-8">
-    <li>Mentored new grads on careers and coding skills.</li>
+    <li>Mentored a group of new grads and taught them about careers and coding skills.</li>
+    <li>Hosted twice a week office hours where I answered student questions.</li>
+    <li>Assisted students in developing their networking skills.</li>
+    <li>Helped students explore opportunities in career development.</li>
   </ul>
   <p className="text-gray-500">Product Management Intern | Jun 2020 - Jul 2020</p>
   <ul className="list-disc pl-8">
-    <li>Partnered with teams to define and solve customer problems.</li>
+    <li>Owned solving customer problems end-to-end, from strategy to execution by working directly with full-time product managers and a team of designers and engineers.</li>
+    <li>Partnered with Product Analysts and UX Research to conduct and examine direct user feedback, qualitative research, and quantitative data to define customer pain points in the website styling space.</li>
+    <li>Developed hypotheses and drove creative, cross-functional ideation and solution discovery.</li>
+    <li>Defined a set of metrics to measure customer satisfaction and business impact with the ability to analyze them and utilize them in decision-making processes.</li>
+    <li>Maintained communication with the entire team to ensure effective collaboration and transparency.</li>
+    <li>Presented findings broadly to interested product teams throughout the company.</li>
   </ul>
 </div>
-
 <div>
   <div className="flex items-center">
-    <img src="/hhc.png" alt="Helping Hands Community Logo" className="h-10 mr-4"/>
+    <h3 className="text-2xl font-semibold">PassionNet</h3>
+  </div>  
+  <p className="text-gray-500">Co Director: New Technologies, Data, and Ethics | Jan 2021 - Aug 2021</p>
+  <ul className="list-disc pl-8">
+    <li>Taught a 4-week long course on AI ethics and Neuroscience to a group of Middle Schoolers.</li>
+    <li>Designed a curriculum.</li>
+  </ul>
+</div>
+<div>
+  <div className="flex items-center"> 
+    <h3 className="text-2xl font-semibold">Connecticut College</h3>
+  </div>
+  <p className="text-gray-500">Computational Biology and Informatics Researcher | Jan 2020 - May 2021</p>  
+  <ul className="list-disc pl-8">
+    <li>Created Apache spark pipeline to analyze single nucleotide polymorphisms.</li>
+    <li>Used Google Cloud Life Sciences to process, analyze, and annotate genomics.</li>
+    <li>Created algorithms to analyze medical imaging from DICOM files in order to better identify abnormalities.</li>
+    <li>Engineered a web app to pull in digital medical records, biometric data from wearables, and genetic info into one place.</li>
+    <li>Developed a Python application to collect and analyze EEG data.</li>
+  </ul>
+  <p className="text-gray-500">Summer Science Research Institute Bioinformatics and Computational Biology Researcher | May 2020 - Jun 2020</p>
+  <ul className="list-disc pl-8">  
+    <li>Created Apache spark pipeline to analyze single nucleotide polymorphisms.</li>
+    <li>Used Google Cloud Life Sciences to process, analyze, and annotate genomics.</li>
+    <li>Created algorithms to analyze medical imaging from DICOM files in order to better identify abnormalities.</li> 
+    <li>Engineered a web app to pull in digital medical records, biometric data from wearables, and genetic info into one place.</li>
+  </ul>
+  <p className="text-gray-500">CameLAB Neuroscience Lab Research Assistant | Aug 2017 - May 2021</p>
+  <ul className="list-disc pl-8">
+    <li>Set up experiments using 3D Reach Tracker, EEG, and eye-tracking technology.</li>
+    <li>Used Matlab to analyze data.</li>  
+  </ul>
+</div>  
+<div>
+  <div className="flex items-center">
+    <h3 className="text-2xl font-semibold">Google</h3>  
+  </div>
+  <p className="text-gray-500">CSSI Section Leader &amp; Student Mentor | Jun 2020 - Sep 2020</p>
+  <ul className="list-disc pl-8">
+    <li>Was selected by Google to work as an algorithms TA and Student mentor for the Google education team.</li>
+    <li>In charge of mentoring and teaching a group of 50 students.</li>
+    <li>Made sure group had at least a 95% pass rate in their class.</li>
+  </ul>
+</div>
+<div>  
+  <div className="flex items-center">
     <h3 className="text-2xl font-semibold">Helping Hands Community</h3>
   </div>
   <p className="text-gray-500">Field Operations Engineering Specialist | Jun 2020 - Sep 2020</p>
-  <ul className="list-disc pl-8">
-    <li>Developed and managed the website and supported community partnerships.</li>
+  <ul className="list-disc pl-8">  
+    <li>Developed the HHC website.</li>
+    <li>Created partnerships with the community.</li> 
+    <li>Supported volunteers.</li>
+    <li>Worked closely with the COO and Engineering team to address issues.</li>
+    <li>Worked at a company co-founded by Pedram Keyani, Former Director of Engineering at Facebook and Uber, and started by talented tech folks with big hearts from Uber, Lyft, Google, WhatsApp, and Facebook who joined forces to create a platform for those able to help, to connect with those struggling most with current events: the elderly, immunocompromised, and at-risk in communities.</li>
   </ul>
 </div>
-
 <div>
-  <div className="flex items-center">
-    <img src="/google.png" alt="Google Logo" className="h-10 mr-4"/>
-    <h3 className="text-2xl font-semibold">Google</h3>
-  </div>
-  <p className="text-gray-500">CSSI Section Leader & Student Mentor | Jun 2020 - Sep 2020</p>
-  <ul className="list-disc pl-8">
-    <li>Mentored and supported a large group of students in their learning journey.</li>
-  </ul>
-</div>
-
-<div>
-  <div className="flex items-center">
+  <div className="flex items-center">  
     <h3 className="text-2xl font-semibold">Nu School</h3>
   </div>
-  <p className="text-gray-500">Technology Fellow | Jul 2020 - Jul 2020</p>
+  <p className="text-gray-500">Technology Fellow | Jul 2020</p>
   <ul className="list-disc pl-8">
-    <li>Participated in training and led a team to build an MVP to reduce food waste.</li>
-  </ul>
+    <li>Participated in a week of training and webinars, improving soft skills and important processes, such as building an MVP.</li>
+    <li>Used learnings to lead a global team to build an MVP and design a prototype for an idea that helped reduce food waste.</li> 
+    <li>Pitched idea to the CEO of PersistIQ and answered questions.</li>
+    <li>Continued working on the idea as a team after the program.</li>
+  </ul>  
 </div>
 
 <div>
