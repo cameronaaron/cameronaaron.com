@@ -243,7 +243,6 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/nu-school.png" alt="Nu School Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Nu School</h3>
   </div>
   <p className="text-gray-500">Technology Fellow | Jul 2020 - Jul 2020</p>
