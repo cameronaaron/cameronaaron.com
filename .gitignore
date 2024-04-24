@@ -93,3 +93,4 @@ modules.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/webstorm+all
 .DS_Store
+node_modules
