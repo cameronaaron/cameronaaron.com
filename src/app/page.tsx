@@ -17,7 +17,7 @@ export default function Home() {
           >
             Connect on{" "}
             <Image
-              src="/linkedin.svg"
+              src="l.svg.png"
               alt="LinkedIn Logo"
               className="dark:invert"
               width={100}
