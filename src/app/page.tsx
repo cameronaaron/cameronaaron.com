@@ -31,7 +31,7 @@ export default function Home() {
       <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/public/profile.jpg"
+          src="/profile.jpg"
           alt="Cameron E. Aaron"
           width={180}
           height={180}
@@ -116,7 +116,7 @@ export default function Home() {
   <div className="grid grid-cols-1 gap-8">
     <div>
       <div className="flex items-center">
-        <img src="/logos/bridges-academy.png" alt="Bridges Academy Logo" className="h-10 mr-4"/>
+        <img src="/ba.png" alt="Bridges Academy Logo" className="h-10 mr-4"/>
         <h3 className="text-2xl font-semibold">Bridges Academy</h3>
       </div>
       <p className="text-gray-500">Biopsychology Teacher | Jun 2023 - Present</p>
@@ -138,7 +138,7 @@ export default function Home() {
     </div>
     <div>
       <div className="flex items-center">
-        <img src="/logos/dutchie.png" alt="Dutchie Logo" className="h-10 mr-4"/>
+        <img src="/Dutchie.svg" alt="Dutchie Logo" className="h-10 mr-4"/>
         <h3 className="text-2xl font-semibold">Dutchie</h3>
       </div>
       <p className="text-gray-500">Lead Systems Admin | Aug 2022 - Nov 2022</p>
@@ -160,7 +160,7 @@ export default function Home() {
     </div>
     <div>
       <div className="flex items-center">
-        <img src="/logos/spacex.png" alt="SpaceX Logo" className="h-10 mr-4"/>
+        <img src="/spacex.svg" alt="SpaceX Logo" className="h-10 mr-4"/>
         <h3 className="text-2xl font-semibold">SpaceX</h3>
       </div>
       <p className="text-gray-500">Aerospace Medicine, Space Operations | Aug 2020 - Dec 2020</p>
@@ -171,7 +171,7 @@ export default function Home() {
     
     <div>
       <div className="flex items-center">
-        <img src="/logos/github.png" alt="GitHub Logo" className="h-10 mr-4"/>
+        <img src="/github.png" alt="GitHub Logo" className="h-10 mr-4"/>
         <h3 className="text-2xl font-semibold">GitHub</h3>
       </div>
       <p className="text-gray-500">Software Engineer | Aug 2019 - Jan 2020</p>
@@ -180,7 +180,6 @@ export default function Home() {
       </ul>
 <div>
   <div className="flex items-center">
-    <img src="/logos/c19-bayshield.png" alt="C19 BayShield Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">C19 BayShield</h3>
   </div>
   <p className="text-gray-500">Backend Team Lead Engineer | Apr 2020 - Sep 2020</p>
@@ -192,7 +191,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/connecticut-college.png" alt="Connecticut College Logo" className="h-10 mr-4"/>
+    <img src="/conn.png" alt="Connecticut College Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Connecticut College</h3>
   </div>
   <p className="text-gray-500">Computational Biology and Informatics Researcher | Jan 2020 - May 2021</p>
@@ -207,7 +206,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/upkey.png" alt="Upkey Logo" className="h-10 mr-4"/>
+    <img src="/upkey.svg" alt="Upkey Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Upkey</h3>
   </div>
   <p className="text-gray-500">Program Mentor | Jun 2020 - Feb 2021</p>
@@ -222,7 +221,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/helping-hands-community.png" alt="Helping Hands Community Logo" className="h-10 mr-4"/>
+    <img src="/hhc.png" alt="Helping Hands Community Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Helping Hands Community</h3>
   </div>
   <p className="text-gray-500">Field Operations Engineering Specialist | Jun 2020 - Sep 2020</p>
@@ -233,7 +232,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/google.png" alt="Google Logo" className="h-10 mr-4"/>
+    <img src="/google.png" alt="Google Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Google</h3>
   </div>
   <p className="text-gray-500">CSSI Section Leader & Student Mentor | Jun 2020 - Sep 2020</p>
@@ -255,7 +254,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/wurrly.png" alt="Wurrly Logo" className="h-10 mr-4"/>
+    <img src="/wurrly.jpg" alt="Wurrly Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Wurrly</h3>
   </div>
   <p className="text-gray-500">QA Engineer | May 2015 - Aug 2015</p>
@@ -266,7 +265,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/ted-conferences.png" alt="TED Conferences Logo" className="h-10 mr-4"/>
+    <img src="/ted.ai" alt="TED Conferences Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">TED Conferences</h3>
   </div>
   <p className="text-gray-500">Lead Organizer TEDxYouth@NewLondon | Jul 2018 - Dec 2019</p>
@@ -277,7 +276,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/2enews.png" alt="2eNews Logo" className="h-10 mr-4"/>
+    <img src="/2e.png" alt="2eNews Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">2eNews</h3>
   </div>
   <p className="text-gray-500">Variations 2e Article Writer | Dec 2018 - Jun 2019</p>
@@ -288,7 +287,6 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/clues-inc.png" alt="Clues Inc. Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">Clues Inc.</h3>
   </div>
   <p className="text-gray-500">Creator | Feb 2017 - 2019</p>
@@ -299,7 +297,7 @@ export default function Home() {
 
 <div>
   <div className="flex items-center">
-    <img src="/logos/bridges-2e-center.png" alt="The Bridges 2e Center Logo" className="h-10 mr-4"/>
+    <img src="/ba.png" alt="The Bridges 2e Center Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">The Bridges 2e Center for Research and Professional Development</h3>
   </div>
   <p className="text-gray-500">Panelist at VISION & LEADERSHIP 2e SYMPOSIUM 2019 | Oct 2018 - Oct 2018</p>
