@@ -385,8 +385,8 @@ export default function Home() {
 </div>
 
 
-      <div className="mb-32 w-full max-w-5xl" id="recommendations">
-  <h2 className="mb-4 text-3xl font-bold">Recommendations</h2>
+      <div className="mb-32 w-full max-w-5xl" id="Testaments to Cameron's Work">
+  <h2 className="mb-4 text-3xl font-bold">Testaments to Cameron's Work</h2>
   <div className="grid grid-cols-1 gap-8">
     <div>
       <p className="text-xl italic">"Cameron is a smart, well spoken, inquisitive worker who always digs deeper to understand the whys, hows and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee."</p>
