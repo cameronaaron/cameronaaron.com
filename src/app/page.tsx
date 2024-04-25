@@ -116,7 +116,7 @@ export default function Home() {
   <div className="grid grid-cols-1 gap-8">
     <div>
       <div className="flex items-center">
-        <img src="/ba.png" alt="Bridges Academy Logo" className="h-10 mr-4"/>
+        <img src="/ba.svg" alt="Bridges Academy Logo" className="h-10 mr-4"/>
         <h3 className="text-2xl font-semibold">Bridges Academy</h3>
       </div>
       <p className="text-gray-500">Biopsychology Teacher | Jun 2023 - Present</p>
@@ -209,7 +209,7 @@ export default function Home() {
         <li>Collected data in occupational health surveillance and public health improvement projects for SpaceX sites.</li>
       </ul>
     </div>
-Copy code<div>
+ <div>
   <div className="flex items-center">
     <img src="/github.png" alt="GitHub Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">GitHub</h3>
@@ -234,6 +234,8 @@ Copy code<div>
 </div>
 <div>
   <div className="flex items-center">
+  <img src="/upkey.svg" alt="Bridges Academy Logo" className="h-10 mr-4"/>
+
     <h3 className="text-2xl font-semibold">Upkey</h3>
   </div>
   <p className="text-gray-500">Program Mentor | Jun 2020 - Feb 2021</p>
@@ -290,7 +292,9 @@ Copy code<div>
 </div>  
 <div>
   <div className="flex items-center">
-    <h3 className="text-2xl font-semibold">Google</h3>  
+  <img src="/google.svg" alt="Wurrly Logo" className="h-10 mr-4"/>  
+
+    <h3 className="text-2xl font-semibold">Google</h3>
   </div>
   <p className="text-gray-500">CSSI Section Leader &amp; Student Mentor | Jun 2020 - Sep 2020</p>
   <ul className="list-disc pl-8">
@@ -370,7 +374,7 @@ Copy code<div>
 
 <div>
   <div className="flex items-center">
-    <img src="/ba.png" alt="The Bridges 2e Center Logo" className="h-10 mr-4"/>
+    <img src="/ba.svg" alt="The Bridges 2e Center Logo" className="h-10 mr-4"/>
     <h3 className="text-2xl font-semibold">The Bridges 2e Center for Research and Professional Development</h3>
   </div>
   <p className="text-gray-500">Panelist at VISION & LEADERSHIP 2e SYMPOSIUM 2019 | Oct 2018 - Oct 2018</p>
