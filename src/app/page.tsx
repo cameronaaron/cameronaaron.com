@@ -927,40 +927,40 @@ export default function Home() {
         </section>
 
         <section id="contact" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-          <motion.h2
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-3xl font-bold mb-4 text-gray-900"
-          >
-            Contact
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-xl mb-4 text-gray-700"
-          >
-            Feel free to reach out to me for any inquiries or collaborations:
-          </motion.p>
-          <ul className="text-lg text-gray-700">
-            <motion.li
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              Email: <a href="mailto:cameronaaron1@gmail.com" className="text-blue-500 hover:underline">cameronaaron1@gmail.com</a>
-            </motion.li>
-            <motion.li
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              LinkedIn: <a href="https://www.linkedin.com/in/kamisama" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">linkedin.com/in/kamisama</a>
-            </motion.li>
-          </ul>
-        </section>
-      </main>
-    </>
-  );
+  <motion.h2
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    className="text-3xl font-bold mb-4 text-gray-900"
+  >
+    Contact
+  </motion.h2>
+  <motion.p
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    className="text-xl mb-4 text-gray-700"
+  >
+    Feel free to reach out to me for any inquiries or collaborations:
+  </motion.p>
+  <ul className="text-lg text-gray-700">
+    <motion.li
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      Email: <a href="mailto:cameronaaron1@gmail.com" className="text-blue-800 hover:underline">cameronaaron1@gmail.com</a>
+    </motion.li>
+    <motion.li
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      LinkedIn: <a href="https://www.linkedin.com/in/kamisama" target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">linkedin.com/in/kamisama</a>
+    </motion.li>
+  </ul>
+</section>
+</main>
+</>
+);
 }
