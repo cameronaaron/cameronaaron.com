@@ -295,6 +295,7 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
+              <Image src="/bay.jpg" alt="C19 BayShield" width={40} height={40} />
                 <h3 className="text-2xl font-semibold text-gray-900">C19 BayShield</h3>
               </div>
               <p className="text-gray-500">Backend Team Lead Engineer | Apr 2020 - Sep 2020</p>
@@ -343,6 +344,7 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
+              <Image src="/pass.png" alt="PassionNet" width={40} height={40} />
                 <h3 className="text-2xl font-semibold text-gray-900">PassionNet</h3>
               </div>
               <p className="text-gray-500">Co Director: New Technologies, Data, and Ethics | Jan 2021 - Aug 2021</p>
@@ -359,6 +361,8 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
+              <Image src="/conn.svg.png" alt="Connecticut College" width={40} height={40} />
+
                 <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
               </div>
               <p className="text-gray-500">Computational Biology and Informatics Researcher | Jan 2020 - May 2021</p>
@@ -408,6 +412,8 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
+              <Image src="/hhc.png" alt="Helping Hands Community Logo" width={40} height={40} />
+
                 <h3 className="text-2xl font-semibold text-gray-900">Helping Hands Community</h3>
               </div>
               <p className="text-gray-500">Field Operations Engineering Specialist | Jun 2020 - Sep 2020</p>
@@ -495,6 +501,8 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
+              <Image src="/ba.png" alt="Bridges Academy Logo" width={40} height={40} />
+
                 <h3 className="text-2xl font-semibold text-gray-900">Clues Inc.</h3>
               </div>
               <p className="text-gray-500">Creator | Feb 2017 - 2019</p>
@@ -510,7 +518,7 @@ export default function Home() {
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/ba.png" alt="The Bridges 2e Center Logo" width={40} height={40} />
+                <Image src="/2ecen.png" alt="The Bridges 2e Center Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">The Bridges 2e Center for Research and Professional Development</h3>
               </div>
               <p className="text-gray-500">Panelist at VISION & LEADERSHIP 2e SYMPOSIUM 2019 | Oct 2018 - Oct 2018</p>
@@ -536,6 +544,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
+              <Image src="/bgrad.webp" alt="Bridges Graduate School Logo" width={40} height={40} />
               <h3 className="text-2xl font-semibold text-gray-900">Bridges Graduate School of Cognitive Diversity in Education</h3>
               <p className="text-gray-500">M.Ed. Program in Cognitive Diversity | May 2023 - May 2025</p>
               <ul className="list-disc pl-8 text-gray-700">
@@ -554,6 +563,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
+              <Image src="/conn.svg.png" alt="Connecticut College Logo" width={40} height={40} />
               <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
               <p className="text-gray-500">BA, Computer Science and Psychology, Minor in Cognitive Science, Certificate in Arts and Technology from the, Ammerman Center for Arts and Technology | Aug 2017 - May 2021</p>
               <ul className="list-disc pl-8 text-gray-700">
@@ -567,6 +577,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
+              <Image src="/coursera.svg.png" alt="Coursera Logo" width={40} height={40} />
               <h3 className="text-2xl font-semibold text-gray-900">Coursera</h3>
               <p className="text-gray-500">Certificates</p>
               <ul className="list-disc pl-8 text-gray-700">
