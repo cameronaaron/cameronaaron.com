@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-8 bg-gray-100">
       <header className="w-full max-w-5xl mx-auto text-center py-8">
-        <h1 className="text-4xl font-bold mb-2">Cameron E. Aaron</h1>
+        <h1 className="text-4xl font-bold mb-2 text-gray-900">Cameron E. Aaron</h1>
         <p className="text-lg font-mono text-gray-700">Software Engineer &amp; Neuroscientist</p>
       </header>
 
@@ -40,37 +40,37 @@ export default function Home() {
 
       <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 text-center">
         <a href="#about" className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 className="text-xl font-semibold mb-2">About</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900">About</h2>
           <p className="text-sm text-gray-600">Learn about my background and expertise.</p>
         </a>
         <a href="#experience" className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 className="text-xl font-semibold mb-2">Experience</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900">Experience</h2>
           <p className="text-sm text-gray-600">Explore my professional experience and projects.</p>
         </a>
         <a href="#education" className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 className="text-xl font-semibold mb-2">Education</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900">Education</h2>
           <p className="text-sm text-gray-600">See my educational background and qualifications.</p>
         </a>
         <a href="#contact" className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 className="text-xl font-semibold mb-2">Contact</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900">Contact</h2>
           <p className="text-sm text-gray-600">Get in touch with me for collaborations or inquiries.</p>
         </a>
       </nav>
 
       <section id="about" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">About Me</h2>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">About Me</h2>
         <p className="text-lg leading-relaxed text-gray-700">
           I’m Cameron Aaron, a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Over the past six years, I have collaborated with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.
         </p>
       </section>
 
       <section id="experience" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">Professional Experience</h2>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">Professional Experience</h2>
         <div className="space-y-8">
           <div>
             <div className="flex items-center mb-2">
               <Image src="/ba.svg" alt="Bridges Academy Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">Bridges Academy</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">Bridges Academy</h3>
             </div>
             <p className="text-gray-500">Biopsychology Teacher | Jun 2023 - Present</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -97,7 +97,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/Dutchie.svg" alt="Dutchie Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">Dutchie</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">Dutchie</h3>
             </div>
             <p className="text-gray-500">Lead Systems Admin | Aug 2022 - Nov 2022</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -152,7 +152,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/spacex.svg" alt="SpaceX Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">SpaceX</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">SpaceX</h3>
             </div>
             <p className="text-gray-500">Aerospace Medicine, Space Operations | Aug 2020 - Dec 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -168,7 +168,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/github.png" alt="GitHub Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">GitHub</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">GitHub</h3>
             </div>
             <p className="text-gray-500">Software Engineer | Aug 2019 - Jan 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -178,7 +178,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">C19 BayShield</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">C19 BayShield</h3>
             </div>
             <p className="text-gray-500">Backend Team Lead Engineer | Apr 2020 - Sep 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -194,7 +194,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/upkey.svg" alt="Upkey Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">Upkey</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">Upkey</h3>
             </div>
             <p className="text-gray-500">Program Mentor | Jun 2020 - Feb 2021</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -216,7 +216,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">PassionNet</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">PassionNet</h3>
             </div>
             <p className="text-gray-500">Co Director: New Technologies, Data, and Ethics | Jan 2021 - Aug 2021</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -227,7 +227,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">Connecticut College</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
             </div>
             <p className="text-gray-500">Computational Biology and Informatics Researcher | Jan 2020 - May 2021</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -254,7 +254,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/google.svg" alt="Google Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">Google</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">Google</h3>
             </div>
             <p className="text-gray-500">CSSI Section Leader &amp; Student Mentor | Jun 2020 - Sep 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -266,7 +266,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">Helping Hands Community</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">Helping Hands Community</h3>
             </div>
             <p className="text-gray-500">Field Operations Engineering Specialist | Jun 2020 - Sep 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -280,7 +280,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">Nu School</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">Nu School</h3>
             </div>
             <p className="text-gray-500">Technology Fellow | Jul 2020</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -294,7 +294,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/wurrly.jpg" alt="Wurrly Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">Wurrly</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">Wurrly</h3>
             </div>
             <p className="text-gray-500">QA Engineer | May 2015 - Aug 2015</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -305,7 +305,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/ted.png" alt="TED Conferences Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">TED Conferences</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">TED Conferences</h3>
             </div>
             <p className="text-gray-500">Lead Organizer TEDxYouth@NewLondon | Jul 2018 - Dec 2019</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -316,7 +316,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/2e.png" alt="2eNews Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">2eNews</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">2eNews</h3>
             </div>
             <p className="text-gray-500">Variations 2e Article Writer | Dec 2018 - Jun 2019</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -326,7 +326,7 @@ export default function Home() {
 
           <div>
             <div className="flex items-center mb-2">
-              <h3 className="text-2xl font-semibold">Clues Inc.</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">Clues Inc.</h3>
             </div>
             <p className="text-gray-500">Creator | Feb 2017 - 2019</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -337,7 +337,7 @@ export default function Home() {
           <div>
             <div className="flex items-center mb-2">
               <Image src="/ba.svg" alt="The Bridges 2e Center Logo" width={40} height={40} />
-              <h3 className="text-2xl font-semibold ml-4">The Bridges 2e Center for Research and Professional Development</h3>
+              <h3 className="text-2xl font-semibold ml-4 text-gray-900">The Bridges 2e Center for Research and Professional Development</h3>
             </div>
             <p className="text-gray-500">Panelist at VISION & LEADERSHIP 2e SYMPOSIUM 2019 | Oct 2018 - Oct 2018</p>
             <ul className="list-disc pl-8 text-gray-700">
@@ -348,10 +348,10 @@ export default function Home() {
       </section>
 
       <section id="education" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">Education</h2>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">Education</h2>
         <div className="space-y-8">
           <div>
-            <h3 className="text-2xl font-semibold">Bridges Graduate School of Cognitive Diversity in Education</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Bridges Graduate School of Cognitive Diversity in Education</h3>
             <p className="text-gray-500">M.Ed. Program in Cognitive Diversity | May 2023 - May 2025</p>
             <ul className="list-disc pl-8 text-gray-700">
               <li>Focus on development of advanced abilities and areas of challenge in learning, self-regulation, and social skills.</li>
@@ -365,7 +365,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h3 className="text-2xl font-semibold">Connecticut College</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
             <p className="text-gray-500">BA, Computer Science and Psychology, Minor in Cognitive Science | Aug 2017 - May 2021</p>
             <ul className="list-disc pl-8 text-gray-700">
               <li>Research: Mechanisms of attentional processing, Bioinformatics and Computational Biology, Cyber Security and Network Infrastructure, Robotics and Artificial Intelligence </li>
@@ -374,7 +374,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h3 className="text-2xl font-semibold">Coursera</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Coursera</h3>
             <p className="text-gray-500">Certificates</p>
             <ul className="list-disc pl-8 text-gray-700">
               <li>Cloud Engineering with GCP by Google Cloud</li>
@@ -388,84 +388,84 @@ export default function Home() {
       </section>
 
       <section id="honors-awards" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">Honors & Awards</h2>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">Honors & Awards</h2>
         <div className="space-y-8">
           <div>
-            <h3 className="text-xl font-semibold">Bridges Diamond Awards - Doug Lenzini</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Bridges Diamond Awards - Doug Lenzini</h3>
             <p className="text-gray-500">Apr 2010, Apr 2012, Apr 2013</p>
-            <p>A distinction reserved for students who model exemplary year-long commitment and service to the school community.</p>
+            <p className="text-gray-700">A distinction reserved for students who model exemplary year-long commitment and service to the school community.</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold">2020 Impact Labs Fellow</h3>
+            <h3 className="text-xl font-semibold text-gray-900">2020 Impact Labs Fellow</h3>
             <p className="text-gray-500">Jan 2020</p>
-            <p>Award recognizing innovative contributions in technology.</p>
+            <p className="text-gray-700">Award recognizing innovative contributions in technology.</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold">Computer Science Leader - Connecticut College</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Computer Science Leader - Connecticut College</h3>
             <p className="text-gray-500">Aug 2017</p>
-            <p>Leadership role acknowledged at the beginning of academic tenure.</p>
+            <p className="text-gray-700">Leadership role acknowledged at the beginning of academic tenure.</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold">Jacobs Design Award (C19 Bayshield)</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Jacobs Design Award (C19 Bayshield)</h3>
             <p className="text-gray-500">Jun 2020</p>
-            <p>Awarded for leading a team to develop an emergency resource management app, producing over 6300 pieces of PPE.</p>
+            <p className="text-gray-700">Awarded for leading a team to develop an emergency resource management app, producing over 6300 pieces of PPE.</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold">Ammerman Center Bridget Baird Award - Connecticut College</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Ammerman Center Bridget Baird Award - Connecticut College</h3>
             <p className="text-gray-500">Apr 2021</p>
-            <p>Awarded for excellence in research in arts and technology.</p>
+            <p className="text-gray-700">Awarded for excellence in research in arts and technology.</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold">Top Emerging Talent Summer '21 - Pangea.app</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Top Emerging Talent Summer '21 - Pangea.app</h3>
             <p className="text-gray-500">Jun 2021</p>
-            <p>Recognized as one of the most promising recent grads across the globe.</p>
+            <p className="text-gray-700">Recognized as one of the most promising recent grads across the globe.</p>
           </div>
         </div>
       </section>
 
       <section id="testimonials" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">Testimonials</h2>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">Testimonials</h2>
         <div className="space-y-8">
           <div>
-            <p className="text-xl italic">"Cameron is a smart, well-spoken, inquisitive worker who always digs deeper to understand the whys, hows and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee."</p>
+            <p className="text-xl italic text-gray-700">"Cameron is a smart, well-spoken, inquisitive worker who always digs deeper to understand the whys, hows and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee."</p>
             <p className="text-gray-500 mt-2">- Vinicius SantAnna, Former HubSpot and Dutchie</p>
           </div>
 
           <div>
-            <p className="text-xl italic">"Cameron is a highly empathetic and talented Engineer. Cameron is customer-obsessed, an amazing team player and was a wonderful addition to our digital support team. I’d love an opportunity to work with Cameron again."</p>
+            <p className="text-xl italic text-gray-700">"Cameron is a highly empathetic and talented Engineer. Cameron is customer-obsessed, an amazing team player and was a wonderful addition to our digital support team. I’d love an opportunity to work with Cameron again."</p>
             <p className="text-gray-500 mt-2">- Andrea Griffiths PMP CCSK, Senior Product Manager at GitHub</p>
           </div>
 
           <div>
-            <p className="text-xl italic">"Cameron engaged with the career office in his early days as a student at Connecticut College. His intellectual curiosity launched his academic career in computer classes as well as film and literature courses. Cameron has encompassed all aspects of the liberal arts and has been open to learning everything. His ability to think creatively and to be somewhat fearless, has allowed him to draw connections that I don't think the average student would see. As a result, Cameron has been able to secure coveted internship opportunities during his time as a student. I totally expect Cameron to invent or be a part of a team who invents the next best thing! When that happens, I'll be on the sidelines saying, 'I told you!!' I'm so proud of you, Cameron!"</p>
+            <p className="text-xl italic text-gray-700">"Cameron engaged with the career office in his early days as a student at Connecticut College. His intellectual curiosity launched his academic career in computer classes as well as film and literature courses. Cameron has encompassed all aspects of the liberal arts and has been open to learning everything. His ability to think creatively and to be somewhat fearless, has allowed him to draw connections that I don't think the average student would see. As a result, Cameron has been able to secure coveted internship opportunities during his time as a student. I totally expect Cameron to invent or be a part of a team who invents the next best thing! When that happens, I'll be on the sidelines saying, 'I told you!!' I'm so proud of you, Cameron!"</p>
             <p className="text-gray-500 mt-2">- Persephone L. Hall, Dedicated leader in career development</p>
           </div>
 
           <div>
-            <p className="text-xl italic">"Cameron is a wonderful collaborator. He has been an incredible resource for our school. His multi-faceted expertise (pedagogy, tech, and project development) has supported our students and staff immensely."</p>
+            <p className="text-xl italic text-gray-700">"Cameron is a wonderful collaborator. He has been an incredible resource for our school. His multi-faceted expertise (pedagogy, tech, and project development) has supported our students and staff immensely."</p>
             <p className="text-gray-500 mt-2">- JoeAnna McDonald, MA Mathematics</p>
           </div>
 
           <div>
-            <p className="text-xl italic">"Cameron is a passionate and dedicated professional that is a welcomed addition to any team. It's evident he cares about his work, works hard, and gives his all in whatever role he finds himself in."</p>
+            <p className="text-xl italic text-gray-700">"Cameron is a passionate and dedicated professional that is a welcomed addition to any team. It's evident he cares about his work, works hard, and gives his all in whatever role he finds himself in."</p>
             <p className="text-gray-500 mt-2">- Nate Ledbury, Certified Salesforce Administrator</p>
           </div>
 
           <div>
-            <p className="text-xl italic">"Cameron performed cybersecurity research for Connecticut College during his time as an undergrad. His interest in white hat hacking and his ability to find vulnerabilities was an asset to his research. He found several vulnerabilities in our systems by utilizing different tools to detect them while having zero impact on the college's network. His research provided the college with proof of concept of how threat actors could take advantage of some of our vulnerabilities. We were able to make mitigations based on his findings. Cameron is a thorough investigator who likes to understand problems and get to the bottom of a solution. He is easygoing and a joy to work with. I'd recommend him for any position."</p>
+            <p className="text-xl italic text-gray-700">"Cameron performed cybersecurity research for Connecticut College during his time as an undergrad. His interest in white hat hacking and his ability to find vulnerabilities was an asset to his research. He found several vulnerabilities in our systems by utilizing different tools to detect them while having zero impact on the college's network. His research provided the college with proof of concept of how threat actors could take advantage of some of our vulnerabilities. We were able to make mitigations based on his findings. Cameron is a thorough investigator who likes to understand problems and get to the bottom of a solution. He is easygoing and a joy to work with. I'd recommend him for any position."</p>
             <p className="text-gray-500 mt-2">- H. John Schaeffer, CISO and Director of Networks, Servers & Security at Connecticut College</p>
           </div>
         </div>
       </section>
 
       <section id="contact" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
-        <h2 className="text-3xl font-bold mb-4">Contact</h2>
-        <p className="text-xl mb-4">
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">Contact</h2>
+        <p className="text-xl mb-4 text-gray-700">
           Feel free to reach out to me for any inquiries or collaborations:
         </p>
         <ul className="text-lg text-gray-700">
