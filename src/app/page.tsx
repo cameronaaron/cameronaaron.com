@@ -650,81 +650,266 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="testimonials" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
+        <section id="recommendations" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
             className="text-3xl font-bold mb-4 text-gray-900"
           >
-            Testimonials
+            Recommendations
           </motion.h2>
           <div className="space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron is a smart, well-spoken, inquisitive worker who always digs deeper to understand the whys, hows, and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee."
-              </p>
-              <p className="text-gray-500 mt-2">- Vinicius SantAnna, Former HubSpot and Dutchie</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron is a highly empathetic and talented Engineer. Cameron is customer-obsessed, an amazing team player and was a wonderful addition to our digital support team. I’d love an opportunity to work with Cameron again."
-              </p>
-              <p className="text-gray-500 mt-2">- Andrea Griffiths PMP CCSK, Senior Product Manager at GitHub</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron engaged with the career office in his early days as a student at Connecticut College. His intellectual curiosity launched his academic career in computer classes as well as film and literature courses. Cameron has encompassed all aspects of the liberal arts and has been open to learning everything. His ability to think creatively and to be somewhat fearless, has allowed him to draw connections that I don't think the average student would see. As a result, Cameron has been able to secure coveted internship opportunities during his time as a student. I totally expect Cameron to invent or be a part of a team who invents the next best thing! When that happens, I'll be on the sidelines saying, 'I told you!!' I'm so proud of you, Cameron!"
-              </p>
-              <p className="text-gray-500 mt-2">- Persephone L. Hall, Dedicated leader in career development</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron is a wonderful collaborator. He has been an incredible resource for our school. His multi-faceted expertise (pedagogy, tech, and project development) has supported our students and staff immensely."
-              </p>
-              <p className="text-gray-500 mt-2">- JoeAnna McDonald, MA Mathematics</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron is a passionate and dedicated professional that is a welcomed addition to any team. It's evident he cares about his work, works hard, and gives his all in whatever role he finds himself in."
-              </p>
-              <p className="text-gray-500 mt-2">- Nate Ledbury, Certified Salesforce Administrator</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <p className="text-xl italic text-gray-700">
-                "Cameron performed cybersecurity research for Connecticut College during his time as an undergrad. His interest in white hat hacking and his ability to find vulnerabilities was an asset to his research. He found several vulnerabilities in our systems by utilizing different tools to detect them while having zero impact on the college's network. His research provided the college with proof of concept of how threat actors could take advantage of some of our vulnerabilities. We were able to make mitigations based on his findings. Cameron is a thorough investigator who likes to understand problems and get to the bottom of a solution. He is easygoing and a joy to work with. I'd recommend him for any position."
-              </p>
-              <p className="text-gray-500 mt-2">- H. John Schaeffer, CISO and Director of Networks, Servers & Security at Connecticut College</p>
-            </motion.div>
+            {[
+              {
+                name: "JoeAnna McDonald",
+                title: "MA Mathematics",
+                date: "March 21, 2024",
+                connection: "JoeAnna worked with Cameron on the same team",
+                recommendation: "Cameron is a wonderful collaborator. He has been an incredible resource for our school. His multi-faceted expertise (pedagogy, tech, and project development) has supported our students and staff immensely."
+              },
+              {
+                name: "Nate Ledbury",
+                title: "CRM Admin at Boston Museum of Science | Certified Salesforce Administrator",
+                date: "February 22, 2024",
+                connection: "Nate worked with Cameron on the same team",
+                recommendation: "Cameron is a passionate and dedicated professional that is a welcomed addition to any team. Its evident he cares about his work, works hard, and gives his all in whatever role he finds himself in."
+              },
+              {
+                name: "H. John Schaeffer",
+                title: "CISO and Director of Networks, Servers & Security at Connecticut College",
+                date: "February 9, 2024",
+                connection: "H. John managed Cameron directly",
+                recommendation: "Cameron performed cybersecurity research for Connecticut College during his time as an undergrad. His interest in white hat hacking and his ability to find vulnerabilities was an asset to his research. He found several vulnerabilities in our systems by utilizing different tools to detect them while having zero impact on the college's network. His research provided the college with proof of concept of how threat actors could take advantage of some of our vulnerabilities. We were able to make mitigations based on his findings. Cameron is a thorough investigator who likes to understand problems and get to the bottom of a solution. He is easygoing and a joy to work with. I'd recommend him for any position."
+              },
+              {
+                name: "Rose East",
+                title: "Customer support professional focused on building supportive and collaborative communities.",
+                date: "January 29, 2024",
+                connection: "Rose was senior to Cameron but didn't manage Cameron directly",
+                recommendation: "Cameron is enthusiastic and persistent. He has a lot of energy and curiosity and the drive to follow it up."
+              },
+              {
+                name: "Krystle Scott",
+                title: "Voice Actor | Narrator | Analyst | Salesforce Administrator | Support Engineer",
+                date: "January 24, 2024",
+                connection: "Krystle worked with Cameron on the same team",
+                recommendation: "Cameron did a phenomenal job with sourcing information across several teams in preparation for onboarding new members of the community forum team at GitHub. He consistently offered novel solutions to issues arising during policy changes and new feature roll out. He has a knack for smoothly connecting objective and introspective observations in collaborative environments."
+              },
+              {
+                name: "Vinicius SantAnna",
+                title: "Former HubSpot and Dutchie",
+                date: "March 29, 2023",
+                connection: "Vinicius was senior to Cameron but didn't manage Cameron directly",
+                recommendation: "Cameron is a smart, well spoken, inquisitive worker who always digs deeper to understand the whys, hows and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee."
+              },
+              {
+                name: "Sean Hastings",
+                title: "Information Security @ Dutchie",
+                date: "November 7, 2022",
+                connection: "Sean worked with Cameron on the same team",
+                recommendation: "Cameron is an exceptional security-minded business applications expert. I consistently leaned on Cameron not only for his subject matter expertise and technical skills, but also his vision for securing the organization's most critical systems and applications. Cameron is a professional who is always looking forward to determine how solutions can be made more secure and more efficient, and he was an immensely helpful ally of the security team. I hope to be granted the privilege of working with Cameron again in the future!"
+              },
+              {
+                name: "Ashley Pinales",
+                title: "Latina in Tech | WFM People Leader | ex Grubhub, Wayfair",
+                date: "November 6, 2022",
+                connection: "Ashley was senior to Cameron but didn't manage Cameron directly",
+                recommendation: "I could always count on Cameron to address issues that happened with our systems quickly and make sure they never happen again. Cameron's passion for technology is evident in his work and was demonstrated on a daily basis. He would research new ways for us to use the systems we had and discovered new ways to utilize the data we had to the fullest. I'll greatly miss working with him, but he would be an excellent asset to have on a team where creative problem-solving is revered."
+              },
+              {
+                name: "Darin Mellor",
+                title: "Project Manager armed with decades of experience in tech, and fueled by the desire to leave things better than they are found.",
+                date: "November 4, 2022",
+                connection: "Darin worked with Cameron but on different teams",
+                recommendation: "Cameron is a highly motivated, passionate, and a hard working human. In my experience working with him he slayed any challenge he was given. He helped bring together three support organizations and set the foundation for our success. I consider myself lucky to have worked with and learned from Cameron. I know he will be beyond successful at anything he does."
+              },
+              {
+                name: "Michael Gombos",
+                title: "Infrastructure Guy",
+                date: "July 11, 2022",
+                connection: "Michael worked with Cameron but on different teams",
+                recommendation: "Cameron is an exceptionally security minded employee at Dutchie. He has been a security champion for the support team. His proactive recommendations have helped security for the company as a whole."
+              },
+              {
+                name: "Justin Hurst",
+                title: "Dutchie Hardware and Product Support III",
+                date: "July 7, 2022",
+                connection: "Justin worked with Cameron on the same team",
+                recommendation: "Cameron is a passionate, intelligent, and overall great person to add to any team."
+              },
+              {
+                name: "KT Ellis",
+                title: "#OpenToWork | OIT #over-40 Leadership | BRMP®",
+                date: "July 6, 2022",
+                connection: "KT worked with Cameron on the same team",
+                recommendation: "I've only been working with Cameron for a couple months, but his passion for his work was evident on day one! When he attacks a problem, he comes at it from every angle possible, often in new and unique ways than the rest of the team. He shares ways for the company to improve even when they aren't in his natural swim lane. He's smart, dedicated, and really great guy to boot!"
+              },
+              {
+                name: "Diane Walter",
+                title: "Director of Marketing and Communications at 412 Food Rescue",
+                date: "May 28, 2022",
+                connection: "Diane worked with Cameron but they were at different companies",
+                recommendation: "Cameron is a force of good in this world. As a senior-level Product Expert for Google Fi, he volunteers his empathy and expertise to assist users on a variety of platforms. His deep product knowledge, creative solutioning, and user-driven insights make him a valued part of the Fi family. He's also a stand-up guy who's just plain fun to interact with."
+              },
+              {
+                name: "Raymond Martinez",
+                title: "Customer Experience Leader | Project Manager",
+                date: "April 25, 2022",
+                connection: "Raymond was senior to Cameron but didn't manage Cameron directly",
+                recommendation: "Cameron is a great collaborator and team player. He's someone who goes out of his way to ensure and confirm understanding with others when asked for assistance leaving no stone unturned. Cameron has been vital to my onboarding at Dutchie helping me understand some of our more complex CS systems. He constantly displays his professionalism when working with others to ensure the best and most informed outcome for our team."
+              },
+              {
+                name: "Kate Berezo",
+                title: "Community Engagement Director at Thrive Scholars | Driving Social Impact with Top Industry Leaders",
+                date: "July 1, 2021",
+                connection: "Kate managed Cameron directly",
+                recommendation: "Cameron is a one of the most talented and dedicated mentors I've had to privilege of working with in my career. His positive attitude and passion for all things STEM is infectious. I'm forever grateful knowing that I can count on Cameron to provide support to one of our talented Scholars in both personal and professional development during their college careers and beyond."
+              },
+              {
+                name: "Patricia Cebotari",
+                title: "Software Developer & Manager | Frontend, SQL, React",
+                date: "June 3, 2021",
+                connection: "Patricia managed Cameron directly",
+                recommendation: "Cameron is ridiculously efficient and has always been willing and able to take the lead in a team setting. After working with him, it was clear that he is forward-thinking and open to learning and putting research into new ideas and approaches. After working with him through an internship, I was particularly impressed by his ability to apply his past experience to new technologies and approaches at the moment."
+              },
+              {
+                name: "Christine Chung, PhD",
+                title: "Associate Professor of Computer Science at Connecticut College",
+                date: "May 8, 2021",
+                connection: "Christine was Cameron’s teacher",
+                recommendation: "I have known Cameron Aaron since he was a first year at Conn when I was filling in for his Intro CS professor one day, and he made an immediate impression on me as a bright and inquisitive student. Cameron clearly has a special ability to make connections between and across various topics, concepts, and ways of thinking. He also has an infectious charisma that has made him naturally emerge as a leader among our students. Cameron is caring and passionate and always exudes a productive positivity. He would be an asset to any organization. Our department will sorely miss him after he graduates this spring!"
+              },
+              {
+                name: "Karina Sinha",
+                title: "Software Developer at Petricore, Inc",
+                date: "April 29, 2021",
+                connection: "Karina worked with Cameron on the same team",
+                recommendation: "I only worked with Cameron for a few months as part of a summer internship, but those few months told me everything I need to know about his work ethic and personality. He is a hardworking and intelligent computer scientist and researcher who would be an excellent addition to any team. When we worked together at a VR startup, I always found myself pleasantly surprised by his expansive knowledge, attention to detail, and willingness to wear as many hats as needed. Cameron always gives 110%, and with his wide skillset, he has a lot to offer! I highly recommend Cameron to any employer, you won’t regret it!"
+              },
+              {
+                name: "Gwendolyn D'Elia, CPTM",
+                title: "Trainer | Salesforce CRM | Agile | Training Specialist within Higher Ed Advancement",
+                date: "April 29, 2021",
+                connection: "Gwendolyn worked with Cameron on the same team",
+                recommendation: "Cameron engaged with the Office of Advancement enthusiastically during his senior year, jumping in always to be of assistance in a variety of ways. With the utmost professionalism and creativity, Cameron has brought all of his academic and professional success into the realm of Advancement and fundraising with kindness and consideration -- truly encompassing what it means to put 'the liberal arts into action'! I'm so excited to see all of the amazing things that Cameron will do in his future, as I'm convinced he'll move mountains."
+              },
+              {
+                name: "Persephone L. Hall",
+                title: "Dedicated leader in career development committed to building communities that help students grow to be best version of themselves.",
+                date: "April 27, 2021",
+                connection: "Persephone L. was Cameron’s mentor",
+                recommendation: "Cameron engaged with the career office in his early days as a student at Connecticut College. His intellectual curiosity launched his academic career in computer classes as well as film and literature courses. Cameron has encompassed all aspects of the liberal arts and has been open to learning everything. His ability to think creatively and to be somewhat fearless, has allowed him to draw connections that I don't think the average student would see. As a result, Cameron has been able to secure coveted internship opportunities during his time as a student. I totally expect Cameron to invent or be a part of a team who invents the next best thing! When that happens, I'll be on the sidelines saying, 'I told you!!' I'm so proud of you, Cameron!"
+              },
+              {
+                name: "Shalandy Zhang",
+                title: "Software Engineer at Facebook",
+                date: "April 26, 2021",
+                connection: "Shalandy worked with Cameron on the same team",
+                recommendation: "I had the pleasure of working with Cameron at C19 BayShield, where we were developing an app to help distribute 3D-printed PPE during the pandemic. I was inspired by both Cameron's technical knowledge in helping deploy the app to Google Play/iOS as well as his dedication and passion for the mission. Cameron was also a natural in project management, setting clear steps for himself as well as the rest of the engineering team all the while balancing his heavy college coursework. I cannot recommend him enough as I know he would be invaluable in any role and environment he is passionate about."
+              },
+              {
+                name: "Andrea Griffiths PMP CCSK",
+                title: "Senior Product Manager at GitHub",
+                date: "April 20, 2021",
+                connection: "Andrea worked with Cameron on the same team",
+                recommendation: "Cameron is a highly empathetic and talented Engineer. Cameron is customer obsessed, an amazing team player and was a wonderful addition to our digital support team. I’d love an opportunity to work with Cameron again."
+              },
+              {
+                name: "Amy Peck",
+                title: "XR, Spatial Computing & Emerging Tech Strategist (Non-Hype) • CEO-EndeavorXR • Podcast Host-Future Construct • Keynote Speaker • Futurist • Board Member & Advisor • Author Blockchain is the New Black",
+                date: "August 13, 2020",
+                connection: "Amy worked with Cameron but they were at different companies",
+                recommendation: "Cameron is a rock star!!"
+              },
+              {
+                name: "Rethek Kumar",
+                title: "Junior Software Engineer | MAC @ University Of Windsor | FAST Alumni",
+                date: "July 30, 2020",
+                connection: "Rethek worked with Cameron on the same team",
+                recommendation: "Cameron is a critical thinker, always coming up with innovative solutions and a good team-mate, always ready to help and support over any idea, has professionalism and punctuality."
+              },
+              {
+                name: "Anu Kaur",
+                title: "Account Manager | Results-Driven Marketing Manager | SEO, Social Media | Aligning Strategies to Drive Win-Win Outcomes | Social Media Strategist | Strategy",
+                date: "July 27, 2020",
+                connection: "Anu worked with Cameron on the same team",
+                recommendation: "Cameron has been a great teammate, always ready to take up new tasks, ready to help. Loved working together."
+              },
+              {
+                name: "Sara Helin",
+                title: "Product @ Pactio",
+                date: "July 27, 2020",
+                connection: "Sara worked with Cameron on the same team",
+                recommendation: "Cameron was great to work with on our summer project and really took the initiative. Aside from being friendly and organised, he also has broad technical knowledge which helped develop our project. He is an asset to any team."
+              },
+              {
+                name: "Danielle Fernandez",
+                title: "Project Manager",
+                date: "July 27, 2020",
+                connection: "Danielle worked with Cameron on the same team",
+                recommendation: "I’ve had the pleasure of collaborating with Cameron on a project during our fellowship at Nu School. His fresh ideas and perspective, as well as his leadership skills, made virtually working with a team of people who were strangers at first not only easier but also a meaningful learning experience. While our project was short-term, his innovative nature was evident. I have no doubts that Cameron will prove to be a valuable member to any company."
+              },
+              {
+                name: "Dylan Arceneaux",
+                title: "Owner and operator at A9 Designs Prototyping and Fabrication.",
+                date: "July 27, 2020",
+                connection: "Dylan worked with Cameron but on different teams",
+                recommendation: "Having Cameron on our team was like having a shining lighthouse on the coast of a rocky shoreline, we would be absolutely lost without him. It’s been the utmost pleasure working with this highly talent, versatile, and skilled developer who has consistently gone above and beyond for the team. If you were making one right move for your company, it would be to have Cameron on your team."
+              },
+              {
+                name: "Dana Castner",
+                title: "Founder of Choice Tracker, Sr. Product Designer at Able",
+                date: "July 26, 2020",
+                connection: "Dana managed Cameron directly",
+                recommendation: "During a 2 week capstone project for his internship, Cameron was given a very broad and vague engineering problem to solve. He and his team took the provided UX flows and were able to piece together multiple solution options. I was incredibly impressed when we needed to change direction as a team, he was able to suggest a new technical solution, on the spot, and clearly articulate the tradeoffs and benefits it would have on our product development going forward. Over the two weeks, he was wonderful to work with, taking the lead of his team and implementing organizational structure that made it even easier for me to manage. I would definitely recommend working with Cameron if you have the chance!"
+              },
+              {
+                name: "Tina Taleb",
+                title: "Software Engineer",
+                date: "February 7, 2020",
+                connection: "Tina worked with Cameron on the same team",
+                recommendation: "I worked with Cameron at Github for a summer internship. He is undoubtedly intelligent and hard-working. His strong background in CS combined with his interest in other fields made working with him pleasurable and fun! I know he will have a bright future and I wish to work with him again in the future."
+              },
+              {
+                name: "Chris Wiebe",
+                title: "Head of School -- Tree Academy",
+                date: "December 11, 2015",
+                connection: "Chris was Cameron’s mentor",
+                recommendation: "I am currently overseeing Cameron's independent study in computer programming and artificial intelligence. His mastery of programming languages and tools, willingness to pursue outside-the-box design thinking, and ability to resolve inevitable bugs that arise are a testament to his work ethic and immense potential in this field."
+              },
+              {
+                name: "Max Goldberg",
+                title: "Associate Director at Meredith Corporation | Google Ads | Paid Search SEM | Paid Social | Display Advertising | Digital Advertising | Performance Marketing",
+                date: "September 21, 2015",
+                connection: "Max worked with Cameron on the same team",
+                recommendation: "Cameron is an exceptionally talented young man with remarkable communication skills and technical abilities. He is strong in his will and determined in everything he does. His professionalism is constant. As a young man he already has an impressive trajectory, having raised thousands of dollars for his school's robotics team and establishing relationships with big companies in the US and other countries. He has skill in HTML, Javascript, Python, CSS, and C++, and he loves learning new things. He is a valuable asset and worthy of strong professional consideration."
+              },
+              {
+                name: "Amy Peck",
+                title: "XR, Spatial Computing & Emerging Tech Strategist (Non-Hype) • CEO-EndeavorXR • Podcast Host-Future Construct • Keynote Speaker • Futurist • Board Member & Advisor • Author Blockchain is the New Black",
+                date: "September 9, 2015",
+                connection: "Amy worked with Cameron but they were at different companies",
+                recommendation: "Cameron reached out to me when I was at Leap Motion to explore our technology for a school robotics project. I was impressed by his interest in combining several new technologies into what became a very ambitious project. Because Leap Motion was such a small company, it was rare we were able to support such school projects, but we were impressed by Cameron's drive and curiosity - both of which I am sure will serve him well in his future endeavors."
+              },
+              {
+                name: "Kathryn Owen",
+                title: "Marketing | Events | Trade Shows",
+                date: "September 4, 2015",
+                connection: "Kathryn worked with Cameron but they were at different companies",
+                recommendation: "I’ve had the privilege of working with Cameron for the 2013-2014 FIRST season as a sponsor for Mechanical Paradise, FRC Team 4019. Cameron was always punctual with deadlines and tasks given, making the sponsorship process easy to manage. His passion for the FIRST Robotics program and his positive, go-getter attitude are great assets to his team. I highly believe Cameron will take these attributes and succeed in any journey he pursues in his future."
+              }
+            ].map(({ name, title, date, connection, recommendation }) => (
+              <motion.div
+                key={name}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+              >
+                <p className="text-xl italic text-gray-700">"{recommendation}"</p>
+                <p className="text-gray-500 mt-2">- {name}, {title} | {date} | {connection}</p>
+              </motion.div>
+            ))}
           </div>
         </section>
 
