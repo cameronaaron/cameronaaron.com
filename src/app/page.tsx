@@ -115,7 +115,7 @@ export default function Home() {
         </section>
 
         <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 text-center">
-          {['About', 'Experience', 'Education', 'Contact'].map((section, index) => (
+          {['About', 'Experience', 'Education', 'Recommendations', 'Contact'].map((section, index) => (
             <motion.a
               key={section}
               href={`#${section.toLowerCase()}`}
@@ -621,7 +621,10 @@ With over six years of experience in the tech industry, I have consistently deli
 >
   <h3 className="text-xl font-semibold text-gray-900">2eASD grant scholarship - UCONN</h3>
   <p className="text-gray-500">May 2024</p>
-  <p className="text-gray-700">Description of the scholarship.</p>
+  <p className="text-gray-700">I'm thrilled to share that I have been selected as a recipient of the 2eASD grant scholarship for Confratute 2024! This incredible opportunity will allow me to attend the transformative event at the University of Connecticut from July 14th to July 18th, where I will gain invaluable knowledge, skills, and strategies to better support and engage twice-exceptional (2e) students.
+As an educator passionate about meeting the unique needs of 2e learners, I am deeply grateful for this scholarship, which covers my registration, meals, housing, and transportation to and from the event. I'm excited to participate in the keynote and special strand sessions led by renowned experts Sally Reis and Susan Baum, focusing on strength-based pedagogy for 2e students.
+As part of the scholarship requirements, I will be developing a final project that showcases how I plan to implement strength-based strategies to support 2e learners in my educational setting. I look forward to collaborating with fellow educators, sharing ideas, and creating a actionable plan to make a positive impact on the lives of 2e students.
+I want to express my heartfelt thanks to the 2eASD team for this incredible opportunity. I am committed to making the most of this experience and applying the knowledge gained to create a more inclusive and empowering learning environment for all students, especially those who are twice-exceptional.</p>
 </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -674,7 +677,182 @@ With over six years of experience in the tech industry, I have consistently deli
             </motion.div>
           </div>
         </section>
+        <section id="projects" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
+  <motion.h2
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    className="text-3xl font-bold mb-4 text-gray-900"
+  >
+    Projects
+  </motion.h2>
+  <div className="space-y-8">
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://resumechecker.cameronaaron.com/" target="_blank" className="text-blue-500 underline">Resume Feedback Assistant</a></h3>
+      <p className="text-gray-500">Apr 2024 - Present</p>
+      <p className="text-gray-700">Developed an advanced web application using FastAPI that provides actionable advice to improve resumes based on specific job listings. Key features of the application include:</p>
+      <ul className="text-gray-700 list-disc pl-5">
+        <li>File Upload and Text Extraction: Supports PDF and DOCX resume uploads, extracting text using PDFMiner, PyTesseract, and python-docx.</li>
+        <li>AI-Driven Resume Analysis: Utilizes multiple AI providers including OpenAI, Anthropic, and Workers-AI to analyze resumes and job listings, providing tailored optimization advice.</li>
+        <li>Comprehensive Resume Review: Extracts key information from resumes and compares it against job listings to identify strengths, gaps, and areas for improvement.</li>
+        <li>Actionable Advice: Offers clear, concise, and actionable suggestions for enhancing resumes, including highlighting relevant skills, tailoring content to specific jobs, and optimizing format and structure.</li>
+        <li>Robust Error Handling and Logging: Implements aiohttp for API calls with retry strategies and detailed logging using aiologger for monitoring and debugging.</li>
+        <li>User-Friendly Interface: Provides a seamless user experience with file upload and resume analysis capabilities, ensuring easy navigation and clear guidance.</li>
+      </ul>
+      <p className="text-gray-700">This project highlights my skills in Python, FastAPI, asynchronous programming, AI integration, and web development. The application empowers job seekers to create compelling and effective resumes, increasing their chances of securing interviews and job offers.</p>
+    </motion.div>
 
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://resumetosite.cameronaaron.com/" target="_blank" className="text-blue-500 underline">Resume to Personal Web Site Converter</a></h3>
+      <p className="text-gray-500">Apr 2024 - Present</p>
+      <p className="text-gray-700">Developed a sophisticated web application using FastAPI that generates custom Bootstrap websites based on user-uploaded resumes. Key features of the application include:</p>
+      <ul className="text-gray-700 list-disc pl-5">
+        <li>File Upload and Text Extraction: Supports PDF and DOCX resume uploads, extracting text using PDFMiner, PyTesseract, and python-docx.</li>
+        <li>AI-Driven Site Generation: Utilizes multiple AI providers including OpenAI, Anthropic, and Workers-AI to generate HTML, CSS, and JavaScript code for a fully responsive Bootstrap website.</li>
+        <li>Comprehensive Content Parsing: Extracts and incorporates key resume information such as profile summaries, skills, certifications, education, and work experience into the website design.</li>
+        <li>Robust Error Handling and Logging: Implements aiohttp for API calls with retry strategies and detailed logging using aiologger for monitoring and debugging.</li>
+        <li>User-Friendly Interface: Provides a seamless user experience with file upload and site generation capabilities, ensuring easy navigation and clear calls-to-action.</li>
+        <li>Responsive Design: Ensures the generated website is optimized for various devices and screen sizes, providing an excellent user experience across desktop, tablet, and mobile platforms.</li>
+      </ul>
+      <p className="text-gray-700">This project highlights my skills in Python, FastAPI, asynchronous programming, AI integration, and web development. The application empowers users to showcase their professional accomplishments and stand out in their job search or career advancement efforts by providing them with high-quality, custom-built websites.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://slangtranslator.cameronaaron.com" target="_blank" className="text-blue-500 underline">Slangtranslator.com</a></h3>
+      <p className="text-gray-500">Apr 2024 - Present</p>
+      <p className="text-gray-700">Developed a FastAPI-based web application that translates internet slang, colloquialisms, and regional dialects into standard English. Key features of the application include:</p>
+      <ul className="text-gray-700 list-disc pl-5">
+        <li>Internet Slang Translation: Utilizes advanced AI models from OpenAI and Anthropic to translate slang and online lingo into clear, standard English.</li>
+        <li>Contextual Understanding: Provides detailed explanations of the slang, including its meaning, typical usage contexts, and cultural significance.</li>
+        <li>Multi-Provider AI Integration: Leverages multiple AI providers to ensure high-quality translations and comprehensive explanations.</li>
+        <li>User-Friendly Interface: Allows users to input slang terms and receive translations and explanations in a clean, responsive interface.</li>
+        <li>Responsive Design: Ensures the application is accessible and easy to use across various devices and screen sizes.</li>
+      </ul>
+      <p className="text-gray-700">This project showcases my skills in Python, FastAPI, asynchronous programming, AI integration, and web development. The application helps users understand and interpret modern internet slang, making online communication more accessible and comprehensible.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://proofread.cameronaaron.com/" target="_blank" className="text-blue-500 underline">Academic Paper Reviewer/Proof Reader</a></h3>
+      <p className="text-gray-500">Aug 2023 - Present</p>
+      <p className="text-gray-700">Developed a Flask-based web application that provides detailed proofreading and feedback for academic papers using advanced AI models. Key features of the application include:</p>
+      <ul className="text-gray-700 list-disc pl-5">
+        <li>Academic Paper Proofreading: Utilizes OpenAI's GPT-4 to review academic papers, offering corrections and suggestions for grammar, style, clarity, content structure, and citations.</li>
+        <li>Rate Limiting: Implements Flask-Limiter with Redis for efficient rate limiting to prevent abuse, allowing 10 requests per minute.</li>
+        <li>Error Handling and Logging: Includes robust error handling for 404 and 500 errors with detailed logging for effective monitoring and debugging.</li>
+        <li>Automatic Retry Strategy: Uses the Requests library with an automatic retry strategy for handling transient errors in API requests.</li>
+        <li>User-Friendly Interface: Provides an intuitive interface for users to submit their academic papers and receive constructive feedback.</li>
+        <li>Static File Handling: Serves static files like robots.txt efficiently.</li>
+        <li>Scalable Deployment: Configured to run with Gunicorn for scalable deployment, ensuring high performance under load.</li>
+      </ul>
+      <p className="text-gray-700">This project highlights my skills in Python, Flask, API integration, web development, and implementing rate limiting and retry strategies. The application helps users enhance the quality of their academic writing by providing thorough and constructive feedback.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://translate.cameronaaron.com/" target="_blank" className="text-blue-500 underline">Advanced Translation Tool</a></h3>
+      <p className="text-gray-500">Apr 2023 - Present</p>
+      <p className="text-gray-700">Developed an innovative translation application using FastAPI, designed to provide highly accurate and culturally nuanced translations. Key features of the application include:</p>
+      <ul className="text-gray-700 list-disc pl-5">
+        <li>Multilingual Support: Translates text between various languages with a focus on regional dialects and cultural nuances.</li>
+        <li>Formality and Context Sensitivity: Adjusts translations based on formality levels, situational contexts, and specific tones.</li>
+        <li>Gender and Tone Consideration: Incorporates gender-specific language and adjusts the tone to match the emotional and stylistic intent of the original text.</li>
+        <li>Error Handling and Logging: Utilizes aiohttp for robust API communication with retry strategies and comprehensive logging with aiologger.</li>
+        <li>Scalable Architecture: Built with FastAPI for high performance, asynchronous processing, and easy scalability.</li>
+      </ul>
+      <p className="text-gray-700">The translations are not only accurate but also resonate with native speakers on cultural and emotional levels. This project highlights my skills in Python, FastAPI, asynchronous programming, and API integration.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://med.stanford.edu/neurodiversity/SNS2021/Day1.html" target="_blank" className="text-blue-500 underline">Stanford Neurodiversity Summit 2021 Panelist</a></h3>
+      <p className="text-gray-500">Aug 2021 - Present</p>
+      <p className="text-gray-700">Associated with Bridges Academy.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://youtu.be/KQkgt8D0ULQ?si=m6wfwGoNzTrEM7z9" target="_blank" className="text-blue-500 underline">TED ED Talk: Can Machines Be Creative? A Look into Machine Intelligence</a></h3>
+      <p className="text-gray-500">Jan 2015 - Present</p>
+      <p className="text-gray-700">Associated with Bridges Academy. Will Machines take over the world? This is a question that has been in the minds of people everywhere since the dawn of the age of machine. Through the years machines have evolved literally and today we have the capability to create machines that can learn with no human interaction via trial and error not unlike how humans learn and evolve to adaption to our rapidly changing environment. Companies such as google that farm human data as a business model have already implemented this on a mass scale to serve you ads that its neural network hive mind have determined you would like. But what comes next could a simple spam filter AI determine the best way to get rid of spam is to get rid of humans.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://en.wikipedia.org/wiki/Rebound_Rumble" target="_blank" className="text-blue-500 underline">Rebound Rumble</a></h3>
+      <p className="text-gray-500">Jan 2012 - Present</p>
+      <p className="text-gray-700">Associated with FIRST FRC Team 4019. Objective create a Robot that can score goals in basketball hood autonomously.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://conncoll.edu" target="_blank" className="text-blue-500 underline">Machine Learning/Data Mining Project 2: Wrongful conviction data</a></h3>
+      <p className="text-gray-500">Mar 2020</p>
+      <p className="text-gray-700">Associated with Connecticut College.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://conncoll.edu" target="_blank" className="text-blue-500 underline">2019 Connecticut College Network Penetration Test</a></h3>
+      <p className="text-gray-500">Aug 2019 - Dec 2019</p>
+      <p className="text-gray-700">Associated with Connecticut College.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://conncoll.edu" target="_blank" className="text-blue-500 underline">Altruism and Self-esteem</a></h3>
+      <p className="text-gray-500">Aug 2019 - Dec 2019</p>
+      <p className="text-gray-700">Associated with Connecticut College. Conducted a survey-based study to measure the correlation between one's self-esteem and their altruistic tendencies.</p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+    >
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://2esymposium.com/speaker-attendee-biographies-a-f/" target="_blank" className="text-blue-500 underline">Panelist @ VISION & LEADERSHIP 2e SYMPOSIUM 2019</a></h3>
+      <p className="text-gray-500">Oct 2018</p>
+      <p className="text-gray-700">The Bridges 2e Center for Research and Professional Development. Was invited by The Bridges 2e Center for Research and Professional Development to be a Panelist at the VISION & LEADERSHIP 2e SYMPOSIUM 2019.</p>
+    </motion.div>
+  </div>
+</section>
         <section id="recommendations" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
