@@ -1571,14 +1571,14 @@ I want to express my heartfelt thanks to the 2eASD team for this incredible oppo
     </motion.div>
   </div>
 </section>
-        <section id="recommendations" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
+        <section id="testimonials" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
             className="text-3xl font-bold mb-4 text-gray-900"
           >
-            Recommendations
+            testimonials
           </motion.h2>
           <div className="space-y-8">
             {[
