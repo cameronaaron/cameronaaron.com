@@ -145,7 +145,11 @@ export default function Home() {
             transition={{ duration: 1 }}
             className="text-lg leading-relaxed text-gray-700"
           >
-            I’m Cameron Aaron, a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Over the past six years, I have collaborated with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.
+            I'm Cameron Aaron, a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Over the past six years, I have collaborated with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.
+
+As a DevOps Engineer, I've applied my extensive knowledge and skills to create innovative solutions for complex problems across various domains. I am also a recognized Google Product Expert, known for my contributions to the Google community and products.
+
+With over six years of experience in the tech industry, I have consistently delivered high-quality products and services. My passion lies in advancing education and research, particularly at the intersection of AI and cognitive neuroscience. I hold multiple certifications and awards in these fields, along with a double major in Computer Science and Psychology, a minor in Cognitive Science, and a Certificate of Arts and Technology from Connecticut College.
           </motion.p>
         </section>
 
@@ -610,7 +614,15 @@ export default function Home() {
               <p className="text-gray-500">Apr 2010, Apr 2012, Apr 2013</p>
               <p className="text-gray-700">A distinction reserved for students who model exemplary year-long commitment and service to the school community.</p>
             </motion.div>
-
+            <motion.div
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 1 }}
+>
+  <h3 className="text-xl font-semibold text-gray-900">2eASD grant scholarship - UCONN</h3>
+  <p className="text-gray-500">May 2024</p>
+  <p className="text-gray-700">Description of the scholarship.</p>
+</motion.div>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
