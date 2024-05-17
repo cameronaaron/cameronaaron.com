@@ -832,21 +832,23 @@ export default function Home() {
           </motion.div>
         </section>
 
-        <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12 text-center">
-    {['About', 'Experience', 'Education', 'Testimonials', 'Contact'].map((section, index) => (
-        <motion.a
-            key={section}
-            href={`#${section.toLowerCase()}`}
-            className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.2 }}
-        >
-              <h2 className="text-xl font-semibold mb-2 text-gray-900">{section}</h2>
-              <p className="text-sm text-gray-600">Learn about my {section.toLowerCase()}.</p>
-            </motion.a>
-          ))}
-        </nav>
+        <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-12 text-center">
+  {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Blog'].map((section, index) => (
+    <motion.a
+      key={section}
+      href={`#${section.toLowerCase()}`}
+      className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.2 }}
+    >
+      <h2 className="text-xl font-semibold mb-2 text-gray-900">{section}</h2>
+      <p className="text-sm text-gray-600">Learn about my {section.toLowerCase()}.</p>
+    </motion.a>
+  ))}
+</nav>
+
+
 
         <section id="about" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
           <motion.h2
@@ -1313,7 +1315,7 @@ With over six years of experience in the tech industry, I have consistently deli
           </div>
         </section>
 
-        <section id="honors-awards" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
+        <section id="honors & awards" className="w-full max-w-5xl mx-auto mb-12 bg-white p-8 rounded-lg shadow">
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1578,7 +1580,7 @@ I want to express my heartfelt thanks to the 2eASD team for this incredible oppo
             transition={{ duration: 1 }}
             className="text-3xl font-bold mb-4 text-gray-900"
           >
-            testimonials
+            Testimonials
           </motion.h2>
           <div className="space-y-8">
             {[
