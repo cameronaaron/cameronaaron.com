@@ -833,7 +833,7 @@ export default function Home() {
         </section>
 
         <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-12 text-center">
-  {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Blog'].map((section, index) => (
+  {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Projects'].map((section, index) => (
     <motion.a
       key={section}
       href={`#${section.toLowerCase()}`}
