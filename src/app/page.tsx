@@ -832,16 +832,16 @@ export default function Home() {
           </motion.div>
         </section>
 
-        <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 text-center">
-          {['About', 'Experience', 'Education', 'Recommendations', 'Contact'].map((section, index) => (
-            <motion.a
-              key={section}
-              href={`#${section.toLowerCase()}`}
-              className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2 }}
-            >
+        <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12 text-center">
+    {['About', 'Experience', 'Education', 'Testimonials', 'Contact'].map((section, index) => (
+        <motion.a
+            key={section}
+            href={`#${section.toLowerCase()}`}
+            className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2 }}
+        >
               <h2 className="text-xl font-semibold mb-2 text-gray-900">{section}</h2>
               <p className="text-sm text-gray-600">Learn about my {section.toLowerCase()}.</p>
             </motion.a>
