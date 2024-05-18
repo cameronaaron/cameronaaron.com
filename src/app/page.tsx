@@ -4,6 +4,7 @@ import React, { createContext, useContext } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 
 
