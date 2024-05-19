@@ -15,7 +15,7 @@ export default function Home() {
         <title>Cameron E. Aaron - Software Engineer & Neuroscientist</title>
         <meta
           name="description"
-          content="Cameron E. Aaron is a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
+          content="Cameron E. Aaron is a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
         />
         <meta
           name="keywords"
@@ -25,7 +25,7 @@ export default function Home() {
         <meta property="og:title" content="Cameron E. Aaron - Software Engineer & Neuroscientist" />
         <meta
           property="og:description"
-          content="Cameron E. Aaron is a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
+          content="Cameron E. Aaron is a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
         />
         <meta property="og:image" content="/profile.jpg" />
         <meta property="og:url" content="https://cameronaaron.com" />
@@ -35,7 +35,7 @@ export default function Home() {
         <meta name="twitter:title" content="Cameron E. Aaron - Software Engineer & Neuroscientist" />
         <meta
           name="twitter:description"
-          content="Cameron E. Aaron is a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
+          content="Cameron E. Aaron is a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
         />
         <meta name="twitter:image" content="/profile.jpg" />
         <link rel="canonical" href="https://cameronaaron.com" />
@@ -866,7 +866,7 @@ export default function Home() {
             transition={{ duration: 1 }}
             className="text-lg leading-relaxed text-gray-700"
           >
-            I'm Cameron Aaron, a seasoned DevOps Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Over the past six years, I have collaborated with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.
+            I'm Cameron Aaron, a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Over the past six years, I have collaborated with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.
 
 As a DevOps Engineer, I've applied my extensive knowledge and skills to create innovative solutions for complex problems across various domains. I am also a recognized Google Product Expert, known for my contributions to the Google community and products.
 
