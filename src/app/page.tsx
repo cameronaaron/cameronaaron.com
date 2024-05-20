@@ -27,7 +27,7 @@ export default function Home() {
           property="og:description"
           content="Cameron E. Aaron is a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
         />
-        <meta property="og:image" content="/profile.jpg" />
+        <meta property="og:image" content="/profile.webp" />
         <meta property="og:url" content="https://cameronaaron.com" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="cameronaaron.com" />
@@ -37,7 +37,7 @@ export default function Home() {
           name="twitter:description"
           content="Cameron E. Aaron is a seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, software engineering, and aerospace medicine. Explore his professional experience, educational background, and achievements."
         />
-        <meta name="twitter:image" content="/profile.jpg" />
+        <meta name="twitter:image" content="/profile.webp" />
         <link rel="canonical" href="https://cameronaaron.com" />
         <script
     type="application/ld+json"
@@ -47,7 +47,7 @@ export default function Home() {
         "@type": "Person",
         name: "Cameron E. Aaron",
         url: "https://cameronaaron.com",
-        image: "https://cameronaaron.com/profile.jpg",
+        image: "https://cameronaaron.com/profile.webp",
         jobTitle: "Software Engineer & Neuroscientist",
         worksFor: {
           "@type": "Organization",
@@ -809,7 +809,7 @@ export default function Home() {
           >
             <Image
               className="rounded-full"
-              src="/profile.jpg"
+              src="/profile.webp"
               alt="Cameron E. Aaron"
               width={180}
               height={180}
@@ -828,7 +828,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src="/l.png" alt="LinkedIn Logo" width={100} height={24} priority />
+              <Image src="/l.webp" alt="LinkedIn Logo" width={100} height={24} priority />
             </a>
           </motion.div>
         </section>
@@ -891,7 +891,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/ba.png" alt="Bridges Academy Logo" width={40} height={40} />
+                <Image src="/ba.webp" alt="Bridges Academy Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">Bridges Academy</h3>
               </div>
               <p className="text-gray-500">Biopsychology Teacher | Jun 2023 - Present</p>
@@ -983,7 +983,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/spacex.png" alt="SpaceX Logo" width={40} height={40} />
+                <Image src="/spacex.webp" alt="SpaceX Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">SpaceX</h3>
               </div>
               <p className="text-gray-500">Aerospace Medicine, Space Operations | Aug 2020 - Dec 2020</p>
@@ -1004,7 +1004,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/github.png" alt="GitHub Logo" width={40} height={40} />
+                <Image src="/github.webp" alt="GitHub Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">GitHub</h3>
               </div>
               <p className="text-gray-500">Software Engineer | Aug 2019 - Jan 2020</p>
@@ -1020,7 +1020,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/bay.jpg" alt="C19 BayShield" width={40} height={40} />
+              <Image src="/bay.webp" alt="C19 BayShield" width={40} height={40} />
                 <h3 className="text-2xl font-semibold text-gray-900">C19 BayShield</h3>
               </div>
               <p className="text-gray-500">Backend Team Lead Engineer | Apr 2020 - Sep 2020</p>
@@ -1041,7 +1041,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/upkey.jpg" alt="Upkey Logo" width={40} height={40} />
+                <Image src="/upkey.webp" alt="Upkey Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">Upkey</h3>
               </div>
               <p className="text-gray-500">Program Mentor | Jun 2020 - Feb 2021</p>
@@ -1069,7 +1069,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/pass.png" alt="PassionNet" width={40} height={40} />
+              <Image src="/pass.webp" alt="PassionNet" width={40} height={40} />
                 <h3 className="text-2xl font-semibold text-gray-900">PassionNet</h3>
               </div>
               <p className="text-gray-500">Co Director: New Technologies, Data, and Ethics | Jan 2021 - Aug 2021</p>
@@ -1086,7 +1086,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/conn.svg.png" alt="Connecticut College" width={40} height={40} />
+              <Image src="/conn.svg.webp" alt="Connecticut College" width={40} height={40} />
 
                 <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
               </div>
@@ -1119,7 +1119,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/google.png" alt="Google Logo" width={40} height={40} />
+                <Image src="/google.webp" alt="Google Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">Google</h3>
               </div>
               <p className="text-gray-500">CSSI Section Leader &amp; Student Mentor | Jun 2020 - Sep 2020</p>
@@ -1137,7 +1137,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/hhc.png" alt="Helping Hands Community Logo" width={40} height={40} />
+              <Image src="/hhc.webp" alt="Helping Hands Community Logo" width={40} height={40} />
 
                 <h3 className="text-2xl font-semibold text-gray-900">Helping Hands Community</h3>
               </div>
@@ -1158,7 +1158,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/nu.jpg" alt="Nu School Logo" width={40} height={40} />
+              <Image src="/nu.webp" alt="Nu School Logo" width={40} height={40} />
 
                 <h3 className="text-2xl font-semibold text-gray-900">Nu School</h3>
               </div>
@@ -1178,7 +1178,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/wurrly.jpg" alt="Wurrly Logo" width={40} height={40} />
+                <Image src="/wurrly.webp" alt="Wurrly Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">Wurrly</h3>
               </div>
               <p className="text-gray-500">QA Engineer | May 2015 - Aug 2015</p>
@@ -1194,7 +1194,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/ted.png" alt="TED Conferences Logo" width={40} height={40} />
+                <Image src="/ted.webp" alt="TED Conferences Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">TED Conferences</h3>
               </div>
               <p className="text-gray-500">Lead Organizer TEDxYouth@NewLondon | Jul 2018 - Dec 2019</p>
@@ -1210,7 +1210,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/2e.png" alt="2eNews Logo" width={40} height={40} />
+                <Image src="/2e.webp" alt="2eNews Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">2eNews</h3>
               </div>
               <p className="text-gray-500">Variations 2e Article Writer | Dec 2018 - Jun 2019</p>
@@ -1226,7 +1226,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-              <Image src="/ba.png" alt="Bridges Academy Logo" width={40} height={40} />
+              <Image src="/ba.webp" alt="Bridges Academy Logo" width={40} height={40} />
 
                 <h3 className="text-2xl font-semibold text-gray-900">Clues Inc.</h3>
               </div>
@@ -1243,7 +1243,7 @@ With over six years of experience in the tech industry, I have consistently deli
               className="mb-8"
             >
               <div className="flex items-center mb-2">
-                <Image src="/2ecen.png" alt="The Bridges 2e Center Logo" width={40} height={40} />
+                <Image src="/2ecen.webp" alt="The Bridges 2e Center Logo" width={40} height={40} />
                 <h3 className="text-2xl font-semibold ml-4 text-gray-900">The Bridges 2e Center for Research and Professional Development</h3>
               </div>
               <p className="text-gray-500">Panelist at VISION & LEADERSHIP 2e SYMPOSIUM 2019 | Oct 2018 - Oct 2018</p>
@@ -1288,7 +1288,7 @@ With over six years of experience in the tech industry, I have consistently deli
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
-              <Image src="/conn.svg.png" alt="Connecticut College Logo" width={40} height={40} />
+              <Image src="/conn.svg.webp" alt="Connecticut College Logo" width={40} height={40} />
               <h3 className="text-2xl font-semibold text-gray-900">Connecticut College</h3>
               <p className="text-gray-500">BA, Computer Science and Psychology, Minor in Cognitive Science, Certificate in Arts and Technology from the, Ammerman Center for Arts and Technology | Aug 2017 - May 2021</p>
               <ul className="list-disc pl-8 text-gray-700">
@@ -1302,7 +1302,7 @@ With over six years of experience in the tech industry, I have consistently deli
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
-              <Image src="/coursera.svg.png" alt="Coursera Logo" width={40} height={40} />
+              <Image src="/coursera.svg.webp" alt="Coursera Logo" width={40} height={40} />
               <h3 className="text-2xl font-semibold text-gray-900">Coursera</h3>
               <p className="text-gray-500">Certificates</p>
               <ul className="list-disc pl-8 text-gray-700">
