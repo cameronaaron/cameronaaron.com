@@ -1538,9 +1538,10 @@ I want to express my heartfelt thanks to the 2eASD team for this incredible oppo
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
     >
-      <h3 className="text-xl font-semibold text-gray-900"><a href="https://conncoll.edu" target="_blank" className="text-blue-700 underline">Machine Learning/Data Mining Project 2: Wrongful conviction data</a></h3>
-      <p className="text-gray-600">Mar 2020</p>
-      <p className="text-gray-800">Associated with Connecticut College.</p>
+      <h3 className="text-xl font-semibold text-gray-900"><a href="https://www.conncoll.edu/academics/internships-student-research/student-research-projects/genetic-reflexions-a-magic-mirror-that-displays-genetic-info-about-the-person-with-their-reflection.html" target="_blank" className="text-blue-700 underline">“Genetic RefleXions,” a magic mirror that displays genetic info about the person with their reflection"</a></h3>
+      <p className="text-gray-600">May 2021</p>
+      <p className="text-gray-600">Recipient of the 2021 Ammerman Center Bridget Baird Award</p>
+      <p className="text-gray-800">Associated with Connecticut College's Ammerman Center for Arts and Technology.</p>
     </motion.div>
 
     <motion.div
@@ -1548,7 +1549,7 @@ I want to express my heartfelt thanks to the 2eASD team for this incredible oppo
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
     >
-      <h3 className="text-xl font-semibold text-gray-900"><a href="https://conncoll.edu" target="_blank" className="text-blue-700 underline">2019 Connecticut College Network Penetration Test</a></h3>
+      <h3 className="text-xl font-semibold text-gray-900"><a href="#" target="_blank" className="text-blue-700 underline">2019 Connecticut College Network Penetration Test</a></h3>
       <p className="text-gray-600">Aug 2019 - Dec 2019</p>
       <p className="text-gray-800">Associated with Connecticut College.</p>
     </motion.div>
