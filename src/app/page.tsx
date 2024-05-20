@@ -813,6 +813,7 @@ export default function Home() {
               alt="Cameron E. Aaron"
               width={180}
               height={180}
+              loading="eager"
               priority
             />
           </motion.div>
