@@ -774,11 +774,103 @@ export default function Home() {
             organization: "Beeper",
             position: "Open Source Contributor",
             dates: "May 2022 - Present"
+          },
+          {
+            "@context": "https://schema.org/",
+            "@type": "WebPage",
+            "name": "Cameron E. Aaron",
+            "speakable": {
+              "@type": "SpeakableSpecification",
+              "xPath": [
+                "/html/head/title",
+                "/html/head/meta[@name='description']/@content"
+              ]
+            },
+            "url": "https://cameronaaron.com"
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "ProfilePage",
+            "dateCreated": "2024-12-23T12:34:00-05:00",
+            "dateModified": "2024-12-26T14:53:00-05:00",
+            "mainEntity": {
+              "@type": "Person",
+              "name": "Cameron E. Aaron",
+              "alternateName": "kamisama",
+              "identifier": "123475623",
+              "interactionStatistic": [
+                {
+                  "@type": "InteractionCounter",
+                  "interactionType": "https://schema.org/FollowAction",
+                  "userInteractionCount": 1
+                },
+                {
+                  "@type": "InteractionCounter",
+                  "interactionType": "https://schema.org/LikeAction",
+                  "userInteractionCount": 5
+                }
+              ],
+              "agentInteractionStatistic": {
+                "@type": "InteractionCounter",
+                "interactionType": "https://schema.org/WriteAction",
+                "userInteractionCount": 2346
+              },
+              "description": "Software Engineer & Neuroscientist",
+              "image": "https://cameronaaron.com/profile.webp",
+              "sameAs": [
+                "https://twitter.com/cameronaaron4",
+                "https://www.linkedin.com/in/kamisama",
+                "mailto:cameronaaron1@gmail.com",
+                "https://github.com/cameronaaron",
+                "https://linktr.ee/cameronaaron",
+                "https://www.facebook.com/cameron.kami.aaron/",
+                "https://instagram.com/cameronaaronofficial",
+                "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
+                "https://soundcloud.com/cameron-aaron",
+                "https://medium.com/@cameronaaron",
+                "https://www.reddit.com/u/cameronaaron1"
+              ]
+            }
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "image": "https://cameronaaron.com/profile.webp",
+            "url": "https://cameronaaron.com",
+            "sameAs": [
+              "https://twitter.com/cameronaaron4",
+              "https://www.linkedin.com/in/kamisama",
+              "https://github.com/cameronaaron",
+              "https://linktr.ee/cameronaaron",
+              "https://www.facebook.com/cameron.kami.aaron/",
+              "https://instagram.com/cameronaaronofficial",
+              "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
+              "https://soundcloud.com/cameron-aaron",
+              "https://medium.com/@cameronaaron",
+              "https://www.reddit.com/u/cameronaaron1"
+            ],
+            "logo": "https://cameronaaron.com/profile.webp",
+            "name": "Cameron E. Aaron",
+            "description": "As a DevOps Engineer, Cameron Aaron applies his extensive knowledge and skills in artificial intelligence, neuroscience, software engineering, and aerospace medicine to create innovative solutions for complex problems. He is also a Google Product Expert, recognized for his contributions to the Google community and products. With over six years of experience in the tech industry, Cameron has worked for leading companies such as Dutchie, GitHub, SpaceX, and Microsoft, delivering high-quality products and services in various domains and sectors. He is passionate about advancing education and research, especially at the intersection of AI and cognitive neuroscience. He holds multiple certifications and awards in these fields, as well as a double major in Computer Science and Psychology, a minor in Cognitive Science, and a Certificate of Arts and Technology from Connecticut College.",
+            "email": "cameronaaron1@gmail.com",
+            "telephone": "[redacted-phone]",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "1122 23rd Ave",
+              "addressLocality": "Seattle",
+              "addressCountry": "US",
+              "addressRegion": "WA",
+              "postalCode": "98122"
+            },
+            "vatID": "FR12345678901",
+            "iso6523Code": "0199:724500PMK2A2M1SQQ228"
           }
+          
         ]
       })
     }}
   />
+  
 </Head>
       <main className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
         <header className="w-full max-w-5xl mx-auto text-center py-8">
