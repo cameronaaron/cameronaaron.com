@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
     "framer-motion": "^11.2.6",
     "next": "^15.0.0-rc.0",
     "react": "^19.0.0-rc-935180c7e0-20240524",
     "react-dom": "^19.0.0-rc-935180c7e0-20240524",
-    "sharp": "^0.33.4",
-    "@types/react": "npm:types-react@rc",
-    "@types/react-dom": "npm:types-react-dom@rc"
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
     "@types/node": "^20",
