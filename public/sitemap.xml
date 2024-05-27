@@ -98,5 +98,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  
+  <url>
+    <loc>https://bsd.cameronaaron.com/</loc>
+    <lastmod>2024-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://workshop.cameronaaron.com/</loc>
+    <lastmod>2024-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 
 </urlset>
