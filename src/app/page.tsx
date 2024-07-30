@@ -1,10 +1,9 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-
 
 export default function Home() {
   return (
@@ -184,11 +183,10 @@ export default function Home() {
                   "name": "Bridges Diamond Award for exemplary commitment and service to the school community"
                 }
               ]
-            })
+            }),
           }}
         />
-  
-</Head>
+      </Head>
       <main className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
         <header className="w-full max-w-5xl mx-auto text-center py-8">
           <motion.h1
@@ -244,20 +242,20 @@ export default function Home() {
         </section>
 
         <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-12 text-center">
-  {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Projects'].map((section, index) => (
-    <motion.a
-      key={section}
-      href={`#${section.toLowerCase()}`}
-      className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.2 }}
-    >
-      <h2 className="text-xl font-semibold mb-2 text-gray-900">{section}</h2>
-      <p className="text-sm text-gray-600">Learn about my {section.toLowerCase()}.</p>
-    </motion.a>
-  ))}
-</nav>
+          {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Projects'].map((section, index) => (
+            <motion.a
+              key={section}
+              href={`#${section.toLowerCase()}`}
+              className="group p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.2 }}
+            >
+              <h2 className="text-xl font-semibold mb-2 text-gray-900">{section}</h2>
+              <p className="text-sm text-gray-600">Learn about my {section.toLowerCase()}.</p>
+            </motion.a>
+          ))}
+        </nav>
 
 
 
