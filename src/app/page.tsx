@@ -38,836 +38,137 @@ export default function Home() {
         <meta name="twitter:image" content="/profile.webp" />
         <link rel="canonical" href="https://cameronaaron.com" />
         <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: "Cameron E. Aaron",
-        url: "https://cameronaaron.com",
-        image: "https://cameronaaron.com/profile.webp",
-        jobTitle: "Software Engineer & Neuroscientist",
-        worksFor: {
-          "@type": "Organization",
-          name: "Dutchie, GitHub, SpaceX, Microsoft"
-        },
-        sameAs: [
-          "https://twitter.com/cameronaaron4",
-          "https://www.linkedin.com/in/kamisama",
-          "mailto:cameronaaron1@gmail.com",
-          "https://twitter.com/cameronaaron4",
-          "https://www.linkedin.com/in/kamisama",
-          "https://github.com/cameronaaron",
-          "mailto:cameronaaron1@gmail.com",
-          "https://linktr.ee/cameronaaron",
-          "https://linktr.ee/cameronaaron",
-          "https://www.facebook.com/cameron.kami.aaron/",
-          "https://instagram.com/cameronaaronofficial",
-          "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
-          "https://soundcloud.com/cameron-aaron",
-          "https://www.linkedin.com/in/kamisama/",
-          "https://x.com/CameronAaron4",
-          "https://www.youtube.com/@CameronAaron/videos?sub_confirmation=1",
-          "https://cameronaaron.com/resume.pdf",
-          "https://github.com/cameronaaron",
-          "https://cameronaaron.medium.com/",
-          "https://twitter.com/cameronaaron4?lang=en",
-          "https://www.reddit.com/u/cameronaaron1",
-          "https://medium.com/@cameronaaron/creating-the-perfect-fit-turning-add-into-an-asset-3d9c556fc9d3",
-          "https://medium.com/@cameronaaron/in-december-of-2019-i-was-inducted-as-a-scholar-of-the-ammerman-center-of-arts-and-technology-4349aec810fa",
-          "https://medium.com/@cameronaaron"
-        ],
-        contact: {
-          address: "1122 23rd Ave, Seattle, WA 98122",
-          phone: "[redacted-phone]",
-          email: "cameronaaron1@gmail.com",
-          linkedin: "https://www.linkedin.com/in/kamisama",
-          github: "https://github.com/cameronaaron",
-          linktree: "https://linktr.ee/cameronaaron",
-          blog: "https://cameronaaron.com"
-        },
-        skills: [
-          "Linux",
-          "PHP",
-          "Engineering",
-          "Robotics",
-          "Science",
-          "Penetration Testing",
-          "Computer Science",
-          "Public Relations",
-          "Cloud Computing",
-          "Nonprofits",
-          "Business",
-          "System Administration",
-          "Server Administration",
-          "Website Development",
-          "Program Development",
-          "Artificial Intelligence",
-          "Flash Animation",
-          "MySQL",
-          "Photoshop",
-          "JavaScript",
-          "Computer Hardware",
-          "Advanced CSS",
-          "Adobe Fireworks",
-          "Illustrator",
-          "Solidworks",
-          "Ubuntu",
-          "Open Source",
-          "Perl",
-          "Java",
-          "Ruby",
-          "HTML 5",
-          "XML",
-          "XSLT",
-          "Labview",
-          "C++",
-          "Data Security",
-          "Cryptography",
-          "Computer Security",
-          "Robot Programming",
-          "Swift 3D",
-          "Cloud Security",
-          "IPS",
-          "cPanel",
-          "FTPS",
-          "Ethical Hacker",
-          "Black Box Testing",
-          "Internet Security",
-          "Marketing Communications",
-          "MEAN stack",
-          "Algorithms"
-        ],
-        languages: {
-          Chinese: "Elementary",
-          Spanish: "Elementary",
-          Vietnamese: "Elementary",
-          English: "Native or Bilingual",
-          Korean: "Elementary",
-          Japanese: "Limited Working"
-        },
-        certifications: [
-          "Nu School Summer Fellowship",
-          "Operating Systems and You: Becoming a Power User",
-          "Data Structures",
-          "Google Cloud Platform Fundamentals: Core Infrastructure",
-          "Machine Learning and Artificial Intelligence",
-          "Suite of Tools™",
-          "Bachelors of Arts Psychology and Computer Science",
-          "Foundations of Project Management",
-          "Sexual Harassment in the Workplace",
-          "Algorithms by Stanford University on Coursera",
-          "COVID-19, mRNA, LNP-S, PF, 100 Mcg/0.5 mL Dose (Moderna) 4 doses",
-          "Greedy Algorithms, Minimum Spanning Trees, and Dynamic Programming",
-          "Shortest Paths Revisited, NP-Complete Problems and What To Do About Them",
-          "Graph Search, Shortest Paths, and Data Structures",
-          "Ordained Minister (American Marriage Ministries)",
-          "Ordained Minister (Universal Life Church)",
-          "Google IT Automation Professional Certificate",
-          "AT&T Summer Learning Academy Extern",
-          "Algorithmic Toolbox",
-          "Algorithms on Graphs",
-          "Algorithms on Strings",
-          "COVID-19 Contact Tracing",
-          "Genome Assembly Programming Challenge",
-          "Cyber@ANZ Program",
-          "Software Engineering Virtual Experience (JPMorgan Chase & Co.)",
-          "Automating Real-World Tasks with Python",
-          "G Suite Administration Specialization",
-          "G Suite Mail Management",
-          "G Suite Security",
-          "Google IT Automation with Python Specialization",
-          "Introduction to G Suite",
-          "Managing G Suite",
-          "Configuration Management and the Cloud",
-          "Crash Course on Python",
-          "Introduction to Git and GitHub",
-          "Troubleshooting and Debugging Techniques",
-          "Using Python to Interact with the Operating System",
-          "Cloud Engineering with GCP Specialization",
-          "Divide and Conquer, Sorting and Searching, and Randomized Algorithms",
-          "Google IT Support Specialization",
-          "IT Security: Defense against the digital dark arts",
-          "Operating Systems and You: Becoming a Power User",
-          "Preparing for the Google Cloud Associate Cloud Engineer Exam",
-          "System Administration and IT Infrastructure Services",
-          "Technical Support Fundamentals",
-          "The Bits and Bytes of Computer Networking",
-          "Architecting with Google Compute Engine Specialization",
-          "Elastic Cloud Infrastructure: Scaling and Automation",
-          "Essential Cloud Infrastructure: Core Services",
-          "Essential Cloud Infrastructure: Foundation",
-          "Fundamentals of Digital Marketing",
-          "Google Cloud Platform Fundamentals: Core Infrastructure",
-          "Reliable Cloud Infrastructure: Design and Process",
-          "Student Support Network- Advanced",
-          "Social & Behavioral Research",
-          "Crisis Counselor",
-          "Student Support Network",
-          "Green Dot",
-          "Arts and Technology",
-          "Protecting Human Research Participants",
-          "Young Expert Certification in Artificial Intelligence and Neural Networks",
-          "Badge Certification in Neural Networks",
-          "Machine Learning and Artificial Intelligence",
-          "GOLD Initiative Introduction to Machine Shop",
-          "BLS for Healthcare Providers"
-        ],
-        honorsAwards: [
-          "Bridges Diamond Awards",
-          "Caught in the Act Award",
-          "Science Leaders",
-          "Term Honor: Dean's List (Bridges Graduate School of Cognitive Diversity in Education)",
-          "Bridget Baird Award (Ammerman Center for Arts and Technology)"
-        ],
-        publications: [
-          "Finding the perfect Fit: The 2e-Friendly Workplace",
-          "Lapses in sustained attention predicted by changes in visually-guided movements",
-          "Stanford Neurodiversity Summit 2021 Panelist",
-          "Vision Sciences Society Annual Meeting Abstract"
-        ],
-        summary: "As a DevOps Engineer, Cameron Aaron applies his extensive knowledge and skills in artificial intelligence, neuroscience, software engineering, and aerospace medicine to create innovative solutions for complex problems. He is also a Google Product Expert, recognized for his contributions to the Google community and products. With over six years of experience in the tech industry, Cameron has worked for leading companies such as Dutchie, GitHub, SpaceX, and Microsoft, delivering high-quality products and services in various domains and sectors. He is passionate about advancing education and research, especially at the intersection of AI and cognitive neuroscience. He holds multiple certifications and awards in these fields, as well as a double major in Computer Science and Psychology, a minor in Cognitive Science, and a Certificate of Arts and Technology from Connecticut College.",
-        education: [
-          {
-            institution: "Bridges Graduate School of Cognitive Diversity in Education",
-            degree: "M.Ed. Program in Cognitive Diversity, Education",
-            dates: "May 2023 - May 2025",
-            activities: [
-              "CDL 511 - Introduction to Cognitively Diverse Minds: A World of Learning Differences",
-              "CDL 512 - Conceptions of Giftedness: From Theory to Practice",
-              "CDL 513 - Complexities of Twice Exceptionality",
-              "IEC 511 - Cognitive Diversity and Strength-Based, Talent-Focused Education",
-              "EXA 511 - Practicum",
-              "IEC 621 - Foundations of Creativity",
-              "RES 621 - Methods and Techniques of Educational Research",
-              "IEC 622 Innovative Uses for Technology",
-              "CAP 622 Capstone Action Research Project",
-              "CDL 623 Social and Emotional Diversity"
-            ],
-            honor: "Dean's List"
-          },
-          {
-            institution: "Bridges Graduate School of Cognitive Diversity in Education",
-            degree: "Certificate in Twice Exceptional Education",
-            dates: "August 2023 - June 2024",
-            activities: [
-              "CDL 511 - Introduction to Cognitively Diverse Minds: A World of Learning Differences",
-              "CDL 512 - Conceptions of Giftedness: From Theory to Practice",
-              "CDL 513 - Complexities of Twice Exceptionality",
-              "IEC 511 - Cognitive Diversity and Strength-Based, Talent-Focused Education",
-              "EXA 511 - Practicum"
-            ],
-            honor: "Dean's List"
-          },
-          {
-            institution: "Connecticut College",
-            degree: "Bachelor's degree, Computer Science",
-            dates: "August 2017 - May 2021",
-            activities: [
-              "Office for Sexual Violence Prevention and Victim Advocacy Safety Net",
-              "Unity House Big Sib",
-              "Honor Council",
-              "Junior Class Student Activities Council Representative",
-              "Science Leader",
-              "Computer Science leader",
-              "House Senator (Student Government Association)",
-              "Science Leader Student advisory board member",
-              "Human Development SAB",
-              "Knowlton House senator"
-            ],
-            advisers: [
-              "Professor Dr. Gary Parker",
-              "Professor Dr. Stephen Douglass"
-            ],
-            projects: [
-              {
-                title: "Predatory and Prey Behavior Modifying MIP Robots",
-                description: "MIP robots, sold by the company WowWee, are self-balancing toys equipped with multiple sensors. The objective of this project is to hack these robots so that we can develop our own controllers that take in the sensory data and make decisions as to what the robot is to do next. Our first program used the robot’s distance sensors to program a wall-following robot."
-              }
-            ]
-          },
-          {
-            institution: "Connecticut College",
-            degree: "Bachelor's degree, Psychology",
-            dates: "August 2017 - May 2021",
-            activities: [
-              "Office for Sexual Violence Prevention and Victim Advocacy Safety Net",
-              "Unity House Big Sib",
-              "Honor Council",
-              "Junior Class Student Activities Council Representative",
-              "Science Leader",
-              "Computer Science leader",
-              "House Senator (Student Government Association)",
-              "Science Leader Student advisory board member",
-              "Human Development SAB",
-              "Knowlton House senator"
-            ],
-            adviser: "Professor Dr. Joseph A. Schroeder",
-            projects: [
-              {
-                title: "Lapses in sustained attention predicted by changes in visually-guided movements",
-                description: "Studied complex behavior to uncover sensitive measures that indicate when a person is losing focus during a sustained attention task. Found significant differences in movement initiation latency preceding commission errors on no-go trials."
-              }
-            ]
-          },
-          {
-            institution: "Connecticut College",
-            degree: "Minor, Cognitive Science",
-            dates: "August 2017 - May 2021",
-            activities: [
-              "Office for Sexual Violence Prevention and Victim Advocacy Safety Net",
-              "Unity House Big Sib",
-              "Honor Council",
-              "Junior Class Student Activities Council Representative",
-              "Science Leader",
-              "Computer Science leader",
-              "House Senator (Student Government Association)",
-              "Science Leader Student advisory board member",
-              "Human Development SAB",
-              "Knowlton House senator"
-            ],
-            dean: "Dr. Jefferson A. Singer"
-          },
-          {
-            institution: "Ammerman Center for Arts and Technology",
-            program: "Certificate Program",
-            dates: "August 2018 - May 2021",
-            activities: [
-              "Office for Sexual Violence Prevention and Victim Advocacy Safety Net",
-              "Unity House Big Sib",
-              "Honor Council",
-              "Junior Class Student Activities Council Representative",
-              "Science Leader",
-              "Computer Science leader",
-              "House Senator (Student Government Association)",
-              "Science Leader Student advisory board member",
-              "Human Development SAB",
-              "Knowlton House senator"
-            ],
-            adviser: "Professor Dr. Stephen Douglass",
-            projects: [
-              {
-                title: "Genetic RefleXions",
-                description: "Created a magic mirror that displays genetic info about the person with their reflection. This project aimed to give the person insight into their genes, providing them with a new perspective on who they are and boosting their self-perception."
-              }
-            ],
-            awards: [
-              "Recipient of the 2021 Ammerman Center Bridget Baird Award for excellence in research in arts and technology."
-            ]
-          },
-          {
-            institution: "Trinity Christian College",
-            program: "Business/Corporate Communications",
-            dates: "May 2020 - July 2020",
-            grade: "A",
-            courses: [
-              "BUS201, Business Leadership and Entrepreneurship"
-            ]
-          },
-          {
-            institution: "Bridges Academy",
-            program: "High School, Mechatronics, Robotics, and Automation Engineering and Science",
-            dates: "2009 - 2017",
-            activities: [
-              "Robotics Team",
-              "Debate Team",
-              "Key Club",
-              "Student Council"
-            ]
-          },
-          {
-            institution: "California State University, Northridge",
-            program: "Psychology",
-            dates: "December 2020 - January 2021",
-            grade: "A",
-            courses: [
-              "PSY 345. Social Psychology (3)"
-            ]
-          },
-          {
-            institution: "University of Massachusetts Amherst",
-            program: "Psychology",
-            dates: "December 2020 - January 2021",
-            grade: "A",
-            courses: [
-              "PSYCH 350 - Developmental Psychology (3)"
-            ]
-          },
-          {
-            institution: "Shepherd of the Valley Lutheran School",
-            program: "Elementary School, Grade 3-4",
-            dates: "August 2006 - May 2008"
-          }
-        ],
-        experience: [
-          {
-            company: "Bridges Academy",
-            positions: [
-              {
-                title: "Biopsychology Teacher",
-                dates: "June 2023 - Present",
-                location: "Seattle, Washington, United States",
-                description: "Develop and implement a comprehensive biopsychology curriculum for gifted students."
-              },
-              {
-                title: "Director of Information Technology Engineering",
-                dates: "March 2023 - Present",
-                location: "Seattle, Washington, United States",
-                description: "Spearheaded the establishment and management of the entire IT infrastructure at Bridges Academy School, demonstrating comprehensive knowledge of hardware, software, and network systems. Implemented an integrated IT sec program to protect the school's data and systems, utilizing state-of-the-art security protocols and standards."
-              },
-              {
-                title: "Engineering Teacher",
-                dates: "March 2023 - Present",
-                location: "Seattle, Washington, United States",
-                description: "Develop and implement a comprehensive software engineering curriculum, emphasizing both theory and practical application, for gifted students at Bridges Academy School in Seattle."
-              },
-              {
-                title: "Gifted Education Teacher",
-                dates: "November 2022 - April 2023",
-                location: "United States",
-                description: "Plan and execute a comprehensive and differentiated curriculum for gifted students based on individual strengths, interests, and abilities, aligning with the school's overall educational goals and standards."
-              },
-              {
-                title: "Safety Team",
-                dates: "August 2023 - Present",
-                location: "Seattle, Washington, United States",
-                description: "Part of the Safety Team ensuring the safety and security of the school environment."
-              }
-            ]
-          },
-          {
-            company: "Dutchie",
-            positions: [
-              {
-                title: "Lead Systems Admin",
-                dates: "August 2022 - November 2022",
-                location: "Los Angeles Metropolitan Area",
-                description: "Identify, diagnose, and report technical problems. This includes escalating and tracking problems appropriately. Root cause analysis is essential."
-              },
-              {
-                title: "Lead Support Systems Analyst",
-                dates: "February 2022 - August 2022",
-                location: "Bend, Oregon, United States",
-                description: "Develop thorough, professionally documented, data-driven systems-related projects including migrations and large overhauls or changes. Identify data trends displaying systems needs to determine and develop prioritized goals for the Support team."
-              },
-              {
-                title: "Project Manager",
-                dates: "August 2021 - February 2022",
-                location: "Bend, Oregon, United States",
-                description: "Develop thorough, professionally documented, data-driven projects. Analyze team data to determine team necessities and develop prioritized goals."
-              },
-              {
-                title: "Product Support Specialist (Tier ll), Customer Success",
-                dates: "July 2021 - August 2021",
-                location: "Los Angeles County, California, United States",
-                description: "Explain workflows and product configuration with customers. Troubleshoot and write bugs for unexpected behavior for Engineering."
-              }
-            ]
-          },
-          {
-            company: "GitHub",
-            positions: [
-              {
-                title: "Software Engineer, Support Operations",
-                dates: "August 2019 - January 2020",
-                location: "San Francisco Bay Area",
-                description: "Defining and streamlining processes and workflows. Building tools to help make delivering support easier. Providing education and training to customer support agents."
-              },
-              {
-                title: "Community Support and Customer Success Engineering",
-                dates: "June 2019 - August 2019",
-                location: "San Francisco, California",
-                description: "An interdisciplinary role that involves machine learning. Work with cross-functional stakeholders in Operations, Product, Engineering, and Legal to support product launches."
-              }
-            ]
-          },
-          {
-            company: "SpaceX",
-            positions: [
-              {
-                title: "Aerospace Medicine, Space Operations",
-                dates: "August 2020 - December 2020",
-                location: "Hawthorne, California, United States",
-                description: "Assist with SpaceX’s COVID response to keep employees and crewmembers safe while keeping operations running. Collaborate with academic institutions and/or private organizations on medical research."
-              }
-            ]
-          },
-          {
-            company: "Microsoft",
-            positions: [
-              {
-                title: "Support Operations Engineer",
-                dates: "August 2019 - January 2020",
-                location: "San Francisco Bay Area",
-                description: "Worked with cross-functional stakeholders in Operations, Product, Engineering, and Legal to support product launches. Developed and executed support strategies that align with product goals."
-              }
-            ]
-          },
-          {
-            company: "TED Conferences",
-            positions: [
-              {
-                title: "Lead Organizer TEDxYouth@NewLondon and Head of special events in the Connecticut College TEDx club",
-                dates: "July 2018 - December 2019",
-                location: "New London/Norwich, Connecticut Area",
-                description: "Spearheads TEDxYouth@New London. Brainstormed new events for the club. Manages community service."
-              },
-              {
-                title: "TED-Ed Clubs Regional Leader: New London",
-                dates: "September 2017 - December 2019",
-                location: "New London/Norwich, Connecticut Area",
-                description: "Was the go-to person for local TED-Ed clubs appointed by the TED-Ed team. Taught public speaking techniques to students aged 12 to 14. Managed the communications with TED-Ed's central office."
-              }
-            ]
-          },
-          {
-            company: "Sibyl Systems",
-            positions: [
-              {
-                title: "Founder and CEO",
-                dates: "August 2015 - December 2019",
-                location: "Studio City",
-                description: "Founded a startup because AI and Machine intelligence can help close the technological gap and allow us to overcome modern-day technical hurdles to make our daily lives more efficient. Wanted to create generalizable intelligence using reinforcement learning and neural networks to help people and create a better future."
-              }
-            ]
-          },
-          {
-            company: "2eNews",
-            positions: [
-              {
-                title: "Variations 2e Article Writer",
-                dates: "December 2018 - June 2019",
-                location: "Studio City",
-                description: "Wrote an article for the Variations 2E magazine (Issue 2 (Spring 2019): The 2e-Friendly Workplace) about 2E in the workplace. This took up 4 pages in the magazine and was read by people around the world."
-              }
-            ]
-          },
-          {
-            company: "Clues Inc. Comic Books",
-            positions: [
-              {
-                title: "Creator",
-                dates: "February 2017 - 2019",
-                location: "Greater Los Angeles Area",
-                description: "Created a comic book to spread awareness and promote the positive side of having learning disabilities."
-              }
-            ]
-          },
-          {
-            company: "4me",
-            positions: [
-              {
-                title: "DevOps Engineer",
-                dates: "Present",
-                description: "Endorsed by Paul Reiber and 3 others who are highly skilled at this."
-              }
-            ]
-          },
-          {
-            company: "Upkey",
-            positions: [
-              {
-                title: "DevOps Engineer",
-                dates: "Present",
-                description: "Endorsed by 4 colleagues."
-              }
-            ]
-          }
-        ],
-        volunteering: [
-          {
-            organization: "New London Public Schools",
-            position: "DIEI Program Mentor",
-            dates: "March 2021 - May 2021",
-            description: "Support New London High School Juniors to help them achieve academic, career, and self-developmental success. Serve as a tutor and mentor to provide guidance through facilitating community engagement with the students."
-          },
-          {
-            organization: "Verily Life Sciences",
-            position: "Project Baseline Volunteer",
-            dates: "June 2017 - Present",
-            description: "Health"
-          },
-          {
-            organization: "TED Conferences",
-            position: "TED-Ed Clubs Council Member",
-            dates: "December 2016 - January 2022",
-            description: "A member of an elite group of youth idea-advocates, leadership-champions and voice-amplifiers."
-          },
-          {
-            organization: "Google",
-            positions: [
-              {
-                title: "Product Expert - Project Fi and Pixel",
-                dates: "August 2016 - Present",
-                description: "Assist users on the Project Fi Google Product Forum."
-              },
-              {
-                title: "Google Community Translator- Japanese",
-                dates: "January 2015 - Present",
-                description: "Science and Technology"
-              },
-              {
-                title: "Crowdsourced Contributor",
-                dates: "January 2013 - Present",
-                description: "Science and Technology"
-              },
-              {
-                title: "Made by Google insider",
-                dates: "January 2010 - Present",
-                description: "Science and Technology"
-              }
-            ]
-          },
-          {
-            organization: "Various Non Profit organizations",
-            position: "Promoting STEMS In Schools",
-            dates: "January 2012 - May 2017",
-            description: "Science and Technology"
-          },
-          {
-            organization: "Bridges Academy",
-            positions: [
-              {
-                title: "Japanese Culture Liaison",
-                dates: "January 2010 - May 2017",
-                description: "I run an Anime Club and act as an ambassador for Bridges Academy when Japanese foreign exchange students visit."
-              },
-              {
-                title: "Key Club Member",
-                dates: "August 2009 - May 2017",
-                description: "I act as an ambassador for my school and community when appropriate I often act as the voice of the student and help address concerns about social issues."
-              }
-            ]
-          },
-          {
-            organization: "Nextbit Systems",
-            position: "Cyanogen/Nextbit Private Alpha Tester"
-          },
-          {
-            organization: "Sunrise Senior Living",
-            position: "Volunteer",
-            dates: "July 2016 - May 2017",
-            description: "Health"
-          },
-          {
-            organization: "Programming 101",
-            position: "Owner and Teacher",
-            dates: "January 2011 - December 2014",
-            description: "It has been my long held belief that coding is as important as math and science so I made it my mission to teach both basic and Advanced programming skills to people of any age."
-          },
-          {
-            organization: "FIRST FRC Team 4019",
-            position: "Captain",
-            dates: "September 2010 - May 2017",
-            description: "Children"
-          },
-          {
-            organization: "In His Presence Church",
-            position: "Volunteer",
-            dates: "January 2011 - May 2017",
-            description: "Disaster and Humanitarian Relief"
-          },
-          {
-            organization: "Lia",
-            position: "Researcher",
-            dates: "July 2017 - July 2020",
-            description: "Education"
-          },
-          {
-            organization: "ZeeMee",
-            position: "Marketing for a Silicon Valley startup- Campus Ambassador",
-            dates: "March 2018 - June 2021",
-            description: "Education",
-            url: "https://www.zeemee.com/cameronaaron"
-          },
-          {
-            organization: "Connecticut College",
-            positions: [
-              {
-                title: "Safety Net",
-                dates: "July 2018 - May 2021",
-                description: "I advocate for sexual and power-based violence and prevention."
-              },
-              {
-                title: "Student Support Network",
-                dates: "April 2018",
-                description: "Issued"
-              },
-              {
-                title: "Green Dot",
-                dates: "March 2018",
-                description: "Issued"
-              },
-              {
-                title: "Arts and Technology",
-                dates: "January 2018",
-                description: "Issued"
-              }
-            ]
-          },
-          {
-            organization: "Crisis Text Line",
-            position: "Crisis Counselor",
-            dates: "May 2019 - Present",
-            description: "Talk to people who text 741741 who are in mental distress."
-          },
-          {
-            organization: "Reddit, Inc.",
-            position: "Moderator of the Official /r/Android_Beta subreddit",
-            dates: "April 2018 - Present",
-            description: "I am one of the official moderators of the official Android beta community https://www.reddit.com/r/android_beta?utm_medium=android_app&utm_source=share"
-          },
-          {
-            organization: "Helping Hands Community",
-            position: "Field Operations Specialist",
-            dates: "June 2020 - June 2021",
-            description: "Health"
-          },
-          {
-            organization: "NeuroTechX",
-            position: "Neuroscience Writer",
-            dates: "August 2020 - January 2021",
-            description: "Health"
-          },
-          {
-            organization: "TEALS Program",
-            positions: [
-              {
-                title: "Teacher",
-                dates: "June 2021 - Present",
-                description: "Supporting the AP Computer Science A class at Los Angeles Center for Enriched Studies (LACES) as a TA. TEALS helps teachers learn to teach CS by pairing them with industry volunteers and proven curricula."
-              },
-              {
-                title: "Teaching Assistant",
-                dates: "June 2021 - Present",
-                description: "Supporting the AP Computer Science A class at Los Angeles Center for Enriched Studies (LACES) as a TA."
-              }
-            ]
-          },
-          {
-            organization: "Stanford University",
-            position: "Panelist",
-            dates: "August 2021 - Present",
-            description: "Stanford Neurodiversity Summit 2021 panelist"
-          },
-          {
-            organization: "The COVID Tracking Project at The Atlantic",
-            position: "Volunteer",
-            dates: "June 2020 - September 2021",
-            description: "The COVID Tracking Project is a volunteer-driven initiative housed at The Atlantic. We collect and publish the most complete COVID-19 data available for US states and territories. Learn more: www.covidtracking.com"
-          },
-          {
-            organization: "Thrive Scholars",
-            position: "STEM Program Mentor",
-            dates: "March 2021 - June 2021",
-            description: "Mentor high-achieving, low-income students of color with opportunities to thrive at top colleges and in meaningful careers. Collaborate with Thrive's comprehensive and data-proven program that prepares scholars to pursue competitive STEM careers."
-          },
-          {
-            organization: "NAGC",
-            position: "Convention Submission Reviewer",
-            dates: "January 2024 - Present",
-            description: "Education"
-          },
-          {
-            organization: "Beeper",
-            position: "Open Source Contributor",
-            dates: "May 2022 - Present"
-          },
-          {
-            "@context": "https://schema.org/",
-            "@type": "WebPage",
-            "name": "Cameron E. Aaron",
-            "speakable": {
-              "@type": "SpeakableSpecification",
-              "xPath": [
-                "/html/head/title",
-                "/html/head/meta[@name='description']/@content"
-              ]
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": "Cameron E. Aaron",
+          "url": "https://cameronaaron.com/",
+          "image": "https://cameronaaron.com/profile.webp",
+          "jobTitle": "Software Engineer & Neuroscientist",
+          "sameAs": [
+            "https://twitter.com/cameronaaron4",
+            "https://www.linkedin.com/in/kamisama",
+            "https://github.com/cameronaaron",
+            "https://linktr.ee/cameronaaron",
+            "https://www.facebook.com/cameron.kami.aaron/",
+            "https://instagram.com/cameronaaronofficial",
+            "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
+            "https://soundcloud.com/cameron-aaron",
+            "https://medium.com/@cameronaaron"
+          ],
+          "alumniOf": [
+            {
+              "@type": "CollegeOrUniversity",
+              "name": "Connecticut College",
+              "sameAs": "https://www.conncoll.edu/"
             },
-            "url": "https://cameronaaron.com"
-          },
-          {
-            "@context": "https://schema.org",
-            "@type": "ProfilePage",
-            "dateCreated": "2024-12-23T12:34:00-05:00",
-            "dateModified": "2024-12-26T14:53:00-05:00",
-            "mainEntity": {
-              "@type": "Person",
-              "name": "Cameron E. Aaron",
-              "alternateName": "kamisama",
-              "identifier": "123475623",
-              "interactionStatistic": [
-                {
-                  "@type": "InteractionCounter",
-                  "interactionType": "https://schema.org/FollowAction",
-                  "userInteractionCount": 1
-                },
-                {
-                  "@type": "InteractionCounter",
-                  "interactionType": "https://schema.org/LikeAction",
-                  "userInteractionCount": 5
-                }
-              ],
-              "agentInteractionStatistic": {
-                "@type": "InteractionCounter",
-                "interactionType": "https://schema.org/WriteAction",
-                "userInteractionCount": 2346
-              },
-              "description": "Software Engineer & Neuroscientist",
-              "image": "https://cameronaaron.com/profile.webp",
-              "sameAs": [
-                "https://twitter.com/cameronaaron4",
-                "https://www.linkedin.com/in/kamisama",
-                "mailto:cameronaaron1@gmail.com",
-                "https://github.com/cameronaaron",
-                "https://linktr.ee/cameronaaron",
-                "https://www.facebook.com/cameron.kami.aaron/",
-                "https://instagram.com/cameronaaronofficial",
-                "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
-                "https://soundcloud.com/cameron-aaron",
-                "https://medium.com/@cameronaaron",
-                "https://www.reddit.com/u/cameronaaron1"
-              ]
+            {
+              "@type": "CollegeOrUniversity",
+              "name": "Bridges Graduate School of Cognitive Diversity in Education",
+              "sameAs": "https://www.bridges.edu/"
+            },
+            {
+              "@type": "CollegeOrUniversity",
+              "name": "Illinois Institute of Technology",
+              "sameAs": "https://www.iit.edu/"
             }
-          },
-          {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "image": "https://cameronaaron.com/profile.webp",
-            "url": "https://cameronaaron.com",
-            "sameAs": [
-              "https://twitter.com/cameronaaron4",
-              "https://www.linkedin.com/in/kamisama",
-              "https://github.com/cameronaaron",
-              "https://linktr.ee/cameronaaron",
-              "https://www.facebook.com/cameron.kami.aaron/",
-              "https://instagram.com/cameronaaronofficial",
-              "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
-              "https://soundcloud.com/cameron-aaron",
-              "https://medium.com/@cameronaaron",
-              "https://www.reddit.com/u/cameronaaron1"
-            ],
-            "logo": "https://cameronaaron.com/profile.webp",
-            "name": "Cameron E. Aaron",
-            "description": "As a DevOps Engineer, Cameron Aaron applies his extensive knowledge and skills in artificial intelligence, neuroscience, software engineering, and aerospace medicine to create innovative solutions for complex problems. He is also a Google Product Expert, recognized for his contributions to the Google community and products. With over six years of experience in the tech industry, Cameron has worked for leading companies such as Dutchie, GitHub, SpaceX, and Microsoft, delivering high-quality products and services in various domains and sectors. He is passionate about advancing education and research, especially at the intersection of AI and cognitive neuroscience. He holds multiple certifications and awards in these fields, as well as a double major in Computer Science and Psychology, a minor in Cognitive Science, and a Certificate of Arts and Technology from Connecticut College.",
-            "email": "cameronaaron1@gmail.com",
-            "telephone": "[redacted-phone]",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "1122 23rd Ave",
-              "addressLocality": "Seattle",
-              "addressCountry": "US",
-              "addressRegion": "WA",
-              "postalCode": "98122"
+          ],
+          "hasCredential": [
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Bachelor's degree",
+              "description": "Bachelor of Science in Computer Science from Connecticut College",
+              "educationalLevel": "Bachelor's"
             },
-            "vatID": "FR12345678901",
-            "iso6523Code": "0199:724500PMK2A2M1SQQ228"
-          }
-          
-        ]
-      })
-    }}
-  />
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Bachelor's degree",
+              "description": "Bachelor of Arts in Psychology from Connecticut College",
+              "educationalLevel": "Bachelor's"
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Master's degree",
+              "description": "Master of Education in Cognitive Diversity from Bridges Graduate School of Cognitive Diversity in Education",
+              "educationalLevel": "Master's"
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Certificate",
+              "description": "Certificate in Twice Exceptional Education from Bridges Graduate School of Cognitive Diversity in Education"
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Master's degree",
+              "description": "Master of Business Administration (MBA) in Computer/Information Technology Administration and Management from Illinois Institute of Technology",
+              "educationalLevel": "Master's"
+            }
+          ],
+          "knowsLanguage": [
+            {
+              "@type": "Language",
+              "name": "Chinese"
+            },
+            {
+              "@type": "Language",
+              "name": "Spanish"
+            },
+            {
+              "@type": "Language",
+              "name": "Vietnamese"
+            },
+            {
+              "@type": "Language",
+              "name": "English"
+            },
+            {
+              "@type": "Language",
+              "name": "Korean"
+            },
+            {
+              "@type": "Language",
+              "name": "Japanese"
+            }
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Support",
+            "telephone": "[redacted-phone]",
+            "email": "cameronaaron1@gmail.com",
+            "url": "https://cameronaaron.com/"
+          },
+          "affiliation": {
+            "@type": "Organization",
+            "name": "Google",
+            "description": "Product Expert - Project Fi and Pixel"
+          },
+          "worksFor": [
+            {
+              "@type": "Organization",
+              "name": "Dutchie",
+              "sameAs": "https://dutchie.com/"
+            },
+            {
+              "@type": "Organization",
+              "name": "GitHub",
+              "sameAs": "https://github.com/"
+            },
+            {
+              "@type": "Organization",
+              "name": "SpaceX",
+              "sameAs": "https://spacex.com/"
+            },
+            {
+              "@type": "Organization",
+              "name": "Microsoft",
+              "sameAs": "https://microsoft.com/"
+            }
+          ]
+        })
+      }}
+    />
   
 </Head>
       <main className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
