@@ -5,7 +5,161 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-export default function Home() {
+export async function getStaticProps() {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Cameron E. Aaron",
+    "url": "https://cameronaaron.com/",
+    "image": "https://cameronaaron.com/profile.webp",
+    "jobTitle": "Software Engineer & Neuroscientist",
+    "sameAs": [
+      "https://twitter.com/cameronaaron4",
+      "https://www.linkedin.com/in/kamisama",
+      "https://github.com/cameronaaron",
+      "https://linktr.ee/cameronaaron",
+      "https://www.facebook.com/cameron.kami.aaron/",
+      "https://instagram.com/cameronaaronofficial",
+      "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
+      "https://soundcloud.com/cameron-aaron",
+      "https://medium.com/@cameronaaron",
+      "https://www.reddit.com/u/cameronaaron1"
+    ],
+    "alumniOf": [
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Connecticut College",
+        "sameAs": "https://www.conncoll.edu/"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Bridges Graduate School of Cognitive Diversity in Education",
+        "sameAs": "https://www.bridges.edu/"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Illinois Institute of Technology",
+        "sameAs": "https://www.iit.edu/"
+      }
+    ],
+    "hasCredential": [
+      {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "Bachelor's degree",
+        "description": "Bachelor of Science in Computer Science from Connecticut College",
+        "educationalLevel": "Bachelor's"
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "Bachelor's degree",
+        "description": "Bachelor of Arts in Psychology from Connecticut College",
+        "educationalLevel": "Bachelor's"
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "Master's degree",
+        "description": "Master of Education in Cognitive Diversity from Bridges Graduate School of Cognitive Diversity in Education",
+        "educationalLevel": "Master's"
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "Certificate",
+        "description": "Certificate in Twice Exceptional Education from Bridges Graduate School of Cognitive Diversity in Education"
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "Master's degree",
+        "description": "Master of Business Administration (MBA) in Computer/Information Technology Administration and Management from Illinois Institute of Technology",
+        "educationalLevel": "Master's"
+      }
+    ],
+    "knowsLanguage": [
+      {
+        "@type": "Language",
+        "name": "Chinese"
+      },
+      {
+        "@type": "Language",
+        "name": "Spanish"
+      },
+      {
+        "@type": "Language",
+        "name": "Vietnamese"
+      },
+      {
+        "@type": "Language",
+        "name": "English"
+      },
+      {
+        "@type": "Language",
+        "name": "Korean"
+      },
+      {
+        "@type": "Language",
+        "name": "Japanese"
+      }
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Support",
+      "telephone": "[redacted-phone]",
+      "email": "cameronaaron1@gmail.com",
+      "url": "https://cameronaaron.com/"
+    },
+    "affiliation": [
+      {
+        "@type": "Organization",
+        "name": "Google",
+        "description": "Product Expert - Project Fi and Pixel"
+      },
+      {
+        "@type": "Organization",
+        "name": "TED Conferences",
+        "description": "Lead Organizer TEDxYouth@NewLondon"
+      }
+    ],
+    "worksFor": [
+      {
+        "@type": "Organization",
+        "name": "Dutchie",
+        "sameAs": "https://dutchie.com/"
+      },
+      {
+        "@type": "Organization",
+        "name": "GitHub",
+        "sameAs": "https://github.com/"
+      },
+      {
+        "@type": "Organization",
+        "name": "SpaceX",
+        "sameAs": "https://spacex.com/"
+      },
+      {
+        "@type": "Organization",
+        "name": "Microsoft",
+        "sameAs": "https://microsoft.com/"
+      }
+    ],
+    "honor": [
+      {
+        "@type": "CreativeWork",
+        "name": "Ammerman Center Bridget Baird Award for excellence in research in arts and technology"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "Bridges Diamond Award for exemplary commitment and service to the school community"
+      }
+    ]
+  };
+
+  return {
+    props: {
+      schemaData
+    }
+  };
+}
+
+export default function Home({ schemaData }) {
   return (
     <>
       <Head>
@@ -38,153 +192,7 @@ export default function Home() {
         <link rel="canonical" href="https://cameronaaron.com" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "name": "Cameron E. Aaron",
-              "url": "https://cameronaaron.com/",
-              "image": "https://cameronaaron.com/profile.webp",
-              "jobTitle": "Software Engineer & Neuroscientist",
-              "sameAs": [
-                "https://twitter.com/cameronaaron4",
-                "https://www.linkedin.com/in/kamisama",
-                "https://github.com/cameronaaron",
-                "https://linktr.ee/cameronaaron",
-                "https://www.facebook.com/cameron.kami.aaron/",
-                "https://instagram.com/cameronaaronofficial",
-                "https://www.youtube.com/channel/UCVaw-r9lsNYEEi4-mKVKCKA",
-                "https://soundcloud.com/cameron-aaron",
-                "https://medium.com/@cameronaaron",
-                "https://www.reddit.com/u/cameronaaron1"
-              ],
-              "alumniOf": [
-                {
-                  "@type": "CollegeOrUniversity",
-                  "name": "Connecticut College",
-                  "sameAs": "https://www.conncoll.edu/"
-                },
-                {
-                  "@type": "CollegeOrUniversity",
-                  "name": "Bridges Graduate School of Cognitive Diversity in Education",
-                  "sameAs": "https://www.bridges.edu/"
-                },
-                {
-                  "@type": "CollegeOrUniversity",
-                  "name": "Illinois Institute of Technology",
-                  "sameAs": "https://www.iit.edu/"
-                }
-              ],
-              "hasCredential": [
-                {
-                  "@type": "EducationalOccupationalCredential",
-                  "credentialCategory": "Bachelor's degree",
-                  "description": "Bachelor of Science in Computer Science from Connecticut College",
-                  "educationalLevel": "Bachelor's"
-                },
-                {
-                  "@type": "EducationalOccupationalCredential",
-                  "credentialCategory": "Bachelor's degree",
-                  "description": "Bachelor of Arts in Psychology from Connecticut College",
-                  "educationalLevel": "Bachelor's"
-                },
-                {
-                  "@type": "EducationalOccupationalCredential",
-                  "credentialCategory": "Master's degree",
-                  "description": "Master of Education in Cognitive Diversity from Bridges Graduate School of Cognitive Diversity in Education",
-                  "educationalLevel": "Master's"
-                },
-                {
-                  "@type": "EducationalOccupationalCredential",
-                  "credentialCategory": "Certificate",
-                  "description": "Certificate in Twice Exceptional Education from Bridges Graduate School of Cognitive Diversity in Education"
-                },
-                {
-                  "@type": "EducationalOccupationalCredential",
-                  "credentialCategory": "Master's degree",
-                  "description": "Master of Business Administration (MBA) in Computer/Information Technology Administration and Management from Illinois Institute of Technology",
-                  "educationalLevel": "Master's"
-                }
-              ],
-              "knowsLanguage": [
-                {
-                  "@type": "Language",
-                  "name": "Chinese"
-                },
-                {
-                  "@type": "Language",
-                  "name": "Spanish"
-                },
-                {
-                  "@type": "Language",
-                  "name": "Vietnamese"
-                },
-                {
-                  "@type": "Language",
-                  "name": "English"
-                },
-                {
-                  "@type": "Language",
-                  "name": "Korean"
-                },
-                {
-                  "@type": "Language",
-                  "name": "Japanese"
-                }
-              ],
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "Customer Support",
-                "telephone": "[redacted-phone]",
-                "email": "cameronaaron1@gmail.com",
-                "url": "https://cameronaaron.com/"
-              },
-              "affiliation": [
-                {
-                  "@type": "Organization",
-                  "name": "Google",
-                  "description": "Product Expert - Project Fi and Pixel"
-                },
-                {
-                  "@type": "Organization",
-                  "name": "TED Conferences",
-                  "description": "Lead Organizer TEDxYouth@NewLondon"
-                }
-              ],
-              "worksFor": [
-                {
-                  "@type": "Organization",
-                  "name": "Dutchie",
-                  "sameAs": "https://dutchie.com/"
-                },
-                {
-                  "@type": "Organization",
-                  "name": "GitHub",
-                  "sameAs": "https://github.com/"
-                },
-                {
-                  "@type": "Organization",
-                  "name": "SpaceX",
-                  "sameAs": "https://spacex.com/"
-                },
-                {
-                  "@type": "Organization",
-                  "name": "Microsoft",
-                  "sameAs": "https://microsoft.com/"
-                }
-              ],
-              "honor": [
-                {
-                  "@type": "CreativeWork",
-                  "name": "Ammerman Center Bridget Baird Award for excellence in research in arts and technology"
-                },
-                {
-                  "@type": "CreativeWork",
-                  "name": "Bridges Diamond Award for exemplary commitment and service to the school community"
-                }
-              ]
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
         />
       </Head>
       <main className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
@@ -206,7 +214,6 @@ export default function Home() {
             Software Engineer &amp; Neuroscientist
           </motion.p>
         </header>
-
         <section className="w-full max-w-5xl mx-auto mb-12">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -240,7 +247,6 @@ export default function Home() {
             </a>
           </motion.div>
         </section>
-
         <nav className="w-full max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-12 text-center">
           {['About', 'Experience', 'Education', 'Testimonials', 'Contact', 'Projects'].map((section, index) => (
             <motion.a
