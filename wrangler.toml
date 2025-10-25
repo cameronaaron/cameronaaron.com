@@ -1,4 +1,7 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "cameronaaronsite"
+main = "src/index.js"
 compatibility_date = "2025-10-24"
-pages_build_output_dir = "out"
+
+[site]
+bucket = "./out"

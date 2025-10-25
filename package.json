@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "preview": "wrangler pages dev .vercel/output/static --compatibility-date=2025-10-24",
-    "deploy": "npm run build && wrangler pages deploy .vercel/output/static --project-name=cameronaaron-com",
-    "deploy:prod": "npm run build && wrangler pages deploy .vercel/output/static --project-name=cameronaaron-com --branch=main",
+    "preview": "wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:prod": "npm run build && wrangler deploy --env production",
     "start": "next start",
     "lint": "next lint",
     "cf-typegen": "wrangler types"
@@ -20,6 +20,7 @@
     "sharp": "^0.34.2"
   },
   "devDependencies": {
+    "@cloudflare/kv-asset-handler": "^0.4.0",
     "@opennextjs/cloudflare": "^1.11.0",
     "@types/node": "^22.12.1",
     "@types/react": "^19.2.2",
