@@ -10,8 +10,6 @@ export const profile = {
   social: {
     github: "https://github.com/cameronaaron",
     linkedin: "https://www.linkedin.com/in/kamisama",
-    twitter: "https://twitter.com/cameronaaron4",
-    linktree: "https://linktr.ee/cameronaaron",
   },
   
   stats: [

@@ -92,8 +92,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Cameron E. Aaron - Software Engineer & Neuroscientist",
     description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine.",
-    creator: "@cameronaaron4",
-    site: "@cameronaaron4",
     images: {
       url: "/profile.webp",
       alt: "Cameron E. Aaron - Software Engineer & Neuroscientist",
