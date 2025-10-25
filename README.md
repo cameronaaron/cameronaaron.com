@@ -59,7 +59,7 @@ npm run deploy:prod       # Deploy to production
 **Requirements:**
 
 - GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
-- Cloudflare Pages project: `cameronaaron-com`
+- Cloudflare Pages project: `cameronaaronsite`
 
 ## 📊 Performance
 

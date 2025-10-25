@@ -1,11 +1,16 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "cameronaaron-com"
+name = "cameronaaronsite"
 compatibility_date = "2025-10-24"
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = "out"
+
+# Build configuration for Cloudflare Pages
+[build]
+command = "npm install --legacy-peer-deps && npm run build"
+publish = "out"
 
 # Production configuration
 [env.production]
-name = "cameronaaron-com"
+name = "cameronaaronsite"
 routes = [
   { pattern = "cameronaaron.com", custom_domain = true },
   { pattern = "www.cameronaaron.com", custom_domain = true }

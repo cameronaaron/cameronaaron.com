@@ -202,7 +202,7 @@ npm run lint    # Run ESLint
 - **Performance**: 330+ edge locations, zero cold starts, <50ms response time
 
 ### Deployment Files
-- `wrangler.toml` - Cloudflare Workers config (project: cameronaaron-com)
+- `wrangler.toml` - Cloudflare Workers config (project: cameronaaronsite)
 - `.github/workflows/deploy.yml` - GitHub Actions workflow
 - `public/_headers` - Caching & security headers (1-year cache for static assets)
 - `public/_redirects` - HTTPS enforcement, www redirects
