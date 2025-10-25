@@ -2,19 +2,3 @@
 name = "cameronaaronsite"
 compatibility_date = "2025-10-24"
 pages_build_output_dir = "out"
-
-# Build configuration for Cloudflare Pages
-[build]
-command = "npm ci && npm run build"
-
-# Production configuration
-[env.production]
-name = "cameronaaronsite"
-routes = [
-  { pattern = "cameronaaron.com", custom_domain = true },
-  { pattern = "www.cameronaaron.com", custom_domain = true }
-]
-
-# Environment variables for production
-[env.production.vars]
-NODE_ENV = "production"
