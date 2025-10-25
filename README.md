@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Cameron E. Aaron - Portfolio
 
-## Getting Started
+Modern portfolio website built with Next.js 15, React 19, TypeScript, and Tailwind CSS. Deployed globally on Cloudflare Workers.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # Development server
+npm run build        # Production build
+npm run preview      # Test with Cloudflare Workers
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+src/
+├── app/              # Next.js App Router
+├── components/       # UI components
+├── data/            # Content (edit here!)
+└── utils/           # Helper functions
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+public/              # Static assets (.webp images)
+```
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 15.5.6** - React framework with App Router
+- **React 19.2.0** - UI library
+- **TypeScript 5.9.3** - Type safety
+- **Tailwind CSS 3.4.18** - Styling
+- **Framer Motion 11.18.2** - Animations
+- **Cloudflare Workers** - Edge deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ✏️ Editing Content
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Update content in `src/data/` directory:
 
-## Deploy on Vercel
+- `profile.ts` - Personal info
+- `experience.ts` - Work history
+- `projects.ts` - Portfolio projects
+- `skills.ts` - Technical skills
+- `testimonials.ts` - Recommendations
+- `faqs.ts` - FAQ section
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Images go in `public/` as `.webp` files.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 🚀 Deployment
+
+**Automatic:** Push to `master` → Live in 2 minutes via GitHub Actions
+
+**Manual:**
+
+```bash
+./verify-deployment.sh    # Pre-flight checks
+npm run deploy:prod       # Deploy to production
+```
+
+**Requirements:**
+
+- GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+- Cloudflare Pages project: `cameronaaron-com`
+
+## 📊 Performance
+
+- Bundle: 53.3 kB
+- First Load: 155 kB
+- Static files: 59
+- Response time: <50ms globally
+- Deployment: 330+ edge locations
+
+## 🔍 SEO Features
+
+- 46+ structured data entities (Schema.org)
+- OpenGraph & Twitter Cards
+- Dynamic sitemap & robots.txt
+- Google rich results ready (FAQ, Reviews, Breadcrumbs, etc.)
+
+## 📞 Contact
+
+- **Email:** <cameronthescientist@pm.me>
+- **GitHub:** [github.com/cameronaaron](https://github.com/cameronaaron)
+- **LinkedIn:** [linkedin.com/in/cameronaaron](https://linkedin.com/in/cameronaaron)
+- **Website:** [cameronaaron.com](https://cameronaaron.com)
+
+## 📄 License
+
+Copyright © 2025 Cameron E. Aaron. All rights reserved.
+
+---
+
+**Status:** ✅ Production Ready | **Last Updated:** October 2025

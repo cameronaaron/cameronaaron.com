@@ -1,0 +1,16 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "cameronaaron-com"
+compatibility_date = "2025-10-24"
+pages_build_output_dir = ".vercel/output/static"
+
+# Production configuration
+[env.production]
+name = "cameronaaron-com"
+routes = [
+  { pattern = "cameronaaron.com", custom_domain = true },
+  { pattern = "www.cameronaaron.com", custom_domain = true }
+]
+
+# Environment variables for production
+[env.production.vars]
+NODE_ENV = "production"

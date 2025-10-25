@@ -1,0 +1,9 @@
+# Cloudflare Pages Redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Redirect www to non-www (if needed)
+# https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+
+# Force HTTPS (Cloudflare handles this automatically, but can be explicit)
+http://cameronaaron.com/* https://cameronaaron.com/:splat 301
+http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
