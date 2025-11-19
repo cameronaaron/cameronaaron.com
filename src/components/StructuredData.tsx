@@ -64,6 +64,12 @@ export default function StructuredData() {
   const reviewSchemas = testimonials.slice(0, 4).map((testimonial) => ({
     "@context": "https://schema.org",
     "@type": "Review",
+    itemReviewed: {
+      "@type": "Person",
+      name: profile.name,
+      jobTitle: profile.title,
+      url: "https://cameronaaron.com",
+    },
     reviewRating: {
       "@type": "Rating",
       ratingValue: "5",

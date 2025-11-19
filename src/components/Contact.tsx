@@ -23,10 +23,10 @@ export default function Contact() {
           className="text-center mb-16"
         >
           <h2 id="contact-heading" className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-            Let's Work Together
+            Let's Connect
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Have a project in mind? Let's discuss how we can work together to bring your ideas to life.
+            I'm always open to discussing new ideas, tech, or just chatting about shared interests.
           </p>
         </motion.div>
 

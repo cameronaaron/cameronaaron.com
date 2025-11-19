@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
 
 interface ProfileImageProps {
@@ -10,8 +11,43 @@ interface ProfileImageProps {
 }
 
 export default function ProfileImage({ src, alt }: ProfileImageProps) {
+  const [isClient, setIsClient] = useState(false);
+  
+  // Mouse position tracking for 3D tilt effect
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  // Transform mouse position to rotation
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [15, -15]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-15, 15]);
+  
+  // Add spring physics for smooth motion
+  const springConfig = { damping: 20, stiffness: 100 };
+  const rotateXSpring = useSpring(rotateX, springConfig);
+  const rotateYSpring = useSpring(rotateY, springConfig);
+
+  useEffect(() => {
+    setIsClient(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = document.getElementById('profile-container')?.getBoundingClientRect();
+      if (rect) {
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const x = (e.clientX - centerX) / (rect.width / 2);
+        const y = (e.clientY - centerY) / (rect.height / 2);
+        mouseX.set(x);
+        mouseY.set(y);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
+
   return (
     <motion.div
+      id="profile-container"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ 
         opacity: 1, 
@@ -23,30 +59,74 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         scale: { duration: 0.8, delay: 0.4 },
         y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
       }}
+      style={{
+        perspective: 1000,
+      }}
       className="relative"
     >
-      <div className="relative w-full aspect-square max-w-md mx-auto">
-        {/* Glowing background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-3xl opacity-30 animate-pulse" />
+      <motion.div 
+        style={{
+          rotateX: isClient ? rotateXSpring : 0,
+          rotateY: isClient ? rotateYSpring : 0,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative w-full aspect-square max-w-md mx-auto"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        {/* Glowing background with depth */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'translateZ(-50px)' }} />
         
-        {/* Image container */}
-        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
-              <Image
-                src={src}
-                alt={alt}
-                width={800}
-                height={800}
-                className="object-cover w-full h-full"
-                priority
-                loading="eager"
-                sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
-              />
-        </div>
+        {/* Secondary glow layer */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-full blur-2xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{ transform: 'translateZ(-30px)' }}
+        />
+        
+        {/* Image container with 3D depth */}
+        <motion.div 
+          className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
+          style={{ transform: 'translateZ(20px)' }}
+          whileHover={{
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+            boxShadow: '0 25px 50px -12px rgba(168, 85, 247, 0.5)',
+          }}
+        >
+          <Image
+            src={src}
+            alt={alt}
+            width={800}
+            height={800}
+            className="object-cover w-full h-full"
+            priority
+            loading="eager"
+            sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
+          />
+          
+          {/* Shine effect on hover */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0"
+            initial={{ x: '-100%', y: '-100%' }}
+            whileHover={{ x: '100%', y: '100%' }}
+            transition={{ duration: 0.8 }}
+          />
+        </motion.div>
 
-        {/* Floating badges */}
-        <FloatingBadge emoji="🚀" position="top-right" />
-        <FloatingBadge emoji="🧠" position="bottom-left" delay={0.5} />
-      </div>
+        {/* Floating badges with depth */}
+        <div style={{ transform: 'translateZ(40px)' }}>
+          <FloatingBadge emoji="🚀" position="top-right" />
+          <FloatingBadge emoji="🧠" position="bottom-left" delay={0.5} />
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

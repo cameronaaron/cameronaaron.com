@@ -75,7 +75,7 @@ export default function Navigation() {
               size="md"
               className="shadow-lg shadow-primary/20 hover:shadow-primary/40"
             >
-              Hire Me
+              Let's Chat
             </Button>
           </div>
         </div>

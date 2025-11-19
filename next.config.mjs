@@ -21,11 +21,15 @@ const nextConfig = {
     optimizePackageImports: ['framer-motion', 'react', 'react-dom'],
   },
   
+  // Turbopack configuration for Next.js 16+
+  turbopack: {},
+  
   // Production optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'],
     } : false,
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
 };
 

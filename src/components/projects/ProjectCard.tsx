@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState } from 'react';
 import type { Project } from '@/data/projects';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 
@@ -10,6 +11,35 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, index }: ProjectCardProps) {
+  const [isHovering, setIsHovering] = useState(false);
+  
+  const x = useMotionValue(0.5);
+  const y = useMotionValue(0.5);
+  
+  const rotateX = useTransform(y, [0, 1], [8, -8]);
+  const rotateY = useTransform(x, [0, 1], [-8, 8]);
+  
+  const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
+  const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const percentX = (e.clientX - centerX) / (rect.width / 2);
+    const percentY = (e.clientY - centerY) / (rect.height / 2);
+    
+    x.set(0.5 + percentX * 0.5);
+    y.set(0.5 + percentY * 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0.5);
+    y.set(0.5);
+    setIsHovering(false);
+  };
+
   return (
     <SpotlightCard
       as={motion.a}
@@ -21,9 +51,17 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
       whileHover={{ 
-        y: -8,
-        scale: 1.02,
+        y: -12,
+        scale: 1.03,
         transition: { duration: 0.3, ease: "easeOut" }
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: isHovering ? springRotateX : 0,
+        rotateY: isHovering ? springRotateY : 0,
+        transformStyle: 'preserve-3d',
       }}
       className="group block h-full p-8 relative overflow-hidden"
     >
@@ -32,6 +70,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         initial={false}
       />
+      
+      {/* Glow effect on hover */}
+      <motion.div
+        className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"
+        initial={false}
+      />
+      
       <div className="relative z-10">
         <motion.h3 
           className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors"
@@ -50,8 +95,8 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + tagIndex * 0.05 }}
-              whileHover={{ scale: 1.1, y: -2 }}
-              className="px-3 py-1 bg-white/5 text-muted-foreground/80 rounded-lg text-xs font-medium border border-white/10 hover:border-primary/30 transition-colors"
+              whileHover={{ scale: 1.15, y: -3 }}
+              className="px-3 py-1 bg-white/5 text-muted-foreground/80 rounded-lg text-xs font-medium border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-colors"
             >
               {tag}
             </motion.span>

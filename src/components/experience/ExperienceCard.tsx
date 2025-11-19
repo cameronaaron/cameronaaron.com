@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
+import { useState } from 'react';
 import type { Experience } from '@/data/experience';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 
@@ -11,6 +12,35 @@ interface ExperienceCardProps {
 }
 
 export default function ExperienceCard({ experience, index }: ExperienceCardProps) {
+  const [isHovering, setIsHovering] = useState(false);
+  
+  const x = useMotionValue(0.5);
+  const y = useMotionValue(0.5);
+  
+  const rotateX = useTransform(y, [0, 1], [5, -5]);
+  const rotateY = useTransform(x, [0, 1], [-5, 5]);
+  
+  const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
+  const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const percentX = (e.clientX - centerX) / (rect.width / 2);
+    const percentY = (e.clientY - centerY) / (rect.height / 2);
+    
+    x.set(0.5 + percentX * 0.5);
+    y.set(0.5 + percentY * 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0.5);
+    y.set(0.5);
+    setIsHovering(false);
+  };
+
   return (
     <SpotlightCard
       as={motion.div}
@@ -19,9 +49,18 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
       viewport={{ once: true, margin: "-100px" }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
       whileHover={{ 
-        scale: 1.02,
-        boxShadow: "0 20px 40px rgba(124, 58, 237, 0.2)",
+        scale: 1.03,
+        y: -10,
+        boxShadow: "0 25px 50px rgba(124, 58, 237, 0.3)",
         transition: { duration: 0.3 }
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: isHovering ? springRotateX : 0,
+        rotateY: isHovering ? springRotateY : 0,
+        transformStyle: 'preserve-3d',
       }}
       className="p-8 h-full relative overflow-hidden group"
     >
@@ -30,26 +69,40 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
         className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         initial={false}
       />
+      
+      {/* Border glow effect */}
+      <motion.div
+        className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-0 group-hover:opacity-10 blur-lg transition-opacity duration-500"
+        initial={false}
+      />
+      
       <div className="flex items-start gap-6 relative z-10">
         <motion.div 
           className="flex-shrink-0"
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.15, rotate: 5 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <div className="w-16 h-16 rounded-xl bg-white p-2 shadow-md group-hover:shadow-xl transition-shadow">
+          <div className="w-16 h-16 rounded-xl bg-white p-2 shadow-md group-hover:shadow-xl transition-shadow relative overflow-hidden">
             <Image
               src={experience.logo}
               alt={experience.company}
               width={48}
               height={48}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain relative z-10"
+            />
+            {/* Shimmer effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.6 }}
             />
           </div>
         </motion.div>
 
         <div className="flex-1">
           <motion.h3 
-            className="text-2xl font-bold text-foreground mb-4"
+            className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -61,13 +114,22 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
             {experience.positions.map((pos, posIndex) => (
               <motion.div 
                 key={posIndex} 
-                className="border-l-2 border-primary/30 pl-4 hover:border-primary/60 transition-colors"
+                className="border-l-2 border-primary/30 pl-4 hover:border-primary/80 transition-colors group/position relative"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + posIndex * 0.1 }}
+                whileHover={{ x: 5 }}
               >
+                {/* Dot indicator */}
+                <motion.div
+                  className="absolute -left-[5px] top-2 w-2 h-2 bg-primary rounded-full"
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  transition={{ delay: 0.4 + posIndex * 0.1 }}
+                  whileHover={{ scale: 1.5 }}
+                />
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                  <h4 className="text-lg font-semibold text-primary">{pos.title}</h4>
+                  <h4 className="text-lg font-semibold text-primary group-hover/position:text-pink-400 transition-colors">{pos.title}</h4>
                   <span className="text-sm text-muted-foreground font-medium">{pos.period}</span>
                 </div>
                 <p className="text-muted-foreground/80 leading-relaxed">{pos.description}</p>

@@ -73,14 +73,39 @@ export default function Skills() {
             </motion.h3>
             <div className="grid grid-cols-2 gap-4">
               {skills.domains.map((domain, index) => (
-                <SpotlightCard key={index} className="p-4 flex items-center justify-center text-center h-full">
-                  <p className="text-gray-300 font-medium">{domain}</p>
-                </SpotlightCard>
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                >
+                  <SpotlightCard 
+                    className="p-4 flex items-center justify-center text-center h-full group cursor-default"
+                    as={motion.div}
+                    whileHover={{ 
+                      scale: 1.05, 
+                      y: -5,
+                      boxShadow: "0 10px 30px rgba(168, 85, 247, 0.3)"
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  >
+                    <p className="text-gray-300 font-medium group-hover:text-primary transition-colors">{domain}</p>
+                  </SpotlightCard>
+                </motion.div>
               ))}
             </div>
 
             {/* Certifications */}
-            <h3 className="text-2xl font-bold mt-12 mb-6 text-white">Certifications</h3>
+            <motion.h3 
+              className="text-2xl font-bold mt-12 mb-6 text-white"
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+            >
+              Certifications
+            </motion.h3>
             <div className="space-y-3">
               {skills.certifications.map((cert, index) => (
                 <motion.div
@@ -89,14 +114,19 @@ export default function Skills() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3"
+                  whileHover={{ x: 10, scale: 1.02 }}
+                  className="flex items-start gap-3 group cursor-default"
                 >
-                  <div className="flex-shrink-0 mt-1">
-                    <svg className="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                  <motion.div 
+                    className="flex-shrink-0 mt-1"
+                    whileHover={{ rotate: 360, scale: 1.2 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <svg className="w-5 h-5 text-purple-500 group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                  </div>
-                  <p className="text-gray-400">{cert}</p>
+                  </motion.div>
+                  <p className="text-gray-400 group-hover:text-gray-200 transition-colors">{cert}</p>
                 </motion.div>
               ))}
             </div>

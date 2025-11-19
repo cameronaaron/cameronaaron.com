@@ -1,17 +1,42 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
-import Experience from '@/components/Experience';
-import Projects from '@/components/Projects';
-import Skills from '@/components/Skills';
-import Testimonials from '@/components/Testimonials';
-import FAQ from '@/components/FAQ';
-import Contact from '@/components/Contact';
+import AmbientBackground from '@/components/ui/AmbientBackground';
+import CursorTrail from '@/components/ui/CursorTrail';
+
+// Lazy load below-the-fold components for better performance
+const Experience = dynamic(() => import('@/components/Experience'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const Projects = dynamic(() => import('@/components/Projects'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const Skills = dynamic(() => import('@/components/Skills'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const Testimonials = dynamic(() => import('@/components/Testimonials'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const FAQ = dynamic(() => import('@/components/FAQ'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const Contact = dynamic(() => import('@/components/Contact'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
 
 export default function Home() {
   return (
     <>
+      <AmbientBackground />
+      <CursorTrail />
       <a 
         href="#main-content" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg"
