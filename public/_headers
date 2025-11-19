@@ -1,22 +1,55 @@
 # Cloudflare Pages Headers
 # https://developers.cloudflare.com/pages/configuration/headers/
 
-# Cache static assets for 1 year
-/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico)
+# Service Worker - no cache, always fresh
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Content-Type: application/javascript
+
+# Offline page - cache for 1 hour
+/offline.html
+  Cache-Control: public, max-age=3600
+  Content-Type: text/html
+
+# Cache static assets for 1 year with immutable
+/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|ttf|eot)
   Cache-Control: public, max-age=31536000, immutable
+  Cross-Origin-Resource-Policy: cross-origin
+  Access-Control-Allow-Origin: *
 
 # Cache Next.js static files for 1 year
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+  Cross-Origin-Resource-Policy: cross-origin
 
 # Security headers for all pages
 /*
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=()
   X-XSS-Protection: 1; mode=block
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
 
-# HTML files with smart caching
+# HTML files with smart caching and link prefetch
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+  Link: </icon-192x192.png>; rel=preload; as=image; type=image/png
+  Link: </profile.webp>; rel=preload; as=image; type=image/webp
+
+# Manifest with proper caching
+/manifest.json
+  Cache-Control: public, max-age=86400
+  Content-Type: application/manifest+json
+  Access-Control-Allow-Origin: *
+
+# Sitemap and robots with proper content types
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/xml
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+  Content-Type: text/plain

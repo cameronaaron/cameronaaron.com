@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
+import TextReveal from '@/components/ui/TextReveal';
+
 interface SectionHeaderProps {
   title: string;
   subtitle?: string | ReactNode;
@@ -17,11 +19,11 @@ export default function SectionHeader({ title, subtitle, className = '' }: Secti
       viewport={{ once: true }}
       className={`text-center mb-16 ${className}`}
     >
-      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-        {title}
+      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent overflow-hidden pb-2">
+        <TextReveal text={title} />
       </h2>
       {subtitle && (
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
           {subtitle}
         </p>
       )}

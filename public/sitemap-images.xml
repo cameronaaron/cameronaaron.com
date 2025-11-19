@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://cameronaaron.com/</loc>
+    <image:image>
+      <image:loc>https://cameronaaron.com/profile.webp</image:loc>
+      <image:caption>Cameron Aaron</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://cameronaaron.com/ba.webp</image:loc>
+      <image:caption>Bridges Academy</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://cameronaaron.com/spacex.webp</image:loc>
+      <image:caption>SpaceX</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://cameronaaron.com/github.webp</image:loc>
+      <image:caption>GitHub</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://cameronaaron.com/google.webp</image:loc>
+      <image:caption>Google</image:caption>
+    </image:image>
+  </url>
+</urlset>

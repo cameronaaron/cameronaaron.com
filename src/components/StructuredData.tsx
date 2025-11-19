@@ -34,9 +34,18 @@ export default function StructuredData() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Cameron E. Aaron",
+    name: "Cameron Aaron",
     url: "https://cameronaaron.com",
-    logo: `https://cameronaaron.com${profile.image}`,
+    logo: "https://cameronaaron.com/icon-512x512.png",
+    sameAs: [
+      profile.social.github,
+      profile.social.linkedin,
+    ],
+    contactPoint: [{
+      "@type": "ContactPoint",
+      email: profile.email,
+      contactType: "customer service"
+    }],
   };
 
   const faqSchema = {
@@ -115,7 +124,7 @@ export default function StructuredData() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Cameron E. Aaron Portfolio",
+    name: "Cameron Aaron Portfolio",
     url: "https://cameronaaron.com",
     potentialAction: {
       "@type": "SearchAction",

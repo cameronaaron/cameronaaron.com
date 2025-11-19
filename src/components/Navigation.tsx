@@ -1,19 +1,32 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems } from '@/data/navigation';
 import Button from '@/components/ui/Button';
+import Magnetic from '@/components/ui/Magnetic';
 
 export default function Navigation() {
   const isScrolled = useScrollPosition(50);
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
     <>
+      {/* Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-pink-600 origin-left z-[60]"
+        style={{ scaleX }}
+      />
+
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-6 focus:py-3 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-6 focus:py-3 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
       >
         Skip to main content
       </a>
@@ -23,7 +36,7 @@ export default function Navigation() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/90 backdrop-blur-lg shadow-lg'
+            ? 'bg-background/80 backdrop-blur-md border-b border-white/5 shadow-lg'
             : 'bg-transparent'
         }`}
         role="navigation"
@@ -34,39 +47,33 @@ export default function Navigation() {
             <motion.a
               href="#"
               whileHover={{ scale: 1.05 }}
-              className={`text-2xl font-bold transition-colors ${
-                isScrolled
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'
-                  : 'text-white'
-              }`}
-              aria-label="Cameron E. Aaron - Home"
+              className="text-2xl font-bold transition-colors bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent"
             >
-              C.E.A.
+              Cameron
             </motion.a>
 
             <nav className="hidden md:flex items-center gap-8" aria-label="Primary navigation">
               {navItems.map((item, index) => (
-                <motion.a
-                  key={index}
-                  href={item.href}
-                  whileHover={{ scale: 1.1 }}
-                  className={`font-semibold transition-colors ${
-                    isScrolled
-                      ? 'text-gray-700 hover:text-purple-600'
-                      : 'text-white hover:text-purple-300'
-                  }`}
-                  aria-label={`Navigate to ${item.name} section`}
-                >
-                  {item.name}
-                </motion.a>
+                <Magnetic key={index}>
+                  <motion.a
+                    href={item.href}
+                    className={`font-semibold transition-colors inline-block px-2 py-1 ${
+                      isScrolled
+                        ? 'text-muted-foreground hover:text-primary'
+                        : 'text-muted-foreground/80 hover:text-white'
+                    }`}
+                  >
+                    {item.name}
+                  </motion.a>
+                </Magnetic>
               ))}
             </nav>
 
             <Button
               href="#contact"
-              variant={isScrolled ? 'primary' : 'secondary'}
+              variant="primary"
               size="md"
-              ariaLabel="Contact me for hiring opportunities"
+              className="shadow-lg shadow-primary/20 hover:shadow-primary/40"
             >
               Hire Me
             </Button>

@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useRef, type ReactNode } from 'react';
 
 interface ButtonProps {
   href?: string;
@@ -22,7 +22,15 @@ export default function Button({
   className = '',
   ariaLabel,
 }: ButtonProps) {
-  const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-block text-center';
+  const ref = useRef<HTMLElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  // Magnetic spring physics
+  const springX = useSpring(x, { stiffness: 150, damping: 15 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-block text-center relative z-10';
   
   const sizeStyles = {
     sm: 'px-4 py-2 text-sm',
@@ -31,7 +39,7 @@ export default function Button({
   };
   
   const variantStyles = {
-    primary: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-purple-500/50 hover:scale-105',
+    primary: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-purple-500/50',
     secondary: 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20',
     outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white',
   };
@@ -41,9 +49,28 @@ export default function Button({
   const Component = href ? motion.a : motion.button;
   const props = href ? { href } : { onClick, type: 'button' as const };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (variant !== 'primary' || !ref.current) return;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    x.set((e.clientX - centerX) * 0.3);
+    y.set((e.clientY - centerY) * 0.3);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <Component
       {...props}
+      // @ts-expect-error - ref type mismatch with motion components is common
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: springX, y: springY }}
       whileHover={{ scale: variant === 'primary' ? 1.05 : 1.02 }}
       whileTap={{ scale: 0.95 }}
       className={styles}

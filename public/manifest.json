@@ -1,24 +1,47 @@
 {
-  "name": "Cameron E. Aaron - Portfolio",
-  "short_name": "C.E. Aaron",
+  "name": "Cameron Aaron - Software Engineer & Neuroscientist",
+  "short_name": "Cameron Aaron",
   "description": "Software Engineer & Neuroscientist specializing in AI, cybersecurity, and product management",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#0a0a0a",
   "theme_color": "#7c3aed",
   "orientation": "portrait-primary",
+  "categories": ["portfolio", "technology", "education", "business"],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/profile.webp",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/webp",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/profile.webp",
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/webp",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/profile.webp",
+      "sizes": "1200x630",
+      "type": "image/webp"
     }
   ]
 }

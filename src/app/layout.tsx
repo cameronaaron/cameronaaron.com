@@ -2,18 +2,25 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import SmoothScroll from "@/components/ui/SmoothScroll";
+import CustomCursor from "@/components/ui/CustomCursor";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cameronaaron.com"),
   title: {
-    default: "Cameron E. Aaron - Software Engineer & Neuroscientist",
-    template: "%s | Cameron E. Aaron"
+    default: "Cameron Aaron - Software Engineer & Neuroscientist",
+    template: "%s | Cameron Aaron"
   },
   description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine. Experience at GitHub, SpaceX, Dutchie, and Microsoft.",
   keywords: [
-    "Cameron E. Aaron", 
+    "Cameron Aaron", 
     "Software Engineer", 
     "Neuroscientist", 
     "DevOps", 
@@ -42,11 +49,15 @@ export const metadata: Metadata = {
     "Aerospace Medicine",
     "Education Technology"
   ],
-  authors: [{ name: "Cameron E. Aaron", url: "https://cameronaaron.com" }],
-  creator: "Cameron E. Aaron",
-  publisher: "Cameron E. Aaron",
+  authors: [{ name: "Cameron Aaron", url: "https://cameronaaron.com" }],
+  creator: "Cameron Aaron",
+  publisher: "Cameron Aaron",
   alternates: {
     canonical: "https://cameronaaron.com",
+    languages: {
+      'en-US': '/',
+      'en': '/',
+    },
     types: {
       'application/rss+xml': 'https://cameronaaron.com/feed.xml',
     },
@@ -54,30 +65,32 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/profile.webp", sizes: "400x400", type: "image/webp" },
-      { url: "/favicon.ico", sizes: "any" }
+      { url: "/icon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/profile.webp", sizes: "400x400", type: "image/webp" }
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
     ],
     other: [
       {
         rel: "mask-icon",
-        url: "/profile.webp",
+        url: "/icon-512x512.png",
       }
     ]
   },
   openGraph: {
-    title: "Cameron E. Aaron - Software Engineer & Neuroscientist",
+    title: "Cameron Aaron - Software Engineer & Neuroscientist",
     description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine. Building innovative solutions at the intersection of technology and science.",
     url: "https://cameronaaron.com",
-    siteName: "Cameron E. Aaron Portfolio",
+    siteName: "Cameron Aaron Portfolio",
     images: [
       {
-        url: "/profile.webp",
+        url: "https://cameronaaron.com/profile.webp",
         width: 1200,
         height: 630,
-        alt: "Cameron E. Aaron - Software Engineer & Neuroscientist",
+        alt: "Cameron Aaron - Software Engineer & Neuroscientist",
         type: "image/webp",
       },
     ],
@@ -90,11 +103,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cameron E. Aaron - Software Engineer & Neuroscientist",
+    title: "Cameron Aaron - Software Engineer & Neuroscientist",
     description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine.",
     images: {
-      url: "/profile.webp",
-      alt: "Cameron E. Aaron - Software Engineer & Neuroscientist",
+      url: "https://cameronaaron.com/profile.webp",
+      alt: "Cameron Aaron - Software Engineer & Neuroscientist",
     },
   },
   robots: {
@@ -112,11 +125,11 @@ export const metadata: Metadata = {
   },
   category: 'technology',
   classification: 'Portfolio Website',
-  applicationName: 'Cameron E. Aaron Portfolio',
+  applicationName: 'Cameron Aaron Portfolio',
   referrer: 'origin-when-cross-origin',
   appleWebApp: {
     capable: true,
-    title: 'Cameron E. Aaron',
+    title: 'Cameron Aaron',
     statusBarStyle: 'black-translucent',
   },
   formatDetection: {
@@ -149,9 +162,20 @@ export default function RootLayout({
       <head>
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" href="/profile.webp" as="image" type="image/webp" fetchPriority="high" />
+        <link rel="prefetch" href="/icon-192x192.png" as="image" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <StructuredData />
       </head>
-      <body className={inter.className} suppressHydrationWarning>{children}</body>
+      <body className={inter.className} suppressHydrationWarning>
+        <SmoothScroll />
+        <CustomCursor />
+        <ServiceWorkerRegistration />
+        {children}
+      </body>
     </html>
   );
 }

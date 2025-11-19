@@ -1,4 +1,11 @@
-export const socialPlatforms = [
+export interface SocialPlatform {
+  name: string;
+  icon: string;
+  key: 'github' | 'linkedin';
+  color: string;
+}
+
+export const socialPlatforms: readonly SocialPlatform[] = [
   { 
     name: 'GitHub', 
     icon: '💻', 

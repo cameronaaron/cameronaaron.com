@@ -13,8 +13,16 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.4, duration: 0.8 }}
+      animate={{ 
+        opacity: 1, 
+        scale: 1,
+        y: [0, -20, 0] // Float animation
+      }}
+      transition={{ 
+        opacity: { duration: 0.8, delay: 0.4 },
+        scale: { duration: 0.8, delay: 0.4 },
+        y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+      }}
       className="relative"
     >
       <div className="relative w-full aspect-square max-w-md mx-auto">
@@ -23,13 +31,16 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         
         {/* Image container */}
         <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            className="object-cover"
-            priority
-          />
+              <Image
+                src={src}
+                alt={alt}
+                width={800}
+                height={800}
+                className="object-cover w-full h-full"
+                priority
+                loading="eager"
+                sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
+              />
         </div>
 
         {/* Floating badges */}

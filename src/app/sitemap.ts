@@ -3,34 +3,49 @@ import type { MetadataRoute } from 'next'
 export const dynamic = 'force-static'
  
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://cameronaaron.com';
+  const lastModified = new Date();
+
   return [
     {
-      url: 'https://cameronaaron.com',
-      lastModified: new Date(),
+      url: baseUrl,
+      lastModified,
       changeFrequency: 'monthly',
-      priority: 1,
+      priority: 1.0,
     },
     {
-      url: 'https://cameronaaron.com#experience',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: 'https://cameronaaron.com#projects',
-      lastModified: new Date(),
+      url: `${baseUrl}#experience`,
+      lastModified,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://cameronaaron.com#skills',
-      lastModified: new Date(),
+      url: `${baseUrl}#projects`,
+      lastModified,
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.8,
     },
     {
-      url: 'https://cameronaaron.com#contact',
-      lastModified: new Date(),
+      url: `${baseUrl}#skills`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}#testimonials`,
+      lastModified,
+      changeFrequency: 'yearly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}#faq`,
+      lastModified,
+      changeFrequency: 'yearly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}#contact`,
+      lastModified,
       changeFrequency: 'yearly',
       priority: 0.5,
     },

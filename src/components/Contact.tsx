@@ -4,14 +4,15 @@ import { motion } from 'framer-motion';
 import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
 import SocialLink from '@/components/contact/SocialLink';
+import Tilt from '@/components/ui/Tilt';
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-20 bg-gradient-to-br from-purple-900 via-slate-900 to-purple-900 relative overflow-hidden">
+    <section id="contact" className="py-20 bg-background relative overflow-hidden" aria-labelledby="contact-heading">
       {/* Background decoration */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full blur-3xl" />
+      <div className="absolute inset-0 opacity-20 pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/30 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/30 rounded-full blur-[100px]" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -21,10 +22,10 @@ export default function Contact() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+          <h2 id="contact-heading" className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
             Let's Work Together
           </h2>
-          <p className="text-purple-200 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Have a project in mind? Let's discuss how we can work together to bring your ideas to life.
           </p>
         </motion.div>
@@ -32,19 +33,22 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center mb-12">
             {/* Email */}
-            <motion.a
-              href={`mailto:${profile.email}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group max-w-md w-full"
-            >
-              <div className="text-4xl mb-4 text-center">📧</div>
-              <h3 className="text-xl font-bold text-white mb-2 text-center">Email</h3>
-              <p className="text-purple-200 group-hover:text-white transition-colors text-center">
-                {profile.email}
-              </p>
-            </motion.a>
+            <Tilt className="w-full max-w-md">
+              <motion.a
+                href={`mailto:${profile.email}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="glass-card rounded-2xl p-8 group w-full block hover:border-primary/50 transition-colors relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="text-4xl mb-4 text-center transform group-hover:scale-110 transition-transform duration-300">📧</div>
+                <h3 className="text-xl font-bold text-foreground mb-2 text-center">Email</h3>
+                <p className="text-muted-foreground group-hover:text-primary transition-colors text-center">
+                  {profile.email}
+                </p>
+              </motion.a>
+            </Tilt>
           </div>
 
           {/* Social Links */}
@@ -55,7 +59,7 @@ export default function Contact() {
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <h3 className="text-2xl font-bold text-white mb-6">Connect With Me</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-6">Connect With Me</h3>
             <div className="flex flex-wrap justify-center gap-4">
               {socialPlatforms.map((social, index) => (
                 <SocialLink

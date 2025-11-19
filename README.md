@@ -1,4 +1,4 @@
-# Cameron E. Aaron - Portfolio
+# Cameron Aaron - Portfolio
 
 Modern portfolio website built with Next.js 15, React 19, TypeScript, and Tailwind CSS. Deployed globally on Cloudflare Workers.
 
@@ -85,7 +85,7 @@ npm run deploy:prod       # Deploy to production
 
 ## 📄 License
 
-Copyright © 2025 Cameron E. Aaron. All rights reserved.
+Copyright © 2025 Cameron Aaron. All rights reserved.
 
 ---
 

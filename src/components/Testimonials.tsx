@@ -1,14 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { testimonials } from '@/data/testimonials';
-import { useToggle } from '@/hooks/useToggle';
 import SectionHeader from '@/components/ui/SectionHeader';
 import TestimonialCard from '@/components/testimonials/TestimonialCard';
 import Button from '@/components/ui/Button';
 
 export default function Testimonials() {
-  const [showAll, toggleShowAll] = useToggle(false);
+  const [showAll, setShowAll] = useState(false);
   
   // Show only featured testimonials by default
   const displayedTestimonials = showAll 
@@ -16,8 +16,11 @@ export default function Testimonials() {
     : testimonials.filter(t => t.featured);
 
   return (
-    <section id="testimonials" className="py-20 bg-gradient-to-br from-slate-50 to-purple-50">
-      <div className="container mx-auto px-6">
+    <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
+
+      <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           title="What People Say"
           subtitle="Recommendations from colleagues, managers, and mentors"
@@ -39,7 +42,7 @@ export default function Testimonials() {
             className="text-center"
           >
             <Button
-              onClick={toggleShowAll}
+              onClick={() => setShowAll(!showAll)}
               variant="primary"
               size="lg"
             >
