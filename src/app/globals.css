@@ -1,6 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #2563eb;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #1f2937;
+  --color-muted-foreground: #9ca3af;
+  --color-accent: #8b5cf6;
+  --color-accent-foreground: #ffffff;
+  
+  --gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+  --gradient-hero-glow: conic-gradient(from 90deg at 50% 50%, #0a0a0a 0%, #171717 50%, #0a0a0a 100%);
+  
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-slide-up: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px #7c3aed, 0 0 10px #7c3aed; }
+    100% { box-shadow: 0 0 20px #7c3aed, 0 0 30px #7c3aed; }
+  }
+}
 
 @layer base {
   * {
