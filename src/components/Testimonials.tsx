@@ -27,11 +27,33 @@ export default function Testimonials() {
         />
 
         {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8">
+        <motion.div 
+          className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.15
+              }
+            }
+          }}
+        >
           {displayedTestimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} testimonial={testimonial} index={index} />
+            <motion.div
+              key={index}
+              variants={{
+                hidden: { opacity: 0, y: 30, scale: 0.95 },
+                visible: { opacity: 1, y: 0, scale: 1 }
+              }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <TestimonialCard testimonial={testimonial} index={index} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Show More/Less Button */}
         {testimonials.length > displayedTestimonials.length && (

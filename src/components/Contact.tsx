@@ -59,19 +59,48 @@ export default function Contact() {
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <h3 className="text-2xl font-bold text-foreground mb-6">Connect With Me</h3>
-            <div className="flex flex-wrap justify-center gap-4">
+            <motion.h3 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+              className="text-2xl font-bold text-foreground mb-6"
+            >
+              Connect With Me
+            </motion.h3>
+            <motion.div 
+              className="flex flex-wrap justify-center gap-4"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.08
+                  }
+                }
+              }}
+            >
               {socialPlatforms.map((social, index) => (
-                <SocialLink
+                <motion.div
                   key={index}
-                  name={social.name}
-                  icon={social.icon}
-                  url={profile.social[social.key]}
-                  color={social.color}
-                  index={index}
-                />
+                  variants={{
+                    hidden: { opacity: 0, y: 20, scale: 0.8 },
+                    visible: { opacity: 1, y: 0, scale: 1 }
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <SocialLink
+                    name={social.name}
+                    icon={social.icon}
+                    url={profile.social[social.key]}
+                    color={social.color}
+                    index={index}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

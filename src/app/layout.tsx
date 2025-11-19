@@ -160,20 +160,39 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* DNS Prefetch and Preconnect for performance */}
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Critical resource preload */}
         <link rel="preload" href="/profile.webp" as="image" type="image/webp" fetchPriority="high" />
         <link rel="prefetch" href="/icon-192x192.png" as="image" />
+        
+        {/* PWA Configuration */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        {/* Security Headers */}
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+        
+        {/* Performance Hints */}
+        <meta httpEquiv="Accept-CH" content="DPR, Viewport-Width, Width" />
+        
         <StructuredData />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <SmoothScroll />
         <CustomCursor />
         <ServiceWorkerRegistration />
+        <noscript>
+          <div className="noscript-warning">
+            This website requires JavaScript to be enabled for the best experience.
+          </div>
+        </noscript>
         {children}
       </body>
     </html>
