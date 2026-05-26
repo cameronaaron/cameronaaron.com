@@ -14,8 +14,8 @@ export default function Testimonials() {
 
   // Show only featured testimonials by default.
   const featuredTestimonials = sortedTestimonials.filter((testimonial) => testimonial.featured);
+  const additionalTestimonials = sortedTestimonials.filter((testimonial) => !testimonial.featured);
   const hasAdditionalTestimonials = sortedTestimonials.length > featuredTestimonials.length;
-  const displayedTestimonials = showAll ? sortedTestimonials : featuredTestimonials;
 
   return (
     <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
@@ -28,7 +28,56 @@ export default function Testimonials() {
           subtitle="Recommendations from colleagues, managers, and mentors"
         />
 
-        {/* Testimonials Grid */}
+        {showAll && hasAdditionalTestimonials && (
+          <div className="text-center mb-8">
+            <Button
+              onClick={() => setShowAll(false)}
+              variant="primary"
+              size="lg"
+            >
+              Show Featured Only
+            </Button>
+          </div>
+        )}
+
+        {showAll && additionalTestimonials.length > 0 && (
+          <div className="max-w-6xl mx-auto mb-8">
+            <p className="text-center text-sm text-gray-400 mb-6">
+              Showing {additionalTestimonials.length} more recommendations
+            </p>
+
+            <motion.div
+              className="grid md:grid-cols-2 gap-6"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.15
+                  }
+                }
+              }}
+            >
+              {additionalTestimonials.map((testimonial, index) => (
+                <motion.div
+                  key={`${testimonial.name}-${testimonial.date}`}
+                  data-testid={`testimonial-item-extra-${index}`}
+                  variants={{
+                    hidden: { opacity: 0, y: 30, scale: 0.95 },
+                    visible: { opacity: 1, y: 0, scale: 1 }
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <TestimonialCard testimonial={testimonial} index={index + featuredTestimonials.length} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        )}
+
+        {/* Featured Testimonials */}
         <motion.div 
           className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8"
           initial="hidden"
@@ -43,9 +92,9 @@ export default function Testimonials() {
             }
           }}
         >
-          {displayedTestimonials.map((testimonial, index) => (
+          {featuredTestimonials.map((testimonial, index) => (
             <motion.div
-              key={index}
+              key={`${testimonial.name}-${testimonial.date}`}
               data-testid={`testimonial-item-${index}`}
               variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.95 },
