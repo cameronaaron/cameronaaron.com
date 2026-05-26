@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
+import { useEffect } from 'react';
 import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
 import StatCard from '@/components/ui/StatCard';
@@ -10,18 +11,44 @@ import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
 import BackgroundParticles from '@/components/hero/BackgroundParticles';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
+import Magnetic from '@/components/ui/Magnetic';
+import { useMousePosition } from '@/hooks/useMousePosition';
 
 const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), {
   ssr: false,
 });
 
 export default function Hero() {
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
+  const { x: mouseX, y: mouseY } = useMousePosition();
+  const rawPointerX = useMotionValue(0);
+  const rawPointerY = useMotionValue(0);
   
   // Parallax transformations
   const yParallax = useTransform(scrollY, [0, 500], [0, 150]);
   const opacityFade = useTransform(scrollY, [0, 300], [1, 0]);
   const scaleDown = useTransform(scrollY, [0, 500], [1, 0.8]);
+  const auraOpacity = useTransform(scrollY, [0, 500], [0.34, 0.12]);
+  const chapterProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 });
+  const auraX = useSpring(mouseX, { stiffness: 105, damping: 24, mass: 0.45 });
+  const auraY = useSpring(mouseY, { stiffness: 105, damping: 24, mass: 0.45 });
+
+  useEffect(() => {
+    rawPointerX.set(mouseX);
+    rawPointerY.set(mouseY);
+  }, [mouseX, mouseY, rawPointerX, rawPointerY]);
+
+  const pointerVelocityX = useVelocity(rawPointerX);
+  const pointerVelocityY = useVelocity(rawPointerY);
+  const pointerSpeed = useTransform([pointerVelocityX, pointerVelocityY], ([vx, vy]: number[]) => {
+    const speed = Math.sqrt(vx * vx + vy * vy);
+    return Math.min(speed / 1100, 1);
+  });
+  const auraSize = useTransform(pointerSpeed, [0, 1], [460, 650]);
+  const auraCoreAlpha = useTransform(pointerSpeed, [0, 1], [0.14, 0.28]);
+  const auraEdgeAlpha = useTransform(pointerSpeed, [0, 1], [0.08, 0.16]);
+  const dynamicAuraOpacity = useTransform([auraOpacity, pointerSpeed], ([base, speed]: number[]) => Math.min(0.5, base + speed * 0.14));
+  const pointerAura = useMotionTemplate`radial-gradient(${auraSize}px circle at ${auraX}px ${auraY}px, rgba(34, 211, 238, ${auraCoreAlpha}), rgba(16, 185, 129, ${auraEdgeAlpha}) 34%, transparent 76%)`;
 
   return (
     <section 
@@ -29,6 +56,19 @@ export default function Hero() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background"
       aria-label="Hero section"
     >
+      <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/5" aria-hidden="true">
+        <motion.div
+          className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
+          style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
+        />
+      </div>
+
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: pointerAura, opacity: dynamicAuraOpacity }}
+        aria-hidden="true"
+      />
+
       {/* Ambient Background Glow with parallax */}
       <motion.div 
         className="absolute inset-0 bg-hero-glow opacity-40" 
@@ -105,25 +145,49 @@ export default function Hero() {
               transition={{ delay: 0.6 }}
               className="flex flex-wrap gap-4"
             >
-              <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
-                <span className="relative z-10">View Credentials</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Button>
-              <Button href="#experience" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
-                Explore Experience
-              </Button>
+              <Magnetic strength={0.15}>
+                <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
+                  <span className="relative z-10">View Credentials</span>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Button>
+              </Magnetic>
+              <Magnetic strength={0.1}>
+                <Button href="#experience" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
+                  Explore Experience
+                </Button>
+              </Magnetic>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="mt-6 flex flex-wrap gap-2"
+            >
+              {['Engineering', 'Security', 'Clinical Care', 'NP Path'].map((chip, index) => (
+                <motion.span
+                  key={chip}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.75 + index * 0.08 }}
+                  whileHover={{ y: -2, scale: 1.04 }}
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-foreground/80"
+                >
+                  {chip}
+                </motion.span>
+              ))}
             </motion.div>
 
             {/* Stats with hover effects */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.8 }}
               className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 border-t border-white/5 pt-8"
             >
               {profile.stats.map((stat, index) => (

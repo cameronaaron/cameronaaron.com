@@ -67,7 +67,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "4me (Xurrent)",
-    logo: "/icon-192x192.png",
+    logo: "/xurrent.webp",
     positions: [
       {
         title: "DevOps Engineer",
@@ -89,7 +89,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "C19 BayShield",
-    logo: "/icon-192x192.png",
+    logo: "/c19-bayshield.svg",
     positions: [
       {
         title: "Backend Team Lead Engineer - COVID-19 Response",
@@ -100,7 +100,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Helping Hands Community",
-    logo: "/icon-192x192.png",
+    logo: "/helping-hands.webp",
     positions: [
       {
         title: "Field Operations Engineering Specialist",
@@ -111,7 +111,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "BardoVR",
-    logo: "/icon-192x192.png",
+    logo: "/bardovr.webp",
     positions: [
       {
         title: "Virtual Reality Health & Wellness Developer",

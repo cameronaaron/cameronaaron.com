@@ -4,7 +4,6 @@ import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
-import CustomCursor from "@/components/ui/CustomCursor";
 
 const manrope = Manrope({ 
   subsets: ["latin"],
@@ -197,7 +196,6 @@ export default function RootLayout({
       </head>
       <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <SmoothScroll />
-        <CustomCursor />
         <ServiceWorkerRegistration />
         <noscript>
           <div className="noscript-warning">

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import type { Experience } from '@/data/experience';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -13,6 +14,14 @@ interface ExperienceCardProps {
 
 export default function ExperienceCard({ experience, index }: ExperienceCardProps) {
   const [isHovering, setIsHovering] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
+  const companyMonogram = experience.company
+    .split(/\s+/)
+    .map((word) => word[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase();
   
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
@@ -24,6 +33,8 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
   const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!enableHoverMotion) return;
+
     const rect = e.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -48,18 +59,23 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-      whileHover={{ 
-        scale: 1.03,
-        y: -10,
-        boxShadow: "0 25px 50px rgba(124, 58, 237, 0.3)",
-        transition: { duration: 0.3 }
-      }}
+      whileHover={
+        enableHoverMotion
+          ? {
+              scale: 1.03,
+              y: -10,
+              boxShadow: "0 25px 50px rgba(124, 58, 237, 0.3)",
+              transition: { duration: 0.3 }
+            }
+          : undefined
+      }
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovering(true)}
+      onMouseEnter={() => enableHoverMotion && setIsHovering(true)}
       onMouseLeave={handleMouseLeave}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.995, y: 1 }}
       style={{
-        rotateX: isHovering ? springRotateX : 0,
-        rotateY: isHovering ? springRotateY : 0,
+        rotateX: isHovering && enableHoverMotion ? springRotateX : 0,
+        rotateY: isHovering && enableHoverMotion ? springRotateY : 0,
         transformStyle: 'preserve-3d',
       }}
       className="p-8 h-full relative overflow-hidden group"
@@ -79,22 +95,30 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
       <div className="flex items-start gap-6 relative z-10">
         <motion.div 
           className="flex-shrink-0"
-          whileHover={{ scale: 1.15, rotate: 5 }}
+          whileHover={enableHoverMotion ? { scale: 1.15, rotate: 5 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
           <div className="w-16 h-16 rounded-xl bg-white p-2 shadow-md group-hover:shadow-xl transition-shadow relative overflow-hidden">
-            <Image
-              src={experience.logo}
-              alt={experience.company}
-              width={48}
-              height={48}
-              className="w-full h-full object-contain relative z-10"
-            />
+            {logoError ? (
+              <div className="w-full h-full rounded-lg bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 text-foreground/90 font-bold text-xs flex items-center justify-center relative z-10">
+                {companyMonogram}
+              </div>
+            ) : (
+              <Image
+                src={experience.logo}
+                alt={experience.company}
+                width={48}
+                height={48}
+                className="w-full h-full object-contain relative z-10"
+                onError={() => setLogoError(true)}
+                unoptimized
+              />
+            )}
             {/* Shimmer effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent"
               initial={{ x: '-100%' }}
-              whileHover={{ x: '100%' }}
+              whileHover={enableHoverMotion ? { x: '100%' } : undefined}
               transition={{ duration: 0.6 }}
             />
           </div>
@@ -118,7 +142,7 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + posIndex * 0.1 }}
-                whileHover={{ x: 5 }}
+                whileHover={enableHoverMotion ? { x: 5 } : undefined}
               >
                 {/* Dot indicator */}
                 <motion.div
@@ -126,7 +150,7 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   transition={{ delay: 0.4 + posIndex * 0.1 }}
-                  whileHover={{ scale: 1.5 }}
+                  whileHover={enableHoverMotion ? { scale: 1.5 } : undefined}
                 />
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
                   <h4 className="text-lg font-semibold text-primary group-hover/position:text-pink-400 transition-colors">{pos.title}</h4>

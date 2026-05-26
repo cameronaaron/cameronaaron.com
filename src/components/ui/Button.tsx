@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface ButtonProps {
   href?: string;
@@ -25,10 +26,11 @@ export default function Button({
   const ref = useRef<HTMLElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const { enableHoverMotion, isCoarsePointer, prefersReducedMotion } = useInteractionMode();
   
   // Magnetic spring physics
-  const springX = useSpring(x, { stiffness: 150, damping: 15 });
-  const springY = useSpring(y, { stiffness: 150, damping: 15 });
+  const springX = useSpring(x, { stiffness: 220, damping: 18, mass: 0.7 });
+  const springY = useSpring(y, { stiffness: 220, damping: 18, mass: 0.7 });
 
   const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-block text-center relative z-10';
   
@@ -50,7 +52,7 @@ export default function Button({
   const props = href ? { href } : { onClick, type: 'button' as const };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (variant !== 'primary' || !ref.current) return;
+    if (!enableHoverMotion || variant !== 'primary' || !ref.current) return;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
     const centerY = top + height / 2;
@@ -71,8 +73,25 @@ export default function Button({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ x: springX, y: springY }}
-      whileHover={{ scale: variant === 'primary' ? 1.05 : 1.02 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={
+        enableHoverMotion
+          ? {
+              scale: variant === 'primary' ? 1.05 : 1.02,
+              y: -2,
+              transition: { type: 'spring', stiffness: 320, damping: 20 },
+            }
+          : undefined
+      }
+      whileTap={
+        prefersReducedMotion
+          ? { opacity: 0.92 }
+          : {
+              scale: isCoarsePointer ? 0.985 : 0.96,
+              y: 1.5,
+              filter: 'brightness(0.95)',
+              transition: { type: 'spring', stiffness: 500, damping: 26 },
+            }
+      }
       className={styles}
       aria-label={ariaLabel}
     >

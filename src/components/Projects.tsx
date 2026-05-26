@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -18,6 +18,7 @@ export default function Projects() {
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
+  const chapterProgress = useSpring(scrollYProgress, { stiffness: 150, damping: 28, mass: 0.35 });
 
   return (
     <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
@@ -32,6 +33,26 @@ export default function Projects() {
       />
 
       <div className="container mx-auto px-6 relative z-10">
+        <div className="mb-10 hidden lg:block">
+          <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md px-5 py-4">
+            <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              <span>Research Storyline</span>
+              <span>Scroll-driven chapter</span>
+            </div>
+            <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+              <motion.div
+                className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
+                style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-between text-[11px] font-medium text-muted-foreground/90">
+              <span>Featured Work</span>
+              <span>Publications</span>
+              <span>Deep Dives</span>
+            </div>
+          </div>
+        </div>
+
         <SectionHeader
           title="Research & Publications"
           subtitle="Conference presentations, scholarly work, and interdisciplinary research outputs"

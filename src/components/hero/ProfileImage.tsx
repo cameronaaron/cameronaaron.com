@@ -4,6 +4,7 @@ import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface ProfileImageProps {
   src: string;
@@ -11,6 +12,8 @@ interface ProfileImageProps {
 }
 
 export default function ProfileImage({ src, alt }: ProfileImageProps) {
+  const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
+
   // Mouse position tracking for 3D tilt effect
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -25,6 +28,12 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const rotateYSpring = useSpring(rotateY, springConfig);
 
   useEffect(() => {
+    if (!enableHoverMotion) {
+      mouseX.set(0);
+      mouseY.set(0);
+      return;
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       const rect = document.getElementById('profile-container')?.getBoundingClientRect();
       if (rect) {
@@ -39,7 +48,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, [enableHoverMotion, mouseX, mouseY]);
 
   return (
     <motion.div
@@ -48,7 +57,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
       animate={{ 
         opacity: 1, 
         scale: 1,
-        y: [0, -20, 0] // Float animation
+        y: prefersReducedMotion ? 0 : [0, -20, 0] // Float animation
       }}
       transition={{ 
         opacity: { duration: 0.8, delay: 0.4 },
@@ -67,7 +76,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
           transformStyle: 'preserve-3d',
         }}
         className="relative w-full aspect-square max-w-md mx-auto"
-        whileHover={{ scale: 1.05 }}
+        whileHover={enableHoverMotion ? { scale: 1.05 } : undefined}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         {/* Glowing background with depth */}
@@ -77,8 +86,8 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-full blur-2xl"
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
+            scale: prefersReducedMotion ? 1 : [1, 1.2, 1],
+            opacity: prefersReducedMotion ? 0.3 : [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 4,
@@ -92,10 +101,13 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         <motion.div 
           className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
           style={{ transform: 'translateZ(20px)' }}
-          whileHover={{
-            borderColor: 'rgba(255, 255, 255, 0.4)',
-            boxShadow: '0 25px 50px -12px rgba(168, 85, 247, 0.5)',
-          }}
+          whileHover={
+            enableHoverMotion
+              ? {
+                  boxShadow: '0 25px 50px -12px rgba(168, 85, 247, 0.5)',
+                }
+              : undefined
+          }
         >
           <Image
             src={src}
@@ -112,7 +124,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
           <motion.div
             className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0"
             initial={{ x: '-100%', y: '-100%' }}
-            whileHover={{ x: '100%', y: '100%' }}
+            whileHover={enableHoverMotion ? { x: '100%', y: '100%' } : undefined}
             transition={{ duration: 0.8 }}
           />
         </motion.div>

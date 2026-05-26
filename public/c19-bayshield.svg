@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="C19 BayShield logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="18" fill="#0b1220"/>
+  <path d="M50 13l28 10v23c0 20-12 34-28 41-16-7-28-21-28-41V23z" fill="url(#g)" opacity="0.95"/>
+  <path d="M50 20l21 8v18c0 15-8 26-21 33-13-7-21-18-21-33V28z" fill="#0b1220" opacity="0.35"/>
+  <text x="50" y="56" text-anchor="middle" fill="#ecfeff" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" font-weight="700">C19</text>
+</svg>

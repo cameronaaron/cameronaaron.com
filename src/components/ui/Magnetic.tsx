@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode, type MouseEvent } from 'react';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface MagneticProps {
   children: ReactNode;
@@ -13,12 +14,13 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const { enableHoverMotion } = useInteractionMode();
 
-  const springX = useSpring(x, { stiffness: 150, damping: 15 });
-  const springY = useSpring(y, { stiffness: 150, damping: 15 });
+  const springX = useSpring(x, { stiffness: 180, damping: 17, mass: 0.8 });
+  const springY = useSpring(y, { stiffness: 180, damping: 17, mass: 0.8 });
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!enableHoverMotion || !ref.current) return;
 
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
@@ -41,7 +43,7 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ x: springX, y: springY }}
+      style={enableHoverMotion ? { x: springX, y: springY } : undefined}
       className={className}
     >
       {children}
