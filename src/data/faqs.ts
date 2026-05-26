@@ -24,6 +24,10 @@ export const faqs = [
     answer: "Yeah! I started in Biopsychology and Neuroscience. It taught me a lot about systems—biological ones—which surprisingly translates really well to understanding distributed software systems."
   },
   {
+    question: "What was your graduate capstone defense project?",
+    answer: "My M.Ed. capstone was \"Bridging Transitions,\" an arts-based research project on thrice-exceptional Black male students in higher education. I produced a five-part educational video series focused on identification, transition barriers, strengths-based practice, social-emotional experience, and institutional recommendations."
+  },
+  {
     question: "What awards and recognition have you received?",
     answer: "I won the 2021 Ammerman Center Bridget Baird Award for my Genetic RefleXions Magic Mirror project, which displays genetic information alongside user reflections. I've also won multiple hackathons and received academic excellence awards throughout my career."
   }

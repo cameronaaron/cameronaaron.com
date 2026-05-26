@@ -6,15 +6,21 @@ describe('sitemap metadata route', () => {
     expect(dynamic).toBe('force-static');
   });
 
-  it('returns canonical homepage sitemap entry', () => {
+  it('returns homepage and capstone sitemap entries', () => {
     const result = sitemap();
 
-    expect(result).toHaveLength(1);
+    expect(result).toHaveLength(2);
     expect(result[0]).toMatchObject({
       url: 'https://cameronaaron.com/',
       changeFrequency: 'weekly',
       priority: 1,
     });
+    expect(result[1]).toMatchObject({
+      url: 'https://cameronaaron.com/capstone.html',
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    });
     expect(result[0].lastModified).toBeInstanceOf(Date);
+    expect(result[1].lastModified).toBeInstanceOf(Date);
   });
 });

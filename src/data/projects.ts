@@ -10,6 +10,22 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "Bridging Transitions: Video-Based Educational Content on Thrice-exceptional Black Male Students' Higher Education Journey",
+    description: "Graduate capstone project producing a five-part educational video series on identification challenges, transition barriers, strength-based practices, social-emotional experiences, and institutional recommendations.",
+    link: "https://cameronaaron.com/capstone.html",
+    tags: [
+      "Thrice-Exceptional",
+      "Gifted Education",
+      "Higher Education",
+      "Arts-Based Research",
+      "Culturally Responsive Education",
+      "Community Cultural Wealth",
+    ],
+    period: "Spring 2026",
+    cta: "Capstone Project",
+    featured: true,
+  },
+  {
     title: "Lapses in Sustained Attention Predicted by Changes in Visually-Guided Movements",
     description: "Vision Sciences Society Annual Meeting research linking motor behavior and cognitive attention patterns with translational clinical implications.",
     link: "https://www.visionsciences.org/",

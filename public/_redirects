@@ -7,3 +7,7 @@
 # Force HTTPS (Cloudflare handles this automatically, but can be explicit)
 http://cameronaaron.com/* https://cameronaaron.com/:splat 301
 http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+
+# Static export rewrites for extensionless landing pages
+/capstone /capstone.html 200
+/capstone/ /capstone.html 200

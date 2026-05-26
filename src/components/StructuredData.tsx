@@ -4,6 +4,8 @@ import { projects } from '@/data/projects';
 import { skills } from '@/data/skills';
 import { certifications } from '@/data/certifications';
 import { testimonials } from '@/data/testimonials';
+import { faqs } from '@/data/faqs';
+import { educationItems } from '@/data/education';
 import { sortByDateDesc } from '@/data/dateOrdering';
 
 function toIsoDate(monthYearText?: string): string | undefined {
@@ -29,8 +31,15 @@ export default function StructuredData() {
   const sortedProjects = sortByDateDesc(projects, (project) => project.period);
   const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
   const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
+  const researchThemes = Array.from(new Set(sortedProjects.flatMap((project) => project.tags)));
+  const roleNames = Array.from(
+    new Set(
+      experiences.flatMap((exp) => exp.positions.map((position) => position.title).filter(Boolean))
+    )
+  ) as string[];
 
   const baseUrl = 'https://cameronaaron.com';
+  const capstoneUrl = `${baseUrl}/capstone.html`;
   const personId = `${baseUrl}/#person`;
   const websiteId = `${baseUrl}/#website`;
   const webpageId = `${baseUrl}/#webpage`;
@@ -55,7 +64,15 @@ export default function StructuredData() {
       profile.social.github,
       profile.social.linkedin,
     ],
-    knowsAbout: skills.domains.slice(0, 20),
+    alumniOf: educationItems.map((item) => ({
+      "@type": 'CollegeOrUniversity',
+      name: item.institution,
+    })),
+    hasOccupation: roleNames.slice(0, 12).map((roleName) => ({
+      "@type": 'Occupation',
+      name: roleName,
+    })),
+    knowsAbout: Array.from(new Set([...skills.domains, ...researchThemes])).slice(0, 30),
     contactPoint: [
       {
         "@type": "ContactPoint",
@@ -106,6 +123,14 @@ export default function StructuredData() {
       "@type": "ImageObject",
       url: `${baseUrl}${profile.image}`,
     },
+    hasPart: [
+      {
+        "@type": 'WebPage',
+        "@id": `${capstoneUrl}#webpage`,
+        url: capstoneUrl,
+        name: 'Bridging Transitions Capstone Defense',
+      },
+    ],
     inLanguage: 'en-US',
   };
 
@@ -121,6 +146,39 @@ export default function StructuredData() {
     ],
   };
 
+  const educationSchema = {
+    "@type": 'ItemList',
+    name: 'Education',
+    itemListElement: educationItems.map((item, index) => ({
+      "@type": 'ListItem',
+      position: index + 1,
+      item: {
+        "@type": 'EducationalOccupationalCredential',
+        name: item.credential,
+        credentialCategory: item.credential.toLowerCase().includes('certificate') ? 'certificate' : 'degree',
+        recognizedBy: {
+          "@type": 'CollegeOrUniversity',
+          name: item.institution,
+        },
+        description: item.details.join(' '),
+      },
+    })),
+  };
+
+  const faqPageSchema = {
+    "@type": 'FAQPage',
+    "@id": `${baseUrl}/#faq`,
+    name: 'Frequently Asked Questions',
+    mainEntity: faqs.map((faq) => ({
+      "@type": 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   const researchOutputSchema = {
     "@type": "ItemList",
     name: 'Research and Publications',
@@ -128,8 +186,17 @@ export default function StructuredData() {
       "@type": "ListItem",
       position: index + 1,
       item: {
-        "@type": "CreativeWork",
+        "@type": project.link.includes('/capstone') ? 'ScholarlyArticle' : 'CreativeWork',
         name: project.title,
+        ...(project.link.includes('/capstone')
+          ? {
+              author: {
+                "@id": personId,
+              },
+              isAccessibleForFree: true,
+              educationalUse: 'Professional development and institutional training',
+            }
+          : {}),
         description: project.description,
         url: project.link,
         keywords: project.tags.join(', '),
@@ -208,6 +275,8 @@ export default function StructuredData() {
       webPageSchema,
       profilePageSchema,
       breadcrumbSchema,
+      educationSchema,
+      faqPageSchema,
       researchOutputSchema,
       workExperienceSchema,
       credentialSchema,
