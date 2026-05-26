@@ -2,8 +2,8 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "npm run build && npm run preview",
-      "startServerReadyPattern": "ready",
+      "startServerCommand": "npm run build && npx serve -s out -l 3000",
+      "startServerReadyPattern": "Accepting connections",
       "url": [
         "http://localhost:3000"
       ],

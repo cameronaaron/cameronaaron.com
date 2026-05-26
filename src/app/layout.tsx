@@ -1,53 +1,65 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-const inter = Inter({ 
+const manrope = Manrope({ 
   subsets: ["latin"],
   display: 'swap',
+  preload: true,
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-display',
   preload: true,
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cameronaaron.com"),
   title: {
-    default: "Cameron Aaron - Software Engineer & Neuroscientist",
+    default: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
     template: "%s | Cameron Aaron"
   },
-  description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine. Experience at GitHub, SpaceX, Dutchie, and Microsoft.",
+  description: "Software engineer and security researcher with interdisciplinary experience in healthcare technology, aerospace medicine, neuroscience research, and public health operations while preparing for Nurse Practitioner school.",
   keywords: [
-    "Cameron Aaron", 
-    "Software Engineer", 
-    "Neuroscientist", 
-    "DevOps", 
+    "Cameron Aaron",
+    "Software Engineer",
+    "Security Researcher",
+    "Cybersecurity",
+    "DevOps",
+    "Cloud Engineering",
     "AI Engineer",
-    "Machine Learning Expert",
-    "GitHub Developer", 
-    "SpaceX Engineer", 
-    "Dutchie", 
-    "Microsoft", 
-    "Cybersecurity Expert",
-    "Product Manager",
+    "Machine Learning",
     "Full-Stack Developer",
     "Python Developer",
     "TypeScript Developer",
     "React Developer",
     "Next.js Developer",
-    "Cloud Architect",
-    "AWS Certified",
-    "Google Cloud Certified",
-    "Biopsychology Teacher",
-    "IT Director",
     "Systems Administrator",
-    "FastAPI Developer",
-    "AI Research",
     "Bioinformatics",
+    "EMT",
+    "CNA",
+    "Nurse Practitioner",
+    "NP School",
+    "Nursing Prerequisites",
     "Aerospace Medicine",
-    "Education Technology"
+    "Healthcare Technology",
+    "Clinical Research",
+    "Biopsychology",
+    "Neuroscience",
+    "Public Health Operations",
+    "Emergency Medical Technician",
+    "Patient-Centered Care",
+    "Community Health Worker",
+    "Clinical Data Analysis",
+    "Medical Imaging",
+    "EEG Research",
+    "Cognitive Diversity"
   ],
   authors: [{ name: "Cameron Aaron", url: "https://cameronaaron.com" }],
   creator: "Cameron Aaron",
@@ -81,16 +93,16 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "Cameron Aaron - Software Engineer & Neuroscientist",
-    description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine. Building innovative solutions at the intersection of technology and science.",
+    title: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
+    description: "Software engineer and security researcher with active emergency and nursing credentials, healthcare technology expertise, and a clear path toward Nurse Practitioner training.",
     url: "https://cameronaaron.com",
-    siteName: "Cameron Aaron Portfolio",
+    siteName: "Cameron Aaron - Medical Resume",
     images: [
       {
         url: "https://cameronaaron.com/profile.webp",
         width: 1200,
         height: 630,
-        alt: "Cameron Aaron - Software Engineer & Neuroscientist",
+        alt: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
         type: "image/webp",
       },
     ],
@@ -103,11 +115,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cameron Aaron - Software Engineer & Neuroscientist",
-    description: "Seasoned Product Manager and Software Engineer with expertise in AI, neuroscience, and aerospace medicine.",
+    title: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
+    description: "Interdisciplinary profile spanning software engineering, security research, healthcare technology, and Nurse Practitioner preparation.",
     images: {
       url: "https://cameronaaron.com/profile.webp",
-      alt: "Cameron Aaron - Software Engineer & Neuroscientist",
+      alt: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
     },
   },
   robots: {
@@ -123,9 +135,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  category: 'technology',
-  classification: 'Portfolio Website',
-  applicationName: 'Cameron Aaron Portfolio',
+  category: 'healthcare and technology',
+  classification: 'Professional Resume Website',
+  applicationName: 'Cameron Aaron Medical Resume',
   referrer: 'origin-when-cross-origin',
   appleWebApp: {
     capable: true,
@@ -146,7 +158,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#7c3aed",
+  themeColor: "#06b6d4",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -183,7 +195,7 @@ export default function RootLayout({
         
         <StructuredData />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <SmoothScroll />
         <CustomCursor />
         <ServiceWorkerRegistration />

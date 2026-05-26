@@ -22,9 +22,9 @@ export interface Profile {
 
 export const profile: Profile = {
   name: "Cameron Aaron",
-  title: "Software Engineer & Neuroscientist",
-  tagline: "Building the future at the intersection of AI, neuroscience, and technology",
-  bio: "Seasoned Product Manager and Software Engineer with a diverse background in artificial intelligence, neuroscience, and aerospace medicine. Over six years of experience collaborating with industry leaders like Dutchie, GitHub, SpaceX, and Microsoft, driving innovation and delivering high-quality solutions.",
+  title: "EMT, CNA, Software Engineer, Security Researcher & Future Nurse Practitioner",
+  tagline: "Interdisciplinary professional bridging emergency care, neuroscience research, software engineering, and cybersecurity while preparing for Nurse Practitioner school.",
+  bio: "Dedicated healthcare and technology professional with experience in aerospace medicine, clinical research, public health operations, software engineering, and security research. My next stage is Nurse Practitioner training, while continuing to build secure, high-impact technology for health and science.",
   email: "cameronthescientist@pm.me",
   location: "Los Angeles, CA",
   image: "/profile.webp",
@@ -35,9 +35,10 @@ export const profile: Profile = {
   },
   
   stats: [
-    { label: "Years of Experience", value: "6+" },
-    { label: "Companies", value: "10+" },
-    { label: "Projects Delivered", value: "50+" },
-    { label: "Awards Won", value: "7+" },
+    { label: "Clinical Certifications", value: "10+" },
+    { label: "Years Interdisciplinary", value: "8+" },
+    { label: "Research Projects", value: "15+" },
+    { label: "Software & Security Projects", value: "50+" },
+    { label: "Awards & Honors", value: "12+" },
   ],
 };

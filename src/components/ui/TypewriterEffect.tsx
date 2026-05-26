@@ -18,7 +18,7 @@ export default function TypewriterEffect({
 }: TypewriterEffectProps) {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+  const isComplete = currentIndex >= text.length;
 
   useEffect(() => {
     if (currentIndex < text.length) {
@@ -28,10 +28,8 @@ export default function TypewriterEffect({
       }, typingSpeed);
       
       return () => clearTimeout(timer);
-    } else if (currentIndex === text.length && !isComplete) {
-      setIsComplete(true);
     }
-  }, [currentIndex, text, typingSpeed, isComplete]);
+  }, [currentIndex, text, typingSpeed]);
 
   return (
     <span className={className}>

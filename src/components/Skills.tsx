@@ -27,8 +27,9 @@ export default function Skills() {
 
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader 
-          title="Skills & Expertise" 
-          subtitle="Deep technical expertise across multiple domains"
+          title="Clinical & Technical Skills" 
+          subtitle="Healthcare capabilities, research tools, and health IT expertise"
+          className="[&>h2]:font-display"
         />
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
@@ -46,7 +47,7 @@ export default function Skills() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              Technical Skills
+              Core Competencies
             </motion.h3>
             <div className="space-y-4">
               {skills.technical.map((skill, index) => (
@@ -104,7 +105,7 @@ export default function Skills() {
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
             >
-              Certifications
+              Certification Highlights
             </motion.h3>
             <div className="space-y-3">
               {skills.certifications.map((cert, index) => (

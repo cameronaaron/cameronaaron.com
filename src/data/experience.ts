@@ -12,23 +12,45 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
+    company: "SpaceX",
+    logo: "/spacex.webp",
+    positions: [
+      {
+        title: "Aerospace Medicine, Space Operations",
+        period: "Aug 2020 - Jan 2021",
+        description: "Collaborated with flight surgeons and medical fellows on Starship and Crew Dragon medical deliverables, occupational health surveillance, and COVID-19 response protocols.",
+      },
+    ],
+  },
+  {
     company: "Bridges Academy",
     logo: "/ba.webp",
     positions: [
       {
-        title: "Biopsychology Teacher",
-        period: "Jun 2023 - Present",
-        description: "Teaching biopsychology with comprehensive project-based curriculum.",
+        title: "Biopsychology Instructor",
+        period: "Nov 2022 - Jul 2024",
+        description: "Developed and delivered advanced biopsychology curriculum, mentored student research, and applied evidence-based strategies for complex neurological learning outcomes.",
+      },
+    ],
+  },
+  {
+    company: "Connecticut College",
+    logo: "/conn.svg.webp",
+    positions: [
+      {
+        title: "CameLAB Neuroscience Lab Research Assistant",
+        period: "Aug 2017 - May 2021",
+        description: "Conducted EEG, 3D Reach Tracker, and eye-tracking research with MATLAB analysis; co-authored sustained attention and motor behavior findings.",
       },
       {
-        title: "Director of Information Technology Engineering",
-        period: "Mar 2023 - Present",
-        description: "Established and managed comprehensive IT infrastructure, providing responsive technical support and fostering digital literacy.",
+        title: "Computational Biology & Bioinformatics Researcher",
+        period: "Jan 2020 - May 2021",
+        description: "Built Apache Spark SNP analysis pipelines, DICOM imaging analysis tools, and applications integrating digital medical records with biometric and genomic data.",
       },
       {
-        title: "Engineering Teacher",
-        period: "Nov 2022 - Present",
-        description: "Developed comprehensive software engineering curriculum with project-based learning experiences.",
+        title: "Cybersecurity Researcher",
+        period: "Aug 2019 - May 2021",
+        description: "Performed ethical penetration testing and vulnerability assessments to support proactive institutional risk mitigation.",
       },
     ],
   },
@@ -37,30 +59,20 @@ export const experiences: Experience[] = [
     logo: "/Dutchie.svg",
     positions: [
       {
-        title: "Lead Systems Admin",
-        period: "Aug 2022 - Nov 2022",
-        description: "Led systems administration, translating functional to technical requirements, managing SaaS platforms, and building analytics solutions.",
-      },
-      {
-        title: "Lead Support Systems Analyst",
-        period: "Feb 2022 - Aug 2022",
-        description: "Developed data-driven systems projects including migrations and major overhauls.",
-      },
-      {
-        title: "Project Manager",
-        period: "Aug 2021 - Feb 2022",
-        description: "Managed cross-organizational projects, analyzing team data to develop prioritized goals.",
+        title: "Systems Administrator",
+        period: "Jul 2021 - Nov 2022",
+        description: "Progressed across support and systems roles, led SaaS operations, documentation, and security-focused systems improvements.",
       },
     ],
   },
   {
-    company: "SpaceX",
-    logo: "/spacex.webp",
+    company: "4me (Xurrent)",
+    logo: "/icon-192x192.png",
     positions: [
       {
-        title: "Aerospace Medicine, Space Operations",
-        period: "Aug 2020 - Dec 2020",
-        description: "Assisted with COVID response, collaborated on medical research for Starship/Crew Dragon programs.",
+        title: "DevOps Engineer",
+        period: "Feb 2023 - Apr 2023",
+        description: "Improved service availability, supported on-premise installations, and strengthened disaster recovery operations.",
       },
     ],
   },
@@ -69,20 +81,53 @@ export const experiences: Experience[] = [
     logo: "/github.webp",
     positions: [
       {
-        title: "Software Engineer",
-        period: "Aug 2019 - Jan 2020",
-        description: "Developed internal tools to enhance product functionality and user experience.",
+        title: "Software Engineer, Support Operations",
+        period: "May 2019 - Jan 2020",
+        description: "Developed support tooling and collaborated across operations, product, engineering, and legal on customer-facing launches.",
       },
     ],
   },
   {
-    company: "Google",
+    company: "C19 BayShield",
+    logo: "/icon-192x192.png",
+    positions: [
+      {
+        title: "Backend Team Lead Engineer - COVID-19 Response",
+        period: "Mar 2020 - Sep 2020",
+        description: "Led 50+ Berkeley engineers and makers, delivering a resource platform that helped distribute over 6,300 PPE items to health facilities.",
+      },
+    ],
+  },
+  {
+    company: "Helping Hands Community",
+    logo: "/icon-192x192.png",
+    positions: [
+      {
+        title: "Field Operations Engineering Specialist",
+        period: "Jun 2020 - Sep 2020",
+        description: "Supported community COVID-19 response logistics for vulnerable populations through healthcare access partnerships and operations support.",
+      },
+    ],
+  },
+  {
+    company: "BardoVR",
+    logo: "/icon-192x192.png",
+    positions: [
+      {
+        title: "Virtual Reality Health & Wellness Developer",
+        period: "Apr 2020 - Aug 2020",
+        description: "Built immersive VR experiences designed to improve psychological wellbeing, focus, and compassion outcomes.",
+      },
+    ],
+  },
+  {
+    company: "Google Fi",
     logo: "/google.webp",
     positions: [
       {
-        title: "CSSI Section Leader & Student Mentor",
-        period: "Jun 2020 - Sep 2020",
-        description: "Selected as Algorithms TA/mentor for ~50 students, ensuring 95% pass rate.",
+        title: "Senior Product Expert (Volunteer)",
+        period: "2019 - 2022",
+        description: "Provided advanced multi-platform technical support and contributed expert guidance to community user support channels.",
       },
     ],
   },

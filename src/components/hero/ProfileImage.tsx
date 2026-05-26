@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
 
 interface ProfileImageProps {
@@ -11,8 +11,6 @@ interface ProfileImageProps {
 }
 
 export default function ProfileImage({ src, alt }: ProfileImageProps) {
-  const [isClient, setIsClient] = useState(false);
-  
   // Mouse position tracking for 3D tilt effect
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -27,8 +25,6 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const rotateYSpring = useSpring(rotateY, springConfig);
 
   useEffect(() => {
-    setIsClient(true);
-    
     const handleMouseMove = (e: MouseEvent) => {
       const rect = document.getElementById('profile-container')?.getBoundingClientRect();
       if (rect) {
@@ -66,8 +62,8 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
     >
       <motion.div 
         style={{
-          rotateX: isClient ? rotateXSpring : 0,
-          rotateY: isClient ? rotateYSpring : 0,
+          rotateX: rotateXSpring,
+          rotateY: rotateYSpring,
           transformStyle: 'preserve-3d',
         }}
         className="relative w-full aspect-square max-w-md mx-auto"

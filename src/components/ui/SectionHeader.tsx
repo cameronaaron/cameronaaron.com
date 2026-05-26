@@ -19,7 +19,7 @@ export default function SectionHeader({ title, subtitle, className = '' }: Secti
       viewport={{ once: true }}
       className={`text-center mb-16 ${className}`}
     >
-      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent overflow-hidden pb-2">
+      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent overflow-hidden pb-2 font-display">
         <TextReveal text={title} />
       </h2>
       {subtitle && (

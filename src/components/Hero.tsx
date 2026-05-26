@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
@@ -8,8 +9,11 @@ import TextReveal from '@/components/ui/TextReveal';
 import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
 import BackgroundParticles from '@/components/hero/BackgroundParticles';
-import InteractiveParticles from '@/components/hero/InteractiveParticles';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
+
+const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), {
+  ssr: false,
+});
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -21,6 +25,7 @@ export default function Hero() {
 
   return (
     <section 
+      id="home"
       className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background"
       aria-label="Hero section"
     >
@@ -74,7 +79,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+              className="text-4xl md:text-6xl font-bold mb-6 tracking-tight font-display"
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
                 <TypewriterEffect text={profile.name} typingSpeed={80} />
@@ -100,8 +105,8 @@ export default function Hero() {
               transition={{ delay: 0.6 }}
               className="flex flex-wrap gap-4"
             >
-              <Button href="#contact" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
-                <span className="relative z-10">Let's Connect</span>
+              <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
+                <span className="relative z-10">View Credentials</span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"
                   initial={{ x: '-100%' }}
@@ -109,8 +114,8 @@ export default function Hero() {
                   transition={{ duration: 0.3 }}
                 />
               </Button>
-              <Button href="#projects" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
-                See My Journey
+              <Button href="#experience" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
+                Explore Experience
               </Button>
             </motion.div>
 

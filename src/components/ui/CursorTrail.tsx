@@ -61,9 +61,9 @@ export default function CursorTrail() {
   return (
     <div className="fixed inset-0 pointer-events-none z-50" aria-hidden="true">
       {trail.map((point, index) => {
-        const age = Date.now() - point.timestamp;
-        const opacity = Math.max(0, 1 - age / 800);
-        const scale = 1 - index * 0.05;
+        const progress = (index + 1) / trail.length;
+        const opacity = Math.max(0.15, progress);
+        const scale = 0.6 + progress * 0.4;
 
         return (
           <motion.div

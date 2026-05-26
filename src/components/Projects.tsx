@@ -6,7 +6,6 @@ import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
-import ParallaxSection from '@/components/ui/ParallaxSection';
 
 export default function Projects() {
   const featuredProjects = projects.filter(p => p.featured);
@@ -34,8 +33,9 @@ export default function Projects() {
 
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
-          title="Featured Projects"
-          subtitle="Innovative solutions leveraging AI, web development, and scientific research"
+          title="Research & Publications"
+          subtitle="Conference presentations, scholarly work, and interdisciplinary research outputs"
+          className="[&>h2]:font-display"
         />
 
         {/* Featured Projects */}

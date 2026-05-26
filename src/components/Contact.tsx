@@ -26,7 +26,7 @@ export default function Contact() {
             Let's Connect
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            I'm always open to discussing new ideas, tech, or just chatting about shared interests.
+            Open to healthcare, clinical research, and interdisciplinary collaboration opportunities.
           </p>
         </motion.div>
 

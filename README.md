@@ -1,6 +1,6 @@
 # Cameron Aaron - Portfolio
 
-Modern portfolio website built with Next.js 15, React 19, TypeScript, and Tailwind CSS. Deployed globally on Cloudflare Workers.
+Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4. Deployed globally on Cloudflare Workers.
 
 ## 🚀 Quick Start
 
@@ -8,6 +8,7 @@ Modern portfolio website built with Next.js 15, React 19, TypeScript, and Tailwi
 npm install
 npm run dev          # Development server
 npm run build        # Production build
+npm run lint         # ESLint checks
 npm run preview      # Test with Cloudflare Workers
 ```
 
@@ -25,11 +26,11 @@ public/              # Static assets (.webp images)
 
 ## 🛠️ Tech Stack
 
-- **Next.js 15.5.6** - React framework with App Router
-- **React 19.2.0** - UI library
-- **TypeScript 5.9.3** - Type safety
-- **Tailwind CSS 3.4.18** - Styling
-- **Framer Motion 11.18.2** - Animations
+- **Next.js 16.2.6** - React framework with App Router
+- **React 19.2.6** - UI library
+- **TypeScript 6.0.3** - Type safety
+- **Tailwind CSS 4.3.0** - Styling
+- **Framer Motion 12.40.0** - Animations
 - **Cloudflare Workers** - Edge deployment
 
 ## ✏️ Editing Content

@@ -20,47 +20,51 @@ const colors = [
   'rgba(167, 243, 208, 0.6)', // cyan
 ];
 
+function createSeededRandom(seed: number) {
+  let value = seed;
+  return () => {
+    value = (value * 1664525 + 1013904223) % 4294967296;
+    return value / 4294967296;
+  };
+}
+
+function createInitialParticles(count = 30, seed = 1337): Particle[] {
+  const random = createSeededRandom(seed);
+
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: random() * 100,
+    y: random() * 100,
+    size: random() * 4 + 2,
+    color: colors[Math.floor(random() * colors.length)],
+    velocity: {
+      x: (random() - 0.5) * 0.2,
+      y: (random() - 0.5) * 0.2,
+    },
+    opacity: random() * 0.5 + 0.3,
+  }));
+}
+
 export default function InteractiveParticles() {
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState<Particle[]>(() => createInitialParticles());
 
   useEffect(() => {
-    // Initialize particles
-    const initialParticles: Particle[] = Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      velocity: {
-        x: (Math.random() - 0.5) * 0.2,
-        y: (Math.random() - 0.5) * 0.2,
-      },
-      opacity: Math.random() * 0.5 + 0.3,
-    }));
-    setParticles(initialParticles);
-
-    // Mouse move handler
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
     // Animation loop
     const animate = () => {
       setParticles((prev) =>
         prev.map((particle) => {
           let newX = particle.x + particle.velocity.x;
           let newY = particle.y + particle.velocity.y;
+          let newVelocityX = particle.velocity.x;
+          let newVelocityY = particle.velocity.y;
 
           // Bounce off edges
           if (newX < 0 || newX > 100) {
-            particle.velocity.x *= -1;
+            newVelocityX *= -1;
             newX = Math.max(0, Math.min(100, newX));
           }
           if (newY < 0 || newY > 100) {
-            particle.velocity.y *= -1;
+            newVelocityY *= -1;
             newY = Math.max(0, Math.min(100, newY));
           }
 
@@ -68,6 +72,10 @@ export default function InteractiveParticles() {
             ...particle,
             x: newX,
             y: newY,
+            velocity: {
+              x: newVelocityX,
+              y: newVelocityY,
+            },
           };
         })
       );
@@ -76,7 +84,6 @@ export default function InteractiveParticles() {
     const interval = setInterval(animate, 50);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       clearInterval(interval);
     };
   }, []);

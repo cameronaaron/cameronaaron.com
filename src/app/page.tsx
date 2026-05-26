@@ -7,7 +7,15 @@ import AmbientBackground from '@/components/ui/AmbientBackground';
 import CursorTrail from '@/components/ui/CursorTrail';
 
 // Lazy load below-the-fold components for better performance
+const Certifications = dynamic(() => import('@/components/Certifications'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
 const Experience = dynamic(() => import('@/components/Experience'), {
+  loading: () => <div className="h-screen" />,
+  ssr: false
+});
+const Education = dynamic(() => import('@/components/Education'), {
   loading: () => <div className="h-screen" />,
   ssr: false
 });
@@ -20,10 +28,6 @@ const Skills = dynamic(() => import('@/components/Skills'), {
   ssr: false
 });
 const Testimonials = dynamic(() => import('@/components/Testimonials'), {
-  loading: () => <div className="h-screen" />,
-  ssr: false
-});
-const FAQ = dynamic(() => import('@/components/FAQ'), {
   loading: () => <div className="h-screen" />,
   ssr: false
 });
@@ -46,11 +50,12 @@ export default function Home() {
       <main className="min-h-screen" id="main-content">
         <Navigation />
         <Hero />
+        <Certifications />
         <Experience />
+        <Education />
         <Projects />
         <Skills />
         <Testimonials />
-        <FAQ />
         <Contact />
       
       {/* Footer */}

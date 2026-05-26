@@ -88,6 +88,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         <p className="text-muted-foreground mb-6 line-clamp-3 leading-relaxed flex-grow">
           {project.description}
         </p>
+        <p className="text-cyan-300 text-sm font-medium mb-4">{project.period}</p>
         <div className="flex flex-wrap gap-2 mb-6">
           {project.tags.slice(0, 3).map((tag, tagIndex) => (
             <motion.span
@@ -107,7 +108,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           whileHover={{ x: 8 }}
           transition={{ duration: 0.2 }}
         >
-          View Project
+          {project.cta ?? 'Read More'}
           <motion.svg 
             className="w-4 h-4 ml-2" 
             fill="none" 

@@ -2,8 +2,7 @@ import { profile } from '@/data/profile';
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
 import { skills } from '@/data/skills';
-import { faqs } from '@/data/faqs';
-import { testimonials } from '@/data/testimonials';
+import { certifications } from '@/data/certifications';
 
 export default function StructuredData() {
   const personSchema = {
@@ -20,6 +19,16 @@ export default function StructuredData() {
       profile.social.linkedin,
     ],
     knowsAbout: skills.domains,
+    hasCredential: certifications.map((cert) => ({
+      "@type": "EducationalOccupationalCredential",
+      name: cert.name,
+      credentialCategory: cert.status,
+      recognizedBy: {
+        "@type": "Organization",
+        name: cert.issuer,
+      },
+      identifier: cert.credentialId,
+    })),
   };
 
   const profilePageSchema = {
@@ -44,43 +53,9 @@ export default function StructuredData() {
     contactPoint: [{
       "@type": "ContactPoint",
       email: profile.email,
-      contactType: "customer service"
+      contactType: "professional inquiries"
     }],
   };
-
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map(faq => ({
-      "@type": "Question",
-      name: faq.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.answer,
-      },
-    })),
-  };
-
-  const reviewSchemas = testimonials.slice(0, 4).map((testimonial) => ({
-    "@context": "https://schema.org",
-    "@type": "Review",
-    itemReviewed: {
-      "@type": "Person",
-      name: profile.name,
-      jobTitle: profile.title,
-      url: "https://cameronaaron.com",
-    },
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: "5",
-      bestRating: "5",
-    },
-    author: {
-      "@type": "Person",
-      name: testimonial.name,
-    },
-    reviewBody: testimonial.text,
-  }));
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -95,20 +70,16 @@ export default function StructuredData() {
     ],
   };
 
-  const projectsSchema = {
+  const researchOutputSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     itemListElement: projects.map((project, index) => ({
-      "@type": "SoftwareApplication",
+      "@type": "CreativeWork",
       position: index + 1,
       name: project.title,
       description: project.description,
-      applicationCategory: "WebApplication",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      datePublished: project.period,
+      url: project.link,
     })),
   };
 
@@ -130,7 +101,7 @@ export default function StructuredData() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Cameron Aaron Portfolio",
+    name: "Cameron Aaron Medical Resume",
     url: "https://cameronaaron.com",
     potentialAction: {
       "@type": "SearchAction",
@@ -155,22 +126,11 @@ export default function StructuredData() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      {reviewSchemas.map((schema, index) => (
-        <script
-          key={`review-${index}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
-      <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectsSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(researchOutputSchema) }}
       />
       <script
         type="application/ld+json"

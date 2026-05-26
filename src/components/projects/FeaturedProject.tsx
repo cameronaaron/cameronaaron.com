@@ -31,12 +31,14 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Featured Project
+                Featured Publication
               </div>
               
               <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">
                 {project.title}
               </h3>
+
+              <p className="text-cyan-300 text-sm font-medium mb-4">{project.period}</p>
               
               <p className="text-gray-400 text-lg leading-relaxed mb-8">
                 {project.description}
@@ -58,7 +60,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
                 variant="primary" 
                 className="w-fit group-hover:shadow-[0_0_20px_rgba(124,58,237,0.5)] transition-shadow"
               >
-                View Project
+                {project.cta ?? 'View Publication'}
               </Button>
             </div>
           </div>

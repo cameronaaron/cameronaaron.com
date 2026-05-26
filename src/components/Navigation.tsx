@@ -45,9 +45,9 @@ export default function Navigation() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <motion.a
-              href="#"
+              href="#home"
               whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold transition-colors bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent"
+              className="text-2xl font-bold transition-colors bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent font-display"
             >
               Cameron
             </motion.a>
@@ -75,7 +75,7 @@ export default function Navigation() {
               size="md"
               className="shadow-lg shadow-primary/20 hover:shadow-primary/40"
             >
-              Let's Chat
+              Contact
             </Button>
           </div>
         </div>

@@ -5,10 +5,11 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   { name: "Home", href: "#home" },
+  { name: "Certifications", href: "#certifications" },
   { name: "Experience", href: "#experience" },
-  { name: "Projects", href: "#projects" },
+  { name: "Education", href: "#education" },
+  { name: "Publications", href: "#projects" },
   { name: "Skills", href: "#skills" },
   { name: "Testimonials", href: "#testimonials" },
-  { name: "FAQ", href: "#faq" },
   { name: "Contact", href: "#contact" },
 ];
