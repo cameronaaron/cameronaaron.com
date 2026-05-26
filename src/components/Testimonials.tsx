@@ -6,19 +6,41 @@ import { testimonials } from '@/data/testimonials';
 import { sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import TestimonialCard from '@/components/testimonials/TestimonialCard';
-import Button from '@/components/ui/Button';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 
+type RelationshipFilter = 'all' | 'manager' | 'mentor' | 'colleague';
+
 export default function Testimonials() {
-  const [showAll, setShowAll] = useState(false);
   const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
   const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
 
-  // Show only featured testimonials by default.
+  // Featured testimonials drive the spotlight carousel.
   const featuredTestimonials = sortedTestimonials.filter((testimonial) => testimonial.featured);
-  const hasAdditionalTestimonials = sortedTestimonials.length > featuredTestimonials.length;
-  const visibleTestimonials = showAll ? sortedTestimonials : featuredTestimonials;
   const spotlightTestimonial = featuredTestimonials[spotlightIndex] ?? featuredTestimonials[0];
+
+  const visibleTestimonials = sortedTestimonials.filter((testimonial) => {
+    if (relationshipFilter === 'all') return true;
+
+    const relationship = testimonial.relationship.toLowerCase();
+
+    if (relationshipFilter === 'manager') {
+      return relationship.includes('manager');
+    }
+
+    if (relationshipFilter === 'mentor') {
+      return relationship.includes('mentor') || relationship.includes('professor');
+    }
+
+    return relationship.includes('colleague');
+  });
+
+  const relationshipOptions: Array<{ key: RelationshipFilter; label: string }> = [
+    { key: 'all', label: 'All Voices' },
+    { key: 'manager', label: 'Managers' },
+    { key: 'mentor', label: 'Mentors' },
+    { key: 'colleague', label: 'Colleagues' },
+  ];
 
   const cycleSpotlight = (direction: 1 | -1) => {
     if (featuredTestimonials.length === 0) return;
@@ -101,53 +123,68 @@ export default function Testimonials() {
           </motion.div>
         ) : null}
 
-        {/* Featured Testimonials */}
-        <motion.div 
-          className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.15
-              }
-            }
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="mx-auto mb-8 flex max-w-6xl flex-wrap items-center justify-center gap-2"
         >
-          {visibleTestimonials.map((testimonial, index) => (
-            <motion.div
-              key={`${testimonial.name}-${testimonial.date}`}
-              data-testid={`testimonial-item-${index}`}
-              variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.95 },
-                visible: { opacity: 1, y: 0, scale: 1 }
-              }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <TestimonialCard testimonial={testimonial} index={index} />
-            </motion.div>
-          ))}
+          {relationshipOptions.map((option) => {
+            const isActive = relationshipFilter === option.key;
+
+            return (
+              <motion.button
+                key={option.key}
+                type="button"
+                onClick={() => setRelationshipFilter(option.key)}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
+                  isActive
+                    ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
+                    : 'border-white/12 bg-white/5 text-muted-foreground hover:border-white/30 hover:text-foreground'
+                }`}
+                aria-pressed={isActive}
+              >
+                {option.label}
+              </motion.button>
+            );
+          })}
         </motion.div>
 
-        {/* Show More/Less Button */}
-        {hasAdditionalTestimonials && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <Button
-              onClick={() => setShowAll(!showAll)}
-              variant="primary"
-              size="lg"
-            >
-              {showAll ? 'Show Less' : `View All ${sortedTestimonials.length} Recommendations`}
-            </Button>
-          </motion.div>
-        )}
+        {/* Testimonials Grid */}
+        <motion.div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
+          <AnimatePresence mode="popLayout">
+            {visibleTestimonials.length === 0 ? (
+              <motion.div
+                key={`empty-${relationshipFilter}`}
+                className="col-span-full rounded-2xl border border-white/12 bg-white/[0.03] px-6 py-10 text-center"
+                initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+              >
+                <p className="text-lg font-semibold text-foreground">No testimonials in this filter yet.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Try All Voices, Managers, or Colleagues to explore more recommendations.</p>
+              </motion.div>
+            ) : (
+              visibleTestimonials.map((testimonial, index) => (
+                <motion.div
+                  key={`${relationshipFilter}-${testimonial.name}-${testimonial.date}`}
+                  data-testid={`testimonial-item-${index}`}
+                  layout
+                  initial={{ opacity: 0, y: 22, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.34, ease: 'easeOut', delay: Math.min(index * 0.04, 0.16) }}
+                >
+                  <TestimonialCard testimonial={testimonial} index={index} />
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

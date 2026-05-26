@@ -25,8 +25,9 @@ afterEach(() => {
 describe('branch coverage targets', () => {
   it('toggles FAQ interactive branches and renders testimonials actions', () => {
     render(<Testimonials />);
-    expect(screen.getByRole('button', { name: /view all/i })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /show less/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
+    expect(screen.getByRole('button', { name: /show previous testimonial/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /show next testimonial/i })).toBeTruthy();
 
     const { container } = render(<FAQ />);
     fireEvent.click(screen.getByText("What's your background?"));

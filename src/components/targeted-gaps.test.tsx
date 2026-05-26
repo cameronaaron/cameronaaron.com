@@ -140,7 +140,7 @@ describe('targeted coverage gaps', () => {
     expect(testimonialOutput.itemListElement[0].item.datePublished).toBeUndefined();
   });
 
-  it('covers testimonials show-all branch', async () => {
+  it('covers testimonials list rendering without expand button', async () => {
     vi.doMock('@/data/testimonials', () => ({
       testimonials: [
         {
@@ -165,10 +165,7 @@ describe('targeted coverage gaps', () => {
     const { default: Testimonials } = await import('@/components/Testimonials');
     render(<Testimonials />);
 
-    const viewAll = screen.getByRole('button', { name: /view all/i });
-    fireEvent.click(viewAll);
-
-    expect(screen.getByRole('button', { name: /show less/i })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
     expect(screen.getByText('Hidden Person')).toBeTruthy();
   });
 

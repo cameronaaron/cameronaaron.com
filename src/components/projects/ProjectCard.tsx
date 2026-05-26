@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState } from 'react';
 import type { Project } from '@/data/projects';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
@@ -30,12 +30,8 @@ export function calculateCardTiltTargets(
 
 export default function ProjectCard({ project, index }: ProjectCardProps) {
   const [isHovering, setIsHovering] = useState(false);
-  const [relevanceDisplay, setRelevanceDisplay] = useState(0);
-  const [signalDisplay, setSignalDisplay] = useState(0);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
   const readingMinutes = Math.max(2, Math.ceil(project.description.length / 130));
-  const impactScore = 82 + ((index * 7) % 17);
-  const signalScore = 68 + Math.min(28, project.tags.length * 6 + (index % 4) * 3);
   
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
@@ -45,25 +41,6 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   
   const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
   const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
-  const relevanceCounter = useMotionValue(0);
-  const signalCounter = useMotionValue(0);
-  const relevanceSpring = useSpring(relevanceCounter, { stiffness: 130, damping: 28, mass: 0.55 });
-  const signalSpring = useSpring(signalCounter, { stiffness: 130, damping: 28, mass: 0.55 });
-
-  /* v8 ignore next 3 */
-  useMotionValueEvent(relevanceSpring, 'change', (value) => {
-    setRelevanceDisplay(Math.round(value));
-  });
-
-  /* v8 ignore next 3 */
-  useMotionValueEvent(signalSpring, 'change', (value) => {
-    setSignalDisplay(Math.round(value));
-  });
-
-  useEffect(() => {
-    relevanceCounter.set(0);
-    signalCounter.set(0);
-  }, [relevanceCounter, signalCounter]);
 
   /* v8 ignore next 10 */
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -80,24 +57,11 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
     x.set(0.5);
     y.set(0.5);
     setIsHovering(false);
-
-    relevanceCounter.set(0);
-    signalCounter.set(0);
   };
 
   const handleMouseEnter = () => {
     if (!enableHoverMotion) return;
-
     setIsHovering(true);
-
-    if (prefersReducedMotion) {
-      setRelevanceDisplay(impactScore);
-      setSignalDisplay(signalScore);
-      return;
-    }
-
-    relevanceCounter.set(impactScore);
-    signalCounter.set(signalScore);
   };
 
   return (
@@ -143,45 +107,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         initial={false}
       />
 
-      <div className="absolute inset-x-4 bottom-4 z-20 translate-y-8 rounded-xl border border-white/15 bg-black/50 p-3 opacity-0 backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-muted-foreground">
-          <span>Live Insight Feed</span>
-          <span className="text-cyan-300">{relevanceDisplay}% relevance</span>
-        </div>
-        <div className="mt-2 flex items-center justify-between text-xs text-foreground/90">
-          <span>{readingMinutes} min deep dive</span>
-          <span>{signalDisplay}% signal match</span>
-        </div>
-        <div className="mt-3 space-y-1.5">
-          <div>
-            <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground/90">
-              <span>Relevance</span>
-              <span>{relevanceDisplay}</span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-              <motion.div
-                className="h-full bg-gradient-to-r from-cyan-400 to-primary"
-                style={{ transformOrigin: 'left' }}
-                animate={{ scaleX: relevanceDisplay / 100 }}
-                transition={{ type: 'spring', stiffness: 140, damping: 30, mass: 0.7 }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground/90">
-              <span>Signal</span>
-              <span>{signalDisplay}</span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-              <motion.div
-                className="h-full bg-gradient-to-r from-emerald-400 to-secondary"
-                style={{ transformOrigin: 'left' }}
-                animate={{ scaleX: signalDisplay / 100 }}
-                transition={{ type: 'spring', stiffness: 140, damping: 30, mass: 0.7 }}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="absolute right-4 top-4 z-20 flex translate-y-2 items-center gap-2 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-200/90 opacity-0 backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <motion.span
+          className="h-1.5 w-1.5 rounded-full bg-cyan-300"
+          animate={prefersReducedMotion ? undefined : { scale: [1, 1.5, 1] }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        Deep dive {readingMinutes}m
       </div>
       
       <div className="relative z-10">
@@ -210,6 +142,14 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             </motion.span>
           ))}
         </div>
+        <motion.div
+          className="mb-5 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground/90"
+          initial={{ opacity: 0.55 }}
+          whileHover={enableHoverMotion ? { opacity: 1 } : undefined}
+        >
+          <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">{project.tags.length} signals</span>
+          <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">interactive card</span>
+        </motion.div>
         <motion.div 
           className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform mt-auto"
           whileHover={enableHoverMotion ? { x: 8 } : undefined}
