@@ -13,17 +13,21 @@ import InteractiveParticles from '@/components/hero/InteractiveParticles';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
 import { useMousePosition } from '@/hooks/useMousePosition';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 export default function Hero() {
+  const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();
   const { scrollY, scrollYProgress } = useScroll();
   const { x: mouseX, y: mouseY } = useMousePosition();
   const rawPointerX = useMotionValue(0);
   const rawPointerY = useMotionValue(0);
+  const parallaxDepth = performanceTier === 'full' ? 150 : performanceTier === 'balanced' ? 100 : 45;
+  const scaleFloor = performanceTier === 'full' ? 0.8 : performanceTier === 'balanced' ? 0.88 : 0.94;
   
   // Parallax transformations
-  const yParallax = useTransform(scrollY, [0, 500], [0, 150]);
+  const yParallax = useTransform(scrollY, [0, 500], [0, parallaxDepth]);
   const opacityFade = useTransform(scrollY, [0, 300], [1, 0]);
-  const scaleDown = useTransform(scrollY, [0, 500], [1, 0.8]);
+  const scaleDown = useTransform(scrollY, [0, 500], [1, scaleFloor]);
   const auraOpacity = useTransform(scrollY, [0, 500], [0.34, 0.12]);
   const chapterProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 });
   const auraX = useSpring(mouseX, { stiffness: 105, damping: 24, mass: 0.45 });
@@ -59,11 +63,13 @@ export default function Hero() {
         />
       </div>
 
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: pointerAura, opacity: dynamicAuraOpacity }}
-        aria-hidden="true"
-      />
+      {shouldRenderHeavyEffects ? (
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: pointerAura, opacity: dynamicAuraOpacity }}
+          aria-hidden="true"
+        />
+      ) : null}
 
       {/* Ambient Background Glow with parallax */}
       <motion.div 
@@ -82,8 +88,8 @@ export default function Hero() {
         aria-hidden="true" 
       />
       
-      <BackgroundParticles />
-      <InteractiveParticles />
+      <BackgroundParticles quality={performanceTier} />
+      <InteractiveParticles quality={performanceTier} />
 
       <motion.div 
         className="container mx-auto px-6 relative z-10"
@@ -171,7 +177,7 @@ export default function Hero() {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 + index * 0.08 }}
-                  whileHover={{ y: -2, scale: 1.04 }}
+                  whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
                   className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-foreground/80"
                 >
                   {chip}
@@ -192,7 +198,7 @@ export default function Hero() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1 }}
-                  whileHover={{ scale: 1.1, y: -5 }}
+                  whileHover={shouldRenderHeavyEffects ? { scale: 1.1, y: -5 } : undefined}
                 >
                   <StatCard value={stat.value} label={stat.label} />
                 </motion.div>
@@ -206,6 +212,26 @@ export default function Hero() {
             style={{ y: useTransform(scrollY, [0, 500], [0, -100]) }}
           >
              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl -z-10" />
+             {performanceTier === 'full' || performanceTier === 'balanced' ? (
+               <>
+                 {[
+                   { label: 'EMT', className: '-left-4 top-10' },
+                   { label: 'Security', className: 'right-1 top-3' },
+                   { label: 'Research', className: '-right-8 bottom-24' },
+                   { label: 'Future NP', className: 'left-2 -bottom-4' },
+                 ].map((badge, index) => (
+                   <motion.span
+                     key={badge.label}
+                     className={`absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md ${badge.className}`}
+                     animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
+                     transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
+                     whileHover={{ scale: 1.06, y: -2 }}
+                   >
+                     {badge.label}
+                   </motion.span>
+                 ))}
+               </>
+             ) : null}
              <ProfileImage src={profile.image} alt={profile.name} />
           </motion.div>
         </div>

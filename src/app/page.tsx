@@ -12,6 +12,8 @@ import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import AmbientBackground from '@/components/ui/AmbientBackground';
 import CursorTrail from '@/components/ui/CursorTrail';
+import QuickActionsDock from '@/components/ui/QuickActionsDock';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 function SectionHandoff({
   label,
@@ -109,12 +111,14 @@ function SectionHandoff({
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
+  const { performanceTier, shouldRenderCursorTrail } = usePerformanceProfile();
   const pageProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 32, mass: 0.45 });
 
   return (
     <>
-      <AmbientBackground />
-      <CursorTrail />
+      <AmbientBackground performanceTier={performanceTier} />
+      {shouldRenderCursorTrail ? <CursorTrail /> : null}
+      <QuickActionsDock performanceTier={performanceTier} />
 
       <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 xl:hidden" aria-hidden="true">
         <div className="h-1 w-full bg-white/10 backdrop-blur-sm">

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
+type ParticleQuality = 'full' | 'balanced' | 'lite' | 'reduced';
+
 interface Particle {
   x: number;
   y: number;
@@ -14,10 +16,16 @@ interface Particle {
   originalY: number;
 }
 
-export default function BackgroundParticles() {
+interface BackgroundParticlesProps {
+  quality?: ParticleQuality;
+}
+
+export default function BackgroundParticles({ quality = 'full' }: BackgroundParticlesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (quality === 'reduced') return;
+
     const canvas = canvasRef.current;
     /* v8 ignore next */
     if (!canvas) return;
@@ -29,11 +37,20 @@ export default function BackgroundParticles() {
     let particles: Particle[] = [];
     let width = 0;
     let height = 0;
+
+    const qualityConfig = {
+      full: { denominator: 10000, maxParticles: 150, connectDistance: 100, mouseRadius: 150, useConnections: true, useMousePull: true },
+      balanced: { denominator: 17000, maxParticles: 95, connectDistance: 85, mouseRadius: 120, useConnections: true, useMousePull: true },
+      lite: { denominator: 32000, maxParticles: 45, connectDistance: 0, mouseRadius: 0, useConnections: false, useMousePull: false },
+      reduced: { denominator: 100000, maxParticles: 0, connectDistance: 0, mouseRadius: 0, useConnections: false, useMousePull: false },
+    } as const;
+
+    const activeConfig = qualityConfig[quality];
     
     const mouse = {
       x: -1000,
       y: -1000,
-      radius: 150
+      radius: activeConfig.mouseRadius
     };
 
     const resize = () => {
@@ -45,7 +62,10 @@ export default function BackgroundParticles() {
     };
 
     const initParticles = () => {
-      const particleCount = Math.min(Math.floor(width * height / 10000), 150); // Responsive count
+      const particleCount = Math.min(
+        Math.floor(width * height / activeConfig.denominator),
+        activeConfig.maxParticles
+      );
       particles = [];
       for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -98,7 +118,7 @@ export default function BackgroundParticles() {
         const dy = mouse.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < mouse.radius) {
+        if (activeConfig.useMousePull && distance < mouse.radius) {
           // Draw line to mouse
           ctx.beginPath();
           ctx.strokeStyle = `rgba(147, 51, 234, ${1 - distance / mouse.radius})`;
@@ -125,19 +145,21 @@ export default function BackgroundParticles() {
         ctx.fill();
         
         // Connect nearby particles
-        for (let j = i; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx2 = p.x - p2.x;
-          const dy2 = p.y - p2.y;
-          const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-          
-          if (distance2 < 100) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(147, 51, 234, ${0.2 * (1 - distance2 / 100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
+        if (activeConfig.useConnections) {
+          for (let j = i; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx2 = p.x - p2.x;
+            const dy2 = p.y - p2.y;
+            const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+            
+            if (distance2 < activeConfig.connectDistance) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(147, 51, 234, ${0.2 * (1 - distance2 / activeConfig.connectDistance)})`;
+              ctx.lineWidth = 0.5;
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
           }
         }
       });
@@ -146,19 +168,26 @@ export default function BackgroundParticles() {
     };
 
     window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseout', handleMouseLeave);
+
+    if (activeConfig.useMousePull) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseout', handleMouseLeave);
+    }
     
     resize();
     draw();
 
     return () => {
       window.removeEventListener('resize', resize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseout', handleMouseLeave);
+
+      if (activeConfig.useMousePull) {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseout', handleMouseLeave);
+      }
+
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [quality]);
 
   return (
     <canvas

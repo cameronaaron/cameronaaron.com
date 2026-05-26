@@ -3,6 +3,8 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+type ParticleQuality = 'full' | 'balanced' | 'lite' | 'reduced';
+
 interface Particle {
   id: number;
   x: number;
@@ -32,6 +34,10 @@ interface BurstParticle {
   life: number;
   size: number;
   color: string;
+}
+
+interface InteractiveParticlesProps {
+  quality?: ParticleQuality;
 }
 
 const colors = [
@@ -67,9 +73,22 @@ function createInitialParticles(count = 42, seed = 1337): Particle[] {
   }));
 }
 
-export default function InteractiveParticles() {
+export default function InteractiveParticles({ quality = 'full' }: InteractiveParticlesProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [particles, setParticles] = useState<Particle[]>(() => createInitialParticles());
+
+  const qualityConfig = useMemo(() => {
+    if (quality === 'balanced') {
+      return { count: 24, maxConnections: 32, connectionDistance: 12 };
+    }
+
+    if (quality === 'full') {
+      return { count: 42, maxConnections: 80, connectionDistance: 15 };
+    }
+
+    return { count: 0, maxConnections: 0, connectionDistance: 0 };
+  }, [quality]);
+
+  const [particles, setParticles] = useState<Particle[]>(() => createInitialParticles(qualityConfig.count));
   const [connections, setConnections] = useState<Connection[]>([]);
   const [bursts, setBursts] = useState<BurstParticle[]>([]);
 
@@ -90,26 +109,38 @@ export default function InteractiveParticles() {
           const dy = a.y - b.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 15) {
+          if (distance < qualityConfig.connectionDistance) {
             lines.push({
               id: `${a.id}-${b.id}`,
               x1: a.x,
               y1: a.y,
               x2: b.x,
               y2: b.y,
-              opacity: 0.28 * (1 - distance / 15),
+              opacity: 0.28 * (1 - distance / qualityConfig.connectionDistance),
             });
           }
         }
       }
 
-      return lines.slice(0, 80);
+      return lines.slice(0, qualityConfig.maxConnections);
     };
-  }, []);
+  }, [qualityConfig.connectionDistance, qualityConfig.maxConnections]);
 
   useEffect(() => {
-    /* v8 ignore next */
-    if (prefersReducedMotion) return;
+    if (quality !== 'full' && quality !== 'balanced') {
+      setParticles([]);
+      setConnections([]);
+      setBursts([]);
+      return;
+    }
+
+    setParticles(createInitialParticles(qualityConfig.count, quality === 'balanced' ? 2024 : 1337));
+    setConnections([]);
+    setBursts([]);
+  }, [quality, qualityConfig.count]);
+
+  useEffect(() => {
+    if (prefersReducedMotion || quality === 'reduced' || quality === 'lite') return;
 
     const handlePointerMove = (event: MouseEvent) => {
       const x = (event.clientX / window.innerWidth) * 100;
@@ -126,8 +157,10 @@ export default function InteractiveParticles() {
       const baseX = (event.clientX / window.innerWidth) * 100;
       const baseY = (event.clientY / window.innerHeight) * 100;
 
-      const nextBursts: BurstParticle[] = Array.from({ length: 14 }, (_, i) => {
-        const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.45;
+      const burstCount = quality === 'full' ? 14 : 8;
+
+      const nextBursts: BurstParticle[] = Array.from({ length: burstCount }, (_, i) => {
+        const angle = (Math.PI * 2 * i) / burstCount + Math.random() * 0.45;
         const speed = 0.55 + Math.random() * 0.85;
 
         return {
@@ -142,7 +175,7 @@ export default function InteractiveParticles() {
         };
       });
 
-      setBursts((prev) => [...prev, ...nextBursts].slice(-60));
+      setBursts((prev) => [...prev, ...nextBursts].slice(quality === 'full' ? -60 : -28));
     };
 
     const animate = (time: number) => {
@@ -175,8 +208,9 @@ export default function InteractiveParticles() {
 
             if (distance < 22 && distance > 0.001) {
               const pull = (22 - distance) / 22;
-              velocityX += (dx / distance) * pull * 0.012 * step;
-              velocityY += (dy / distance) * pull * 0.012 * step;
+              const attractionStrength = quality === 'full' ? 0.012 : 0.008;
+              velocityX += (dx / distance) * pull * attractionStrength * step;
+              velocityY += (dy / distance) * pull * attractionStrength * step;
               nextX += velocityX;
               nextY += velocityY;
             }
@@ -235,7 +269,11 @@ export default function InteractiveParticles() {
       window.removeEventListener('mousedown', handlePointerDown);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [makeConnections, prefersReducedMotion]);
+  }, [makeConnections, prefersReducedMotion, quality]);
+
+  if (quality === 'reduced' || quality === 'lite') {
+    return null;
+  }
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
