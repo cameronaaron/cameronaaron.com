@@ -62,6 +62,17 @@
     background-attachment: fixed;
   }
 
+  @media (hover: none), (pointer: coarse) {
+    body {
+      /* Prevent mobile repaint jitter caused by fixed background layers. */
+      background-attachment: scroll;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   .custom-cursor-active,
   .custom-cursor-active *,
   .custom-cursor-active body,

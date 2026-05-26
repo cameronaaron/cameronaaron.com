@@ -24,7 +24,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (quality === 'reduced') return;
+    if (quality === 'reduced' || quality === 'lite') return;
 
     const canvas = canvasRef.current;
     /* v8 ignore next */
@@ -188,6 +188,10 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       cancelAnimationFrame(animationFrameId);
     };
   }, [quality]);
+
+  if (quality === 'reduced' || quality === 'lite') {
+    return null;
+  }
 
   return (
     <canvas

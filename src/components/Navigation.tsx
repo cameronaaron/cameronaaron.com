@@ -110,7 +110,7 @@ export default function Navigation() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-background/80 backdrop-blur-md border-b border-white/5 shadow-lg'
+            ? 'bg-background/95 border-b border-white/10 shadow-lg md:bg-background/80 md:border-white/5 md:backdrop-blur-md'
             : 'bg-transparent'
         }`}
         role="navigation"
@@ -173,7 +173,7 @@ export default function Navigation() {
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/45 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md"
+                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-nav-panel"
                 aria-label="Toggle mobile navigation"
@@ -192,7 +192,7 @@ export default function Navigation() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-t border-white/10 bg-black/45 backdrop-blur-md md:hidden"
+              className="border-t border-white/10 bg-black/75 md:hidden"
             >
               <div className="container mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-2">

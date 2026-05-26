@@ -70,7 +70,7 @@ export default function AmbientBackground({ performanceTier = 'full' }: AmbientB
           ? 2
           : 1;
 
-  const animateOrbs = performanceTier !== 'reduced';
+  const animateOrbs = performanceTier === 'full' || performanceTier === 'balanced';
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">

@@ -17,6 +17,7 @@ import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 export default function Hero() {
   const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();
+  const shouldUseParallax = performanceTier === 'full' || performanceTier === 'balanced';
   const { scrollY, scrollYProgress } = useScroll();
   const { x: mouseX, y: mouseY } = useMousePosition();
   const rawPointerX = useMotionValue(0);
@@ -28,6 +29,9 @@ export default function Hero() {
   const yParallax = useTransform(scrollY, [0, 500], [0, parallaxDepth]);
   const opacityFade = useTransform(scrollY, [0, 300], [1, 0]);
   const scaleDown = useTransform(scrollY, [0, 500], [1, scaleFloor]);
+  const topGlowY = useTransform(scrollY, [0, 500], [0, 100]);
+  const bottomGlowY = useTransform(scrollY, [0, 500], [0, -80]);
+  const imageParallaxY = useTransform(scrollY, [0, 500], [0, -100]);
   const auraOpacity = useTransform(scrollY, [0, 500], [0.34, 0.12]);
   const chapterProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 });
   const auraX = useSpring(mouseX, { stiffness: 105, damping: 24, mass: 0.45 });
@@ -74,26 +78,26 @@ export default function Hero() {
       {/* Ambient Background Glow with parallax */}
       <motion.div 
         className="absolute inset-0 bg-hero-glow opacity-40" 
-        style={{ y: yParallax, opacity: opacityFade }}
+        style={shouldUseParallax ? { y: yParallax, opacity: opacityFade } : { opacity: 0.32 }}
         aria-hidden="true" 
       />
       <motion.div 
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" 
-        style={{ y: useTransform(scrollY, [0, 500], [0, 100]) }}
+        style={shouldUseParallax ? { y: topGlowY } : { y: 0 }}
         aria-hidden="true" 
       />
       <motion.div 
         className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none" 
-        style={{ y: useTransform(scrollY, [0, 500], [0, -80]) }}
+        style={shouldUseParallax ? { y: bottomGlowY } : { y: 0 }}
         aria-hidden="true" 
       />
       
-      <BackgroundParticles quality={performanceTier} />
-      <InteractiveParticles quality={performanceTier} />
+      {shouldUseParallax ? <BackgroundParticles quality={performanceTier} /> : null}
+      {shouldUseParallax ? <InteractiveParticles quality={performanceTier} /> : null}
 
       <motion.div 
         className="container mx-auto px-6 relative z-10"
-        style={{ y: yParallax, scale: scaleDown }}
+        style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
@@ -209,7 +213,7 @@ export default function Hero() {
           {/* Image with parallax */}
           <motion.div 
             className="relative"
-            style={{ y: useTransform(scrollY, [0, 500], [0, -100]) }}
+            style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}
           >
              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl -z-10" />
              {performanceTier === 'full' || performanceTier === 'balanced' ? (
@@ -237,7 +241,7 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <ScrollIndicator />
+      {shouldUseParallax ? <ScrollIndicator /> : null}
     </section>
   );
 }

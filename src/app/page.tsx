@@ -112,31 +112,37 @@ function SectionHandoff({
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const { performanceTier, shouldRenderCursorTrail } = usePerformanceProfile();
+  const showFloatingOverlays = performanceTier === 'full' || performanceTier === 'balanced';
+  const showSectionHandoffs = performanceTier === 'full' || performanceTier === 'balanced';
   const pageProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 32, mass: 0.45 });
 
   return (
     <>
       <AmbientBackground performanceTier={performanceTier} />
       {shouldRenderCursorTrail ? <CursorTrail /> : null}
-      <QuickActionsDock performanceTier={performanceTier} />
+      {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
 
-      <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 xl:hidden" aria-hidden="true">
-        <div className="h-1 w-full bg-white/10 backdrop-blur-sm">
-          <motion.div
-            className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
-            style={{ scaleX: pageProgress, transformOrigin: 'left' }}
-          />
+      {showFloatingOverlays ? (
+        <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 xl:hidden" aria-hidden="true">
+          <div className="h-1 w-full bg-white/10 backdrop-blur-sm">
+            <motion.div
+              className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
+              style={{ scaleX: pageProgress, transformOrigin: 'left' }}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 xl:flex xl:flex-col xl:items-center" aria-hidden="true">
-        <div className="relative h-64 w-1 overflow-hidden rounded-full bg-white/10">
-          <motion.div
-            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-400 via-primary to-secondary"
-            style={{ scaleY: pageProgress, transformOrigin: 'bottom' }}
-          />
+      {showFloatingOverlays ? (
+        <div className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 xl:flex xl:flex-col xl:items-center" aria-hidden="true">
+          <div className="relative h-64 w-1 overflow-hidden rounded-full bg-white/10">
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-400 via-primary to-secondary"
+              style={{ scaleY: pageProgress, transformOrigin: 'bottom' }}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <a 
         href="#main-content" 
@@ -147,19 +153,19 @@ export default function Home() {
       <main className="min-h-screen" id="main-content">
         <Navigation />
         <Hero />
-        <SectionHandoff label="Credentials" cue="transitioning to verified credentials" index={1} targetId="certifications" />
+        {showSectionHandoffs ? <SectionHandoff label="Credentials" cue="transitioning to verified credentials" index={1} targetId="certifications" /> : null}
         <Certifications />
-        <SectionHandoff label="Experience" cue="switching from proof to practice" index={2} targetId="experience" />
+        {showSectionHandoffs ? <SectionHandoff label="Experience" cue="switching from proof to practice" index={2} targetId="experience" /> : null}
         <Experience />
-        <SectionHandoff label="Education" cue="entering training and milestones" index={3} targetId="education" />
+        {showSectionHandoffs ? <SectionHandoff label="Education" cue="entering training and milestones" index={3} targetId="education" /> : null}
         <Education />
-        <SectionHandoff label="Research" cue="opening research and publications" index={4} targetId="projects" />
+        {showSectionHandoffs ? <SectionHandoff label="Research" cue="opening research and publications" index={4} targetId="projects" /> : null}
         <Projects />
-        <SectionHandoff label="Capabilities" cue="mapping strengths and specialties" index={5} targetId="skills" />
+        {showSectionHandoffs ? <SectionHandoff label="Capabilities" cue="mapping strengths and specialties" index={5} targetId="skills" /> : null}
         <Skills />
-        <SectionHandoff label="Testimonials" cue="hearing voices from collaborators" index={6} targetId="testimonials" />
+        {showSectionHandoffs ? <SectionHandoff label="Testimonials" cue="hearing voices from collaborators" index={6} targetId="testimonials" /> : null}
         <Testimonials />
-        <SectionHandoff label="Connect" cue="ready for your next conversation" index={7} targetId="contact" />
+        {showSectionHandoffs ? <SectionHandoff label="Connect" cue="ready for your next conversation" index={7} targetId="contact" /> : null}
         <Contact />
       
       {/* Footer */}

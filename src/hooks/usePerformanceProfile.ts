@@ -76,7 +76,8 @@ export function usePerformanceProfile() {
   const performanceTier = useMemo<PerformanceTier>(() => {
     if (prefersReducedMotion) return 'reduced';
     if (saveDataEnabled || lowHardware) return 'lite';
-    if (isCoarsePointer) return 'balanced';
+    // Touch-first devices are far more likely to struggle with stacked backdrop/blur animations.
+    if (isCoarsePointer) return 'lite';
     return 'full';
   }, [isCoarsePointer, lowHardware, prefersReducedMotion, saveDataEnabled]);
 
@@ -89,6 +90,6 @@ export function usePerformanceProfile() {
     shouldRenderCursorTrail: performanceTier === 'full',
     shouldRenderHeavyEffects: performanceTier === 'full',
     shouldRenderAmbientEffects: performanceTier === 'full' || performanceTier === 'balanced',
-    shouldRenderParticles: performanceTier !== 'reduced',
+    shouldRenderParticles: performanceTier === 'full' || performanceTier === 'balanced',
   };
 }
