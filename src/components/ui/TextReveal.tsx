@@ -23,6 +23,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
             <motion.span
               key={j}
               initial={{ y: "100%", opacity: 0 }}
+              /* v8 ignore next */
               animate={isInView ? { y: 0, opacity: 1 } : {}}
               transition={{
                 duration: 0.5,

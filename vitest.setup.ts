@@ -23,21 +23,21 @@ function readMotionValue(value: unknown) {
 vi.mock('framer-motion', () => {
   const stripMotionProps = (props: Record<string, unknown>) => {
     const {
-      initial,
-      animate,
-      exit,
-      transition,
-      whileHover,
-      whileTap,
-      whileInView,
-      viewport,
-      variants,
-      layout,
-      layoutId,
-      drag,
-      dragConstraints,
-      dragElastic,
-      dragMomentum,
+      initial: _initial,
+      animate: _animate,
+      exit: _exit,
+      transition: _transition,
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      whileInView: _whileInView,
+      viewport: _viewport,
+      variants: _variants,
+      layout: _layout,
+      layoutId: _layoutId,
+      drag: _drag,
+      dragConstraints: _dragConstraints,
+      dragElastic: _dragElastic,
+      dragMomentum: _dragMomentum,
       ...rest
     } = props;
 
@@ -100,7 +100,7 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('next/image', () => ({
-  default: ({ priority, unoptimized, ...props }: Record<string, unknown>) =>
+  default: ({ priority: _priority, unoptimized: _unoptimized, ...props }: Record<string, unknown>) =>
     React.createElement('img', props),
 }));
 

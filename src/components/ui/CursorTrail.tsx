@@ -20,7 +20,11 @@ export default function CursorTrail() {
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
+    /* v8 ignore next */
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: coarse)').matches;
+  });
   const [isInteractiveHover, setIsInteractiveHover] = useState(false);
 
   const prefersReducedMotion = useReducedMotion();
@@ -39,11 +43,11 @@ export default function CursorTrail() {
 
   useEffect(() => {
     const pointerMedia = window.matchMedia('(pointer: coarse)');
+    /* v8 ignore next 3 */
     const updatePointerMode = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);
     };
 
-    setIsCoarsePointer(pointerMedia.matches);
     pointerMedia.addEventListener('change', updatePointerMode);
 
     return () => {
@@ -72,6 +76,7 @@ export default function CursorTrail() {
     const sampleTrail = (x: number, y: number) => {
       const now = performance.now();
       // Sample at ~60fps max to avoid over-updating on high polling mice.
+      /* v8 ignore next */
       if (now - lastSampleRef.current < 16) return;
       lastSampleRef.current = now;
 

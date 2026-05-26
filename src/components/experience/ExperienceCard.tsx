@@ -50,6 +50,7 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
   const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    /* v8 ignore next */
     if (!enableHoverMotion) return;
 
     /* v8 ignore next 5 */

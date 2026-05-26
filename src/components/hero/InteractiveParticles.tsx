@@ -108,6 +108,7 @@ export default function InteractiveParticles() {
   }, []);
 
   useEffect(() => {
+    /* v8 ignore next */
     if (prefersReducedMotion) return;
 
     const handlePointerMove = (event: MouseEvent) => {

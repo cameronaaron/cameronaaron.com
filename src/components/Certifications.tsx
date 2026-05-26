@@ -3,8 +3,15 @@
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { certifications, inProgressCertifications } from '@/data/certifications';
+import { sortByDateDesc } from '@/data/dateOrdering';
 
 export default function Certifications() {
+  const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
+  const sortedInProgressCertifications = sortByDateDesc(
+    inProgressCertifications,
+    (certification) => certification.expectedCompletion
+  );
+
   return (
     <section id="certifications" className="py-20 bg-background relative overflow-hidden" aria-labelledby="certifications-heading">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -26,9 +33,10 @@ export default function Certifications() {
             <p className="col-span-3">Status</p>
             <p className="col-span-2">Credential ID</p>
           </div>
-          {certifications.map((cert, index) => (
+          {sortedCertifications.map((cert, index) => (
             <motion.div
               key={`${cert.name}-${cert.credentialId}`}
+              data-testid={`cert-row-${index}`}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -44,9 +52,10 @@ export default function Certifications() {
         </div>
 
         <div className="lg:hidden space-y-4">
-          {certifications.map((cert, index) => (
+          {sortedCertifications.map((cert, index) => (
             <motion.article
               key={`${cert.name}-${cert.credentialId}-mobile`}
+              data-testid={`cert-mobile-row-${index}`}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -64,7 +73,7 @@ export default function Certifications() {
         <div className="mt-12">
           <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Certifications In Progress</h3>
           <div className="grid md:grid-cols-2 gap-4">
-            {inProgressCertifications.map((cert, index) => (
+            {sortedInProgressCertifications.map((cert, index) => (
               <motion.div
                 key={cert.name}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -16 : 16 }}

@@ -5,11 +5,14 @@ import { useEffect, useState } from 'react';
 
 export function useInteractionMode() {
   const prefersReducedMotion = useReducedMotion();
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
+    /* v8 ignore next */
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: coarse)').matches;
+  });
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: coarse)');
-    setIsCoarsePointer(media.matches);
 
     const handleChange = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);

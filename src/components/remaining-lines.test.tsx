@@ -45,7 +45,7 @@ describe('remaining line coverage', () => {
   });
 
   it('covers ExperienceCard pointer math path', () => {
-    const { container } = render(<ExperienceCard experience={experiences[0]} index={0} />);
+    render(<ExperienceCard experience={experiences[0]} index={0} />);
 
     const card = screen.getByTestId('experience-card-0') as HTMLElement;
     expect(card).toBeTruthy();

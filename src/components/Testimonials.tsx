@@ -3,17 +3,19 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { testimonials } from '@/data/testimonials';
+import { sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import TestimonialCard from '@/components/testimonials/TestimonialCard';
 import Button from '@/components/ui/Button';
 
 export default function Testimonials() {
   const [showAll, setShowAll] = useState(false);
+  const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
 
   // Show only featured testimonials by default.
-  const featuredTestimonials = testimonials.filter((t) => t.featured);
-  const hasAdditionalTestimonials = testimonials.length > featuredTestimonials.length;
-  const displayedTestimonials = showAll ? testimonials : featuredTestimonials;
+  const featuredTestimonials = sortedTestimonials.filter((testimonial) => testimonial.featured);
+  const hasAdditionalTestimonials = sortedTestimonials.length > featuredTestimonials.length;
+  const displayedTestimonials = showAll ? sortedTestimonials : featuredTestimonials;
 
   return (
     <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
@@ -44,6 +46,7 @@ export default function Testimonials() {
           {displayedTestimonials.map((testimonial, index) => (
             <motion.div
               key={index}
+              data-testid={`testimonial-item-${index}`}
               variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.95 },
                 visible: { opacity: 1, y: 0, scale: 1 }
@@ -68,7 +71,7 @@ export default function Testimonials() {
               variant="primary"
               size="lg"
             >
-              {showAll ? 'Show Less' : `View All ${testimonials.length} Recommendations`}
+              {showAll ? 'Show Less' : `View All ${sortedTestimonials.length} Recommendations`}
             </Button>
           </motion.div>
         )}

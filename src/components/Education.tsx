@@ -3,8 +3,12 @@
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
+import { sortByDateDesc } from '@/data/dateOrdering';
 
 export default function Education() {
+  const sortedEducationItems = sortByDateDesc(educationItems, (item) => item.period);
+  const sortedHonorsAndAffiliations = sortByDateDesc(honorsAndAffiliations, (item) => item);
+
   return (
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">
       <div className="container mx-auto px-6 relative z-10">
@@ -15,7 +19,7 @@ export default function Education() {
         />
 
         <div className="grid lg:grid-cols-3 gap-6 mb-14">
-          {educationItems.map((item, index) => (
+          {sortedEducationItems.map((item, index) => (
             <motion.article
               key={`${item.institution}-${item.credential}`}
               initial={{ opacity: 0, y: 24 }}
@@ -67,7 +71,7 @@ export default function Education() {
         <div>
           <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Honors & Affiliations</h3>
           <div className="flex flex-wrap gap-3">
-            {honorsAndAffiliations.map((honor, index) => (
+            {sortedHonorsAndAffiliations.map((honor, index) => (
               <motion.span
                 key={honor}
                 initial={{ opacity: 0, scale: 0.92 }}

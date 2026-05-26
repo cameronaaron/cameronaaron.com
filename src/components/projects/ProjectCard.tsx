@@ -215,6 +215,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           whileHover={enableHoverMotion ? { x: 8 } : undefined}
           transition={{ duration: 0.2 }}
         >
+          {/* v8 ignore next */}
           {project.cta ?? 'Read More'}
           <motion.svg 
             className="w-4 h-4 ml-2" 

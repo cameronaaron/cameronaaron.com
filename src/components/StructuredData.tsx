@@ -4,6 +4,7 @@ import { projects } from '@/data/projects';
 import { skills } from '@/data/skills';
 import { certifications } from '@/data/certifications';
 import { testimonials } from '@/data/testimonials';
+import { sortByDateDesc } from '@/data/dateOrdering';
 
 function toIsoDate(monthYearText?: string): string | undefined {
   if (!monthYearText) return undefined;
@@ -25,6 +26,10 @@ function splitPeriod(period?: string): { startDate?: string; endDate?: string } 
 }
 
 export default function StructuredData() {
+  const sortedProjects = sortByDateDesc(projects, (project) => project.period);
+  const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
+  const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
+
   const baseUrl = 'https://cameronaaron.com';
   const personId = `${baseUrl}/#person`;
   const websiteId = `${baseUrl}/#website`;
@@ -119,7 +124,7 @@ export default function StructuredData() {
   const researchOutputSchema = {
     "@type": "ItemList",
     name: 'Research and Publications',
-    itemListElement: projects.map((project, index) => ({
+    itemListElement: sortedProjects.map((project, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -159,7 +164,7 @@ export default function StructuredData() {
   const credentialSchema = {
     "@type": "ItemList",
     name: 'Certifications and Credentials',
-    itemListElement: certifications.map((cert, index) => ({
+    itemListElement: sortedCertifications.map((cert, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -178,7 +183,7 @@ export default function StructuredData() {
   const testimonialSchema = {
     "@type": "ItemList",
     name: 'Professional Testimonials',
-    itemListElement: testimonials.slice(0, 12).map((testimonial, index) => ({
+    itemListElement: sortedTestimonials.slice(0, 12).map((testimonial, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
