@@ -27,6 +27,14 @@ dist/
 coverage/
 .nyc_output/
 
+# Lighthouse and local audit artifacts
+.lighthouseci/
+.chrome-bin/
+lighthouse-*.report.html
+lighthouse-*.report.json
+lighthouse-live*.json
+lighthouse-local*.json
+
 # Environment variables
 .env
 .env.local
