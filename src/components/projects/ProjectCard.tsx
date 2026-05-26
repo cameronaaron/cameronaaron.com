@@ -147,8 +147,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           initial={{ opacity: 0.55 }}
           whileHover={enableHoverMotion ? { opacity: 1 } : undefined}
         >
-          <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">{project.tags.length} signals</span>
-          <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">interactive card</span>
+          <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">{project.tags.length} tags</span>
         </motion.div>
         <motion.div 
           className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform mt-auto"

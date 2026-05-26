@@ -18,7 +18,7 @@ export default function FAQ() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           title="Frequently Asked Questions"
-          subtitle="Learn more about my experience, skills, and services"
+          subtitle="Quick answers about my background, work, and current focus"
         />
 
         <div className="max-w-4xl mx-auto space-y-4">

@@ -39,7 +39,7 @@ export default function Skills() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader 
           title="Clinical & Technical Skills" 
-          subtitle="Healthcare capabilities, research tools, and health IT expertise"
+          subtitle="Clinical strengths, research tools, and technical skills"
           className="[&>h2]:font-display"
         />
 
@@ -51,7 +51,7 @@ export default function Skills() {
           className="mx-auto mb-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
         >
           <div className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">Skill lens:</span> reorder technical competencies dynamically.
+            <span className="font-semibold text-foreground">Sort skills:</span> view by proficiency or alphabetical order.
           </div>
           <div className="flex items-center gap-2">
             <motion.button
@@ -110,7 +110,7 @@ export default function Skills() {
                 transition={{ duration: 0.35, ease: 'easeOut' }}
                 className="mb-5 text-sm text-cyan-200/90"
               >
-                Current lead signal: {strongestSkill.name} at {strongestSkill.level}%
+                  Top skill: {strongestSkill.name} ({strongestSkill.level}%)
               </motion.p>
             ) : null}
             <div className="space-y-4">

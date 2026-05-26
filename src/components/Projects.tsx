@@ -62,7 +62,7 @@ export default function Projects() {
 
         <SectionHeader
           title="Research & Publications"
-          subtitle="Conference presentations, scholarly work, and interdisciplinary research outputs"
+          subtitle="Selected publications, conference presentations, and research projects"
           className="[&>h2]:font-display"
         />
 

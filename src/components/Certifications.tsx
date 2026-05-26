@@ -30,7 +30,7 @@ export default function Certifications() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           title="Clinical Certifications & Licenses"
-          subtitle="Active emergency medicine and healthcare credentials with verified status timelines"
+          subtitle="Current emergency and healthcare credentials with verifiable status"
           className="[&>h2]:font-display"
         />
 
