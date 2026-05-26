@@ -1,6 +1,5 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { motion, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useEffect } from 'react';
 import { profile } from '@/data/profile';
@@ -10,13 +9,10 @@ import TextReveal from '@/components/ui/TextReveal';
 import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
 import BackgroundParticles from '@/components/hero/BackgroundParticles';
+import InteractiveParticles from '@/components/hero/InteractiveParticles';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
 import { useMousePosition } from '@/hooks/useMousePosition';
-
-const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), {
-  ssr: false,
-});
 
 export default function Hero() {
   const { scrollY, scrollYProgress } = useScroll();

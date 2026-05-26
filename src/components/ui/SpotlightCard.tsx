@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
+import { useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
 
 interface SpotlightCardProps<T extends ElementType> {
   children: React.ReactNode;
@@ -17,14 +17,11 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
   ...props
 }: SpotlightCardProps<T> & ComponentPropsWithoutRef<T>) {
   const Component = as || 'div';
-  const divRef = useRef<HTMLElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
-    if (!divRef.current) return;
-
-    const rect = divRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
@@ -38,8 +35,6 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
 
   return (
     <Component
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ref={divRef as any}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

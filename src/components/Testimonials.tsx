@@ -9,11 +9,11 @@ import Button from '@/components/ui/Button';
 
 export default function Testimonials() {
   const [showAll, setShowAll] = useState(false);
-  
-  // Show only featured testimonials by default
-  const displayedTestimonials = showAll 
-    ? testimonials 
-    : testimonials.filter(t => t.featured);
+
+  // Show only featured testimonials by default.
+  const featuredTestimonials = testimonials.filter((t) => t.featured);
+  const hasAdditionalTestimonials = testimonials.length > featuredTestimonials.length;
+  const displayedTestimonials = showAll ? testimonials : featuredTestimonials;
 
   return (
     <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
@@ -56,7 +56,7 @@ export default function Testimonials() {
         </motion.div>
 
         {/* Show More/Less Button */}
-        {testimonials.length > displayedTestimonials.length && (
+        {hasAdditionalTestimonials && (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

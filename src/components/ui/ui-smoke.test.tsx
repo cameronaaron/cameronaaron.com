@@ -50,7 +50,7 @@ describe('ui component smoke coverage', () => {
 
     expect(screen.getByText('Action')).toBeTruthy();
     expect(screen.getByText('TypeScript')).toBeTruthy();
-    expect(screen.getByText('Section')).toBeTruthy();
+    expect(screen.getByText('Subtitle')).toBeTruthy();
     expect(screen.getByText('10+')).toBeTruthy();
   });
 

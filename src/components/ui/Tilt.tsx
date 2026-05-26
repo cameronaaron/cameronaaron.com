@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useRef, type ReactNode, type MouseEvent } from 'react';
+import { type ReactNode, type MouseEvent } from 'react';
 
 interface TiltProps {
   children: ReactNode;
@@ -16,7 +16,6 @@ export default function Tilt({
   intensity = 15,
   perspective = 1000 
 }: TiltProps) {
-  const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -27,9 +26,7 @@ export default function Tilt({
   const rotateY = useTransform(mouseX, [-0.5, 0.5], [-intensity, intensity]);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-
-    const rect = ref.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
     
@@ -47,7 +44,6 @@ export default function Tilt({
 
   return (
     <motion.div
-      ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{

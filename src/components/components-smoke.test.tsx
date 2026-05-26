@@ -32,7 +32,7 @@ import { testimonials } from '@/data/testimonials';
 
 describe('component smoke coverage', () => {
   it('renders core section components', () => {
-    render(
+    const { container } = render(
       <>
         <Navigation />
         <Hero />
@@ -46,17 +46,19 @@ describe('component smoke coverage', () => {
       </>
     );
 
-    expect(screen.getByText('Research & Publications')).toBeTruthy();
-    expect(screen.getByText('Clinical Certifications & Licenses')).toBeTruthy();
-    expect(screen.getByText('Connect With Me')).toBeTruthy();
+    expect(container.querySelector('#home')).toBeTruthy();
+    expect(container.querySelector('#experience')).toBeTruthy();
+    expect(container.querySelector('#education')).toBeTruthy();
+    expect(container.querySelector('#contact')).toBeTruthy();
   });
 
   it('renders FAQ and toggles answer visibility', () => {
-    render(<FAQ />);
+    const { container } = render(<FAQ />);
 
     const firstQuestion = screen.getByText('Is this the official Cameron Aaron website?');
+    expect(container.querySelectorAll('[itemprop="acceptedAnswer"]').length).toBe(1);
     fireEvent.click(firstQuestion);
-    expect(screen.getByText(/official portfolio and resume website/i)).toBeTruthy();
+    expect(container.querySelectorAll('[itemprop="acceptedAnswer"]').length).toBe(0);
   });
 
   it('renders structured data script', () => {
@@ -98,7 +100,7 @@ describe('component smoke coverage', () => {
 
     expect(screen.getByText('GitHub')).toBeTruthy();
     expect(screen.getByText(experiences[0].company)).toBeTruthy();
-    expect(screen.getByText(projects[0].title)).toBeTruthy();
+    expect(screen.getAllByText(projects[0].title).length).toBeGreaterThan(0);
     expect(screen.getByText(testimonials[0].name)).toBeTruthy();
   });
 

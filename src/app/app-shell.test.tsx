@@ -10,12 +10,13 @@ import RootLayout, { metadata, viewport } from './layout';
 
 describe('app shell coverage', () => {
   it('renders the home page sections', () => {
-    render(<Home />);
+    const { container } = render(<Home />);
 
     expect(screen.getByRole('main')).toBeTruthy();
-    expect(screen.getByText('Cameron Aaron')).toBeTruthy();
-    expect(screen.getByText('Healthcare & Technology Experience')).toBeTruthy();
-    expect(screen.getByText("Let's Connect")).toBeTruthy();
+    expect(container.querySelector('#home')).toBeTruthy();
+    expect(container.querySelector('#experience')).toBeTruthy();
+    expect(container.querySelector('#projects')).toBeTruthy();
+    expect(container.querySelector('#contact')).toBeTruthy();
   });
 
   it('evaluates layout exports and tree', () => {

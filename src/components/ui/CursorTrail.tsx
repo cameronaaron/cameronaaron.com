@@ -39,11 +39,11 @@ export default function CursorTrail() {
 
   useEffect(() => {
     const pointerMedia = window.matchMedia('(pointer: coarse)');
-    const updatePointerMode = (event?: MediaQueryListEvent) => {
-      setIsCoarsePointer(event ? event.matches : pointerMedia.matches);
+    const updatePointerMode = (event: MediaQueryListEvent) => {
+      setIsCoarsePointer(event.matches);
     };
 
-    updatePointerMode();
+    setIsCoarsePointer(pointerMedia.matches);
     pointerMedia.addEventListener('change', updatePointerMode);
 
     return () => {
@@ -52,8 +52,6 @@ export default function CursorTrail() {
   }, []);
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
-
     if (isCoarsePointer || prefersReducedMotion) {
       document.documentElement.classList.remove('custom-cursor-active');
       return;
@@ -145,7 +143,7 @@ export default function CursorTrail() {
           .filter((point) => point.life > 0)
       );
 
-      animationFrameId = requestAnimationFrame(cleanup);
+      animationFrameId = window.requestAnimationFrame(cleanup);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -154,14 +152,14 @@ export default function CursorTrail() {
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', () => setIsVisible(true));
 
-    animationFrameId = requestAnimationFrame(cleanup);
+    animationFrameId = window.requestAnimationFrame(cleanup);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mouseleave', handleMouseLeave);
-      cancelAnimationFrame(animationFrameId);
+      window.cancelAnimationFrame(animationFrameId);
     };
   }, [cursorX, cursorY, isCoarsePointer, prefersReducedMotion]);
 
@@ -215,11 +213,9 @@ export default function CursorTrail() {
           boxShadow: '0 0 26px rgba(34, 211, 238, 0.25)',
         }}
         animate={
-          prefersReducedMotion
-            ? undefined
-            : isInteractiveHover
-              ? { scale: [1.04, 1.14, 1.04], borderColor: 'rgba(16, 185, 129, 0.75)' }
-              : { scale: [1, 1.04, 1], borderColor: 'rgba(103, 232, 249, 0.65)' }
+          isInteractiveHover
+            ? { scale: [1.04, 1.14, 1.04], borderColor: 'rgba(16, 185, 129, 0.75)' }
+            : { scale: [1, 1.04, 1], borderColor: 'rgba(103, 232, 249, 0.65)' }
         }
         transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
       />

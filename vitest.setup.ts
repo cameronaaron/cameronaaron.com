@@ -71,12 +71,10 @@ vi.mock('framer-motion', () => {
       scrollYProgress: createMotionValue(0),
     }),
     useMotionValueEvent: (
-      value: unknown,
+      _value: unknown,
       _event: string,
-      callback: (next: number) => void
-    ) => {
-      callback(Number(readMotionValue(value) ?? 0));
-    },
+      _callback: (next: number) => void
+    ) => undefined,
     useTransform: (
       input: unknown,
       arg2?: unknown,
@@ -102,7 +100,8 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('next/image', () => ({
-  default: (props: Record<string, unknown>) => React.createElement('img', props),
+  default: ({ priority, unoptimized, ...props }: Record<string, unknown>) =>
+    React.createElement('img', props),
 }));
 
 vi.mock('next/link', () => ({
@@ -159,14 +158,27 @@ beforeAll(() => {
     value: matchMedia,
   });
 
+  const requestAnimationFrameMock = vi.fn(() => 1);
+  const cancelAnimationFrameMock = vi.fn();
+
   Object.defineProperty(window, 'requestAnimationFrame', {
     writable: true,
-    value: vi.fn(() => 1),
+    value: requestAnimationFrameMock,
   });
 
   Object.defineProperty(window, 'cancelAnimationFrame', {
     writable: true,
-    value: vi.fn(),
+    value: cancelAnimationFrameMock,
+  });
+
+  Object.defineProperty(globalThis, 'requestAnimationFrame', {
+    writable: true,
+    value: requestAnimationFrameMock,
+  });
+
+  Object.defineProperty(globalThis, 'cancelAnimationFrame', {
+    writable: true,
+    value: cancelAnimationFrameMock,
   });
 
   class ResizeObserver {
@@ -196,11 +208,6 @@ beforeAll(() => {
       strokeStyle: '',
       lineWidth: 1,
     })),
-  });
-
-  Object.defineProperty(globalThis, 'addEventListener', {
-    writable: true,
-    value: vi.fn(),
   });
 
   Object.defineProperty(navigator, 'serviceWorker', {

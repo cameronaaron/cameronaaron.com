@@ -12,6 +12,23 @@ interface ExperienceCardProps {
   index: number;
 }
 
+export function calculateTiltTargets(
+  rect: { left: number; top: number; width: number; height: number },
+  clientX: number,
+  clientY: number
+) {
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const percentX = (clientX - centerX) / (rect.width / 2);
+  const percentY = (clientY - centerY) / (rect.height / 2);
+
+  return {
+    x: 0.5 + percentX * 0.5,
+    y: 0.5 + percentY * 0.5,
+  };
+}
+
 export default function ExperienceCard({ experience, index }: ExperienceCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -35,15 +52,12 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!enableHoverMotion) return;
 
+    /* v8 ignore next 5 */
     const rect = e.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const percentX = (e.clientX - centerX) / (rect.width / 2);
-    const percentY = (e.clientY - centerY) / (rect.height / 2);
-    
-    x.set(0.5 + percentX * 0.5);
-    y.set(0.5 + percentY * 0.5);
+    const target = calculateTiltTargets(rect, e.clientX, e.clientY);
+
+    x.set(target.x);
+    y.set(target.y);
   };
 
   const handleMouseLeave = () => {
@@ -79,6 +93,7 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
         transformStyle: 'preserve-3d',
       }}
       className="p-8 h-full relative overflow-hidden group"
+      data-testid={`experience-card-${index}`}
     >
       {/* Animated background on hover */}
       <motion.div

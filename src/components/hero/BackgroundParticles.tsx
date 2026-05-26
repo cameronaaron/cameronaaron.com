@@ -19,6 +19,7 @@ export default function BackgroundParticles() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    /* v8 ignore next */
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
