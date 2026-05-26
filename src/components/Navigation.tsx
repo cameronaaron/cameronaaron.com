@@ -1,15 +1,15 @@
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems } from '@/data/navigation';
-import Button from '@/components/ui/Button';
 import Magnetic from '@/components/ui/Magnetic';
 
 export default function Navigation() {
   const isScrolled = useScrollPosition(50);
   const [activeHref, setActiveHref] = useState(navItems[0]?.href ?? '#home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -56,6 +56,36 @@ export default function Navigation() {
       window.removeEventListener('resize', updateActiveSection);
     };
   }, []);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const closeOnDesktop = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', closeOnDesktop);
+
+    return () => {
+      window.removeEventListener('resize', closeOnDesktop);
+    };
+  }, [mobileMenuOpen]);
 
   const activeNavLabel = navItems.find((item) => item.href === activeHref)?.name ?? 'Home';
 
@@ -138,16 +168,56 @@ export default function Navigation() {
               ))}
             </nav>
 
-            <Button
-              href="#contact"
-              variant="primary"
-              size="md"
-              className="shadow-lg shadow-primary/20 hover:shadow-primary/40"
-            >
-              Contact
-            </Button>
+            <div className="flex items-center md:hidden">
+              <motion.button
+                type="button"
+                onClick={() => setMobileMenuOpen((open) => !open)}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/45 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-nav-panel"
+                aria-label="Toggle mobile navigation"
+              >
+                {mobileMenuOpen ? 'Close' : 'Menu'}
+              </motion.button>
+            </div>
           </div>
         </div>
+
+        <AnimatePresence>
+          {mobileMenuOpen ? (
+            <motion.div
+              id="mobile-nav-panel"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="border-t border-white/10 bg-black/45 backdrop-blur-md md:hidden"
+            >
+              <div className="container mx-auto px-6 py-4">
+                <div className="grid grid-cols-2 gap-2">
+                  {navItems.map((item, index) => (
+                    <motion.a
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors ${
+                        activeHref === item.href
+                          ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
+                          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {item.name}
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </motion.nav>
     </>
   );

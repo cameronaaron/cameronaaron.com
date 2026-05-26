@@ -222,7 +222,7 @@ export default function Hero() {
                  ].map((badge, index) => (
                    <motion.span
                      key={badge.label}
-                     className={`absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md ${badge.className}`}
+                     className={`absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md ${badge.className}`}
                      animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
                      transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
                      whileHover={{ scale: 1.06, y: -2 }}

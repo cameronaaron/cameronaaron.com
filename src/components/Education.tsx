@@ -45,7 +45,38 @@ export default function Education() {
 
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 mb-12 overflow-x-auto">
           <h3 className="text-2xl font-bold text-foreground mb-5 font-display">Nursing Program Prerequisite Coursework</h3>
-          <div className="min-w-[920px]">
+          <div className="space-y-3 md:hidden">
+            {prerequisiteCourses.map((course, index) => (
+              <motion.article
+                key={`${course.requirement}-${course.course}-mobile`}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.03 }}
+                className="rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5 p-4"
+              >
+                <p className="text-xs uppercase tracking-[0.12em] text-cyan-200/80">{course.requirement}</p>
+                <p className="mt-1 text-sm text-foreground font-medium leading-relaxed">{course.course}</p>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
+                    <p className="text-muted-foreground/80 uppercase tracking-[0.08em]">Units</p>
+                    <p className="mt-1 text-foreground font-semibold">{course.units}</p>
+                  </div>
+                  <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
+                    <p className="text-muted-foreground/80 uppercase tracking-[0.08em]">Grade</p>
+                    <p className="mt-1 text-foreground font-semibold">{course.grade}</p>
+                  </div>
+                  <div className="rounded-lg border border-cyan-400/25 bg-cyan-500/10 px-2.5 py-2 text-center">
+                    <p className="text-cyan-200/80 uppercase tracking-[0.08em]">Status</p>
+                    <p className="mt-1 text-cyan-200 font-semibold">{course.status}</p>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="hidden md:block min-w-[920px]">
             <div className="grid grid-cols-12 gap-3 px-3 py-2 text-xs uppercase tracking-wider text-muted-foreground border-b border-white/10">
               <p className="col-span-3">Requirement</p>
               <p className="col-span-5">Relevant Course</p>

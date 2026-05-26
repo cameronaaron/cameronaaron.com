@@ -69,7 +69,7 @@ function SectionHandoff({
           />
           <motion.a
             href={`#${targetId}`}
-            className="relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/90 transition-colors group-hover:border-cyan-300/35 group-hover:text-cyan-100"
+            className="relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.14em] sm:tracking-[0.2em] text-muted-foreground/90 transition-colors group-hover:border-cyan-300/35 group-hover:text-cyan-100"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
             {label}
@@ -86,7 +86,7 @@ function SectionHandoff({
         </div>
 
         <motion.div
-          className="mt-4 flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-200/85"
+          className="mt-4 flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-cyan-200/85"
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
