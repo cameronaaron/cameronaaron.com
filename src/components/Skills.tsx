@@ -1,13 +1,14 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { skills } from '@/data/skills';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SkillBar from '@/components/ui/SkillBar';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 
 export default function Skills() {
+  const [technicalView, setTechnicalView] = useState<'priority' | 'alphabetical'>('priority');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -16,6 +17,16 @@ export default function Skills() {
 
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+
+  const technicalSkills = useMemo(() => {
+    if (technicalView === 'alphabetical') {
+      return [...skills.technical].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return [...skills.technical].sort((a, b) => b.level - a.level);
+  }, [technicalView]);
+
+  const strongestSkill = technicalSkills[0];
 
   return (
     <section id="skills" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
@@ -31,6 +42,48 @@ export default function Skills() {
           subtitle="Healthcare capabilities, research tools, and health IT expertise"
           className="[&>h2]:font-display"
         />
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="mx-auto mb-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+        >
+          <div className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">Skill lens:</span> reorder technical competencies dynamically.
+          </div>
+          <div className="flex items-center gap-2">
+            <motion.button
+              type="button"
+              onClick={() => setTechnicalView('priority')}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
+                technicalView === 'priority'
+                  ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
+                  : 'border-white/15 bg-white/5 text-muted-foreground hover:text-foreground'
+              }`}
+              aria-pressed={technicalView === 'priority'}
+            >
+              Priority
+            </motion.button>
+            <motion.button
+              type="button"
+              onClick={() => setTechnicalView('alphabetical')}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
+                technicalView === 'alphabetical'
+                  ? 'border-emerald-300/45 bg-emerald-300/15 text-emerald-100'
+                  : 'border-white/15 bg-white/5 text-muted-foreground hover:text-foreground'
+              }`}
+              aria-pressed={technicalView === 'alphabetical'}
+            >
+              Alphabetical
+            </motion.button>
+          </div>
+        </motion.div>
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
           {/* Technical Skills */}
@@ -49,9 +102,26 @@ export default function Skills() {
             >
               Core Competencies
             </motion.h3>
+            {strongestSkill ? (
+              <motion.p
+                key={`${technicalView}-${strongestSkill.name}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="mb-5 text-sm text-cyan-200/90"
+              >
+                Current lead signal: {strongestSkill.name} at {strongestSkill.level}%
+              </motion.p>
+            ) : null}
             <div className="space-y-4">
-              {skills.technical.map((skill, index) => (
-                <SkillBar key={index} name={skill.name} level={skill.level} index={index} />
+              {technicalSkills.map((skill, index) => (
+                <motion.div
+                  key={skill.name}
+                  layout
+                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+                >
+                  <SkillBar name={skill.name} level={skill.level} index={index} />
+                </motion.div>
               ))}
             </div>
           </motion.div>

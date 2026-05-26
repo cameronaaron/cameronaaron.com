@@ -10,6 +10,8 @@ import { useInteractionMode } from '@/hooks/useInteractionMode';
 interface ExperienceCardProps {
   experience: Experience;
   index: number;
+  isActive?: boolean;
+  onActivate?: () => void;
 }
 
 export function calculateTiltTargets(
@@ -29,7 +31,12 @@ export function calculateTiltTargets(
   };
 }
 
-export default function ExperienceCard({ experience, index }: ExperienceCardProps) {
+export default function ExperienceCard({
+  experience,
+  index,
+  isActive = false,
+  onActivate,
+}: ExperienceCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
@@ -85,7 +92,12 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
           : undefined
       }
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => enableHoverMotion && setIsHovering(true)}
+      onMouseEnter={() => {
+        if (enableHoverMotion) {
+          setIsHovering(true);
+        }
+        onActivate?.();
+      }}
       onMouseLeave={handleMouseLeave}
       whileTap={prefersReducedMotion ? undefined : { scale: 0.995, y: 1 }}
       style={{
@@ -93,9 +105,18 @@ export default function ExperienceCard({ experience, index }: ExperienceCardProp
         rotateY: isHovering && enableHoverMotion ? springRotateY : 0,
         transformStyle: 'preserve-3d',
       }}
-      className="p-8 h-full relative overflow-hidden group"
+      className={`relative h-full overflow-hidden p-8 group ${
+        isActive ? 'ring-1 ring-cyan-300/35 shadow-[0_20px_60px_rgba(34,211,238,0.16)]' : ''
+      }`}
+      animate={isActive ? { y: -4 } : { y: 0 }}
       data-testid={`experience-card-${index}`}
     >
+      <motion.div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-400/12 via-transparent to-primary/12"
+        animate={{ opacity: isActive ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      />
+
       {/* Animated background on hover */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
