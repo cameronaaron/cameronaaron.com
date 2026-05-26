@@ -2,8 +2,16 @@
 
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
-import { certifications, inProgressCertifications } from '@/data/certifications';
+import { certifications, inProgressCertifications, type Certification } from '@/data/certifications';
 import { sortByDateDesc } from '@/data/dateOrdering';
+
+function buildVerificationHref(cert: Certification): string {
+  const url = new URL(cert.verificationUrl);
+  if (cert.verificationQueryParam) {
+    url.searchParams.set(cert.verificationQueryParam, cert.credentialId);
+  }
+  return url.toString();
+}
 
 export default function Certifications() {
   const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
@@ -46,7 +54,15 @@ export default function Certifications() {
               <p className="col-span-4 text-foreground font-semibold">{cert.name}</p>
               <p className="col-span-3 text-muted-foreground">{cert.issuer}</p>
               <p className="col-span-3 text-cyan-300">{cert.status}</p>
-              <p className="col-span-2 text-muted-foreground text-sm">{cert.credentialId}</p>
+              <a
+                href={buildVerificationHref(cert)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="col-span-2 text-cyan-300 text-sm underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
+                aria-label={`Verify ${cert.name} credential ${cert.credentialId}`}
+              >
+                {cert.credentialId}
+              </a>
             </motion.div>
           ))}
         </div>
@@ -65,7 +81,18 @@ export default function Certifications() {
               <p className="text-foreground font-semibold mb-2">{cert.name}</p>
               <p className="text-muted-foreground text-sm mb-1">{cert.issuer}</p>
               <p className="text-cyan-300 text-sm mb-1">{cert.status}</p>
-              <p className="text-muted-foreground text-xs">Credential: {cert.credentialId}</p>
+              <p className="text-muted-foreground text-xs">
+                Credential:{' '}
+                <a
+                  href={buildVerificationHref(cert)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
+                  aria-label={`Verify ${cert.name} credential ${cert.credentialId}`}
+                >
+                  {cert.credentialId}
+                </a>
+              </p>
             </motion.article>
           ))}
         </div>
