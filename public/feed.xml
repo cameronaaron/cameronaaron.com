@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Cameron Aaron</title>
+    <link>https://cameronaaron.com/</link>
+    <description>Official website and portfolio updates from Cameron Aaron.</description>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 May 2026 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Cameron Aaron Official Portfolio</title>
+      <link>https://cameronaaron.com/</link>
+      <guid>https://cameronaaron.com/</guid>
+      <pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate>
+      <description>Portfolio covering healthcare credentials, software engineering, and security research.</description>
+    </item>
+  </channel>
+</rss>

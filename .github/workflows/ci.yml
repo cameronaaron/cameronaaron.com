@@ -40,6 +40,9 @@ jobs:
       - name: Run production build
         run: npm run build
 
+      - name: Run SEO integrity checks
+        run: npm run seo:check
+
   lighthouse:
     name: Lighthouse Assertions
     runs-on: ubuntu-latest

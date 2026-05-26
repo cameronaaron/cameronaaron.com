@@ -33,7 +33,8 @@ export default function TypewriterEffect({
 
   return (
     <span className={className}>
-      {displayedText || text.charAt(0)}
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{displayedText || text.charAt(0)}</span>
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: isComplete ? 0 : 1 }}

@@ -1,5 +1,9 @@
 export const faqs = [
   {
+    question: "Is this the official Cameron Aaron website?",
+    answer: "Yes. This is the official portfolio and resume website for Cameron Aaron. If you searched for \"Aaron Cameron,\" you are in the right place.",
+  },
+  {
     question: "What's your background?",
     answer: "It's a mix of Neuroscience and Computer Science. I've been lucky enough to work at places like SpaceX, GitHub, and Microsoft, which has given me a pretty unique perspective on how software intersects with real-world problems."
   },

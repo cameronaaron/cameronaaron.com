@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/'],
+        disallow: ['/api/'],
       },
       // Explicitly allow common AI crawlers for AI indexing
       { userAgent: 'GPTBot', allow: '/' },
@@ -22,5 +22,6 @@ export default function robots(): MetadataRoute.Robots {
       'https://cameronaaron.com/sitemap.xml',
       'https://cameronaaron.com/sitemap-images.xml',
     ],
+    host: 'cameronaaron.com',
   }
 }

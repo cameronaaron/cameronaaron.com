@@ -41,7 +41,7 @@ export default function Button({
   };
   
   const variantStyles = {
-    primary: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-purple-500/50',
+    primary: 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-white shadow-lg hover:shadow-cyan-400/45',
     secondary: 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20',
     outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white',
   };

@@ -3,26 +3,66 @@ import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
 import { skills } from '@/data/skills';
 import { certifications } from '@/data/certifications';
+import { testimonials } from '@/data/testimonials';
+
+function toIsoDate(monthYearText?: string): string | undefined {
+  if (!monthYearText) return undefined;
+
+  const parsed = new Date(`${monthYearText} 01`);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  return parsed.toISOString().slice(0, 10);
+}
+
+function splitPeriod(period?: string): { startDate?: string; endDate?: string } {
+  if (!period) return {};
+
+  const [startText, endText] = period.split(' - ').map((segment) => segment.trim());
+  return {
+    startDate: toIsoDate(startText),
+    endDate: toIsoDate(endText),
+  };
+}
 
 export default function StructuredData() {
+  const baseUrl = 'https://cameronaaron.com';
+  const personId = `${baseUrl}/#person`;
+  const websiteId = `${baseUrl}/#website`;
+  const webpageId = `${baseUrl}/#webpage`;
+
   const personSchema = {
-    "@context": "https://schema.org",
     "@type": "Person",
+    "@id": personId,
     name: profile.name,
+    alternateName: ['Aaron Cameron'],
+    givenName: 'Cameron',
+    familyName: 'Aaron',
     jobTitle: profile.title,
     description: profile.bio,
-    image: `https://cameronaaron.com${profile.image}`,
+    image: `${baseUrl}${profile.image}`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: profile.location,
+    },
     email: profile.email,
-    url: "https://cameronaaron.com",
+    url: baseUrl,
     sameAs: [
       profile.social.github,
       profile.social.linkedin,
     ],
-    knowsAbout: skills.domains,
+    knowsAbout: skills.domains.slice(0, 20),
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        email: profile.email,
+        contactType: 'professional inquiries',
+        availableLanguage: ['en'],
+      },
+    ],
     hasCredential: certifications.map((cert) => ({
       "@type": "EducationalOccupationalCredential",
       name: cert.name,
-      credentialCategory: cert.status,
+      credentialCategory: cert.status.toLowerCase(),
       recognizedBy: {
         "@type": "Organization",
         name: cert.issuer,
@@ -32,113 +72,149 @@ export default function StructuredData() {
   };
 
   const profilePageSchema = {
-    "@context": "https://schema.org",
     "@type": "ProfilePage",
-    mainEntity: {
-      "@type": "Person",
-      name: profile.name,
-    },
+    "@id": webpageId,
+    url: baseUrl,
+    name: `${profile.name} | Profile`,
+    inLanguage: 'en-US',
+    isPartOf: { "@id": websiteId },
+    mainEntity: { "@id": personId },
   };
 
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Cameron Aaron",
-    url: "https://cameronaaron.com",
-    logo: "https://cameronaaron.com/icon-512x512.png",
-    sameAs: [
-      profile.social.github,
-      profile.social.linkedin,
-    ],
-    contactPoint: [{
-      "@type": "ContactPoint",
-      email: profile.email,
-      contactType: "professional inquiries"
-    }],
+  const websiteSchema = {
+    "@type": "WebSite",
+    "@id": websiteId,
+    url: baseUrl,
+    name: `${profile.name} Portfolio`,
+    inLanguage: 'en-US',
+    publisher: { "@id": personId },
+  };
+
+  const webPageSchema = {
+    "@type": "WebPage",
+    "@id": `${baseUrl}/#home-page`,
+    url: baseUrl,
+    name: `${profile.name} Portfolio`,
+    isPartOf: { "@id": websiteId },
+    about: { "@id": personId },
+    primaryImageOfPage: {
+      "@type": "ImageObject",
+      url: `${baseUrl}${profile.image}`,
+    },
+    inLanguage: 'en-US',
   };
 
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://cameronaaron.com",
+        item: baseUrl,
       },
     ],
   };
 
   const researchOutputSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
+    name: 'Research and Publications',
     itemListElement: projects.map((project, index) => ({
-      "@type": "CreativeWork",
+      "@type": "ListItem",
       position: index + 1,
-      name: project.title,
-      description: project.description,
-      datePublished: project.period,
-      url: project.link,
-    })),
-  };
-
-  const workExperienceSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: experiences.map((exp, index) => ({
-      "@type": "OrganizationRole",
-      position: index + 1,
-      roleName: exp.positions[0]?.title,
-      startDate: exp.positions[0]?.period,
-      organization: {
-        "@type": "Organization",
-        name: exp.company,
+      item: {
+        "@type": "CreativeWork",
+        name: project.title,
+        description: project.description,
+        url: project.link,
+        keywords: project.tags.join(', '),
+        ...(toIsoDate(project.period) ? { datePublished: toIsoDate(project.period) } : {}),
       },
     })),
   };
 
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Cameron Aaron Medical Resume",
-    url: "https://cameronaaron.com",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://cameronaaron.com/?s={search_term_string}",
-      "query-input": "required name=search_term_string",
-    },
+  const workExperienceSchema = {
+    "@type": "ItemList",
+    name: 'Professional Experience',
+    itemListElement: experiences.map((exp, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "OrganizationRole",
+        roleName: exp.positions[0]?.title,
+        worksFor: {
+          "@type": "Organization",
+          name: exp.company,
+        },
+        ...(splitPeriod(exp.positions[0]?.period).startDate
+          ? { startDate: splitPeriod(exp.positions[0]?.period).startDate }
+          : {}),
+        ...(splitPeriod(exp.positions[0]?.period).endDate
+          ? { endDate: splitPeriod(exp.positions[0]?.period).endDate }
+          : {}),
+      },
+    })),
+  };
+
+  const credentialSchema = {
+    "@type": "ItemList",
+    name: 'Certifications and Credentials',
+    itemListElement: certifications.map((cert, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "EducationalOccupationalCredential",
+        name: cert.name,
+        credentialCategory: cert.status.toLowerCase(),
+        recognizedBy: {
+          "@type": "Organization",
+          name: cert.issuer,
+        },
+        identifier: cert.credentialId,
+      },
+    })),
+  };
+
+  const testimonialSchema = {
+    "@type": "ItemList",
+    name: 'Professional Testimonials',
+    itemListElement: testimonials.slice(0, 12).map((testimonial, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": 'CreativeWork',
+        name: `Testimonial from ${testimonial.name}`,
+        text: testimonial.text,
+        ...(toIsoDate(testimonial.date) ? { datePublished: toIsoDate(testimonial.date) } : {}),
+        creator: {
+          "@type": 'Person',
+          name: testimonial.name,
+          jobTitle: testimonial.role,
+        },
+      },
+    })),
+  };
+
+  const schemaGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      personSchema,
+      websiteSchema,
+      webPageSchema,
+      profilePageSchema,
+      breadcrumbSchema,
+      researchOutputSchema,
+      workExperienceSchema,
+      credentialSchema,
+      testimonialSchema,
+    ],
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(researchOutputSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(workExperienceSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaGraph) }}
       />
     </>
   );

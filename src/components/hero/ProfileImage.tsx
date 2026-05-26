@@ -80,11 +80,11 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         {/* Glowing background with depth */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'translateZ(-50px)' }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'translateZ(-50px)' }} />
         
         {/* Secondary glow layer */}
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-full blur-2xl"
+          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-full blur-2xl"
           animate={{
             scale: prefersReducedMotion ? 1 : [1, 1.2, 1],
             opacity: prefersReducedMotion ? 0.3 : [0.3, 0.5, 0.3],
@@ -131,8 +131,8 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
 
         {/* Floating badges with depth */}
         <div style={{ transform: 'translateZ(40px)' }}>
-          <FloatingBadge emoji="🚀" position="top-right" />
-          <FloatingBadge emoji="🧠" position="bottom-left" delay={0.5} />
+          <FloatingBadge icon="innovation" position="top-right" />
+          <FloatingBadge icon="neuro" position="bottom-left" delay={0.5} />
         </div>
       </motion.div>
     </motion.div>

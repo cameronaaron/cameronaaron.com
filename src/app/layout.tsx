@@ -21,12 +21,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL("https://cameronaaron.com"),
   title: {
-    default: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
+    default: "Cameron Aaron Official Site | EMT, CNA, Software Engineer",
     template: "%s | Cameron Aaron"
   },
-  description: "Software engineer and security researcher with interdisciplinary experience in healthcare technology, aerospace medicine, neuroscience research, and public health operations while preparing for Nurse Practitioner school.",
+  description: "Official website of Cameron Aaron, EMT and CNA with software engineering and security research experience. Explore credentials, experience, publications, and contact details.",
   keywords: [
     "Cameron Aaron",
+    "Aaron Cameron",
+    "Cameron Aaron official site",
+    "Cameron Aaron portfolio",
     "Software Engineer",
     "Security Researcher",
     "Cybersecurity",
@@ -64,7 +67,7 @@ export const metadata: Metadata = {
   creator: "Cameron Aaron",
   publisher: "Cameron Aaron",
   alternates: {
-    canonical: "https://cameronaaron.com",
+    canonical: "https://cameronaaron.com/",
     languages: {
       'en-US': '/',
       'en': '/',
@@ -92,17 +95,17 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
-    description: "Software engineer and security researcher with active emergency and nursing credentials, healthcare technology expertise, and a clear path toward Nurse Practitioner training.",
-    url: "https://cameronaaron.com",
-    siteName: "Cameron Aaron - Medical Resume",
+    title: "Cameron Aaron Official Site | EMT, CNA, Software Engineer",
+    description: "Official Cameron Aaron portfolio with credentials, clinical-care experience, security research, and software engineering work.",
+    url: "https://cameronaaron.com/",
+    siteName: "Cameron Aaron",
     images: [
       {
-        url: "https://cameronaaron.com/profile.webp",
+        url: "https://cameronaaron.com/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
-        type: "image/webp",
+        alt: "Cameron Aaron | EMT, CNA, Software Engineer, Security Researcher & Future NP",
+        type: "image/png",
       },
     ],
     locale: "en_US",
@@ -114,11 +117,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
-    description: "Interdisciplinary profile spanning software engineering, security research, healthcare technology, and Nurse Practitioner preparation.",
+    title: "Cameron Aaron Official Site | EMT, CNA, Software Engineer",
+    description: "Official portfolio of Cameron Aaron featuring healthcare credentials, experience, projects, and contact information.",
     images: {
-      url: "https://cameronaaron.com/profile.webp",
-      alt: "Cameron Aaron - Software Engineer, Security Researcher, EMT & Future NP",
+      url: "https://cameronaaron.com/twitter-image.png",
+      alt: "Cameron Aaron | EMT, CNA, Software Engineer, Security Researcher & Future NP",
     },
   },
   robots: {
@@ -149,10 +152,19 @@ export const metadata: Metadata = {
     address: false,
   },
   verification: {
-    // Add your verification codes when you have them
-    // google: 'your-google-verification-code',
-    // yandex: 'your-yandex-verification-code',
-    // other: 'your-other-verification-code',
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    yandex: process.env.YANDEX_SITE_VERIFICATION,
+    other: process.env.BING_SITE_VERIFICATION
+      ? {
+          'msvalidate.01': process.env.BING_SITE_VERIFICATION,
+        }
+      : undefined,
+  },
+  other: {
+    'geo.region': 'US-CA',
+    'geo.placename': 'Los Angeles',
+    'ICBM': '34.0522, -118.2437',
+    'theme-color': '#06b6d4',
   },
 };
 
