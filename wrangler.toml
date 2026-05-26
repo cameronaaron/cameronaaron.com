@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "cameronaaronsite"
+name = "cameronaaronsite-production"
 main = "src/index.js"
 compatibility_date = "2025-10-24"
 workers_dev = true
