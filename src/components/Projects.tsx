@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { projects } from '@/data/projects';
 import { sortByDateDesc } from '@/data/dateOrdering';
@@ -17,6 +17,8 @@ export default function Projects() {
     projects.filter((project) => !project.featured),
     (project) => project.period
   );
+  const prefersReducedMotion = useReducedMotion();
+  const researchSignals = Array.from(new Set(projects.flatMap((project) => project.tags))).slice(0, 10);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -37,6 +39,18 @@ export default function Projects() {
       <motion.div 
         style={{ y: useTransform(scrollYProgress, [0, 1], [100, -50]) }}
         className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none" 
+      />
+      <motion.div
+        className="pointer-events-none absolute -right-24 top-36 hidden h-64 w-64 rounded-full border border-cyan-300/20 lg:block"
+        animate={prefersReducedMotion ? undefined : { rotate: [0, 360] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+        aria-hidden="true"
+      />
+      <motion.div
+        className="pointer-events-none absolute -right-14 top-44 hidden h-44 w-44 rounded-full border border-emerald-300/20 lg:block"
+        animate={prefersReducedMotion ? undefined : { rotate: [360, 0] }}
+        transition={{ duration: 13, repeat: Infinity, ease: 'linear' }}
+        aria-hidden="true"
       />
 
       <div className="container mx-auto px-6 relative z-10">
@@ -65,6 +79,24 @@ export default function Projects() {
           subtitle="Selected publications, conference presentations, and research projects"
           className="[&>h2]:font-display"
         />
+
+        <div className="mb-12 overflow-hidden rounded-2xl border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
+          <motion.div
+            className="flex w-max items-center gap-2"
+            animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
+            transition={prefersReducedMotion ? undefined : { duration: 22, repeat: Infinity, ease: 'linear' }}
+          >
+            {[...researchSignals, ...researchSignals].map((signal, index) => (
+              <span
+                key={`${signal}-${index}`}
+                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
+                {signal}
+              </span>
+            ))}
+          </motion.div>
+        </div>
 
         {/* Featured Projects */}
         <motion.div 

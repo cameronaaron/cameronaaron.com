@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { additionalCredentials, academicVerificationResources } from './additionalCredentials';
@@ -5,6 +7,14 @@ import { certifications } from './certifications';
 import { educationItems } from './education';
 import { internetFeatures } from './internetFeatures';
 import { projects } from './projects';
+
+function normalizeUrl(value: string): string {
+  return value.trim().replace(/[.,;:!?]+$/, '');
+}
+
+function normalizeText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 describe('meoninternet coverage integration', () => {
   it('maps fixed verification links to credential datasets', () => {
@@ -106,5 +116,91 @@ describe('meoninternet coverage integration', () => {
     expect(verificationUrls).toContain(
       'https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/'
     );
+  });
+
+  it('ensures every URL listed in meoninternet.md is represented in source data', () => {
+    const meOnInternetPath = path.resolve(__dirname, '..', '..', 'meoninternet.md');
+    const source = fs.readFileSync(meOnInternetPath, 'utf8');
+    const urlMatches = source.match(/https?:\/\/[^\s)]+/g) ?? [];
+    const sourceUrls = new Set(urlMatches.map(normalizeUrl));
+
+    const representedUrls = new Set<string>([
+      ...academicVerificationResources.map((item) => item.url),
+      ...additionalCredentials.map((item) => item.verificationUrl),
+      ...certifications.map((item) => item.verificationUrl),
+      ...internetFeatures.map((item) => item.url ?? ''),
+      ...projects.map((item) => item.link),
+      ...educationItems.flatMap((item) =>
+        (item.verificationLinks ?? []).map((link) => link.url)
+      ),
+    ].map((url) => normalizeUrl(url)));
+
+    const missing = [...sourceUrls].filter((url) => !representedUrls.has(url));
+
+    expect(missing).toEqual([]);
+  });
+
+  it('covers key non-URL source claims from meoninternet.md in structured text fields', () => {
+    const textCorpus = normalizeText(
+      [
+        ...academicVerificationResources.flatMap((item) => [
+          item.name,
+          item.institution,
+          item.description,
+          item.credentialId ?? '',
+        ]),
+        ...additionalCredentials.flatMap((item) => [
+          item.name,
+          item.issuer,
+          item.issued,
+          item.credentialId,
+          item.notes ?? '',
+        ]),
+        ...certifications.flatMap((item) => [
+          item.name,
+          item.issuer,
+          item.status,
+          item.credentialId,
+        ]),
+        ...educationItems.flatMap((item) => [
+          item.institution,
+          item.credential,
+          item.period,
+          ...item.details,
+          ...(item.verificationLinks ?? []).flatMap((link) => [link.label]),
+        ]),
+        ...internetFeatures.flatMap((item) => [
+          item.title,
+          item.organization,
+          item.period,
+          item.summary,
+          item.category,
+        ]),
+        ...projects.flatMap((item) => [
+          item.title,
+          item.description,
+          item.period,
+          ...(item.tags ?? []),
+          item.cta ?? '',
+        ]),
+      ].join(' ')
+    );
+
+    const requiredPhrases = [
+      'suite of tools level 2',
+      'bachelor of arts psychology computer science',
+      'hearing from experienced advocates in neurodiversity',
+      'kristin rourke and cameron aaron',
+      'top emerging talent',
+      'sensory inclusive',
+      'researchgate publications archive 3 publications',
+      'toxoplasma gondii modifies personality',
+      'the real magical girls',
+      'eas 101 final paper',
+    ].map((phrase) => normalizeText(phrase));
+
+    const missingPhrases = requiredPhrases.filter((phrase) => !textCorpus.includes(phrase));
+
+    expect(missingPhrases).toEqual([]);
   });
 });
