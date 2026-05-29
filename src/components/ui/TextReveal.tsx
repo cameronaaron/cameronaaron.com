@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TextRevealProps {
   text: string;
@@ -12,6 +12,43 @@ interface TextRevealProps {
 export default function TextReveal({ text, className = "", delay = 0 }: TextRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
+  const [forceVisible, setForceVisible] = useState(false);
+  const storageKey = `text-reveal-complete:${text}`;
+
+  useEffect(() => {
+    const isCompleteInSession = window.sessionStorage.getItem(storageKey) === '1';
+    if (isCompleteInSession) {
+      setForceVisible(true);
+      return;
+    }
+
+    const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (navigationEntries[0]?.type === 'back_forward') {
+      setForceVisible(true);
+      window.sessionStorage.setItem(storageKey, '1');
+    }
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setForceVisible(true);
+        window.sessionStorage.setItem(storageKey, '1');
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [storageKey]);
+
+  const shouldReveal = isInView || forceVisible;
+
+  useEffect(() => {
+    if (shouldReveal) {
+      window.sessionStorage.setItem(storageKey, '1');
+    }
+  }, [shouldReveal, storageKey]);
 
   const words = text.split(" ");
 
@@ -24,7 +61,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
               key={j}
               initial={{ y: "100%", opacity: 0 }}
               /* v8 ignore next */
-              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              animate={shouldReveal ? { y: 0, opacity: 1 } : {}}
               transition={{
                 duration: 0.5,
                 delay: delay + i * 0.1 + j * 0.02,

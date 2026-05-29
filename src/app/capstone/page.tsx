@@ -5,7 +5,7 @@ import { capstone } from '@/data/capstone';
 export const dynamic = 'force-static';
 
 const baseUrl = 'https://cameronaaron.com';
-const pageUrl = `${baseUrl}/capstone.html`;
+const pageUrl = `${baseUrl}/capstone`;
 
 function toYouTubeEmbedUrl(url: string): string | undefined {
   const shortMatch = url.match(/^https?:\/\/youtu\.be\/([^?&/]+)/i);
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description:
     'Bridging Transitions is Cameron Aaron\'s Spring 2026 M.Ed. capstone: a five-part educational video series on thrice-exceptional Black male students and higher education transition.',
   alternates: {
-    canonical: '/capstone.html',
+    canonical: '/capstone',
   },
   keywords: [
     'Bridging Transitions capstone',

@@ -11,3 +11,12 @@ http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 # Static export rewrites for extensionless landing pages
 /capstone /capstone.html 200
 /capstone/ /capstone.html 200
+/credentials /credentials.html 200
+/credentials/ /credentials.html 200
+/internet /internet.html 200
+/internet/ /internet.html 200
+
+# Legacy route compatibility
+/capstone.html /capstone 301
+/credentials.html /credentials 301
+/internet.html /internet 301

@@ -31,6 +31,26 @@ const nextConfig = {
     } : false,
     reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/capstone.html',
+        destination: '/capstone',
+        permanent: true,
+      },
+      {
+        source: '/credentials.html',
+        destination: '/credentials',
+        permanent: true,
+      },
+      {
+        source: '/internet.html',
+        destination: '/internet',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -68,8 +68,7 @@ export const certifications: Certification[] = [
     issuer: "Los Angeles Valley College",
     status: "Earned (Oct 2025)",
     credentialId: "5ed28264-10a0-4798-b16b-f94393e0b7da",
-    verificationUrl: "https://www.lavc.edu/admissions/order-transcripts",
-    verificationQueryParam: "credentialId",
+    verificationUrl: "https://www.parchment.com/lp/award/5ed28264-10a0-4798-b16b-f94393e0b7da",
   },
   {
     name: "Private Security Agent",

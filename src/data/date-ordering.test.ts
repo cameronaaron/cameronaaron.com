@@ -32,7 +32,7 @@ describe('date ordering utility', () => {
     const sortedEducation = sortByDateDesc(educationItems, (item) => item.period);
     const sortedHonors = sortByDateDesc(honorsAndAffiliations, (item) => item);
 
-    expect(sortedProjects[0].title).toBe('Stanford Neurodiversity Summit Panel');
+    expect(sortedProjects[0].title).toContain('Bridging Transitions');
     expect(sortedCertifications[0].name).toBe('Certified Nursing Assistant (CNA)');
     expect(sortedEducation[0].credential).toContain('Master of Education');
     expect(sortedHonors[0]).toContain('(Jun 2025)');

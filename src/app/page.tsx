@@ -15,6 +15,34 @@ import CursorTrail from '@/components/ui/CursorTrail';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
+function SectionReveal({
+  index,
+  children,
+}: {
+  index: number;
+  children: React.ReactNode;
+}) {
+  const glowTone = index % 2 === 0 ? 'from-cyan-400/10 via-primary/12 to-transparent' : 'from-emerald-400/10 via-secondary/12 to-transparent';
+
+  return (
+    <motion.div
+      className="relative"
+      initial={{ opacity: 0, y: 24, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
+      transition={{ duration: 0.7, delay: index * 0.03, ease: 'easeOut' }}
+    >
+      <motion.div
+        className={`pointer-events-none absolute inset-x-0 top-6 mx-auto h-24 w-3/4 rounded-full bg-gradient-to-r ${glowTone} blur-3xl`}
+        animate={{ opacity: [0.3, 0.55, 0.3], scale: [0.98, 1.02, 0.98] }}
+        transition={{ duration: 7 + index * 0.4, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
+      {children}
+    </motion.div>
+  );
+}
+
 function SectionHandoff({
   label,
   index,
@@ -152,30 +180,58 @@ export default function Home() {
       </a>
       <main className="min-h-screen" id="main-content">
         <Navigation />
-        <Hero />
+        <SectionReveal index={0}>
+          <Hero />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Credentials" cue="transitioning to verified credentials" index={1} targetId="certifications" /> : null}
-        <Certifications />
+        <SectionReveal index={1}>
+          <Certifications />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Experience" cue="switching from proof to practice" index={2} targetId="experience" /> : null}
-        <Experience />
+        <SectionReveal index={2}>
+          <Experience />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Education" cue="entering training and milestones" index={3} targetId="education" /> : null}
-        <Education />
+        <SectionReveal index={3}>
+          <Education />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Research" cue="opening research and publications" index={4} targetId="projects" /> : null}
-        <Projects />
+        <SectionReveal index={4}>
+          <Projects />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Capabilities" cue="mapping strengths and specialties" index={5} targetId="skills" /> : null}
-        <Skills />
+        <SectionReveal index={5}>
+          <Skills />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Testimonials" cue="hearing voices from collaborators" index={6} targetId="testimonials" /> : null}
-        <Testimonials />
+        <SectionReveal index={6}>
+          <Testimonials />
+        </SectionReveal>
         {showSectionHandoffs ? <SectionHandoff label="Connect" cue="ready for your next conversation" index={7} targetId="contact" /> : null}
-        <Contact />
+        <SectionReveal index={7}>
+          <Contact />
+        </SectionReveal>
       
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-8">
-        <div className="container mx-auto px-6 text-center">
+      <motion.footer
+        className="bg-slate-900 text-white py-8 relative overflow-hidden"
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent"
+          animate={{ opacity: [0.35, 0.7, 0.35] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden="true"
+        />
+        <div className="container mx-auto px-6 text-center relative z-10">
           <p className="text-gray-400">
             © {new Date().getFullYear()} Cameron Aaron. All rights reserved.
           </p>
         </div>
-      </footer>
+      </motion.footer>
     </main>
     </>
   );

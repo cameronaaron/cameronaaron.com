@@ -9,48 +9,36 @@ export default function ServiceWorkerRegistration() {
       'serviceWorker' in navigator &&
       process.env.NODE_ENV === 'production'
     ) {
-      // Register service worker
-      navigator.serviceWorker
-        .register('/sw.js', { scope: '/' })
-        .then((registration) => {
-          console.log('✅ Service Worker registered:', registration.scope);
+      const cleanupKey = 'sw-cleanup-complete';
 
-          // Check for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (
-                  newWorker.state === 'installed' &&
-                  navigator.serviceWorker.controller
-                ) {
-                  // New service worker available
-                  console.log('🔄 New service worker available');
-                  
-                  // Auto-update after a delay
-                  setTimeout(() => {
-                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
-                  }, 5000);
-                }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('❌ Service Worker registration failed:', error);
-        });
+      if (window.sessionStorage.getItem(cleanupKey) === 'true') {
+        return;
+      }
 
-      // Handle controller change
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('🔄 Service Worker controller changed');
-      });
+      const unregisterServiceWorkers = async () => {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations?.();
 
-      // Handle messages from service worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        console.log('📨 Message from service worker:', event.data);
-      });
+          if (registrations?.length) {
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+          }
+
+          if ('caches' in window) {
+            const cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+          }
+
+          window.sessionStorage.setItem(cleanupKey, 'true');
+
+          if (navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('❌ Service worker cleanup failed:', error);
+        }
+      };
+
+      void unregisterServiceWorkers();
     }
   }, []);
 

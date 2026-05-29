@@ -102,13 +102,13 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-foreground"
           >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.05 }}
@@ -122,7 +122,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
               className="text-4xl md:text-6xl font-bold mb-6 tracking-tight font-display"
@@ -137,7 +137,7 @@ export default function Hero() {
             </div>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
               className="text-lg text-muted-foreground/80 mb-10 leading-relaxed max-w-xl"
@@ -146,7 +146,7 @@ export default function Hero() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="flex flex-wrap gap-4"
@@ -167,10 +167,15 @@ export default function Hero() {
                   Explore Experience
                 </Button>
               </Magnetic>
+              <Magnetic strength={0.1}>
+                <Button href="/internet" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
+                  Online Features
+                </Button>
+              </Magnetic>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
               className="mt-6 flex flex-wrap gap-2"
@@ -178,7 +183,7 @@ export default function Hero() {
               {['Engineering', 'Security', 'Clinical Care', 'NP Path'].map((chip, index) => (
                 <motion.span
                   key={chip}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 + index * 0.08 }}
                   whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
@@ -191,7 +196,7 @@ export default function Hero() {
 
             {/* Stats with hover effects */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 border-t border-white/5 pt-8"
@@ -199,7 +204,7 @@ export default function Hero() {
               {profile.stats.map((stat, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={false}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1 }}
                   whileHover={shouldRenderHeavyEffects ? { scale: 1.1, y: -5 } : undefined}

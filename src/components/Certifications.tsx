@@ -116,6 +116,28 @@ export default function Certifications() {
             ))}
           </div>
         </div>
+
+        <div className="mt-10 rounded-2xl border border-cyan-300/25 bg-cyan-500/10 p-6">
+          <h3 className="text-xl font-bold text-foreground font-display">Need the full credential archive?</h3>
+          <p className="mt-2 text-muted-foreground">
+            This section highlights active clinical licenses. For additional technical certificates, diploma verification,
+            and public-facing credential links, use the dedicated pages below.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/credentials"
+              className="inline-flex items-center rounded-lg border border-cyan-300/40 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/20"
+            >
+              View Full Credentials Page
+            </a>
+            <a
+              href="/internet"
+              className="inline-flex items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              View Online Features Page
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

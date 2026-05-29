@@ -3,6 +3,12 @@ export interface EducationItem {
   credential: string;
   period: string;
   details: string[];
+  verificationLinks?: EducationVerificationLink[];
+}
+
+export interface EducationVerificationLink {
+  label: string;
+  url: string;
 }
 
 export interface PrerequisiteCourse {
@@ -41,6 +47,13 @@ export const educationItems: EducationItem[] = [
       "Minor: Cognitive Science",
       "Certificate: Ammerman Center for Arts and Technology",
       "Award: 2021 Bridget Baird Award for Excellence in Research",
+      "Credential ID: 227H-DXTM-CXND",
+    ],
+    verificationLinks: [
+      {
+        label: "Digital Diploma Verification",
+        url: "https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/",
+      },
     ],
   },
 ];

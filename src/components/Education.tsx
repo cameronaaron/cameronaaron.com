@@ -39,6 +39,24 @@ export default function Education() {
                   </li>
                 ))}
               </ul>
+              {item.verificationLinks?.length ? (
+                <div className="mt-4 border-t border-white/10 pt-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-cyan-200/80 mb-2">Verification</p>
+                  <div className="flex flex-col gap-2">
+                    {item.verificationLinks.map((link) => (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-cyan-300 underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </motion.article>
           ))}
         </div>

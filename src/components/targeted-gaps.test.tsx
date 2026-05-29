@@ -211,38 +211,31 @@ describe('targeted coverage gaps', () => {
     fireEvent.mouseMove(screen.getByRole('button', { name: 'NoHover' }), { clientX: 80, clientY: 40 });
   });
 
-  it('covers service worker production register, events, and error handling', async () => {
+  it('cleans up stale service worker registrations in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
 
-    const postMessage = vi.fn();
-    const installing = {
-      state: 'installed',
-      addEventListener: vi.fn((event: string, callback: () => void) => {
-        if (event === 'statechange') callback();
-      }),
-      postMessage,
-    };
-
-    const registration = {
-      scope: '/',
-      installing,
-      addEventListener: vi.fn((event: string, callback: () => void) => {
-        if (event === 'updatefound') callback();
-      }),
-    };
-
-    const register = vi.fn().mockResolvedValue(registration);
-    const addEventListener = vi.fn((event: string, callback: (event?: { data?: unknown }) => void) => {
-      if (event === 'controllerchange') callback();
-      if (event === 'message') callback({ data: { type: 'PING' } });
-    });
+    const unregister = vi.fn().mockResolvedValue(true);
+    const getRegistrations = vi.fn().mockResolvedValue([
+      {
+        unregister,
+      },
+    ]);
+    const deleteCache = vi.fn().mockResolvedValue(true);
+    const cacheKeys = vi.fn().mockResolvedValue(['legacy-cache']);
 
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
       value: {
         controller: {},
-        register,
-        addEventListener,
+        getRegistrations,
+      },
+    });
+
+    Object.defineProperty(window, 'caches', {
+      configurable: true,
+      value: {
+        keys: cacheKeys,
+        delete: deleteCache,
       },
     });
 
@@ -270,18 +263,13 @@ describe('targeted coverage gaps', () => {
       await Promise.resolve();
     });
 
-    expect(register).toHaveBeenCalledWith('/sw.js', { scope: '/' });
-    expect(addEventListener).toHaveBeenCalledWith('controllerchange', expect.any(Function));
-    expect(addEventListener).toHaveBeenCalledWith('message', expect.any(Function));
-    expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
-
-    register.mockRejectedValueOnce(new Error('registration failed'));
-    render(<ServiceWorkerRegistration />);
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    expect(errorSpy).toHaveBeenCalled();
+    expect(getRegistrations).toHaveBeenCalled();
+    expect(unregister).toHaveBeenCalled();
+    expect(cacheKeys).toHaveBeenCalled();
+    expect(deleteCache).toHaveBeenCalledWith('legacy-cache');
+    expect(window.sessionStorage.getItem('sw-cleanup-complete')).toBe('true');
+    expect(reloadSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('covers custom cursor pointer and interaction branches', () => {

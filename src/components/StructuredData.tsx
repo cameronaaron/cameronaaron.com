@@ -39,7 +39,9 @@ export default function StructuredData() {
   ) as string[];
 
   const baseUrl = 'https://cameronaaron.com';
-  const capstoneUrl = `${baseUrl}/capstone.html`;
+  const capstoneUrl = `${baseUrl}/capstone`;
+  const credentialsUrl = `${baseUrl}/credentials`;
+  const internetUrl = `${baseUrl}/internet`;
   const personId = `${baseUrl}/#person`;
   const websiteId = `${baseUrl}/#website`;
   const webpageId = `${baseUrl}/#webpage`;
@@ -129,6 +131,18 @@ export default function StructuredData() {
         "@id": `${capstoneUrl}#webpage`,
         url: capstoneUrl,
         name: 'Bridging Transitions Capstone Defense',
+      },
+      {
+        "@type": 'WebPage',
+        "@id": `${credentialsUrl}#webpage`,
+        url: credentialsUrl,
+        name: 'Credentials and Verification',
+      },
+      {
+        "@type": 'WebPage',
+        "@id": `${internetUrl}#webpage`,
+        url: internetUrl,
+        name: 'Cameron Aaron on the Internet',
       },
     ],
     inLanguage: 'en-US',

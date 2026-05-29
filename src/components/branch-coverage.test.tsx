@@ -126,4 +126,29 @@ describe('branch coverage targets', () => {
     expect(screen.getByText('Done')).toBeTruthy();
     rafSpy.mockRestore();
   });
+
+  it('resets browser scroll restoration and snaps back on reload navigation', () => {
+    const scrollToSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    const getEntriesSpy = vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+      { type: 'reload' } as PerformanceNavigationTiming,
+    ]);
+    const originalScrollRestoration = window.history.scrollRestoration;
+
+    const smooth = render(<SmoothScroll />);
+
+    expect(window.history.scrollRestoration).toBe('manual');
+
+    const pageShowEvent = new Event('pageshow');
+    Object.defineProperty(pageShowEvent, 'persisted', { value: false });
+    window.dispatchEvent(pageShowEvent);
+
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
+
+    smooth.unmount();
+
+    expect(window.history.scrollRestoration).toBe(originalScrollRestoration);
+
+    scrollToSpy.mockRestore();
+    getEntriesSpy.mockRestore();
+  });
 });
