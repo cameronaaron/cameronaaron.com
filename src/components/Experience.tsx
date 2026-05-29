@@ -5,9 +5,16 @@ import { useRef, useState } from 'react';
 import { experiences } from '@/data/experience';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ExperienceCard from '@/components/experience/ExperienceCard';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 export default function Experience() {
   const [activeExperienceIndex, setActiveExperienceIndex] = useState(0);
+  const { performanceTier } = usePerformanceProfile();
+  const isLiteMotion = performanceTier === 'lite' || performanceTier === 'reduced';
+  const isCinematic = performanceTier === 'full';
+  const entryYOffset = isLiteMotion ? 10 : 22;
+  const timelineTravel = isLiteMotion ? 16 : 32;
+  const timelineStagger = isLiteMotion ? 0.04 : 0.1;
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -32,10 +39,33 @@ export default function Experience() {
         />
 
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: isLiteMotion ? 0.42 : 0.65, ease: 'easeOut' }}
+          className="mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          aria-label="Experience flow phases"
+        >
+          {['Clinical operations', 'Research translation', 'Security and systems'].map((phase, index) => (
+            <motion.div
+              key={phase}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * (isLiteMotion ? 0.04 : 0.1), duration: 0.4, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
+              {phase}
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: entryYOffset }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: isLiteMotion ? 0.42 : 0.6, ease: 'easeOut' }}
           className="mx-auto mb-10 flex max-w-5xl flex-wrap justify-center gap-3"
           aria-label="Experience quick navigation"
         >
@@ -46,11 +76,15 @@ export default function Experience() {
               <motion.button
                 key={`${exp.company}-${index}`}
                 type="button"
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * (isLiteMotion ? 0.02 : 0.05), duration: 0.35, ease: 'easeOut' }}
                 onClick={() => handleJumpToExperience(index)}
                 onMouseEnter={() => setActiveExperienceIndex(index)}
                 onFocus={() => setActiveExperienceIndex(index)}
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={isCinematic ? { y: -2, scale: 1.02 } : undefined}
+                whileTap={isLiteMotion ? undefined : { scale: 0.98 }}
                 className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-300 ${
                   isActive
                     ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100 shadow-lg shadow-cyan-500/20'
@@ -73,11 +107,40 @@ export default function Experience() {
             />
           </div>
 
-          <div className="space-y-12 md:space-y-24">
+          <motion.div
+            className="space-y-12 md:space-y-24"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: timelineStagger,
+                },
+              },
+            }}
+          >
             {experiences.map((exp, index) => (
-              <div
+              <motion.div
                 key={index}
                 id={`experience-item-${index}`}
+                variants={{
+                  hidden: {
+                    opacity: 0,
+                    y: entryYOffset,
+                    x: isLiteMotion ? 0 : index % 2 === 0 ? -timelineTravel : timelineTravel,
+                  },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    x: 0,
+                    transition: {
+                      duration: isLiteMotion ? 0.38 : 0.62,
+                      ease: 'easeOut',
+                    },
+                  },
+                }}
                 className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
               >
                 
@@ -89,15 +152,15 @@ export default function Experience() {
                       ? {
                           scale: 1.35,
                           backgroundColor: 'rgb(34 211 238)',
-                          boxShadow: '0 0 16px rgba(34, 211, 238, 0.85)',
+                          boxShadow: isLiteMotion ? '0 0 10px rgba(34, 211, 238, 0.55)' : '0 0 16px rgba(34, 211, 238, 0.85)',
                         }
                       : {
                           scale: 1,
                           backgroundColor: 'rgb(168 85 247)',
-                          boxShadow: '0 0 10px rgba(168, 85, 247, 0.5)',
+                          boxShadow: isLiteMotion ? '0 0 6px rgba(168, 85, 247, 0.35)' : '0 0 10px rgba(168, 85, 247, 0.5)',
                         }
                   }
-                  transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+                  transition={isLiteMotion ? { duration: 0.2, ease: 'easeOut' } : { type: 'spring', stiffness: 280, damping: 22 }}
                 />
 
                 {/* Content */}
@@ -112,9 +175,9 @@ export default function Experience() {
                     onActivate={() => setActiveExperienceIndex(index)}
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

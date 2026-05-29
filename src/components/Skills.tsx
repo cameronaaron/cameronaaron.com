@@ -6,17 +6,22 @@ import { skills } from '@/data/skills';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SkillBar from '@/components/ui/SkillBar';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 export default function Skills() {
   const [technicalView, setTechnicalView] = useState<'priority' | 'alphabetical'>('priority');
+  const { performanceTier } = usePerformanceProfile();
+  const isLiteMotion = performanceTier === 'lite' || performanceTier === 'reduced';
+  const isCinematic = performanceTier === 'full';
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const y = useTransform(scrollYProgress, [0, 1], isLiteMotion ? [36, -36] : [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+  const entryYOffset = isLiteMotion ? 10 : 20;
 
   const technicalSkills = useMemo(() => {
     if (technicalView === 'alphabetical') {
@@ -44,10 +49,33 @@ export default function Skills() {
         />
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={{ duration: isLiteMotion ? 0.4 : 0.62, ease: 'easeOut' }}
+          className="mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          aria-label="Skills journey phases"
+        >
+          {['Assess', 'Apply', 'Validate'].map((phase, index) => (
+            <motion.div
+              key={phase}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * (isLiteMotion ? 0.04 : 0.1), duration: 0.36, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
+              {phase}
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: entryYOffset }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: isLiteMotion ? 0.4 : 0.5, ease: 'easeOut' }}
           className="mx-auto mb-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
         >
           <div className="text-sm text-muted-foreground">
@@ -57,8 +85,8 @@ export default function Skills() {
             <motion.button
               type="button"
               onClick={() => setTechnicalView('priority')}
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={isCinematic ? { y: -1 } : undefined}
+              whileTap={isLiteMotion ? undefined : { scale: 0.98 }}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
                 technicalView === 'priority'
                   ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
@@ -71,8 +99,8 @@ export default function Skills() {
             <motion.button
               type="button"
               onClick={() => setTechnicalView('alphabetical')}
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={isCinematic ? { y: -1 } : undefined}
+              whileTap={isLiteMotion ? undefined : { scale: 0.98 }}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
                 technicalView === 'alphabetical'
                   ? 'border-emerald-300/45 bg-emerald-300/15 text-emerald-100'
@@ -85,13 +113,26 @@ export default function Skills() {
           </div>
         </motion.div>
 
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+        <motion.div
+          className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: isLiteMotion ? 0.06 : 0.14,
+              },
+            },
+          }}
+        >
           {/* Technical Skills */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            variants={{
+              hidden: { opacity: 0, x: isLiteMotion ? 0 : -36, y: entryYOffset },
+              visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
+            }}
           >
             <motion.h3 
               className="text-2xl font-bold mb-6 text-white"
@@ -118,7 +159,17 @@ export default function Skills() {
                 <motion.div
                   key={skill.name}
                   layout
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+                  initial={{ opacity: 0, y: entryYOffset }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{
+                    delay: index * (isLiteMotion ? 0.015 : 0.04),
+                    duration: isLiteMotion ? 0.26 : 0.42,
+                    ease: 'easeOut',
+                    type: isLiteMotion ? 'tween' : 'spring',
+                    stiffness: 280,
+                    damping: 24,
+                  }}
                 >
                   <SkillBar name={skill.name} level={skill.level} index={index} />
                 </motion.div>
@@ -128,10 +179,10 @@ export default function Skills() {
 
           {/* Domain Expertise */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            variants={{
+              hidden: { opacity: 0, x: isLiteMotion ? 0 : 36, y: entryYOffset },
+              visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
+            }}
           >
             <motion.h3 
               className="text-2xl font-bold mb-6 text-white"
@@ -149,17 +200,17 @@ export default function Skills() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                  transition={{ delay: index * (isLiteMotion ? 0.03 : 0.08), duration: isLiteMotion ? 0.22 : 0.3, ease: 'easeOut' }}
                 >
                   <SpotlightCard 
                     className="p-4 flex items-center justify-center text-center h-full group cursor-default"
                     as={motion.div}
-                    whileHover={{ 
-                      scale: 1.05, 
+                    whileHover={isCinematic ? {
+                      scale: 1.05,
                       y: -5,
                       boxShadow: "0 10px 30px rgba(168, 85, 247, 0.3)"
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    } : undefined}
+                    transition={{ type: isLiteMotion ? 'tween' : 'spring', duration: isLiteMotion ? 0.2 : undefined, stiffness: 400, damping: 15 }}
                   >
                     <p className="text-gray-300 font-medium group-hover:text-primary transition-colors">{domain}</p>
                   </SpotlightCard>
@@ -184,14 +235,14 @@ export default function Skills() {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ x: 10, scale: 1.02 }}
+                  transition={{ delay: index * (isLiteMotion ? 0.025 : 0.07), duration: isLiteMotion ? 0.24 : 0.35, ease: 'easeOut' }}
+                  whileHover={isCinematic ? { x: 10, scale: 1.02 } : undefined}
                   className="flex items-start gap-3 group cursor-default"
                 >
                   <motion.div 
                     className="flex-shrink-0 mt-1"
-                    whileHover={{ rotate: 360, scale: 1.2 }}
-                    transition={{ duration: 0.5 }}
+                    whileHover={isCinematic ? { rotate: 360, scale: 1.2 } : undefined}
+                    transition={{ duration: isLiteMotion ? 0.25 : 0.5 }}
                   >
                     <svg className="w-5 h-5 text-purple-500 group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -202,7 +253,7 @@ export default function Skills() {
               ))}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
