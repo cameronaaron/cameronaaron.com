@@ -5,7 +5,7 @@ export const faqs = [
   },
   {
     question: "What's your background?",
-    answer: "It's a mix of Neuroscience and Computer Science. I've been lucky enough to work at places like SpaceX, GitHub, and Microsoft, which has given me a pretty unique perspective on how software intersects with real-world problems."
+    answer: "It's a mix of Neuroscience and Computer Science. I've been lucky enough to work at places like SpaceX and GitHub (now part of Microsoft), which has given me a pretty unique perspective on how software intersects with real-world problems."
   },
   {
     question: "What are you working on right now?",
@@ -29,7 +29,7 @@ export const faqs = [
   },
   {
     question: "What awards and recognition have you received?",
-    answer: "I won the 2021 Ammerman Center Bridget Baird Award for my Genetic RefleXions Magic Mirror project, which displays genetic information alongside user reflections. I've also won multiple hackathons and received academic excellence awards throughout my career."
+    answer: "I won the 2021 Ammerman Center Bridget Baird Award for my Genetic RefleXions Magic Mirror project, which displays genetic information alongside user reflections. I also took first place at the 2020 Jacobs Design Prize for the C19 BayShield pandemic-response project and have received academic excellence awards throughout my career."
   }
 ] as const;
 

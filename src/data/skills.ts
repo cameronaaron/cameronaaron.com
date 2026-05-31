@@ -32,11 +32,6 @@ export const skills = {
   ],
   
   certifications: [
-    "Cloud Engineering with GCP - Google Cloud",
-    "Google IT Automation with Python",
-    "Google IT Support",
-    "G Suite Administration Specialization",
-    "Architecting with Google Compute Engine",
     "Emergency Medical Technician (Los Angeles County) - Active through Feb 2028",
     "Emergency Medical Technician (NREMT) - Active through Mar 2028",
     "Certified Nursing Assistant (California) - Active through Sep 2028",

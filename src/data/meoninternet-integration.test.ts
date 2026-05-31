@@ -73,8 +73,7 @@ describe('meoninternet coverage integration', () => {
     expect(internetTitles).toContain('Top Emerging Talent Summer 2021');
     expect(internetTitles).toContain('Genetic RefleXions: A Magic Mirror That Displays Genetic Info');
     expect(internetTitles).toContain('Journal of Vision Abstract (VSS 2021)');
-    expect(internetTitles).toContain('ResearchGate Publications Archive (3 Publications)');
-    expect(internetTitles).toContain('ResearchGate Profile');
+    expect(internetTitles).toContain('ResearchGate Profile & Publications Archive');
     expect(internetTitles).toContain('LinkedIn Activity Highlight');
 
     expect(internetUrls).toContain('https://www.stanfordnnea.com/2023-speakers');
@@ -193,7 +192,7 @@ describe('meoninternet coverage integration', () => {
       'kristin rourke and cameron aaron',
       'top emerging talent',
       'sensory inclusive',
-      'researchgate publications archive 3 publications',
+      'researchgate profile publications archive',
       'toxoplasma gondii modifies personality',
       'the real magical girls',
       'eas 101 final paper',

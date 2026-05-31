@@ -72,19 +72,11 @@ export const internetFeatures: InternetFeature[] = [
     url: 'https://doi.org/10.1167/jov.21.9.2719',
   },
   {
-    title: 'ResearchGate Publications Archive (3 Publications)',
+    title: 'ResearchGate Profile & Publications Archive',
     organization: 'ResearchGate',
-    period: '2020',
-    summary: 'Profile includes Toxoplasma Gondii Modifies Personality, The Real Magical Girls, and EAS 101 Final Paper.',
+    period: 'Ongoing (publications since 2020)',
+    summary: 'Research profile and publications archive: Toxoplasma Gondii Modifies Personality, The Real Magical Girls, and EAS 101 Final Paper.',
     category: 'Research',
-    url: 'https://www.researchgate.net/profile/Cameron-Aaron-2',
-  },
-  {
-    title: 'ResearchGate Profile',
-    organization: 'ResearchGate',
-    period: 'Ongoing',
-    summary: 'Research profile with publications, reads, and interdisciplinary research topics.',
-    category: 'Profiles',
     url: 'https://www.researchgate.net/profile/Cameron-Aaron-2',
   },
   {

@@ -37,8 +37,8 @@ export const profile: Profile = {
   stats: [
     { label: "Clinical Certifications", value: "10+" },
     { label: "Years Interdisciplinary", value: "8+" },
-    { label: "Research Projects", value: "15+" },
+    { label: "Research Projects", value: "6+" },
     { label: "Software & Security Projects", value: "50+" },
-    { label: "Awards & Honors", value: "12+" },
+    { label: "Awards & Honors", value: "7+" },
   ],
 };
