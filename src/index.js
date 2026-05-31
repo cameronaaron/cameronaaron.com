@@ -172,7 +172,8 @@ async function handleRequest(event) {
     if (isLongLivedAsset(resolvedPath)) {
       newHeaders.set('Cache-Control', 'public, max-age=31536000, immutable');
     } else if (isHtmlLikePath(resolvedPath)) {
-      newHeaders.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+      // Allow bfcache while still revalidating on each new navigation.
+      newHeaders.set('Cache-Control', 'public, max-age=0, must-revalidate');
     }
 
     return new Response(response.body, {

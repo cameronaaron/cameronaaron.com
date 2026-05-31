@@ -9,22 +9,21 @@ interface TextRevealProps {
   delay?: number;
 }
 
+function readInitialReveal(storageKey: string): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.sessionStorage.getItem(storageKey) === '1') return true;
+  const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+  return nav[0]?.type === 'back_forward';
+}
+
 export default function TextReveal({ text, className = "", delay = 0 }: TextRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
-  const [forceVisible, setForceVisible] = useState(false);
   const storageKey = `text-reveal-complete:${text}`;
+  const [forceVisible, setForceVisible] = useState(() => readInitialReveal(storageKey));
 
   useEffect(() => {
-    const isCompleteInSession = window.sessionStorage.getItem(storageKey) === '1';
-    if (isCompleteInSession) {
-      setForceVisible(true);
-      return;
-    }
-
-    const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    if (navigationEntries[0]?.type === 'back_forward') {
-      setForceVisible(true);
+    if (forceVisible) {
       window.sessionStorage.setItem(storageKey, '1');
     }
 
@@ -36,11 +35,8 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
     };
 
     window.addEventListener('pageshow', handlePageShow);
-
-    return () => {
-      window.removeEventListener('pageshow', handlePageShow);
-    };
-  }, [storageKey]);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, [forceVisible, storageKey]);
 
   const shouldReveal = isInView || forceVisible;
 

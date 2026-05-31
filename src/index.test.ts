@@ -47,7 +47,8 @@ describe('cloudflare worker entrypoint', () => {
 
     expect(mockedGetAsset.mock.calls[0]?.[0]?.request.headers.get('cache-control')).toBeNull();
     expect(assetResponse.status).toBe(200);
-    expect(htmlResponse.headers.get('Cache-Control')).toContain('no-store');
+    // HTML must NOT use no-store — it would block browser bfcache.
+    expect(htmlResponse.headers.get('Cache-Control')).toBe('public, max-age=0, must-revalidate');
   });
 
   it('returns 404 when asset lookup fails', async () => {

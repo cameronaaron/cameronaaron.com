@@ -93,7 +93,7 @@ export default function Hero() {
       />
       
       {shouldUseParallax ? <BackgroundParticles quality={performanceTier} /> : null}
-      {shouldUseParallax ? <InteractiveParticles quality={performanceTier} /> : null}
+      {shouldUseParallax ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
 
       <motion.div 
         className="container mx-auto px-6 relative z-10"

@@ -13,6 +13,10 @@ import Contact from '@/components/Contact';
 import AmbientBackground from '@/components/ui/AmbientBackground';
 import CursorTrail from '@/components/ui/CursorTrail';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
+import BackToTop from '@/components/ui/BackToTop';
+import IntroCurtain from '@/components/ui/IntroCurtain';
+import SectionRail from '@/components/ui/SectionRail';
+import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 function SectionReveal({
@@ -27,7 +31,7 @@ function SectionReveal({
   return (
     <motion.div
       className="relative"
-      initial={{ opacity: 0, y: 24, scale: 0.985 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
       transition={{ duration: 0.7, delay: index * 0.03, ease: 'easeOut' }}
@@ -57,7 +61,7 @@ function SectionHandoff({
   return (
     <motion.div
       className="relative z-10 px-6 py-10"
-      initial={{ opacity: 0, y: 10 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.7, delay: index * 0.04, ease: 'easeOut' }}
@@ -146,9 +150,13 @@ export default function Home() {
 
   return (
     <>
+      <IntroCurtain />
       <AmbientBackground performanceTier={performanceTier} />
       {shouldRenderCursorTrail ? <CursorTrail /> : null}
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
+      {showFloatingOverlays ? <SectionRail /> : null}
+      {showFloatingOverlays ? <KeyboardShortcuts /> : null}
+      <BackToTop />
 
       {showFloatingOverlays ? (
         <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 xl:hidden" aria-hidden="true">
@@ -156,17 +164,6 @@ export default function Home() {
             <motion.div
               className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
               style={{ scaleX: pageProgress, transformOrigin: 'left' }}
-            />
-          </div>
-        </div>
-      ) : null}
-
-      {showFloatingOverlays ? (
-        <div className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 xl:flex xl:flex-col xl:items-center" aria-hidden="true">
-          <div className="relative h-64 w-1 overflow-hidden rounded-full bg-white/10">
-            <motion.div
-              className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-400 via-primary to-secondary"
-              style={{ scaleY: pageProgress, transformOrigin: 'bottom' }}
             />
           </div>
         </div>

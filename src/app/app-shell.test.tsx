@@ -25,7 +25,10 @@ describe('app shell coverage', () => {
     expect(tree).toBeTruthy();
     expect(metadata.title).toBeTruthy();
     expect(metadata.openGraph?.images?.[0]?.url).toContain('opengraph-image.png');
-    expect(viewport.themeColor).toBe('#06b6d4');
+    expect(viewport.themeColor).toEqual([
+      { media: '(prefers-color-scheme: dark)', color: '#06b6d4' },
+      { media: '(prefers-color-scheme: light)', color: '#06b6d4' },
+    ]);
   });
 
   it('renders loading, not found, and error states', () => {

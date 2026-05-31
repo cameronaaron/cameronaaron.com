@@ -88,7 +88,11 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     return { count: 0, maxConnections: 0, connectionDistance: 0 };
   }, [quality]);
 
-  const [particles, setParticles] = useState<Particle[]>(() => createInitialParticles(qualityConfig.count));
+  const [particles, setParticles] = useState<Particle[]>(() =>
+    quality === 'full' || quality === 'balanced'
+      ? createInitialParticles(qualityConfig.count, quality === 'balanced' ? 2024 : 1337)
+      : []
+  );
   const [connections, setConnections] = useState<Connection[]>([]);
   const [bursts, setBursts] = useState<BurstParticle[]>([]);
 
@@ -125,19 +129,6 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       return lines.slice(0, qualityConfig.maxConnections);
     };
   }, [qualityConfig.connectionDistance, qualityConfig.maxConnections]);
-
-  useEffect(() => {
-    if (quality !== 'full' && quality !== 'balanced') {
-      setParticles([]);
-      setConnections([]);
-      setBursts([]);
-      return;
-    }
-
-    setParticles(createInitialParticles(qualityConfig.count, quality === 'balanced' ? 2024 : 1337));
-    setConnections([]);
-    setBursts([]);
-  }, [quality, qualityConfig.count]);
 
   useEffect(() => {
     if (prefersReducedMotion || quality === 'reduced' || quality === 'lite') return;

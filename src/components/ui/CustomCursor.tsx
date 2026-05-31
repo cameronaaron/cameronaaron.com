@@ -38,6 +38,12 @@ export default function CustomCursor() {
     };
   }, [isVisible]);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.body.classList.add('custom-cursor-active');
+    return () => document.body.classList.remove('custom-cursor-active');
+  }, []);
+
   // Hide cursor on touch devices
   if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
     return null;
@@ -45,14 +51,6 @@ export default function CustomCursor() {
 
   return (
     <>
-      <style jsx global>{`
-        body {
-          cursor: none;
-        }
-        a, button, [role="button"] {
-          cursor: none;
-        }
-      `}</style>
       <motion.div
         className="fixed top-0 left-0 w-4 h-4 bg-primary rounded-full pointer-events-none z-[9999] mix-blend-difference"
         animate={{

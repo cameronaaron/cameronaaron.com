@@ -26,4 +26,20 @@ describe('route deployment regression checks', () => {
     expect(redirects).toContain('/internet /internet.html 200');
     expect(redirects).toContain('/internet/ /internet.html 200');
   });
+
+  it('serves HTML 200 responses with a bfcache-safe Cache-Control (never no-store)', () => {
+    const workerSrc = fs.readFileSync(path.join(repoRoot, 'src/index.js'), 'utf8');
+    // `no-store` blocks back/forward cache restoration in Chrome and Firefox,
+    // which manifests as the home page appearing to "break" on browser back.
+    // The 404 fallback may still use no-store; only assert the HTML branch.
+    const htmlBranch = workerSrc.match(/isHtmlLikePath\(resolvedPath\)[\s\S]*?\}\s*\n/);
+    expect(htmlBranch?.[0]).toBeTruthy();
+    expect(htmlBranch?.[0]).not.toContain('no-store');
+  });
+
+  it('public/_headers keeps HTML cacheable for bfcache', () => {
+    const headers = fs.readFileSync(path.join(repoRoot, 'public/_headers'), 'utf8');
+    const htmlBlock = headers.split('/*.html')[1] ?? '';
+    expect(htmlBlock).not.toContain('no-store');
+  });
 });

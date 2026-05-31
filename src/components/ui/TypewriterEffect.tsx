@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface TypewriterEffectProps {
@@ -10,54 +10,64 @@ interface TypewriterEffectProps {
   typingSpeed?: number;
 }
 
+// SSR-safe layout effect.
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+function readInitialComplete(storageKey: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.sessionStorage.getItem(storageKey) === '1') return true;
+  } catch {
+    // ignore
+  }
+  try {
+    const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (nav[0]?.type === 'back_forward') return true;
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
 export default function TypewriterEffect({ 
   text, 
   className = "",
   cursorClassName = "",
   typingSpeed = 100
 }: TypewriterEffectProps) {
+  const storageKey = `typewriter-complete:${text}`;
+  // Initial state MUST match SSR. Collapse to complete state synchronously below if skipping.
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skipTyping, setSkipTyping] = useState(false);
   const isComplete = currentIndex >= text.length;
-  const storageKey = `typewriter-complete:${text}`;
+
+  useIsomorphicLayoutEffect(() => {
+    if (readInitialComplete(storageKey)) {
+      setDisplayedText(text);
+      setCurrentIndex(text.length);
+      setSkipTyping(true);
+    }
+  }, [storageKey, text]);
 
   useEffect(() => {
-    const isCompleteInSession = window.sessionStorage.getItem(storageKey) === '1';
-    if (isCompleteInSession) {
-      setDisplayedText(text);
-      setCurrentIndex(text.length);
-      setSkipTyping(true);
-      return;
-    }
-
-    const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    if (navigationEntries[0]?.type === 'back_forward') {
-      setDisplayedText(text);
-      setCurrentIndex(text.length);
-      setSkipTyping(true);
-      window.sessionStorage.setItem(storageKey, '1');
-    }
-
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         setDisplayedText(text);
         setCurrentIndex(text.length);
         setSkipTyping(true);
-        window.sessionStorage.setItem(storageKey, '1');
+        try { window.sessionStorage.setItem(storageKey, '1'); } catch { /* ignore */ }
       }
     };
 
     window.addEventListener('pageshow', handlePageShow);
-
-    return () => {
-      window.removeEventListener('pageshow', handlePageShow);
-    };
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, [storageKey, text]);
 
   useEffect(() => {
     if (isComplete) {
-      window.sessionStorage.setItem(storageKey, '1');
+      try { window.sessionStorage.setItem(storageKey, '1'); } catch { /* ignore */ }
     }
   }, [isComplete, storageKey]);
 

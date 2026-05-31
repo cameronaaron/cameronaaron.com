@@ -172,13 +172,30 @@ export default function Navigation() {
               <motion.button
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100"
+                whileTap={{ scale: 0.92 }}
+                className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/60 text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/40 hover:text-cyan-200"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-nav-panel"
-                aria-label="Toggle mobile navigation"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
-                {mobileMenuOpen ? 'Close' : 'Menu'}
+                <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
+                <span className="relative block h-3.5 w-5" aria-hidden="true">
+                  <motion.span
+                    className="absolute left-0 top-0 h-[2px] w-full origin-center rounded-full bg-current"
+                    animate={mobileMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                  />
+                  <motion.span
+                    className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rounded-full bg-current"
+                    animate={mobileMenuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+                    transition={{ duration: 0.18 }}
+                  />
+                  <motion.span
+                    className="absolute bottom-0 left-0 h-[2px] w-full origin-center rounded-full bg-current"
+                    animate={mobileMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                  />
+                </span>
               </motion.button>
             </div>
           </div>
@@ -192,7 +209,7 @@ export default function Navigation() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-t border-white/10 bg-black/75 md:hidden"
+              className="border-t border-white/10 bg-black/85 backdrop-blur-xl md:hidden pb-[env(safe-area-inset-bottom)]"
             >
               <div className="container mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-2">
@@ -204,10 +221,10 @@ export default function Navigation() {
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.03 }}
-                      className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors ${
+                      className={`min-h-[44px] rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
                         activeHref === item.href
                           ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
-                          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground'
+                          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground active:bg-white/10'
                       }`}
                     >
                       {item.name}

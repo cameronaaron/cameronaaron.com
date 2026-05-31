@@ -76,8 +76,8 @@ export function usePerformanceProfile() {
   const performanceTier = useMemo<PerformanceTier>(() => {
     if (prefersReducedMotion) return 'reduced';
     if (saveDataEnabled || lowHardware) return 'lite';
-    // Touch-first devices are far more likely to struggle with stacked backdrop/blur animations.
-    if (isCoarsePointer) return 'lite';
+    // Touch-first devices get a reduced but still rich animation set.
+    if (isCoarsePointer) return 'balanced';
     return 'full';
   }, [isCoarsePointer, lowHardware, prefersReducedMotion, saveDataEnabled]);
 
