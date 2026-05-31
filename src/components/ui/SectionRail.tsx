@@ -100,7 +100,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                 aria-current={isActive ? 'true' : undefined}
                 data-active={isActive ? 'true' : 'false'}
                 data-section-id={section.id}
-                className="group relative block focus-visible:outline-none"
+                className="group relative block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <motion.span
                   className="relative z-10 block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/10 transition-colors group-hover:border-cyan-200 group-focus-visible:border-cyan-200"

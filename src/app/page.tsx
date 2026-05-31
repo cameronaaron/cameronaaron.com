@@ -19,6 +19,8 @@ import SectionRail from '@/components/ui/SectionRail';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 function SectionReveal({
   index,
   children,
@@ -225,7 +227,7 @@ export default function Home() {
         />
         <div className="container mx-auto px-6 text-center relative z-10">
           <p className="text-gray-400">
-            © {new Date().getFullYear()} Cameron Aaron. All rights reserved.
+            © {CURRENT_YEAR} Cameron Aaron. All rights reserved.
           </p>
         </div>
       </motion.footer>

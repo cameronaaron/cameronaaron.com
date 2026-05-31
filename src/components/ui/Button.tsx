@@ -32,7 +32,7 @@ export default function Button({
   const springX = useSpring(x, { stiffness: 220, damping: 18, mass: 0.7 });
   const springY = useSpring(y, { stiffness: 220, damping: 18, mass: 0.7 });
 
-  const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-block text-center relative z-10';
+  const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
   
   const sizeStyles = {
     sm: 'px-4 py-2 text-sm',

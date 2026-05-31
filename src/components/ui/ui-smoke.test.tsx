@@ -65,7 +65,9 @@ describe('ui component smoke coverage', () => {
     );
 
     fireEvent.mouseMove(window, { clientX: 40, clientY: 40 });
-    fireEvent.mouseOver(screen.getByRole('button', { name: 'Magnet Target' }));
+    const magnetTarget = screen.getByRole('button', { name: 'Magnet Target' });
+    fireEvent.mouseOver(magnetTarget);
+    fireEvent.touchStart(magnetTarget, { touches: [{ clientX: 0, clientY: 0 }] });
 
     const tiltButton = screen.getByRole('button', { name: 'Tilt Target' });
     fireEvent.mouseMove(tiltButton, { clientX: 120, clientY: 80 });

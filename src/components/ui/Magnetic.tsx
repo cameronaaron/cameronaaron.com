@@ -38,11 +38,18 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
     y.set(0);
   };
 
+  const handleTouchStart = () => {
+    // Touch users get tap feedback elsewhere; ensure no lingering hover offset.
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
       style={enableHoverMotion ? { x: springX, y: springY } : undefined}
       className={className}
     >
