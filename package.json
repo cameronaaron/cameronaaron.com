@@ -19,6 +19,7 @@
     "test:a11y:external": "node scripts/run-pa11y-external.mjs",
     "test:a11y:automated": "npm run test:a11y:contracts && npm run test:a11y:scanners",
     "test:a11y:ci": "npm run test:a11y:contracts && npm run test:a11y:scanners && npm run test:a11y:external",
+    "test:pages:parity": "node scripts/verify-pages-parity.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "seo:audit": "npm run build && npm run seo:check && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "cf-typegen": "wrangler types",

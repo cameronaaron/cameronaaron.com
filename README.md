@@ -30,6 +30,22 @@ Optional scanner env flags:
 - `A11Y_NU_STRICT=1` fail the scanner suite on Nu validator HTML errors
 - `A11Y_EXTERNAL_URL=https://cameronaaron.com` target URL for `test:a11y:external`
 
+## ✅ Pages Parity Guard
+
+```bash
+npm run test:pages:parity
+```
+
+This check fails if required migration parity contracts drift:
+
+- host/canonical redirects in `public/_redirects`
+- host redirects and canonicalization edge logic in `public/_worker.js`
+- security/cache/404 headers in `public/_headers`
+- Pages-first deploy script wiring in `package.json`
+- Pages deploy labels in `.github/workflows/deploy-production.yml`
+
+CI now runs this automatically before lint/typecheck/build.
+
 ## 📁 Project Structure
 
 ```text
@@ -90,15 +106,28 @@ npm run deploy:worker:prod
 
 The previous Worker behavior has been mapped as follows:
 
-- `workshop.cameronaaron.com/* -> https://cameronaaron.com/` is now in `public/_redirects`.
-- `www -> apex` canonical redirect is now in `public/_redirects`.
-- `/index.html -> /` canonical redirect is now in `public/_redirects`.
+- `workshop.cameronaaron.com/* -> https://cameronaaron.com/` is enforced by `public/_worker.js`.
+- `www -> apex` canonical redirect is enforced by `public/_worker.js`.
+- `/index.html -> /` canonical redirect is enforced by `public/_worker.js` and backed by `public/_redirects`.
 - Security headers are provided by `public/_headers` (including `X-Frame-Options: DENY`).
 
 Dashboard-level items that are not code-configured in this repo:
 
 - Add `2eschool.org` and `www.2eschool.org` as custom domains (or create zone Redirect Rules if they should canonicalize to `cameronaaron.com`).
 - Ensure SSL/TLS and proxy are enabled for all mapped domains.
+
+### Cloudflare Dashboard Checklist (Final Cutover)
+
+1. In Cloudflare Pages, open project `cameronaaronsite` and verify latest production deployment is healthy.
+2. In Pages custom domains, add/verify `cameronaaron.com`, `www.cameronaaron.com`, and `workshop.cameronaaron.com`.
+3. In DNS for `cameronaaron.com`, set records exactly as requested by the Pages domain wizard and keep proxy enabled.
+4. Wait until each Pages domain shows active/verified status and TLS certificate is issued.
+5. Run live probes:
+   - `https://cameronaaron.com` returns 200
+   - `https://www.cameronaaron.com` returns 301 to apex
+   - `https://workshop.cameronaaron.com` returns 301 to apex
+   - missing route returns 404 with expected body
+6. Only after all probes pass, remove legacy Worker custom-domain and Worker route bindings.
 
 ## 📊 Performance
 
