@@ -27,8 +27,9 @@ export const educationItems: EducationItem[] = [
     credential: "Master of Education (M.Ed.) - Cognitive Diversity",
     period: "May 2023 - Jun 2026",
     details: [
-      "GPA: A | Honors: Dean's List",
-      "Capstone Defense Passed (Spring 2026)",
+      "Cumulative GPA: 3.83 | Credits Earned: 27.00",
+      "Term Honors: Dean's List (2023 FALL), Provost's List (2024 SPRING, 2024 SUMMER)",
+      "Capstone Action Research Project (Spring 2026, Pass)",
       "Capstone: Bridging Transitions video-based educational series on thrice-exceptional Black male students",
     ],
   },
