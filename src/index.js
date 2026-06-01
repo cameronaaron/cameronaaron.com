@@ -1,5 +1,8 @@
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
+const CANONICAL_HOST = 'cameronaaron.com';
+const REDIRECT_HOSTS = new Set(['workshop.cameronaaron.com']);
+
 if (typeof addEventListener === 'function') {
   addEventListener('fetch', event => {
     event.respondWith(handleRequest(event));
@@ -116,8 +119,27 @@ function buildAssetRequest(url, request) {
   });
 }
 
+function getCanonicalRedirect(url) {
+  if (!REDIRECT_HOSTS.has(url.hostname.toLowerCase())) {
+    return null;
+  }
+
+  const redirectUrl = new URL(url.toString());
+  redirectUrl.protocol = 'https:';
+  redirectUrl.hostname = CANONICAL_HOST;
+  redirectUrl.port = '';
+
+  return redirectUrl;
+}
+
 async function handleRequest(event) {
   const url = new URL(event.request.url);
+  const redirectUrl = getCanonicalRedirect(url);
+
+  if (redirectUrl) {
+    return Response.redirect(redirectUrl.toString(), 301);
+  }
+
   const isHtmlRoute = isHtmlLikePath(url.pathname) || url.pathname === '/';
   const options = {
     // Cache static assets aggressively, but always bypass cache for HTML so

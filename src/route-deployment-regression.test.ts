@@ -27,6 +27,12 @@ describe('route deployment regression checks', () => {
     expect(redirects).toContain('/internet/ /internet.html 200');
   });
 
+  it('keeps the workshop subdomain routed to the worker for canonical redirects', () => {
+    const wranglerConfig = fs.readFileSync(path.join(repoRoot, 'wrangler.toml'), 'utf8');
+
+    expect(wranglerConfig).toContain('{ pattern = "workshop.cameronaaron.com", custom_domain = true }');
+  });
+
   it('serves HTML 200 responses with a bfcache-safe Cache-Control (never no-store)', () => {
     const workerSrc = fs.readFileSync(path.join(repoRoot, 'src/index.js'), 'utf8');
     // `no-store` blocks back/forward cache restoration in Chrome and Firefox,
