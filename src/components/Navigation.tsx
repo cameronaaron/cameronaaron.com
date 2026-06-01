@@ -148,9 +148,9 @@ export default function Navigation() {
                     href={item.href}
                     className={`relative inline-block rounded-full px-3 py-1.5 font-semibold transition-colors ${
                       isScrolled
-                        ? 'text-foreground/90 hover:text-white'
-                        : 'text-white/90 hover:text-white'
-                    } ${activeHref === item.href ? 'text-white' : ''}`}
+                        ? 'text-foreground hover:text-cyan-100'
+                        : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
+                    } ${activeHref === item.href ? 'text-cyan-100' : ''}`}
                     whileHover={{ y: -2 }}
                     transition={{ type: 'spring', stiffness: 320, damping: 20 }}
                     aria-current={activeHref === item.href ? 'page' : undefined}

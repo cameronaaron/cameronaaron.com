@@ -4,6 +4,7 @@ import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
+import IframeTitleGuard from "@/components/ui/IframeTitleGuard";
 
 const manrope = Manrope({ 
   subsets: ["latin"],
@@ -235,25 +236,19 @@ export default function RootLayout({
         
         {/* Critical resource preload */}
         <link rel="preload" href="/profile.webp" as="image" type="image/webp" fetchPriority="high" />
-        <link rel="prefetch" href="/icon-192x192.png" as="image" />
+        <link rel="prefetch" href="/icon-192x192.png" />
         
         {/* PWA Configuration */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         
-        {/* Security Headers (X-Frame-Options set via middleware) */}
-        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-        
-        {/* Performance Hints */}
-        <meta httpEquiv="Accept-CH" content="DPR, Viewport-Width, Width" />
-        
         <StructuredData />
       </head>
       <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <SmoothScroll />
         <ServiceWorkerRegistration />
+        <IframeTitleGuard />
         <noscript>
           <div className="noscript-warning">
             This website requires JavaScript to be enabled for the best experience.

@@ -12,6 +12,24 @@ npm run lint         # ESLint checks
 npm run preview      # Test with Cloudflare Workers
 ```
 
+## ✅ Accessibility Automation
+
+```bash
+npm run test:a11y:contracts   # WCAG-focused Vitest contracts
+npm run test:a11y:scanners    # pa11y + Nu HTML validator against local site
+npm run test:a11y:external    # pa11y against deployed/external URL
+npm run test:a11y:automated   # Runs both in sequence
+npm run test:a11y:ci          # Contracts + local scanners + external pa11y
+```
+
+Optional scanner env flags:
+
+- `A11Y_AUTOSTART=0` do not auto-start `next dev` (expects server already running)
+- `A11Y_PORT=3001` change the local port used by scanner checks
+- `A11Y_URL=http://127.0.0.1:3001` override scanner target URL directly
+- `A11Y_NU_STRICT=1` fail the scanner suite on Nu validator HTML errors
+- `A11Y_EXTERNAL_URL=https://cameronaaron.com` target URL for `test:a11y:external`
+
 ## 📁 Project Structure
 
 ```text

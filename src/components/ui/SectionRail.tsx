@@ -80,7 +80,6 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
     >
       <ul className="pointer-events-auto relative flex flex-col items-center gap-5 rounded-full border border-white/10 bg-black/40 px-3 py-5 backdrop-blur-md shadow-lg shadow-cyan-900/20">
         <li
-          role="presentation"
           className="absolute left-1/2 top-5 bottom-5 w-px -translate-x-1/2 overflow-hidden rounded-full bg-white/10 list-none"
           aria-hidden="true"
         >

@@ -89,7 +89,7 @@ export default function Projects() {
             {[...researchSignals, ...researchSignals].map((signal, index) => (
               <span
                 key={`${signal}-${index}`}
-                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-950/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100"
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
                 {signal}

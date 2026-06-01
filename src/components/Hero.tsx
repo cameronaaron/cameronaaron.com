@@ -129,7 +129,7 @@ export default function Hero() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="text-4xl md:text-6xl font-bold mb-6 tracking-tight font-display"
             >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+              <span className="text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
                 <TypewriterEffect text={profile.name} typingSpeed={80} />
               </span>
             </motion.h1>
@@ -142,7 +142,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-lg text-muted-foreground/80 mb-10 leading-relaxed max-w-xl"
+              className="text-lg text-foreground/90 mb-10 leading-relaxed max-w-xl"
             >
               {profile.tagline}
             </motion.p>
@@ -157,7 +157,7 @@ export default function Hero() {
                 <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
                   <span className="relative z-10">View Credentials</span>
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="absolute inset-0 bg-gradient-to-r from-fuchsia-700 to-rose-800"
                     initial={{ x: '-100%' }}
                     whileHover={{ x: 0 }}
                     transition={{ duration: 0.3 }}
@@ -189,7 +189,7 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 + index * 0.08 }}
                   whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
-                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-foreground/80"
+                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-foreground"
                 >
                   {chip}
                 </motion.span>

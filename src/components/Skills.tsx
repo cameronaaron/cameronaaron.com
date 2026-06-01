@@ -64,7 +64,7 @@ export default function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * (isLiteMotion ? 0.04 : 0.1), duration: 0.36, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-950/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
               {phase}

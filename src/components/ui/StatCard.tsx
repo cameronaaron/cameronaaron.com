@@ -26,15 +26,14 @@ export default function StatCard({ value, label }: StatCardProps) {
       />
 
       <motion.div
-        className="relative text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-emerald-200"
-        animate={prefersReducedMotion ? undefined : { backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+        className="relative text-3xl font-bold text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
+        animate={prefersReducedMotion ? undefined : { opacity: [0.92, 1, 0.92] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ backgroundSize: '220% 220%' }}
       >
         {value}
       </motion.div>
 
-      <div className="relative mt-1 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground/90">
+      <div className="relative mt-1 text-xs font-medium uppercase tracking-[0.12em] text-foreground/90">
         {label}
       </div>
 
