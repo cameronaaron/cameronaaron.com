@@ -16,6 +16,8 @@ export interface PrerequisiteCourse {
   course: string;
   units: string;
   grade: string;
+  gpa?: string;
+  qualityPoints?: string;
   status: string;
 }
 
@@ -44,6 +46,7 @@ export const educationItems: EducationItem[] = [
     credential: "Bachelor of Arts - Psychology & Computer Science",
     period: "Aug 2017 - May 2021",
     details: [
+      "Institutional GPA: 3.278 | Overall GPA: 3.322 (includes transfer coursework)",
       "Minor: Cognitive Science",
       "Certificate: Ammerman Center for Arts and Technology",
       "Award: 2021 Bridget Baird Award for Excellence in Research",
@@ -64,6 +67,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "MICRO 020 - General Microbiology (LACC)",
     units: "4.00",
     grade: "A",
+    gpa: "4.00",
     status: "Completed",
   },
   {
@@ -71,6 +75,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "COMM C1000 - Intro to Public Speaking (LAVC)",
     units: "3.00",
     grade: "B",
+    gpa: "3.00",
     status: "Completed",
   },
   {
@@ -78,6 +83,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "PSY 100 - Introduction to Psychology (Connecticut College)",
     units: "4.00",
     grade: "A-",
+    gpa: "3.70",
     status: "Completed",
   },
   {
@@ -85,6 +91,16 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "PSYCH 041 - Life-Span Psych (LACC)",
     units: "3.00",
     grade: "A",
+    gpa: "4.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Human Growth and Development (additional coursework)",
+    course: "HMD 111 - Intro to Human Development (Connecticut College)",
+    units: "4.00",
+    grade: "B+",
+    gpa: "3.30",
+    qualityPoints: "13.20",
     status: "Completed",
   },
   {
@@ -92,6 +108,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "PSY 201 - Psychological Statistics (Connecticut College)",
     units: "4.00",
     grade: "C",
+    gpa: "2.00",
     status: "Completed",
   },
   {
@@ -99,6 +116,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "PSY 202 - Research Methods in Psychology (Connecticut College)",
     units: "4.00",
     grade: "B-",
+    gpa: "2.70",
     status: "Completed",
   },
   {
@@ -106,6 +124,72 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     course: "EAS 106 - CC: Superheroes & Underdogs (Connecticut College)",
     units: "4.00",
     grade: "B+",
+    gpa: "3.30",
+    status: "Completed",
+  },
+  {
+    requirement: "Advanced Biology (nursing-relevant elective)",
+    course: "BIO 298 - Genomics, Epigenomics, and Transcriptomics (Connecticut College)",
+    units: "4.00",
+    grade: "A",
+    gpa: "4.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Behavioral/Neuroscience Biology (nursing-relevant elective)",
+    course: "PSY 214 - Biopsychology (Connecticut College)",
+    units: "4.00",
+    grade: "B",
+    gpa: "3.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Cognitive/Neuroscience Biology (nursing-relevant elective)",
+    course: "PSY 312 - Cognitive Neuroscience (Connecticut College)",
+    units: "4.00",
+    grade: "B",
+    gpa: "3.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Behavioral Medicine (nursing-relevant elective)",
+    course: "PSY 309 - Behavioral Medicine (Connecticut College)",
+    units: "4.00",
+    grade: "B",
+    gpa: "3.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Abnormal Psychology/Psychopathology (nursing-relevant elective)",
+    course: "PSY 210 - Psycholog Disorders/Dysfunct (Connecticut College)",
+    units: "4.00",
+    grade: "B-",
+    gpa: "2.70",
+    status: "Completed",
+  },
+  {
+    requirement: "Developmental Psychology (nursing-relevant elective)",
+    course: "PSYC 350 - Developmental Psychology (UMass Amherst)",
+    units: "3.00",
+    grade: "A-",
+    gpa: "3.70",
+    status: "Completed",
+  },
+  {
+    requirement: "Social/Behavioral Science (nursing-relevant elective)",
+    course: "PS 345 - Social Psychology (Calif St Univ Northridg)",
+    units: "3.00",
+    grade: "A",
+    gpa: "4.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Behavioral Health Promotion (nursing-relevant elective)",
+    course: "PSY 321 - Sport & Exercise Psychology (Connecticut College)",
+    units: "4.00",
+    grade: "B+",
+    gpa: "3.30",
+    qualityPoints: "13.20",
     status: "Completed",
   },
   {

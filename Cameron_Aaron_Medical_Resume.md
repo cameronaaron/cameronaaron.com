@@ -166,25 +166,28 @@ Dedicated healthcare professional with a unique interdisciplinary background com
 
 ## 🎯 NURSING PROGRAM PREREQUISITE COURSEWORK
 
-| Requirement | Relevant Course(s) | Units | Grade | Status |
-|---------------|---------------------|--------|-------|--------|
-| Microbiology and lab | MICRO 020 - General Microbiology (LACC) | 4.00 | A | Completed |
-| Verbal Communication Skills | COMM C1000 - Intro to Public Speaking (LAVC) | 3.00 | B | Completed |
-| General Psychology | PSY 100 - Introduction to Psychology (Connecticut College) | 4.00 | A- | Completed |
-| Human Growth and Development | PSYCH 041 - Life-Span Psych (LACC) | 3.00 | A | Completed |
-| Statistics | PSY 201 - Psychological Statistics (Connecticut College) | 4.00 | C | Completed |
-| Research Methods | PSY 202 - Research Meth in Psychology (Connecticut College) | 4.00 | B- | Completed |
-| Written Communication Skills | EAS 106 - CC: SUPERHEROES & UNDERDOGS (Connecticut College) | 4.00 | B+ | Completed |
+| Requirement | Relevant Course(s) | Units | Grade / GPA (4.0 scale) | Status |
+|---------------|---------------------|--------|--------------------------|--------|
+| Microbiology and lab | MICRO 020 - General Microbiology (LACC) | 4.00 | A / 4.00 | Completed |
+| Verbal Communication Skills | COMM C1000 - Intro to Public Speaking (LAVC) | 3.00 | B / 3.00 | Completed |
+| General Psychology | PSY 100 - Introduction to Psychology (Connecticut College) | 4.00 | A- / 3.70 | Completed |
+| Human Growth and Development | PSYCH 041 - Life-Span Psych (LACC) | 3.00 | A / 4.00 | Completed |
+| Human Growth and Development (additional coursework) | HMD 111 - Intro to Human Development (Connecticut College) | 4.00 | B+ / 3.30 (13.20 pts) | Completed |
+| Statistics | PSY 201 - Psychological Statistics (Connecticut College) | 4.00 | C / 2.00 | Completed |
+| Research Methods | PSY 202 - Research Meth in Psychology (Connecticut College) | 4.00 | B- / 2.70 | Completed |
+| Written Communication Skills | EAS 106 - CC: SUPERHEROES & UNDERDOGS (Connecticut College) | 4.00 | B+ / 3.30 | Completed |
+| Advanced Biology (nursing-relevant elective) | BIO 298 - Genomics, Epigenomics, and Transcriptomics (Connecticut College) | 4.00 | A / 4.00 | Completed |
+| Behavioral/Neuroscience Biology (nursing-relevant elective) | PSY 214 - Biopsychology (Connecticut College) | 4.00 | B / 3.00 | Completed |
+| Cognitive/Neuroscience Biology (nursing-relevant elective) | PSY 312 - Cognitive Neuroscience (Connecticut College) | 4.00 | B / 3.00 | Completed |
+| Behavioral Medicine (nursing-relevant elective) | PSY 309 - Behavioral Medicine (Connecticut College) | 4.00 | B / 3.00 | Completed |
+| Abnormal Psychology/Psychopathology (nursing-relevant elective) | PSY 210 - Psycholog Disorders/Dysfunct (Connecticut College) | 4.00 | B- / 2.70 | Completed |
+| Developmental Psychology (nursing-relevant elective) | PSYC 350 - Developmental Psychology (UMass Amherst) | 3.00 | A- / 3.70 | Completed |
+| Social/Behavioral Science (nursing-relevant elective) | PS 345 - Social Psychology (Calif St Univ Northridg) | 3.00 | A / 4.00 | Completed |
+| Behavioral Health Promotion (nursing-relevant elective) | PSY 321 - Sport & Exercise Psychology (Connecticut College) | 4.00 | B+ / 3.30 (13.20 pts) | Completed |
 | Human Anatomy and lab | ANATOMY 001 - Intro To Human Anat (LACC) | 4.00 | In Progress | In progress |
 | Human Physiology and lab | PHYSIOL 001 - Intro To Human Phys (Los Angeles Harbor College) | 4.00 | Planned | Planned |
 | Organic Chemistry and lab | CHEM 051 - Fundamentals of Chemistry I (planned) | 5.00 | Planned | Planned |
 | Biochemistry | CHEM 051 - Fundamentals of Chemistry I (planned; course commonly includes biochemistry topics) | 5.00 | Planned | Planned |
-
-### Additional Science Coursework
-
-- PSY 214 - Biopsychology (Connecticut College), 4.00 units, Grade B
-- PSY 312 - Cognitive Neuroscience (Connecticut College), 4.00 units, Grade B
-- BIO 298 - Genomics, Epigenomics, and Transcriptomics (Connecticut College), 4.00 units, Grade A
 
 - Notes: Prerequisite mapping uses transcript course titles plus applicant-provided updates for current/planned courses.
 
