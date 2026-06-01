@@ -162,13 +162,28 @@ export default function ExperienceCard({
         </motion.div>
 
         <div className="flex-1">
-          <motion.h3 
+          <motion.h3
             className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {experience.company}
+            {experience.websiteUrl ? (
+              <a
+                href={experience.websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 hover:text-cyan-200 transition-colors"
+                aria-label={`Open ${experience.company} website`}
+              >
+                <span>{experience.company}</span>
+                <span aria-hidden="true" className="text-sm font-normal text-cyan-300/80">
+                  ↗
+                </span>
+              </a>
+            ) : (
+              <span>{experience.company}</span>
+            )}
           </motion.h3>
           
           <div className="space-y-4">

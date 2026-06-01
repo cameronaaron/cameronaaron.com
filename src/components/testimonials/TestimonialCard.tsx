@@ -30,14 +30,55 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
         {/* Author Info */}
         <div className="flex items-start gap-4 border-t border-white/10 pt-4 mt-auto">
           <div className="flex-1">
-            <h3 className="font-bold text-white">{testimonial.name}</h3>
+            <h3 className="font-bold text-white">
+              {testimonial.profileUrl ? (
+                <a
+                  href={testimonial.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan-300 transition-colors"
+                  aria-label={`Open ${testimonial.name}'s LinkedIn profile`}
+                >
+                  {testimonial.name}
+                </a>
+              ) : (
+                testimonial.name
+              )}
+            </h3>
             <p className="text-sm text-gray-400">{testimonial.role}</p>
             {testimonial.company && (
-              <p className="text-sm text-purple-400">{testimonial.company}</p>
+              <p className="text-sm text-purple-400">
+                {testimonial.companyUrl ? (
+                  <a
+                    href={testimonial.companyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-purple-300 transition-colors"
+                    aria-label={`Open ${testimonial.company} website`}
+                  >
+                    {testimonial.company}
+                  </a>
+                ) : (
+                  testimonial.company
+                )}
+              </p>
             )}
             <p className="text-xs text-gray-500 mt-1">
               {testimonial.relationship} • {testimonial.date}
             </p>
+            {testimonial.originalPostUrl ? (
+              <p className="text-xs text-gray-500 mt-2">
+                <a
+                  href={testimonial.originalPostUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan-300 transition-colors"
+                  aria-label={`Open the original post for ${testimonial.name}`}
+                >
+                  Original post
+                </a>
+              </p>
+            ) : null}
           </div>
         </div>
       </SpotlightCard>

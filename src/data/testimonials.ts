@@ -2,6 +2,9 @@ export interface Testimonial {
   name: string;
   role: string;
   company?: string;
+  companyUrl?: string;
+  profileUrl?: string;
+  originalPostUrl?: string;
   relationship: string;
   date: string;
   text: string;
@@ -10,9 +13,21 @@ export interface Testimonial {
 
 export const testimonials: Testimonial[] = [
   {
+    name: "Dr. Joy Lawson Davis, Ed.D.",
+    role: "Author, Scholar, Professional Development Trainer",
+    profileUrl: "https://www.linkedin.com/in/drjoybrighttalentedblack/",
+    originalPostUrl: "https://www.facebook.com/joyld1/posts/pfbid0261cux8P1tjRCUGC9WyJpk8fxzpNnxbYQeceKUNX7T6aFMy4H89XgVPcmwdd6BHGLl",
+    relationship: "Capstone Committee Member",
+    date: "June 2026",
+    text: "Congratulations to Cameron Aaron on a very successful Capstone Presentation! I served on Cameron's Capstone committee and previewed his innovative videos designed to teach others about the unique challenges of being a 3e student (Gifted, Having another Exceptional condition, and Culturally Diverse). Cameron's videos will provide much needed support to 3e students transitioning between secondary and undergraduate school. I have every confidence that Cameron Aaron will become a leading voice in advocacy and activism for 3e students, their families and the educational community that supports them. Great work Cameron!!",
+    featured: true,
+  },
+  {
     name: "H. John Schaeffer",
     role: "CISO and Director of Networks, Servers & Security",
     company: "Connecticut College",
+    companyUrl: "https://www.conncoll.edu/",
+    profileUrl: "https://www.linkedin.com/in/h-john-schaeffer-5a66793/",
     relationship: "Manager",
     date: "February 2024",
     text: "Cameron performed cybersecurity research for Connecticut College during his time as an undergrad. His interest in white hat hacking and his ability to find vulnerabilities was an asset to his research. He is a thorough investigator who likes to understand problems and get to the bottom of a solution. He is easygoing and a joy to work with. I'd recommend him for any position.",
@@ -21,6 +36,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Sean Hastings",
     role: "Information Security Leader",
+    profileUrl: "https://www.linkedin.com/in/sahast/",
     relationship: "Colleague",
     date: "November 2022",
     text: "Cameron is an exceptional security-minded business applications expert. I consistently leaned on Cameron not only for his subject matter expertise and technical skills, but also his vision for securing the organization's most critical systems and applications. Cameron is a professional who is always looking forward to determine how solutions can be made more secure and more efficient.",
@@ -29,6 +45,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Vinicius SantAnna",
     role: "Former HubSpot and Dutchie",
+    companyUrl: "https://dutchie.com/",
+    profileUrl: "https://www.linkedin.com/in/vinicius-santanna-89113332/",
     relationship: "Senior Colleague",
     date: "March 2023",
     text: "Cameron is a smart, well spoken, inquisitive worker who always digs deeper to understand the whys, hows and outcome of any task. During his time at Dutchie, I saw him work on a handful of extremely difficult projects with the utmost professionalism and dedication. Any company would be lucky to have Cameron as an employee.",
@@ -38,6 +56,8 @@ export const testimonials: Testimonial[] = [
     name: "Christine Chung, PhD",
     role: "Professor and Co-Chair of Computer Science",
     company: "Connecticut College",
+    companyUrl: "https://www.conncoll.edu/",
+    profileUrl: "https://www.linkedin.com/in/christine-chung-phd/",
     relationship: "Professor",
     date: "May 2021",
     text: "Cameron clearly has a special ability to make connections between and across various topics, concepts, and ways of thinking. He also has an infectious charisma that has made him naturally emerge as a leader among our students. Cameron is caring and passionate and always exudes a productive positivity. He would be an asset to any organization.",
@@ -46,6 +66,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "JoeAnna McDonald",
     role: "MA Mathematics",
+    profileUrl: "https://www.linkedin.com/in/joeanna-mcdonald-128681154/",
     relationship: "Colleague",
     date: "March 2024",
     text: "Cameron is a wonderful collaborator. He has been incredible resource for our school. His multi-faceted expertise (pedagogy, tech, and project development) has supported our students and staff immensely.",
@@ -54,6 +75,8 @@ export const testimonials: Testimonial[] = [
     name: "Nate Ledbury",
     role: "CRM Admin",
     company: "Boston Museum of Science",
+    companyUrl: "https://www.mos.org/",
+    profileUrl: "https://www.linkedin.com/in/nate-ledbury-707507a7/",
     relationship: "Colleague",
     date: "February 2024",
     text: "Cameron is a passionate and dedicated professional that is a welcomed addition to any team. Its evident he cares about his work, works hard, and gives his all in whatever role he finds himself in.",
@@ -62,12 +85,14 @@ export const testimonials: Testimonial[] = [
     name: "Krystle Scott",
     role: "Voice Actor | Salesforce Administrator",
     relationship: "Colleague at GitHub",
+    companyUrl: "https://github.com/",
     date: "January 2024",
     text: "Cameron did a phenomenal job with sourcing information across several teams in preparation for onboarding new members of the community forum team at GitHub. He consistently offered novel solutions to issues arising during policy changes and new feature roll out.",
   },
   {
     name: "Ashley Pinales",
     role: "Latina in Tech | WFM People Leader",
+    profileUrl: "https://www.linkedin.com/in/ashley-pinales-2a012770/",
     relationship: "Senior Colleague",
     date: "November 2022",
     text: "I could always count on Cameron to address issues that happened with our systems quickly and make sure they never happen again. Cameron's passion for technology is evident in his work and was demonstrated on a daily basis. He would be an excellent asset to have on a team where creative problem-solving is revered.",
@@ -82,6 +107,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Michael Gombos",
     role: "Enterprise Solutions Engineer",
+    profileUrl: "https://www.linkedin.com/in/michael-gombos-3148ba17/",
     relationship: "Colleague",
     date: "July 2022",
     text: "Cameron is an exceptionally security minded employee at Dutchie. He has been a security champion for the support team. His proactive recommendations have helped security for the company as a whole.",
@@ -98,6 +124,8 @@ export const testimonials: Testimonial[] = [
     name: "Diane Walter",
     role: "Executive Director",
     company: "Steel Valley Accelerator",
+    companyUrl: "https://steelvalleyaccelerator.com/",
+    profileUrl: "https://www.linkedin.com/in/walterama/",
     relationship: "Colleague",
     date: "May 2022",
     text: "Cameron is a force of good in this world. As a senior-level Product Expert for Google Fi, he volunteers his empathy and expertise to assist users on a variety of platforms. His deep product knowledge, creative solutioning, and user-driven insights make him a valued part of the Fi family.",
@@ -105,6 +133,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Raymond Martinez",
     role: "Customer Experience Leader",
+    profileUrl: "https://www.linkedin.com/in/raymondcmartinez/",
     relationship: "Senior Colleague",
     date: "April 2022",
     text: "Cameron is a great collaborator and team player. He's someone who goes out of his way to ensure and confirm understanding with others when asked for assistance leaving no stone unturned. Cameron has been vital to my onboarding at Dutchie helping me understand some of our more complex CS systems.",
@@ -112,6 +141,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Kate Berezo",
     role: "Social Impact in Entertainment",
+    profileUrl: "https://www.linkedin.com/in/katelynberezo/",
     relationship: "Manager",
     date: "July 2021",
     text: "Cameron is a one of the most talented and dedicated mentors I've had to privilege of working with in my career. His positive attitude and passion for all things STEM is infectious. I'm forever grateful knowing that I can count on Cameron to provide support to one of our talented Scholars.",
@@ -119,6 +149,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Patricia Cebotari",
     role: "Compliance Analysis | UX/UI",
+    profileUrl: "https://www.linkedin.com/in/patricia-cebotari/",
     relationship: "Manager",
     date: "June 2021",
     text: "Cameron is ridiculously efficient and has always been willing and able to take the lead in a team setting. After working with him, it was clear that he is forward-thinking and open to learning and putting research into new ideas and approaches.",
@@ -127,6 +158,8 @@ export const testimonials: Testimonial[] = [
     name: "Karina Sinha",
     role: "Software Developer",
     company: "Petricore, Inc",
+    companyUrl: "https://petricoregames.com/",
+    profileUrl: "https://www.linkedin.com/in/karina-sinha/",
     relationship: "Colleague",
     date: "April 2021",
     text: "He is a hardworking and intelligent computer scientist and researcher who would be an excellent addition to any team. I always found myself pleasantly surprised by his expansive knowledge, attention to detail, and willingness to wear as many hats as needed. Cameron always gives 110%!",
@@ -141,6 +174,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Persephone L. Hall",
     role: "Career Development Leader",
+    profileUrl: "https://www.linkedin.com/in/persephonelhall/",
     relationship: "Mentor",
     date: "April 2021",
     text: "His ability to think creatively and to be somewhat fearless, has allowed him to draw connections that I don't think the average student would see. I totally expect Cameron to invent or be a part of a team who invents the next best thing!",
@@ -149,6 +183,7 @@ export const testimonials: Testimonial[] = [
     name: "Shalandy Zhang",
     role: "Software Engineer",
     company: "Facebook",
+    companyUrl: "https://www.facebook.com/",
     relationship: "Colleague",
     date: "April 2021",
     text: "I was inspired by both Cameron's technical knowledge in helping deploy the app to Google Play/iOS as well as his dedication and passion for the mission. Cameron was also a natural in project management, setting clear steps for himself as well as the rest of the engineering team.",
@@ -157,6 +192,8 @@ export const testimonials: Testimonial[] = [
     name: "Andrea Griffiths PMP CCSK",
     role: "Senior Developer Advocate",
     company: "GitHub",
+    companyUrl: "https://github.com/",
+    profileUrl: "https://www.linkedin.com/in/acolombiadev/",
     relationship: "Colleague",
     date: "April 2021",
     text: "Cameron is a highly empathetic and talented Engineer. Cameron is customer obsessed, an amazing team player and was a wonderful addition to our digital support team. I'd love an opportunity to work with Cameron again.",
@@ -171,6 +208,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Dana Castner",
     role: "Digital Product Strategist",
+    profileUrl: "https://www.linkedin.com/in/danacastner/",
     relationship: "Manager",
     date: "July 2020",
     text: "I was incredibly impressed when we needed to change direction as a team, he was able to suggest a new technical solution, on the spot, and clearly articulate the tradeoffs and benefits it would have on our product development going forward. He was wonderful to work with, taking the lead of his team and implementing organizational structure.",
@@ -179,6 +217,7 @@ export const testimonials: Testimonial[] = [
     name: "Dylan Arceneaux",
     role: "Owner and operator",
     company: "A9 Designs Prototyping",
+    profileUrl: "https://www.linkedin.com/in/dylan-arceneaux-b8b296b6/",
     relationship: "Colleague",
     date: "July 2020",
     text: "Having Cameron on our team was like having a shining lighthouse on the coast of a rocky shoreline, we would be absolutely lost without him. It's been the utmost pleasure working with this highly talent, versatile, and skilled developer who has consistently gone above and beyond for the team.",
@@ -194,6 +233,8 @@ export const testimonials: Testimonial[] = [
     name: "Chris Wiebe",
     role: "Assistant Head of School",
     company: "Westerly School",
+    companyUrl: "https://www.westerlyschool.org/",
+    profileUrl: "https://www.linkedin.com/in/chris-wiebe-a2b26778/",
     relationship: "Mentor",
     date: "December 2015",
     text: "His mastery of programming languages and tools, willingness to pursue outside-the-box design thinking, and ability to resolve inevitable bugs that arise are a testament to his work ethic and immense potential in this field.",

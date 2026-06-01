@@ -7,6 +7,7 @@ export interface Position {
 export interface Experience {
   company: string;
   logo: string;
+  websiteUrl?: string;
   positions: Position[];
 }
 
@@ -14,6 +15,7 @@ export const experiences: Experience[] = [
   {
     company: "Bridges Academy",
     logo: "/ba.webp",
+    websiteUrl: "https://bridges.edu/",
     positions: [
       {
         title: "Biopsychology Instructor",
@@ -25,6 +27,7 @@ export const experiences: Experience[] = [
   {
     company: "4me (Xurrent)",
     logo: "/xurrent.webp",
+    websiteUrl: "https://www.xurrent.com/",
     positions: [
       {
         title: "DevOps Engineer",
@@ -36,6 +39,7 @@ export const experiences: Experience[] = [
   {
     company: "Google Fi",
     logo: "/google.webp",
+    websiteUrl: "https://fi.google.com/",
     positions: [
       {
         title: "Senior Product Expert (Volunteer)",
@@ -47,6 +51,7 @@ export const experiences: Experience[] = [
   {
     company: "Dutchie",
     logo: "/Dutchie.svg",
+    websiteUrl: "https://dutchie.com/",
     positions: [
       {
         title: "Systems Administrator",
@@ -58,6 +63,7 @@ export const experiences: Experience[] = [
   {
     company: "Connecticut College",
     logo: "/conn.svg.webp",
+    websiteUrl: "https://www.conncoll.edu/",
     positions: [
       {
         title: "Computational Biology & Bioinformatics Researcher",
@@ -79,6 +85,7 @@ export const experiences: Experience[] = [
   {
     company: "SpaceX",
     logo: "/spacex.webp",
+    websiteUrl: "https://www.spacex.com/",
     positions: [
       {
         title: "Aerospace Medicine, Space Operations",
@@ -90,6 +97,7 @@ export const experiences: Experience[] = [
   {
     company: "Helping Hands Community",
     logo: "/helping-hands.webp",
+    websiteUrl: "https://www.helpinghands.community/",
     positions: [
       {
         title: "Field Operations Engineering Specialist",
@@ -101,6 +109,7 @@ export const experiences: Experience[] = [
   {
     company: "C19 BayShield",
     logo: "/c19-bayshield.svg",
+    websiteUrl: "http://c19bayshield.org/",
     positions: [
       {
         title: "Backend Team Lead Engineer - COVID-19 Response",
@@ -112,6 +121,7 @@ export const experiences: Experience[] = [
   {
     company: "BardoVR",
     logo: "/bardovr.webp",
+    websiteUrl: "https://www.bardovr.com/",
     positions: [
       {
         title: "Virtual Reality Health & Wellness Developer",
@@ -123,6 +133,7 @@ export const experiences: Experience[] = [
   {
     company: "GitHub",
     logo: "/github.webp",
+    websiteUrl: "https://github.com/",
     positions: [
       {
         title: "Software Engineer, Support Operations",
