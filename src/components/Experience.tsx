@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { experiences } from '@/data/experience';
+import { getDateSortKey, sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ExperienceCard from '@/components/experience/ExperienceCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
@@ -15,6 +16,18 @@ export default function Experience() {
   const entryYOffset = isLiteMotion ? 10 : 22;
   const timelineTravel = isLiteMotion ? 16 : 32;
   const timelineStagger = isLiteMotion ? 0.04 : 0.1;
+  const sortedExperiences = [...experiences]
+    .map((experience) => {
+      const sortedPositions = sortByDateDesc(experience.positions, (position) => position.period);
+      const latestPeriod = sortedPositions[0]?.period ?? '';
+
+      return {
+        ...experience,
+        positions: sortedPositions,
+        latestPeriod,
+      };
+    })
+    .sort((left, right) => getDateSortKey(right.latestPeriod) - getDateSortKey(left.latestPeriod));
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -69,7 +82,7 @@ export default function Experience() {
           className="mx-auto mb-10 flex max-w-5xl flex-wrap justify-center gap-3"
           aria-label="Experience quick navigation"
         >
-          {experiences.map((exp, index) => {
+          {sortedExperiences.map((exp, index) => {
             const isActive = activeExperienceIndex === index;
 
             return (
@@ -85,6 +98,8 @@ export default function Experience() {
                 onFocus={() => setActiveExperienceIndex(index)}
                 whileHover={isCinematic ? { y: -2, scale: 1.02 } : undefined}
                 whileTap={isLiteMotion ? undefined : { scale: 0.98 }}
+                data-testid={`experience-nav-${index}`}
+                data-latest-period={exp.latestPeriod}
                 className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-300 ${
                   isActive
                     ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100 shadow-lg shadow-cyan-500/20'
@@ -121,10 +136,12 @@ export default function Experience() {
               },
             }}
           >
-            {experiences.map((exp, index) => (
+            {sortedExperiences.map((exp, index) => (
               <motion.div
                 key={index}
                 id={`experience-item-${index}`}
+                data-testid={`experience-item-${index}`}
+                data-latest-period={exp.latestPeriod}
                 variants={{
                   hidden: {
                     opacity: 0,

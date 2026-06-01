@@ -94,6 +94,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       }}
       className="group block h-full p-8 relative overflow-hidden"
       data-testid={`project-card-${index}`}
+      data-period={project.period}
     >
       {/* Animated gradient overlay on hover */}
       <motion.div

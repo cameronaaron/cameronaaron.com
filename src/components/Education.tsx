@@ -5,9 +5,30 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
 import { sortByDateDesc } from '@/data/dateOrdering';
 
+function isNonFinalizedCourseStatus(status: string): boolean {
+  const normalized = status.trim().toLowerCase();
+  return (
+    normalized.includes('in progress') ||
+    normalized.includes('planned') ||
+    normalized.includes('pending') ||
+    normalized.includes('tbd') ||
+    normalized.includes('enrolled') ||
+    normalized.includes('not started')
+  );
+}
+
 export default function Education() {
   const sortedEducationItems = sortByDateDesc(educationItems, (item) => item.period);
   const sortedHonorsAndAffiliations = sortByDateDesc(honorsAndAffiliations, (item) => item);
+  const sortedPrerequisiteCourses = [...prerequisiteCourses].sort((left, right) => {
+    const bucketDiff = Number(isNonFinalizedCourseStatus(left.status)) - Number(isNonFinalizedCourseStatus(right.status));
+    if (bucketDiff !== 0) return bucketDiff;
+
+    const requirementDiff = left.requirement.localeCompare(right.requirement);
+    if (requirementDiff !== 0) return requirementDiff;
+
+    return left.course.localeCompare(right.course);
+  });
   const formatGradeDisplay = (grade: string, gpa?: string) => {
     if (!gpa) return grade;
     return `${grade} (${gpa})`;
@@ -26,6 +47,8 @@ export default function Education() {
           {sortedEducationItems.map((item, index) => (
             <motion.article
               key={`${item.institution}-${item.credential}`}
+              data-testid={`education-card-${index}`}
+              data-period={item.period}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -78,9 +101,11 @@ export default function Education() {
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 mb-12 overflow-x-auto">
           <h3 className="text-2xl font-bold text-foreground mb-5 font-display">Nursing Program Prerequisite Coursework</h3>
           <div className="space-y-3 md:hidden">
-            {prerequisiteCourses.map((course, index) => (
+            {sortedPrerequisiteCourses.map((course, index) => (
               <motion.article
                 key={`${course.requirement}-${course.course}-mobile`}
+                data-testid={`prereq-mobile-row-${index}`}
+                data-status={course.status}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -116,9 +141,11 @@ export default function Education() {
               <p className="col-span-1">Grade/GPA</p>
               <p className="col-span-2">Status</p>
             </div>
-            {prerequisiteCourses.map((course) => (
+            {sortedPrerequisiteCourses.map((course, index) => (
               <div
                 key={`${course.requirement}-${course.course}`}
+                data-testid={`prereq-desktop-row-${index}`}
+                data-status={course.status}
                 className="grid grid-cols-12 gap-3 px-3 py-3 border-b border-white/5 last:border-b-0"
               >
                 <p className="col-span-3 text-foreground text-sm font-medium">{course.requirement}</p>
@@ -137,6 +164,7 @@ export default function Education() {
             {sortedHonorsAndAffiliations.map((honor, index) => (
               <motion.span
                 key={honor}
+                data-testid={`honor-pill-${index}`}
                 initial={{ opacity: 0, scale: 0.92 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}

@@ -22,7 +22,7 @@ describe('date ordering utility', () => {
     const originalTestimonialOrder = testimonials.map((testimonial) => testimonial.name);
     const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
 
-    expect(sortedTestimonials[0].name).toBe('JoeAnna McDonald');
+    expect(sortedTestimonials[0].name).toBe('Dr. Joy Lawson Davis, Ed.D.');
     expect(testimonials.map((testimonial) => testimonial.name)).toEqual(originalTestimonialOrder);
   });
 

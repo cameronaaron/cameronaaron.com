@@ -8,8 +8,8 @@ describe('date sorting regression guards', () => {
   it('keeps testimonials sorted by recency without requiring expansion', () => {
     render(<Testimonials />);
 
-    expect(screen.getByTestId('testimonial-item-0').textContent).toContain('JoeAnna McDonald');
-    expect(screen.getByTestId('testimonial-item-1').textContent).toContain('H. John Schaeffer');
+    expect(screen.getByTestId('testimonial-item-0').textContent).toContain('Dr. Joy Lawson Davis, Ed.D.');
+    expect(screen.getByTestId('testimonial-item-1').textContent).toContain('JoeAnna McDonald');
     expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
   });
 
