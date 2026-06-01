@@ -16,6 +16,10 @@ function normalizeText(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function getHostname(value: string): string {
+  return new URL(value).hostname.toLowerCase();
+}
+
 describe('meoninternet coverage integration', () => {
   it('maps fixed verification links to credential datasets', () => {
     const academicUrls = academicVerificationResources.map((item) => item.url);
@@ -115,6 +119,26 @@ describe('meoninternet coverage integration', () => {
     expect(verificationUrls).toContain(
       'https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/'
     );
+  });
+
+  it('uses institution-specific website labels for education verification links', () => {
+    const websiteLinks = educationItems.flatMap((item) =>
+      (item.verificationLinks ?? []).filter((link) => link.label.toLowerCase().includes('website'))
+    );
+
+    const labels = websiteLinks.map((link) => link.label);
+    expect(labels).not.toContain('School Website');
+
+    const labelToHostnames = new Map<string, Set<string>>();
+    for (const link of websiteLinks) {
+      const hosts = labelToHostnames.get(link.label) ?? new Set<string>();
+      hosts.add(getHostname(link.url));
+      labelToHostnames.set(link.label, hosts);
+    }
+
+    for (const hosts of labelToHostnames.values()) {
+      expect(hosts.size).toBe(1);
+    }
   });
 
   it('ensures every URL listed in meoninternet.md is represented in source data', () => {

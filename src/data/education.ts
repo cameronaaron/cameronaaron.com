@@ -34,7 +34,7 @@ export const educationItems: EducationItem[] = [
     ],
     verificationLinks: [
       {
-        label: "School Website",
+        label: "Elmbridge University Website",
         url: "https://elmbridge.edu/",
       },
       {
@@ -57,7 +57,7 @@ export const educationItems: EducationItem[] = [
     ],
     verificationLinks: [
       {
-        label: "School Website",
+        label: "Elmbridge University Website",
         url: "https://elmbridge.edu/",
       },
       {
@@ -79,7 +79,7 @@ export const educationItems: EducationItem[] = [
     ],
     verificationLinks: [
       {
-        label: "School Website",
+        label: "Connecticut College Website",
         url: "https://www.conncoll.edu/",
       },
       {

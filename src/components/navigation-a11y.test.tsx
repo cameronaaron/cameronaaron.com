@@ -141,4 +141,21 @@ describe('Navigation accessibility', () => {
       expect(href.length).toBeGreaterThan(1);
     }
   });
+
+  it('keeps cinematic transparent classes before the scroll threshold', () => {
+    render(<Navigation />);
+
+    const nav = screen.getByRole('navigation', { name: /main navigation/i });
+    expect(nav.className).toContain('bg-transparent');
+    expect(nav.className).not.toContain('bg-slate-950/55');
+
+    const brand = screen.getByRole('link', { name: /cameron/i });
+    expect(brand.className).toContain('hover:text-cyan-100');
+
+    const primary = screen.getByRole('navigation', { name: /primary navigation/i });
+    const active = within(primary).getByRole('link', { name: navItems[0].name });
+
+    expect(active.className).toContain('text-cyan-100');
+    expect(active.className).toContain('hover:text-cyan-100');
+  });
 });

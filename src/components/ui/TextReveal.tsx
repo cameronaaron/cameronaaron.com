@@ -55,9 +55,9 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
           {word.split("").map((char, j) => (
             <motion.span
               key={j}
-              initial={{ y: "100%", opacity: 0 }}
+              initial={{ y: "100%" }}
               /* v8 ignore next */
-              animate={shouldReveal ? { y: 0, opacity: 1 } : {}}
+              animate={shouldReveal ? { y: 0 } : {}}
               transition={{
                 duration: 0.5,
                 delay: delay + i * 0.1 + j * 0.02,
