@@ -32,7 +32,7 @@ describe('cloudflare worker entrypoint', () => {
     const response = await responses[0];
 
     expect(response.status).toBe(301);
-    expect(response.headers.get('Location')).toBe('https://cameronaaron.com/projects?ref=lab');
+    expect(response.headers.get('Location')).toBe('https://cameronaaron.com/?ref=lab');
     expect(mockedGetAsset).not.toHaveBeenCalled();
   });
 

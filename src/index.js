@@ -128,6 +128,7 @@ function getCanonicalRedirect(url) {
   redirectUrl.protocol = 'https:';
   redirectUrl.hostname = CANONICAL_HOST;
   redirectUrl.port = '';
+  redirectUrl.pathname = '/';
 
   return redirectUrl;
 }

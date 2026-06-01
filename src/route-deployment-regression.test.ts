@@ -30,7 +30,7 @@ describe('route deployment regression checks', () => {
   it('keeps the workshop subdomain routed to the worker for canonical redirects', () => {
     const wranglerConfig = fs.readFileSync(path.join(repoRoot, 'wrangler.toml'), 'utf8');
 
-    expect(wranglerConfig).toContain('{ pattern = "workshop.cameronaaron.com", custom_domain = true }');
+    expect(wranglerConfig).toContain('{ pattern = "workshop.cameronaaron.com/*", zone_name = "cameronaaron.com" }');
   });
 
   it('serves HTML 200 responses with a bfcache-safe Cache-Control (never no-store)', () => {
