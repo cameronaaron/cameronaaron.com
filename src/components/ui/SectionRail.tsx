@@ -114,7 +114,8 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                 {isActive ? (
                   <motion.span
                     layoutId="section-rail-halo"
-                    className="absolute -inset-2 z-0 rounded-full border border-cyan-300/40"
+                    className="absolute -inset-2 z-0 rounded-full border"
+                    style={{ borderColor: 'rgba(103, 232, 249, 0.4)' }}
                     transition={{ type: 'spring', stiffness: 320, damping: 26 }}
                     aria-hidden="true"
                   />

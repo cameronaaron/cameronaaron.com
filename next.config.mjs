@@ -4,6 +4,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   output: 'export',
+  allowedDevOrigins: ['localhost', '127.0.0.1'],
   
   images: {
     unoptimized: true, // Required for static export
@@ -32,25 +33,6 @@ const nextConfig = {
     reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
 
-  async redirects() {
-    return [
-      {
-        source: '/capstone.html',
-        destination: '/capstone',
-        permanent: true,
-      },
-      {
-        source: '/credentials.html',
-        destination: '/credentials',
-        permanent: true,
-      },
-      {
-        source: '/internet.html',
-        destination: '/internet',
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

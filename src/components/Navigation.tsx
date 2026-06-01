@@ -158,7 +158,11 @@ export default function Navigation() {
                     {activeHref === item.href ? (
                       <motion.span
                         layoutId="active-nav-pill"
-                        className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-cyan-500/25 to-primary/30 ring-1 ring-cyan-300/25"
+                        className="absolute inset-0 -z-10 rounded-full border"
+                        style={{
+                          background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.24), rgba(14, 165, 233, 0.18))',
+                          borderColor: 'rgba(103, 232, 249, 0.25)',
+                        }}
                         transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.35 }}
                       />
                     ) : null}
