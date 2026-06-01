@@ -69,7 +69,7 @@ export const projects: Project[] = [
   },
   {
     title: "thehellisthis.com",
-    description: "Anonymous social art experiment running on Cloudflare Workers where custom chat rooms disappear when they empty out and the main room fades after silence.",
+    description: "Anonymous chat experiment on Cloudflare Workers with markdown support, disappearing custom rooms, and a main room that fades after ten quiet minutes unless people keep the conversation going.",
     link: "https://thehellisthis.com",
     tags: ["Cloudflare Workers", "Ephemeral Chat", "Social Art", "Anonymous"],
     period: "2025 - Present",
