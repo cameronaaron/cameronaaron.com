@@ -27,10 +27,11 @@ describe('route deployment regression checks', () => {
     expect(redirects).toContain('/internet/ /internet.html 200');
   });
 
-  it('keeps the workshop subdomain routed to the worker for canonical redirects', () => {
+  it('keeps the workshop subdomain on a zone route instead of a conflicting custom domain', () => {
     const wranglerConfig = fs.readFileSync(path.join(repoRoot, 'wrangler.toml'), 'utf8');
 
     expect(wranglerConfig).toContain('{ pattern = "workshop.cameronaaron.com/*", zone_name = "cameronaaron.com" }');
+    expect(wranglerConfig).not.toContain('{ pattern = "workshop.cameronaaron.com", custom_domain = true }');
   });
 
   it('serves HTML 200 responses with a bfcache-safe Cache-Control (never no-store)', () => {

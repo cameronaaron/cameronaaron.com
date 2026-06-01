@@ -7,7 +7,7 @@ vi.mock('@cloudflare/kv-asset-handler', () => ({
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
 describe('cloudflare worker entrypoint', () => {
-  it('redirects workshop subdomain traffic to the canonical site before asset lookup', async () => {
+  it('redirects workshop subdomain traffic to the canonical homepage before asset lookup', async () => {
     vi.resetModules();
 
     const listeners = new Map<string, (event: { request: Request; respondWith: (value: Promise<Response>) => void }) => void>();
@@ -23,16 +23,25 @@ describe('cloudflare worker entrypoint', () => {
 
     await import('./index.js');
 
-    const responses: Promise<Response>[] = [];
-    listeners.get('fetch')?.({
-      request: new Request('https://workshop.cameronaaron.com/projects?ref=lab'),
-      respondWith: (value) => responses.push(value),
-    });
+    const invoke = async (requestUrl: string) => {
+      const responses: Promise<Response>[] = [];
 
-    const response = await responses[0];
+      listeners.get('fetch')?.({
+        request: new Request(requestUrl),
+        respondWith: (value) => responses.push(value),
+      });
 
-    expect(response.status).toBe(301);
-    expect(response.headers.get('Location')).toBe('https://cameronaaron.com/?ref=lab');
+      return responses[0];
+    };
+
+    const rootResponse = await invoke('https://workshop.cameronaaron.com/');
+    const nestedResponse = await invoke('https://workshop.cameronaaron.com/projects?ref=lab');
+
+    expect(rootResponse.status).toBe(301);
+    expect(rootResponse.headers.get('Location')).toBe('https://cameronaaron.com/');
+
+    expect(nestedResponse.status).toBe(301);
+    expect(nestedResponse.headers.get('Location')).toBe('https://cameronaaron.com/?ref=lab');
     expect(mockedGetAsset).not.toHaveBeenCalled();
   });
 
