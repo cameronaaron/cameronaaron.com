@@ -57,6 +57,7 @@ export default function Experience() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.42 : 0.65, ease: 'easeOut' }}
           className="mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          role="group"
           aria-label="Experience flow phases"
         >
           {['Clinical operations', 'Research translation', 'Security and systems'].map((phase, index) => (
@@ -80,6 +81,7 @@ export default function Experience() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.42 : 0.6, ease: 'easeOut' }}
           className="mx-auto mb-10 flex max-w-5xl flex-wrap justify-center gap-3"
+          role="group"
           aria-label="Experience quick navigation"
         >
           {sortedExperiences.map((exp, index) => {

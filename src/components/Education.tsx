@@ -38,6 +38,7 @@ export default function Education() {
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
+          headingId="education-heading"
           title="Education & Nursing Prerequisites"
           subtitle="Graduate training, interdisciplinary scholarship, and prerequisite readiness for nursing pathways"
           className="[&>h2]:font-display"
@@ -98,7 +99,12 @@ export default function Education() {
           ))}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 mb-12 overflow-x-auto">
+        <div
+          className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 mb-12 overflow-x-auto"
+          role="region"
+          aria-label="Nursing program prerequisite coursework table"
+          tabIndex={0}
+        >
           <h3 className="text-2xl font-bold text-foreground mb-5 font-display">Nursing Program Prerequisite Coursework</h3>
           <div className="space-y-3 md:hidden">
             {sortedPrerequisiteCourses.map((course, index) => (

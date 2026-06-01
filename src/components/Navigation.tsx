@@ -121,7 +121,7 @@ export default function Navigation() {
             <motion.a
               href="#home"
               whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold transition-colors bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent font-display"
+              className="text-2xl font-bold text-white transition-colors hover:text-cyan-100 font-display"
             >
               Cameron
             </motion.a>
@@ -148,8 +148,8 @@ export default function Navigation() {
                     href={item.href}
                     className={`relative inline-block rounded-full px-3 py-1.5 font-semibold transition-colors ${
                       isScrolled
-                        ? 'text-muted-foreground hover:text-primary'
-                        : 'text-muted-foreground/80 hover:text-white'
+                        ? 'text-foreground/90 hover:text-white'
+                        : 'text-white/90 hover:text-white'
                     } ${activeHref === item.href ? 'text-white' : ''}`}
                     whileHover={{ y: -2 }}
                     transition={{ type: 'spring', stiffness: 320, damping: 20 }}
@@ -175,7 +175,7 @@ export default function Navigation() {
                 whileTap={{ scale: 0.92 }}
                 className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/60 text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/40 hover:text-cyan-200"
                 aria-expanded={mobileMenuOpen}
-                aria-controls="mobile-nav-panel"
+                aria-controls={mobileMenuOpen ? 'mobile-nav-panel' : undefined}
                 aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>

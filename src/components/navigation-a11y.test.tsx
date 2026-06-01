@@ -78,11 +78,12 @@ describe('Navigation accessibility', () => {
     render(<Navigation />);
     const toggle = screen.getByRole('button', { name: /open navigation menu/i });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(toggle.getAttribute('aria-controls')).toBe('mobile-nav-panel');
+    expect(toggle.getAttribute('aria-controls')).toBeNull();
 
     fireEvent.click(toggle);
     const closeBtn = screen.getByRole('button', { name: /close navigation menu/i });
     expect(closeBtn.getAttribute('aria-expanded')).toBe('true');
+    expect(closeBtn.getAttribute('aria-controls')).toBe('mobile-nav-panel');
     expect(document.getElementById('mobile-nav-panel')).toBeTruthy();
 
     fireEvent.click(closeBtn);

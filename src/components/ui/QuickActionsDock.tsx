@@ -20,11 +20,12 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
   const reduced = performanceTier === 'reduced';
 
   return (
-    <div className="pointer-events-none fixed bottom-5 right-5 z-50 sm:bottom-6 sm:right-6" aria-label="Quick navigation dock">
+    <nav className="pointer-events-none fixed bottom-5 right-5 z-50 sm:bottom-6 sm:right-6" aria-label="Quick navigation dock">
       <div className="pointer-events-auto flex flex-col items-end gap-2">
         <AnimatePresence>
           {open ? (
             <motion.div
+              id="quick-actions-menu"
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
@@ -57,6 +58,7 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
           whileTap={{ scale: 0.96 }}
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-black/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 shadow-lg shadow-cyan-500/20 backdrop-blur-md"
           aria-expanded={open}
+          aria-controls={open ? 'quick-actions-menu' : undefined}
           aria-label="Toggle quick actions"
         >
           <motion.span
@@ -69,6 +71,6 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
           Explore
         </motion.button>
       </div>
-    </div>
+    </nav>
   );
 }

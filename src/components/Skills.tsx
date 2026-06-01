@@ -54,6 +54,7 @@ export default function Skills() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.4 : 0.62, ease: 'easeOut' }}
           className="mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          role="group"
           aria-label="Skills journey phases"
         >
           {['Assess', 'Apply', 'Validate'].map((phase, index) => (

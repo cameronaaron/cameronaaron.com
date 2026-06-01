@@ -120,7 +120,7 @@ export default function KeyboardShortcuts() {
         className="fixed bottom-5 left-5 z-40 hidden h-9 items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 md:inline-flex"
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-controls="keyboard-shortcuts-dialog"
+        aria-controls={open ? 'keyboard-shortcuts-dialog' : undefined}
         data-testid="keyboard-shortcuts-trigger"
       >
         <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] tracking-normal text-white">?</kbd>

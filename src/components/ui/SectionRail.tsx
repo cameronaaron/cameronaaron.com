@@ -79,15 +79,16 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
       data-testid="section-rail"
     >
       <ul className="pointer-events-auto relative flex flex-col items-center gap-5 rounded-full border border-white/10 bg-black/40 px-3 py-5 backdrop-blur-md shadow-lg shadow-cyan-900/20">
-        <span
-          className="absolute left-1/2 top-5 bottom-5 w-px -translate-x-1/2 overflow-hidden rounded-full bg-white/10"
+        <li
+          role="presentation"
+          className="absolute left-1/2 top-5 bottom-5 w-px -translate-x-1/2 overflow-hidden rounded-full bg-white/10 list-none"
           aria-hidden="true"
         >
           <motion.span
             className="block w-full origin-top bg-gradient-to-b from-cyan-300 via-primary to-emerald-300"
             style={{ scaleY: progress, height: '100%' }}
           />
-        </span>
+        </li>
 
         {sections.map((section) => {
           const isActive = activeId === section.id;
@@ -97,7 +98,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                 href={`#${section.id}`}
                 onClick={handleClick(section.id)}
                 aria-label={`Jump to ${section.label}`}
-                aria-current={isActive ? 'true' : undefined}
+                aria-current={isActive ? 'location' : undefined}
                 data-active={isActive ? 'true' : 'false'}
                 data-section-id={section.id}
                 className="group relative block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"

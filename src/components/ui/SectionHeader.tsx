@@ -9,9 +9,10 @@ interface SectionHeaderProps {
   title: string;
   subtitle?: string | ReactNode;
   className?: string;
+  headingId?: string;
 }
 
-export default function SectionHeader({ title, subtitle, className = '' }: SectionHeaderProps) {
+export default function SectionHeader({ title, subtitle, className = '', headingId }: SectionHeaderProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,7 +28,10 @@ export default function SectionHeader({ title, subtitle, className = '' }: Secti
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
       />
-      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent overflow-hidden pb-2 font-display">
+      <h2
+        id={headingId}
+        className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent overflow-hidden pb-2 font-display"
+      >
         <TextReveal text={title} />
       </h2>
       {subtitle ? (
