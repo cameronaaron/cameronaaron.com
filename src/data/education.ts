@@ -32,14 +32,38 @@ export const educationItems: EducationItem[] = [
       "Capstone Action Research Project (Spring 2026, Pass)",
       "Capstone: Bridging Transitions video-based educational series on thrice-exceptional Black male students",
     ],
+    verificationLinks: [
+      {
+        label: "School Website",
+        url: "https://elmbridge.edu/",
+      },
+      {
+        label: "Capstone Playlist",
+        url: "https://www.youtube.com/playlist?list=PLPKJAUpRXbupAzN7UaPLEewRw2up_Nyz-",
+      },
+      {
+        label: "Accreditation - Distance Education Accrediting Commission",
+        url: "https://www.deac.org/",
+      },
+    ],
   },
   {
     institution: "Elmbridge University (formerly Bridges Graduate School)",
     credential: "Certificate in Twice Exceptional Education",
     period: "Aug 2023 - Jun 2024",
     details: [
-      "GPA: A | Honors: Dean's List",
+      "Cumulative GPA: 3.83 | Honors: Dean's List",
       "Advanced coursework in twice-exceptionality and strength-based educational practice",
+    ],
+    verificationLinks: [
+      {
+        label: "School Website",
+        url: "https://elmbridge.edu/",
+      },
+      {
+        label: "Accreditation - Distance Education Accrediting Commission",
+        url: "https://www.deac.org/",
+      },
     ],
   },
   {
@@ -55,8 +79,16 @@ export const educationItems: EducationItem[] = [
     ],
     verificationLinks: [
       {
+        label: "School Website",
+        url: "https://www.conncoll.edu/",
+      },
+      {
         label: "Digital Diploma Verification",
         url: "https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/",
+      },
+      {
+        label: "Accreditation - New England Commission of Higher Education",
+        url: "https://cihe.neasc.org/",
       },
     ],
   },

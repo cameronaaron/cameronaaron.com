@@ -34,7 +34,35 @@ export default function Education() {
             >
               <p className="text-cyan-300 text-sm mb-3">{item.period}</p>
               <h3 className="text-foreground text-xl font-bold mb-2 font-display">{item.credential}</h3>
-              <p className="text-muted-foreground mb-4">{item.institution}</p>
+              <div className="mb-4">
+                {item.verificationLinks?.[0] ? (
+                  <a
+                    href={item.verificationLinks[0].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground font-medium hover:text-cyan-200 transition-colors"
+                  >
+                    {item.institution}
+                  </a>
+                ) : (
+                  <p className="text-muted-foreground">{item.institution}</p>
+                )}
+                {item.verificationLinks?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {item.verificationLinks.map((link) => (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100 hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
               <ul className="space-y-2">
                 {item.details.map((detail) => (
                   <li key={detail} className="text-muted-foreground text-sm flex gap-2">
@@ -43,24 +71,6 @@ export default function Education() {
                   </li>
                 ))}
               </ul>
-              {item.verificationLinks?.length ? (
-                <div className="mt-4 border-t border-white/10 pt-4">
-                  <p className="text-xs uppercase tracking-[0.14em] text-cyan-200/80 mb-2">Verification</p>
-                  <div className="flex flex-col gap-2">
-                    {item.verificationLinks.map((link) => (
-                      <a
-                        key={link.url}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-cyan-300 underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
-                      >
-                        {link.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </motion.article>
           ))}
         </div>
