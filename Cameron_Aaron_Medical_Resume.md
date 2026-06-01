@@ -180,7 +180,7 @@ Dedicated healthcare professional with a unique interdisciplinary background com
 | Behavioral/Neuroscience Biology (nursing-relevant elective) | PSY 214 - Biopsychology (Connecticut College) | 4.00 | B / 3.00 | Completed |
 | Cognitive/Neuroscience Biology (nursing-relevant elective) | PSY 312 - Cognitive Neuroscience (Connecticut College) | 4.00 | B / 3.00 | Completed |
 | Behavioral Medicine (nursing-relevant elective) | PSY 309 - Behavioral Medicine (Connecticut College) | 4.00 | B / 3.00 | Completed |
-| Abnormal Psychology/Psychopathology (nursing-relevant elective) | PSY 210 - Psycholog Disorders/Dysfunct (Connecticut College) | 4.00 | B- / 2.70 | Completed |
+| Abnormal Psychology/Psychopathology (nursing-relevant elective) | PSY 210 - Psycholog Disorders/Dysfunct (Connecticut College) | 4.00 | A- / 3.70 | Completed |
 | Developmental Psychology (nursing-relevant elective) | PSYC 350 - Developmental Psychology (UMass Amherst) | 3.00 | A- / 3.70 | Completed |
 | Social/Behavioral Science (nursing-relevant elective) | PS 345 - Social Psychology (Calif St Univ Northridg) | 3.00 | A / 4.00 | Completed |
 | Behavioral Health Promotion (nursing-relevant elective) | PSY 321 - Sport & Exercise Psychology (Connecticut College) | 4.00 | B+ / 3.30 (13.20 pts) | Completed |

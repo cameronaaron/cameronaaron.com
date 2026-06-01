@@ -89,6 +89,13 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local personal/reference artifacts (not part of deployed site)
+Transcript_CAMERONAARON.pdf
+Transcript_CAMERONAARON.txt
+07d7ca3e-2dd4-11f1-8fae-538f270984c2.pdf
+4d7ce9cc-3d09-11f1-be8a-5bae4eb1514f (1).pdf
+4d7ce9cc-3d09-11f1-be8a-5bae4eb1514f (2).pdf
 Cameron_Aaron_Medical_Resume (3).pdf
 Copy of Aaron_Cameron_Capstone_Final_final.txt
 Bridging Transitions - Capstone Defense V2 (5).pptx

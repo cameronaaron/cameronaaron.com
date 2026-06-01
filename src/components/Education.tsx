@@ -8,9 +8,8 @@ import { sortByDateDesc } from '@/data/dateOrdering';
 export default function Education() {
   const sortedEducationItems = sortByDateDesc(educationItems, (item) => item.period);
   const sortedHonorsAndAffiliations = sortByDateDesc(honorsAndAffiliations, (item) => item);
-  const formatGradeDisplay = (grade: string, gpa?: string, qualityPoints?: string) => {
+  const formatGradeDisplay = (grade: string, gpa?: string) => {
     if (!gpa) return grade;
-    if (qualityPoints) return `${grade} (${gpa}; ${qualityPoints} pts)`;
     return `${grade} (${gpa})`;
   };
 
@@ -88,7 +87,7 @@ export default function Education() {
                   </div>
                   <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
                     <p className="text-muted-foreground/80 uppercase tracking-[0.08em]">Grade / GPA</p>
-                    <p className="mt-1 text-foreground font-semibold">{formatGradeDisplay(course.grade, course.gpa, course.qualityPoints)}</p>
+                    <p className="mt-1 text-foreground font-semibold">{formatGradeDisplay(course.grade, course.gpa)}</p>
                   </div>
                   <div className="rounded-lg border border-cyan-400/25 bg-cyan-500/10 px-2.5 py-2 text-center">
                     <p className="text-cyan-200/80 uppercase tracking-[0.08em]">Status</p>
@@ -115,7 +114,7 @@ export default function Education() {
                 <p className="col-span-3 text-foreground text-sm font-medium">{course.requirement}</p>
                 <p className="col-span-5 text-muted-foreground text-sm">{course.course}</p>
                 <p className="col-span-1 text-muted-foreground text-sm">{course.units}</p>
-                <p className="col-span-1 text-muted-foreground text-sm">{formatGradeDisplay(course.grade, course.gpa, course.qualityPoints)}</p>
+                <p className="col-span-1 text-muted-foreground text-sm">{formatGradeDisplay(course.grade, course.gpa)}</p>
                 <p className="col-span-2 text-sm text-cyan-300">{course.status}</p>
               </div>
             ))}

@@ -163,8 +163,9 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     requirement: "Abnormal Psychology/Psychopathology (nursing-relevant elective)",
     course: "PSY 210 - Psycholog Disorders/Dysfunct (Connecticut College)",
     units: "4.00",
-    grade: "B-",
-    gpa: "2.70",
+    grade: "A-",
+    gpa: "3.70",
+    qualityPoints: "14.80",
     status: "Completed",
   },
   {
