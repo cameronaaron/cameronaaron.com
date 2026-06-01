@@ -133,12 +133,29 @@ function getCanonicalRedirect(url) {
   return redirectUrl;
 }
 
+function getIndexHtmlRedirect(url) {
+  if (url.pathname !== '/index.html') {
+    return null;
+  }
+
+  const redirectUrl = new URL(url.toString());
+  redirectUrl.pathname = '/';
+
+  return redirectUrl;
+}
+
 async function handleRequest(event) {
   const url = new URL(event.request.url);
   const redirectUrl = getCanonicalRedirect(url);
 
   if (redirectUrl) {
     return Response.redirect(redirectUrl.toString(), 301);
+  }
+
+  const indexHtmlRedirectUrl = getIndexHtmlRedirect(url);
+
+  if (indexHtmlRedirectUrl) {
+    return Response.redirect(indexHtmlRedirectUrl.toString(), 301);
   }
 
   const isHtmlRoute = isHtmlLikePath(url.pathname) || url.pathname === '/';

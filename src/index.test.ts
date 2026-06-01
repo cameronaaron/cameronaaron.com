@@ -7,6 +7,35 @@ vi.mock('@cloudflare/kv-asset-handler', () => ({
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
 describe('cloudflare worker entrypoint', () => {
+  it('redirects /index.html to / on the same host before asset lookup', async () => {
+    vi.resetModules();
+
+    const listeners = new Map<string, (event: { request: Request; respondWith: (value: Promise<Response>) => void }) => void>();
+    Object.defineProperty(globalThis, 'addEventListener', {
+      writable: true,
+      value: vi.fn((type: string, callback: (event: { request: Request; respondWith: (value: Promise<Response>) => void }) => void) => {
+        listeners.set(type, callback);
+      }),
+    });
+
+    const mockedGetAsset = vi.mocked(getAssetFromKV);
+    mockedGetAsset.mockResolvedValue(new Response('ok', { headers: new Headers() }));
+
+    await import('./index.js');
+
+    const responses: Promise<Response>[] = [];
+    listeners.get('fetch')?.({
+      request: new Request('https://cameronaaron.com/index.html?utm=search'),
+      respondWith: (value) => responses.push(value),
+    });
+
+    const response = await responses[0];
+
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe('https://cameronaaron.com/?utm=search');
+    expect(mockedGetAsset).not.toHaveBeenCalled();
+  });
+
   it('redirects workshop subdomain traffic to the canonical homepage before asset lookup', async () => {
     vi.resetModules();
 
