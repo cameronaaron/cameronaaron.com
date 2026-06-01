@@ -39,7 +39,7 @@ export const skills = {
     "Pediatric Advanced Life Support (PALS) - Active through Jan 2028",
     "Basic Life Support (BLS) - Active through Aug 2027",
     "Neonatal Resuscitation Program (NRP) Advanced Provider - Active through Nov 2027",
-    "Community Health Worker Certificate - Earned Oct 2025",
+    "Community Health Worker Certificate - Earned Dec 2025",
     "Protecting Human Research Participants (NIH) - Active",
     "In Progress: Certified EKG Technician (CET), Certified Phlebotomist",
   ],

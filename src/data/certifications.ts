@@ -66,7 +66,7 @@ export const certifications: Certification[] = [
   {
     name: "Community Health Worker (CHW) Certificate",
     issuer: "Los Angeles Valley College",
-    status: "Earned (Oct 2025)",
+    status: "Earned (Dec 2025)",
     credentialId: "5ed28264-10a0-4798-b16b-f94393e0b7da",
     verificationUrl: "https://www.parchment.com/lp/award/5ed28264-10a0-4798-b16b-f94393e0b7da",
   },

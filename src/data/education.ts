@@ -79,6 +79,22 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     status: "Completed",
   },
   {
+    requirement: "Nutrition",
+    course: "FAM & CS 021 - Nutrition (LACC)",
+    units: "3.00",
+    grade: "A",
+    gpa: "4.00",
+    status: "Completed",
+  },
+  {
+    requirement: "Emergency & Prehospital Care (nursing-relevant elective)",
+    course: "FIRETEK 096 - Emerg Medical Tech (LAVC)",
+    units: "8.00",
+    grade: "B",
+    gpa: "3.00",
+    status: "Completed",
+  },
+  {
     requirement: "General Psychology",
     course: "PSY 100 - Introduction to Psychology (Connecticut College)",
     units: "4.00",
@@ -102,6 +118,13 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     gpa: "3.30",
     qualityPoints: "13.20",
     status: "Completed",
+  },
+  {
+    requirement: "Human Growth and Development (additional coursework)",
+    course: "CH DEV 001 - Child Growth & Develop (LAMC)",
+    units: "3.00",
+    grade: "In Progress",
+    status: "In Progress",
   },
   {
     requirement: "Statistics",
@@ -185,6 +208,13 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     status: "Completed",
   },
   {
+    requirement: "Social/Behavioral Science (nursing-relevant elective)",
+    course: "SOC 001 - Intro to Sociology (WLAC)",
+    units: "3.00",
+    grade: "In Progress",
+    status: "In Progress",
+  },
+  {
     requirement: "Behavioral Health Promotion (nursing-relevant elective)",
     course: "PSY 321 - Sport & Exercise Psychology (Connecticut College)",
     units: "4.00",
@@ -204,8 +234,15 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     requirement: "Human Physiology and lab",
     course: "PHYSIOL 001 - Intro to Human Physiology (Los Angeles Harbor College)",
     units: "4.00",
-    grade: "Planned",
-    status: "Planned",
+    grade: "In Progress",
+    status: "In Progress",
+  },
+  {
+    requirement: "Nursing Clinical Skills (nursing-relevant elective)",
+    course: "NRS-HCA 056 - Essent Prac Skil Nrs (WLAC)",
+    units: "1.00",
+    grade: "P",
+    status: "Completed",
   },
   {
     requirement: "Organic Chemistry and lab",

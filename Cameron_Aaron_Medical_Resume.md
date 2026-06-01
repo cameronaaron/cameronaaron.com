@@ -29,7 +29,7 @@ Dedicated healthcare professional with a unique interdisciplinary background com
 | **Pediatric Advanced Life Support (PALS)** | American Heart Association | Active (Expires Jan 2028) | 265429107644 |
 | **Basic Life Support (BLS)** | American Heart Association | Active (Expires Aug 2027) | 265415002799 |
 | **Neonatal Resuscitation Program (NRP) Advanced Provider** | NRP | Active (Expires Nov 2027) | 1hrm0zbkewrowjwkvaphzstd |
-| **Community Health Worker (CHW) Certificate** | Los Angeles Valley College | Earned (Oct 2025) | 5ed28264-10a0-4798-b16b-f94393e0b7da |
+| **Community Health Worker (CHW) Certificate** | Los Angeles Valley College | Earned (Dec 2025) | 5ed28264-10a0-4798-b16b-f94393e0b7da |
 | **Private Security Agent** | CA Bureau of Security & Investigative Services | Active (Expires Aug 2027) | 6859700 |
 | **Protecting Human Research Participants** | National Institutes of Health | Active | 2504076 |
 
@@ -170,6 +170,7 @@ Dedicated healthcare professional with a unique interdisciplinary background com
 |---------------|---------------------|--------|--------------------------|--------|
 | Microbiology and lab | MICRO 020 - General Microbiology (LACC) | 4.00 | A / 4.00 | Completed |
 | Verbal Communication Skills | COMM C1000 - Intro to Public Speaking (LAVC) | 3.00 | B / 3.00 | Completed |
+| Nutrition | FAM & CS 021 - Nutrition (LACC) | 3.00 | A / 4.00 | Completed |
 | General Psychology | PSY 100 - Introduction to Psychology (Connecticut College) | 4.00 | A- / 3.70 | Completed |
 | Human Growth and Development | PSYCH 041 - Life-Span Psych (LACC) | 3.00 | A / 4.00 | Completed |
 | Human Growth and Development (additional coursework) | HMD 111 - Intro to Human Development (Connecticut College) | 4.00 | B+ / 3.30 (13.20 pts) | Completed |
@@ -185,7 +186,7 @@ Dedicated healthcare professional with a unique interdisciplinary background com
 | Social/Behavioral Science (nursing-relevant elective) | PS 345 - Social Psychology (Calif St Univ Northridg) | 3.00 | A / 4.00 | Completed |
 | Behavioral Health Promotion (nursing-relevant elective) | PSY 321 - Sport & Exercise Psychology (Connecticut College) | 4.00 | B+ / 3.30 (13.20 pts) | Completed |
 | Human Anatomy and lab | ANATOMY 001 - Intro To Human Anat (LACC) | 4.00 | In Progress | In progress |
-| Human Physiology and lab | PHYSIOL 001 - Intro To Human Phys (Los Angeles Harbor College) | 4.00 | Planned | Planned |
+| Human Physiology and lab | PHYSIOL 001 - Intro To Human Phys (Los Angeles Harbor College) | 4.00 | In Progress | In progress |
 | Organic Chemistry and lab | CHEM 051 - Fundamentals of Chemistry I (planned) | 5.00 | Planned | Planned |
 | Biochemistry | CHEM 051 - Fundamentals of Chemistry I (planned; course commonly includes biochemistry topics) | 5.00 | Planned | Planned |
 
