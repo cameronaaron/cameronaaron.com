@@ -1,6 +1,6 @@
 # Cameron Aaron - Portfolio
 
-Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4. Deployed globally on Cloudflare Workers.
+Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4. Deployed globally on Cloudflare Pages.
 
 ## 🚀 Quick Start
 
@@ -49,7 +49,7 @@ public/              # Static assets (.webp images)
 - **TypeScript 6.0.3** - Type safety
 - **Tailwind CSS 4.3.0** - Styling
 - **Framer Motion 12.40.0** - Animations
-- **Cloudflare Workers** - Edge deployment
+- **Cloudflare Pages** - Global static deployment
 
 ## ✏️ Editing Content
 
@@ -68,17 +68,37 @@ Images go in `public/` as `.webp` files.
 
 **Automatic:** Push to `master` → Live in 2 minutes via GitHub Actions
 
-**Manual:**
+**Manual (recommended):**
 
 ```bash
 ./verify-deployment.sh    # Pre-flight checks
 npm run deploy:prod       # Deploy to production
 ```
 
+Alternative worker deploy (KV-backed, subject to write limits):
+
+```bash
+npm run deploy:worker:prod
+```
+
 **Requirements:**
 
 - GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 - Cloudflare Pages project: `cameronaaronsite`
+
+### Worker Parity Notes (Pages Migration)
+
+The previous Worker behavior has been mapped as follows:
+
+- `workshop.cameronaaron.com/* -> https://cameronaaron.com/` is now in `public/_redirects`.
+- `www -> apex` canonical redirect is now in `public/_redirects`.
+- `/index.html -> /` canonical redirect is now in `public/_redirects`.
+- Security headers are provided by `public/_headers` (including `X-Frame-Options: DENY`).
+
+Dashboard-level items that are not code-configured in this repo:
+
+- Add `2eschool.org` and `www.2eschool.org` as custom domains (or create zone Redirect Rules if they should canonicalize to `cameronaaron.com`).
+- Ensure SSL/TLS and proxy are enabled for all mapped domains.
 
 ## 📊 Performance
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Cloudflare Workers Deployment Verification Script
+# Cloudflare Pages Deployment Verification Script
 
-echo "🚀 Cloudflare Workers Deployment - Pre-flight Check"
+echo "🚀 Cloudflare Pages Deployment - Pre-flight Check"
 echo "=================================================="
 echo ""
 
@@ -54,10 +54,9 @@ fi
 # Check 5: Cloudflare config files
 echo -n "✓ Checking Cloudflare config... "
 MISSING=""
-[ ! -f "wrangler.toml" ] && MISSING="$MISSING wrangler.toml"
 [ ! -f "public/_headers" ] && MISSING="$MISSING _headers"
 [ ! -f "public/_redirects" ] && MISSING="$MISSING _redirects"
-[ ! -f ".github/workflows/deploy.yml" ] && MISSING="$MISSING deploy.yml"
+[ ! -f ".github/workflows/deploy-production.yml" ] && MISSING="$MISSING deploy-production.yml"
 
 if [ -z "$MISSING" ]; then
     echo -e "${GREEN}✓ All config files present${NC}"
@@ -94,13 +93,13 @@ echo "     - CLOUDFLARE_API_TOKEN"
 echo "     - CLOUDFLARE_ACCOUNT_ID"
 echo ""
 echo "  2. Create Cloudflare Pages project:"
-echo "     - Project name: cameronaaron-com"
+echo "     - Project name: cameronaaronsite"
 echo "     - Build command: npm run build"
 echo "     - Build output: out"
 echo ""
 echo "  3. Push to GitHub:"
 echo "     git add ."
-echo "     git commit -m \"Configure Cloudflare Workers\""
+echo "     git commit -m \"Configure Cloudflare Pages deploy\""
 echo "     git push origin master"
 echo ""
 echo "  4. Watch deployment:"

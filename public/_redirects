@@ -2,11 +2,18 @@
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
 # Redirect www to non-www (if needed)
-# https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+
+# Legacy host redirect previously handled in Worker
+https://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
+http://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
 
 # Force HTTPS (Cloudflare handles this automatically, but can be explicit)
 http://cameronaaron.com/* https://cameronaaron.com/:splat 301
 http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+
+# Canonicalize /index.html to /
+/index.html / 301
 
 # Static export rewrites for extensionless landing pages
 /capstone /capstone.html 200
