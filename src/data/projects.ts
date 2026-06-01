@@ -68,6 +68,14 @@ export const projects: Project[] = [
     cta: "View Speaker Profile",
   },
   {
+    title: "thehellisthis.com",
+    description: "Anonymous social art experiment running on Cloudflare Workers where custom chat rooms disappear when they empty out and the main room fades after silence.",
+    link: "https://thehellisthis.com",
+    tags: ["Cloudflare Workers", "Ephemeral Chat", "Social Art", "Anonymous"],
+    period: "2025 - Present",
+    cta: "Visit Site",
+  },
+  {
     title: "4me Welcomes Cameron Aaron",
     description: "Public profile feature discussing background across software, operations, and interdisciplinary career development.",
     link: "https://www.xurrent.com/blog/4me-welcomes-cameron-aaron",
