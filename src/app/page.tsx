@@ -11,7 +11,6 @@ import Skills from '@/components/Skills';
 import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import AmbientBackground from '@/components/ui/AmbientBackground';
-import CursorTrail from '@/components/ui/CursorTrail';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import BackToTop from '@/components/ui/BackToTop';
 import IntroCurtain from '@/components/ui/IntroCurtain';
@@ -145,7 +144,7 @@ function SectionHandoff({
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
-  const { performanceTier, shouldRenderCursorTrail } = usePerformanceProfile();
+  const { performanceTier } = usePerformanceProfile();
   const showFloatingOverlays = performanceTier === 'full' || performanceTier === 'balanced';
   const showSectionHandoffs = performanceTier === 'full' || performanceTier === 'balanced';
   const pageProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 32, mass: 0.45 });
@@ -154,7 +153,6 @@ export default function Home() {
     <>
       <IntroCurtain />
       <AmbientBackground performanceTier={performanceTier} />
-      {shouldRenderCursorTrail ? <CursorTrail /> : null}
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <SectionRail /> : null}
       {showFloatingOverlays ? <KeyboardShortcuts /> : null}
