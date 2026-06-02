@@ -134,7 +134,7 @@ export default function Hero() {
               </span>
             </motion.h1>
 
-            <div className="text-2xl md:text-3xl font-light mb-8 text-muted-foreground h-[1.5em]">
+            <div className="text-xl sm:text-2xl md:text-3xl font-light mb-8 text-muted-foreground leading-tight">
               <TextReveal text={profile.title} delay={1.5} />
             </div>
 
