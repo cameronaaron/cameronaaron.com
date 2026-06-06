@@ -2,6 +2,11 @@
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import {
+  getTypewriterStorageKey,
+  markTypewriterComplete,
+  readInitialComplete,
+} from '@/components/ui/typewriter-effect-logic';
 
 interface TypewriterEffectProps {
   text: string;
@@ -14,29 +19,13 @@ interface TypewriterEffectProps {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-function readInitialComplete(storageKey: string): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    if (window.sessionStorage.getItem(storageKey) === '1') return true;
-  } catch {
-    // ignore
-  }
-  try {
-    const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    if (nav[0]?.type === 'back_forward') return true;
-  } catch {
-    // ignore
-  }
-  return false;
-}
-
 export default function TypewriterEffect({ 
   text, 
   className = "",
   cursorClassName = "",
   typingSpeed = 100
 }: TypewriterEffectProps) {
-  const storageKey = `typewriter-complete:${text}`;
+  const storageKey = getTypewriterStorageKey(text);
   // Initial state MUST match SSR. Collapse to complete state synchronously below if skipping.
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -57,7 +46,7 @@ export default function TypewriterEffect({
         setDisplayedText(text);
         setCurrentIndex(text.length);
         setSkipTyping(true);
-        try { window.sessionStorage.setItem(storageKey, '1'); } catch { /* ignore */ }
+        markTypewriterComplete(storageKey);
       }
     };
 
@@ -67,7 +56,7 @@ export default function TypewriterEffect({
 
   useEffect(() => {
     if (isComplete) {
-      try { window.sessionStorage.setItem(storageKey, '1'); } catch { /* ignore */ }
+      markTypewriterComplete(storageKey);
     }
   }, [isComplete, storageKey]);
 

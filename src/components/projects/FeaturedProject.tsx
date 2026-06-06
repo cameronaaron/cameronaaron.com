@@ -3,42 +3,19 @@
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import Tilt from '@/components/ui/Tilt';
+import FeaturedIcon from '@/components/projects/FeaturedIcon';
 import ProjectPattern from '@/components/projects/ProjectPattern';
 import Button from '@/components/ui/Button';
+import {
+  calculateFeaturedSpotlightPosition,
+  getFeaturedIconVariant,
+  getFeaturedProjectCta,
+  getFeaturedProjectLeadToken,
+} from '@/components/projects/featured-logic';
 
 interface FeaturedProjectProps {
   project: Project;
   index?: number;
-}
-
-function FeaturedIcon({ index }: { index: number }) {
-  if (index === 0) {
-    return (
-      <svg viewBox="0 0 24 24" className="h-14 w-14 text-cyan-200" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 14.5 14.4 4.2c.6-.6 1.6-.5 2.1.2l3.3 4.4c.4.6.4 1.3-.2 1.8L9.2 20.8c-.4.4-1 .6-1.5.5l-3.9-1c-.8-.2-1.2-1-.9-1.8l1-3.5c.1-.4.3-.7.5-1Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m12 6 6 6" />
-      </svg>
-    );
-  }
-
-  if (index === 1) {
-    return (
-      <svg viewBox="0 0 24 24" className="h-14 w-14 text-emerald-200" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5c-2.8 1.6-4 4.4-4 7 0 2.6 1.2 5.4 4 7" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 5c2.8 1.6 4 4.4 4 7 0 2.6-1.2 5.4-4 7" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 8h8M8 12h8M8 16h8" />
-        <circle cx="12" cy="8" r="1" fill="currentColor" />
-        <circle cx="12" cy="12" r="1" fill="currentColor" />
-        <circle cx="12" cy="16" r="1" fill="currentColor" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" className="h-14 w-14 text-cyan-200" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 8 4 12l4 4M16 8l4 4-4 4M14 5l-4 14" />
-    </svg>
-  );
 }
 
 export default function FeaturedProject({ project, index = 0 }: FeaturedProjectProps) {
@@ -48,11 +25,10 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const xPct = ((event.clientX - rect.left) / rect.width) * 100;
-    const yPct = ((event.clientY - rect.top) / rect.height) * 100;
+    const target = calculateFeaturedSpotlightPosition(rect, event.clientX, event.clientY);
 
-    hoverX.set(Math.max(0, Math.min(100, xPct)));
-    hoverY.set(Math.max(0, Math.min(100, yPct)));
+    hoverX.set(target.x);
+    hoverY.set(target.y);
   };
 
   const handleMouseLeave = () => {
@@ -114,7 +90,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
                 variant="primary" 
                 className="w-fit group-hover:shadow-[0_0_20px_rgba(34,211,238,0.45)] transition-shadow"
               >
-                {project.cta ?? 'View Publication'}
+                {getFeaturedProjectCta(project.cta)}
               </Button>
             </div>
           </div>
@@ -132,10 +108,10 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
             >
               <div className="text-center">
                 <div className="mb-4 flex justify-center filter drop-shadow-[0_0_15px_rgba(103,232,249,0.25)]">
-                  <FeaturedIcon index={index} />
+                  <FeaturedIcon variant={getFeaturedIconVariant(index)} />
                 </div>
                 <div className="text-2xl font-bold text-white/80 font-mono">
-                  {project.title.split(' ')[0]}
+                  {getFeaturedProjectLeadToken(project.title)}
                 </div>
               </div>
             </motion.div>

@@ -1,20 +1,15 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-
-type ParticleQuality = 'full' | 'balanced' | 'lite' | 'reduced';
-
-interface Particle {
-  x: number;
-  y: number;
-  size: number;
-  speedX: number;
-  speedY: number;
-  opacity: number;
-  fadeSpeed: number;
-  originalX: number;
-  originalY: number;
-}
+import {
+  advanceBackgroundParticle,
+  createBackgroundParticles,
+  getBackgroundParticleConfig,
+  getDistance,
+  shouldRenderBackgroundParticles,
+  type Particle,
+  type ParticleQuality,
+} from '@/components/hero/background-particles/engine';
 
 interface BackgroundParticlesProps {
   quality?: ParticleQuality;
@@ -24,7 +19,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (quality === 'reduced' || quality === 'lite') return;
+    if (!shouldRenderBackgroundParticles(quality)) return;
 
     const canvas = canvasRef.current;
     /* v8 ignore next */
@@ -38,14 +33,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     let width = 0;
     let height = 0;
 
-    const qualityConfig = {
-      full: { denominator: 10000, maxParticles: 150, connectDistance: 100, mouseRadius: 150, useConnections: true, useMousePull: true },
-      balanced: { denominator: 17000, maxParticles: 95, connectDistance: 85, mouseRadius: 120, useConnections: true, useMousePull: true },
-      lite: { denominator: 32000, maxParticles: 45, connectDistance: 0, mouseRadius: 0, useConnections: false, useMousePull: false },
-      reduced: { denominator: 100000, maxParticles: 0, connectDistance: 0, mouseRadius: 0, useConnections: false, useMousePull: false },
-    } as const;
-
-    const activeConfig = qualityConfig[quality];
+    const activeConfig = getBackgroundParticleConfig(quality);
     
     const mouse = {
       x: -1000,
@@ -62,24 +50,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     };
 
     const initParticles = () => {
-      const particleCount = Math.min(
-        Math.floor(width * height / activeConfig.denominator),
-        activeConfig.maxParticles
-      );
-      particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          originalX: Math.random() * width,
-          originalY: Math.random() * height,
-          size: Math.random() * 2 + 1,
-          speedX: (Math.random() - 0.5) * 0.5,
-          speedY: (Math.random() - 0.5) * 0.5,
-          opacity: Math.random() * 0.5 + 0.2,
-          fadeSpeed: (Math.random() - 0.5) * 0.01,
-        });
-      }
+      particles = createBackgroundParticles(width, height, activeConfig);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -97,26 +68,13 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       ctx.clearRect(0, 0, width, height);
       
       particles.forEach((p, i) => {
-        // Update position
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.opacity += p.fadeSpeed;
-
-        // Fade effect
-        if (p.opacity <= 0.1 || p.opacity >= 0.6) {
-          p.fadeSpeed = -p.fadeSpeed;
-        }
-
-        // Wrap around screen
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
+        // Update particle position, opacity and wrapping.
+        advanceBackgroundParticle(p, width, height);
 
         // Mouse interaction
         const dx = mouse.x - p.x;
         const dy = mouse.y - p.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distance = getDistance(dx, dy);
 
         if (activeConfig.useMousePull && distance < mouse.radius) {
           // Draw line to mouse
@@ -150,7 +108,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
             const p2 = particles[j];
             const dx2 = p.x - p2.x;
             const dy2 = p.y - p2.y;
-            const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+            const distance2 = getDistance(dx2, dy2);
             
             if (distance2 < activeConfig.connectDistance) {
               ctx.beginPath();
@@ -189,7 +147,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     };
   }, [quality]);
 
-  if (quality === 'reduced' || quality === 'lite') {
+  if (!shouldRenderBackgroundParticles(quality)) {
     return null;
   }
 

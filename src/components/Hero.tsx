@@ -14,16 +14,15 @@ import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
 
 export default function Hero() {
   const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();
-  const shouldUseParallax = performanceTier === 'full' || performanceTier === 'balanced';
+  const { shouldUseParallax, showFloatingBadges, parallaxDepth, scaleFloor } = getHeroMotionConfig(performanceTier);
   const { scrollY, scrollYProgress } = useScroll();
   const { x: mouseX, y: mouseY } = useMousePosition();
   const rawPointerX = useMotionValue(0);
   const rawPointerY = useMotionValue(0);
-  const parallaxDepth = performanceTier === 'full' ? 150 : performanceTier === 'balanced' ? 100 : 45;
-  const scaleFloor = performanceTier === 'full' ? 0.8 : performanceTier === 'balanced' ? 0.88 : 0.94;
   
   // Parallax transformations
   const yParallax = useTransform(scrollY, [0, 500], [0, parallaxDepth]);
@@ -182,7 +181,7 @@ export default function Hero() {
               transition={{ delay: 0.7 }}
               className="mt-6 flex flex-wrap gap-2"
             >
-              {['Engineering', 'Security', 'Clinical Care', 'NP Path'].map((chip, index) => (
+              {HERO_SIGNAL_CHIPS.map((chip, index) => (
                 <motion.span
                   key={chip}
                   initial={false}
@@ -223,14 +222,9 @@ export default function Hero() {
             style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}
           >
              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl -z-10" />
-             {performanceTier === 'full' || performanceTier === 'balanced' ? (
+             {showFloatingBadges ? (
                <>
-                 {[
-                   { label: 'EMT', className: '-left-4 top-10' },
-                   { label: 'Security', className: 'right-1 top-3' },
-                   { label: 'Research', className: '-right-8 bottom-24' },
-                   { label: 'Future NP', className: 'left-2 -bottom-4' },
-                 ].map((badge, index) => (
+                 {HERO_FLOATING_BADGES.map((badge, index) => (
                    <motion.span
                      key={badge.label}
                      className={`absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md ${badge.className}`}

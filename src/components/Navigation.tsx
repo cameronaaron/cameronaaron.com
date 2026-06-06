@@ -5,6 +5,13 @@ import { useEffect, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems } from '@/data/navigation';
 import Magnetic from '@/components/ui/Magnetic';
+import {
+  ACTIVE_SECTION_TRIGGER_LINE,
+  computeSectionBounds,
+  getActiveNavLabel,
+  pickActiveHref,
+  shouldCloseMobileMenuOnResize,
+} from '@/components/navigation/logic';
 
 export default function Navigation() {
   const isScrolled = useScrollPosition(50);
@@ -19,32 +26,11 @@ export default function Navigation() {
 
   useEffect(() => {
     const updateActiveSection = () => {
-      const triggerLine = 140;
-      let closest: { href: string; distance: number } | null = null;
-
-      for (const item of navItems) {
-        const sectionId = item.href.replace('#', '');
-        const section = document.getElementById(sectionId);
-        if (!section) continue;
-
-        const rect = section.getBoundingClientRect();
-        const distance = Math.abs(rect.top - triggerLine);
-        const isIntersectingTrigger = rect.top <= triggerLine && rect.bottom >= triggerLine;
-
-        if (isIntersectingTrigger) {
-          closest = { href: item.href, distance: 0 };
-          break;
-        }
-
-        if (!closest || distance < closest.distance) {
-          closest = { href: item.href, distance };
-        }
-      }
-
-      if (closest) {
-        const nextHref = closest.href;
-        setActiveHref((current) => (current === nextHref ? current : nextHref));
-      }
+      const sections = computeSectionBounds(navItems);
+      setActiveHref((current) => {
+        const nextHref = pickActiveHref(sections, ACTIVE_SECTION_TRIGGER_LINE, current);
+        return current === nextHref ? current : nextHref;
+      });
     };
 
     updateActiveSection();
@@ -75,7 +61,7 @@ export default function Navigation() {
     if (!mobileMenuOpen) return;
 
     const closeOnDesktop = () => {
-      if (window.innerWidth >= 768) {
+      if (shouldCloseMobileMenuOnResize(window.innerWidth)) {
         setMobileMenuOpen(false);
       }
     };
@@ -87,7 +73,7 @@ export default function Navigation() {
     };
   }, [mobileMenuOpen]);
 
-  const activeNavLabel = navItems.find((item) => item.href === activeHref)?.name ?? 'Home';
+  const activeNavLabel = getActiveNavLabel(navItems, activeHref);
 
   return (
     <>

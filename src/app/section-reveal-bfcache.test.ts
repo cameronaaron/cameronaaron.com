@@ -20,6 +20,10 @@ function readPageSource(): string {
   return readFileSync(resolve(process.cwd(), 'src/app/page.tsx'), 'utf8');
 }
 
+function readSectionTransitionsSource(): string {
+  return readFileSync(resolve(process.cwd(), 'src/components/ui/SectionTransitions.tsx'), 'utf8');
+}
+
 /**
  * Extract the body of a top-level function declaration by name, using
  * brace-balancing so nested JSX/blocks are captured intact.
@@ -52,14 +56,14 @@ function extractFunctionBody(src: string, name: string): string {
 
 describe('Section wrapper bfcache safety', () => {
   it('SectionReveal outer wrapper uses initial={false} so sections are visible after bfcache restore', () => {
-    const body = extractFunctionBody(readPageSource(), 'SectionReveal');
+    const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionReveal');
     const outerWrapper = extractFirstMotionDivProps(body);
     expect(outerWrapper).toMatch(/initial=\{false\}/);
     expect(outerWrapper).not.toMatch(/opacity:\s*0/);
   });
 
   it('SectionHandoff outer wrapper uses initial={false} for the same reason', () => {
-    const body = extractFunctionBody(readPageSource(), 'SectionHandoff');
+    const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionHandoff');
     const outerWrapper = extractFirstMotionDivProps(body);
     expect(outerWrapper).toMatch(/initial=\{false\}/);
     expect(outerWrapper).not.toMatch(/opacity:\s*0/);

@@ -2,18 +2,12 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { readInitialReveal, splitRevealWords } from '@/components/ui/text-reveal-logic';
 
 interface TextRevealProps {
   text: string;
   className?: string;
   delay?: number;
-}
-
-function readInitialReveal(storageKey: string): boolean {
-  if (typeof window === 'undefined') return false;
-  if (window.sessionStorage.getItem(storageKey) === '1') return true;
-  const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-  return nav[0]?.type === 'back_forward';
 }
 
 export default function TextReveal({ text, className = "", delay = 0 }: TextRevealProps) {
@@ -46,7 +40,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
     }
   }, [shouldReveal, storageKey]);
 
-  const words = text.split(" ");
+  const words = splitRevealWords(text);
 
   return (
     <span ref={ref} className={`inline-block ${className}`}>

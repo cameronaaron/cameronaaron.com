@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { faqs } from '@/data/faqs';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import { getFaqPanelId, getFaqTriggerId, isFaqOpen, toggleFaqOpenIndex } from '@/components/faq/logic';
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -23,9 +24,9 @@ export default function FAQ() {
 
         <ul className="max-w-4xl mx-auto space-y-4" role="list">
           {faqs.map((faq, index) => {
-            const isOpen = openIndex === index;
-            const panelId = `faq-panel-${index}`;
-            const buttonId = `faq-trigger-${index}`;
+            const isOpen = isFaqOpen(openIndex, index);
+            const panelId = getFaqPanelId(index);
+            const buttonId = getFaqTriggerId(index);
 
             return (
               <li key={index} className="list-none">
@@ -42,7 +43,7 @@ export default function FAQ() {
                     <motion.button
                       type="button"
                       id={buttonId}
-                      onClick={() => setOpenIndex(isOpen ? null : index)}
+                      onClick={() => setOpenIndex(toggleFaqOpenIndex(openIndex, index))}
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       whileHover={{ scale: 1.005 }}

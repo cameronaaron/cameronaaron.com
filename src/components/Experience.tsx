@@ -3,31 +3,22 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { experiences } from '@/data/experience';
-import { getDateSortKey, sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ExperienceCard from '@/components/experience/ExperienceCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import {
+  EXPERIENCE_FLOW_PHASES,
+  getExperienceItemId,
+  getExperienceMotionConfig,
+  sortExperiencesForTimeline,
+} from '@/components/experience/logic';
 
 export default function Experience() {
   const [activeExperienceIndex, setActiveExperienceIndex] = useState(0);
   const { performanceTier } = usePerformanceProfile();
-  const isLiteMotion = performanceTier === 'lite' || performanceTier === 'reduced';
-  const isCinematic = performanceTier === 'full';
-  const entryYOffset = isLiteMotion ? 10 : 22;
-  const timelineTravel = isLiteMotion ? 16 : 32;
-  const timelineStagger = isLiteMotion ? 0.04 : 0.1;
-  const sortedExperiences = [...experiences]
-    .map((experience) => {
-      const sortedPositions = sortByDateDesc(experience.positions, (position) => position.period);
-      const latestPeriod = sortedPositions[0]?.period ?? '';
-
-      return {
-        ...experience,
-        positions: sortedPositions,
-        latestPeriod,
-      };
-    })
-    .sort((left, right) => getDateSortKey(right.latestPeriod) - getDateSortKey(left.latestPeriod));
+  const { isLiteMotion, isCinematic, entryYOffset, timelineTravel, timelineStagger } =
+    getExperienceMotionConfig(performanceTier);
+  const sortedExperiences = sortExperiencesForTimeline(experiences);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -38,7 +29,7 @@ export default function Experience() {
 
   const handleJumpToExperience = (index: number) => {
     setActiveExperienceIndex(index);
-    const target = document.getElementById(`experience-item-${index}`);
+    const target = document.getElementById(getExperienceItemId(index));
     target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
   };
 
@@ -60,7 +51,7 @@ export default function Experience() {
           role="group"
           aria-label="Experience flow phases"
         >
-          {['Clinical operations', 'Research translation', 'Security and systems'].map((phase, index) => (
+          {EXPERIENCE_FLOW_PHASES.map((phase, index) => (
             <motion.div
               key={phase}
               initial={{ opacity: 0, y: 8 }}
@@ -141,7 +132,7 @@ export default function Experience() {
             {sortedExperiences.map((exp, index) => (
               <motion.div
                 key={index}
-                id={`experience-item-${index}`}
+                id={getExperienceItemId(index)}
                 data-testid={`experience-item-${index}`}
                 data-latest-period={exp.latestPeriod}
                 variants={{

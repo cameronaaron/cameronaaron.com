@@ -2,6 +2,10 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  buildShortcutJumpMap,
+  shouldIgnoreShortcutEvent,
+} from '@/components/ui/keyboard-shortcuts-logic';
 
 interface Shortcut {
   keys: string[];
@@ -22,22 +26,7 @@ export const SHORTCUTS: Shortcut[] = [
   { keys: ['g', 'm'], label: 'Jump to Contact (message me)', targetId: 'contact' },
 ];
 
-const JUMP_MAP: Record<string, string> = SHORTCUTS.filter((s) => s.targetId && s.keys[0] === 'g').reduce(
-  (acc, shortcut) => {
-    acc[shortcut.keys[1]] = shortcut.targetId!;
-    return acc;
-  },
-  {} as Record<string, string>
-);
-
-function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  const tag = target.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
-  if (target.isContentEditable) return true;
-  const editable = target.getAttribute('contenteditable');
-  return editable === '' || editable === 'true' || editable === 'plaintext-only';
-}
+const JUMP_MAP: Record<string, string> = buildShortcutJumpMap(SHORTCUTS);
 
 export default function KeyboardShortcuts() {
   const [open, setOpen] = useState(false);
@@ -64,9 +53,7 @@ export default function KeyboardShortcuts() {
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      if (event.defaultPrevented) return;
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      if (isEditableTarget(event.target)) return;
+      if (shouldIgnoreShortcutEvent(event)) return;
 
       if (event.key === 'Escape') {
         if (open) {

@@ -5,16 +5,18 @@ import { useRef } from 'react';
 import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
 import SocialLink from '@/components/contact/SocialLink';
+import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/logic';
 import Tilt from '@/components/ui/Tilt';
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start 85%', 'center 40%'],
+    offset: [...CONTACT_SCROLL_OFFSETS],
   });
   const revealRaw = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const revealProgress = useSpring(revealRaw, { stiffness: 130, damping: 26, mass: 0.45 });
+  const revealProgress = useSpring(revealRaw, CONTACT_REVEAL_SPRING);
+  const socialLinks = buildContactSocialLinks(socialPlatforms, profile.social);
 
   return (
     <section ref={sectionRef} id="contact" className="py-20 bg-background relative overflow-hidden" aria-labelledby="contact-heading">
@@ -105,9 +107,9 @@ export default function Contact() {
                 }
               }}
             >
-              {socialPlatforms.map((social, index) => (
+              {socialLinks.map((social, index) => (
                 <motion.div
-                  key={index}
+                  key={social.key}
                   variants={{
                     hidden: { opacity: 0, y: 20, scale: 0.8 },
                     visible: { opacity: 1, y: 0, scale: 1 }
@@ -117,7 +119,7 @@ export default function Contact() {
                   <SocialLink
                     name={social.name}
                     platformKey={social.key}
-                    url={profile.social[social.key]}
+                    url={social.url}
                     color={social.color}
                     index={index}
                     revealProgress={revealProgress}

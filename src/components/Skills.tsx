@@ -7,9 +7,10 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import SkillBar from '@/components/ui/SkillBar';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import { getStrongestSkill, sortTechnicalSkills, type TechnicalView } from '@/components/skills/logic';
 
 export default function Skills() {
-  const [technicalView, setTechnicalView] = useState<'priority' | 'alphabetical'>('priority');
+  const [technicalView, setTechnicalView] = useState<TechnicalView>('priority');
   const { performanceTier } = usePerformanceProfile();
   const isLiteMotion = performanceTier === 'lite' || performanceTier === 'reduced';
   const isCinematic = performanceTier === 'full';
@@ -24,14 +25,10 @@ export default function Skills() {
   const entryYOffset = isLiteMotion ? 10 : 20;
 
   const technicalSkills = useMemo(() => {
-    if (technicalView === 'alphabetical') {
-      return [...skills.technical].sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return [...skills.technical].sort((a, b) => b.level - a.level);
+    return sortTechnicalSkills(skills.technical, technicalView);
   }, [technicalView]);
 
-  const strongestSkill = technicalSkills[0];
+  const strongestSkill = getStrongestSkill(technicalSkills);
 
   return (
     <section id="skills" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>

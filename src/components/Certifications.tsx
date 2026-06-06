@@ -2,22 +2,17 @@
 
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
-import { certifications, inProgressCertifications, type Certification } from '@/data/certifications';
-import { sortByDateDesc } from '@/data/dateOrdering';
-
-function buildVerificationHref(cert: Certification): string {
-  const url = new URL(cert.verificationUrl);
-  if (cert.verificationQueryParam) {
-    url.searchParams.set(cert.verificationQueryParam, cert.credentialId);
-  }
-  return url.toString();
-}
+import { certifications, inProgressCertifications } from '@/data/certifications';
+import {
+  buildCertificationCollections,
+  buildVerificationHref,
+  getInProgressAnimationOffset,
+} from '@/components/certifications/logic';
 
 export default function Certifications() {
-  const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
-  const sortedInProgressCertifications = sortByDateDesc(
-    inProgressCertifications,
-    (certification) => certification.expectedCompletion
+  const { sortedCertifications, sortedInProgressCertifications } = buildCertificationCollections(
+    certifications,
+    inProgressCertifications
   );
 
   return (
@@ -104,7 +99,7 @@ export default function Certifications() {
             {sortedInProgressCertifications.map((cert, index) => (
               <motion.div
                 key={cert.name}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -16 : 16 }}
+                initial={{ opacity: 0, x: getInProgressAnimationOffset(index) }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.15 + index * 0.08 }}

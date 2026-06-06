@@ -3,36 +3,11 @@
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
-import { sortByDateDesc } from '@/data/dateOrdering';
-
-function isNonFinalizedCourseStatus(status: string): boolean {
-  const normalized = status.trim().toLowerCase();
-  return (
-    normalized.includes('in progress') ||
-    normalized.includes('planned') ||
-    normalized.includes('pending') ||
-    normalized.includes('tbd') ||
-    normalized.includes('enrolled') ||
-    normalized.includes('not started')
-  );
-}
+import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
 
 export default function Education() {
-  const sortedEducationItems = sortByDateDesc(educationItems, (item) => item.period);
-  const sortedHonorsAndAffiliations = sortByDateDesc(honorsAndAffiliations, (item) => item);
-  const sortedPrerequisiteCourses = [...prerequisiteCourses].sort((left, right) => {
-    const bucketDiff = Number(isNonFinalizedCourseStatus(left.status)) - Number(isNonFinalizedCourseStatus(right.status));
-    if (bucketDiff !== 0) return bucketDiff;
-
-    const requirementDiff = left.requirement.localeCompare(right.requirement);
-    if (requirementDiff !== 0) return requirementDiff;
-
-    return left.course.localeCompare(right.course);
-  });
-  const formatGradeDisplay = (grade: string, gpa?: string) => {
-    if (!gpa) return grade;
-    return `${grade} (${gpa})`;
-  };
+  const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses } =
+    buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations);
 
   return (
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">

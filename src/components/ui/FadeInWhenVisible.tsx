@@ -2,12 +2,13 @@
 
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
+import { getFadeDirectionOffset, type FadeDirection } from '@/components/ui/fade-in-logic';
 
 interface FadeInWhenVisibleProps {
   children: ReactNode;
   delay?: number;
   duration?: number;
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
+  direction?: FadeDirection;
   className?: string;
 }
 
@@ -18,17 +19,9 @@ export default function FadeInWhenVisible({
   direction = 'up',
   className = '' 
 }: FadeInWhenVisibleProps) {
-  const directions = {
-    up: { y: 40 },
-    down: { y: -40 },
-    left: { x: 40 },
-    right: { x: -40 },
-    none: {}
-  };
-
   return (
     <motion.div
-      initial={{ opacity: 0, ...directions[direction] }}
+      initial={{ opacity: 0, ...getFadeDirectionOffset(direction) }}
       whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay, duration, ease: "easeOut" }}

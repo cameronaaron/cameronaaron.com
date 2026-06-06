@@ -2,33 +2,20 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useState } from 'react';
+import {
+  INTRO_CURTAIN_STORAGE_KEY,
+  markIntroCurtainShown,
+  shouldSkipInitialCurtain,
+} from '@/components/ui/intro-curtain-logic';
 
 interface IntroCurtainProps {
   /** Time (ms) before the curtain begins exiting. */
   holdMs?: number;
 }
 
-const STORAGE_KEY = 'intro-curtain-shown';
-
 // SSR-safe layout effect: useLayoutEffect on client, no-op on server.
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-function shouldSkipInitialCurtain(): boolean {
-  if (typeof window === 'undefined') return true;
-  try {
-    if (window.sessionStorage.getItem(STORAGE_KEY) === '1') return true;
-  } catch {
-    // sessionStorage may be unavailable (private mode, etc.) — fall through.
-  }
-  try {
-    const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    if (nav[0]?.type === 'back_forward') return true;
-  } catch {
-    // ignore
-  }
-  return false;
-}
 
 export default function IntroCurtain({ holdMs = 520 }: IntroCurtainProps = {}) {
   const prefersReducedMotion = useReducedMotion();
@@ -43,20 +30,12 @@ export default function IntroCurtain({ holdMs = 520 }: IntroCurtainProps = {}) {
 
   useEffect(() => {
     if (!visible) {
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, '1');
-      } catch {
-        // ignore
-      }
+      markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
       return;
     }
     const timer = window.setTimeout(() => {
       setVisible(false);
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, '1');
-      } catch {
-        // ignore
-      }
+      markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
     }, holdMs);
     return () => window.clearTimeout(timer);
   }, [holdMs, visible]);

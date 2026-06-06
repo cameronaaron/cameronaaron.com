@@ -6,29 +6,15 @@ import { useState } from 'react';
 import type { Experience } from '@/data/experience';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { buildCompanyMonogram, calculateTiltTargets } from '@/components/experience/card-logic';
+
+export { calculateTiltTargets } from '@/components/experience/card-logic';
 
 interface ExperienceCardProps {
   experience: Experience;
   index: number;
   isActive?: boolean;
   onActivate?: () => void;
-}
-
-export function calculateTiltTargets(
-  rect: { left: number; top: number; width: number; height: number },
-  clientX: number,
-  clientY: number
-) {
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-
-  const percentX = (clientX - centerX) / (rect.width / 2);
-  const percentY = (clientY - centerY) / (rect.height / 2);
-
-  return {
-    x: 0.5 + percentX * 0.5,
-    y: 0.5 + percentY * 0.5,
-  };
 }
 
 export default function ExperienceCard({
@@ -40,12 +26,7 @@ export default function ExperienceCard({
   const [isHovering, setIsHovering] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const companyMonogram = experience.company
-    .split(/\s+/)
-    .map((word) => word[0])
-    .join('')
-    .slice(0, 3)
-    .toUpperCase();
+  const companyMonogram = buildCompanyMonogram(experience.company);
   
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);

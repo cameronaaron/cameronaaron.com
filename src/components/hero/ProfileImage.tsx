@@ -5,6 +5,12 @@ import Image from 'next/image';
 import { useEffect } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import {
+  calculateProfilePointerTargets,
+  getProfileFloatAnimation,
+  PROFILE_CONTAINER_ID,
+  PROFILE_SPRING_CONFIG,
+} from '@/components/hero/profile-image-logic';
 
 interface ProfileImageProps {
   src: string;
@@ -13,6 +19,7 @@ interface ProfileImageProps {
 
 export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
+  const reducedMotion = Boolean(prefersReducedMotion);
 
   // Mouse position tracking for 3D tilt effect
   const mouseX = useMotionValue(0);
@@ -23,9 +30,8 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const rotateY = useTransform(mouseX, [-0.5, 0.5], [-15, 15]);
   
   // Add spring physics for smooth motion
-  const springConfig = { damping: 20, stiffness: 100 };
-  const rotateXSpring = useSpring(rotateX, springConfig);
-  const rotateYSpring = useSpring(rotateY, springConfig);
+  const rotateXSpring = useSpring(rotateX, PROFILE_SPRING_CONFIG);
+  const rotateYSpring = useSpring(rotateY, PROFILE_SPRING_CONFIG);
 
   useEffect(() => {
     if (!enableHoverMotion) {
@@ -35,14 +41,11 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = document.getElementById('profile-container')?.getBoundingClientRect();
+      const rect = document.getElementById(PROFILE_CONTAINER_ID)?.getBoundingClientRect();
       if (rect) {
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const x = (e.clientX - centerX) / (rect.width / 2);
-        const y = (e.clientY - centerY) / (rect.height / 2);
-        mouseX.set(x);
-        mouseY.set(y);
+        const target = calculateProfilePointerTargets(rect, e.clientX, e.clientY);
+        mouseX.set(target.x);
+        mouseY.set(target.y);
       }
     };
 
@@ -52,12 +55,12 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
 
   return (
     <motion.div
-      id="profile-container"
+      id={PROFILE_CONTAINER_ID}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ 
         opacity: 1, 
         scale: 1,
-        y: prefersReducedMotion ? 0 : [0, -20, 0] // Float animation
+        y: getProfileFloatAnimation(reducedMotion)
       }}
       transition={{ 
         opacity: { duration: 0.8, delay: 0.4 },
@@ -86,8 +89,8 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-full blur-2xl"
           animate={{
-            scale: prefersReducedMotion ? 1 : [1, 1.2, 1],
-            opacity: prefersReducedMotion ? 0.3 : [0.3, 0.5, 0.3],
+            scale: reducedMotion ? 1 : [1, 1.2, 1],
+            opacity: reducedMotion ? 0.3 : [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 4,

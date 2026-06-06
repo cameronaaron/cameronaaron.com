@@ -3,22 +3,14 @@
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { projects } from '@/data/projects';
-import { sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
+import { buildProjectCollections } from '@/components/projects/logic';
 
 export default function Projects() {
-  const featuredProjects = sortByDateDesc(
-    projects.filter((project) => project.featured),
-    (project) => project.period
-  );
-  const otherProjects = sortByDateDesc(
-    projects.filter((project) => !project.featured),
-    (project) => project.period
-  );
+  const { featuredProjects, otherProjects, researchSignals } = buildProjectCollections(projects);
   const prefersReducedMotion = useReducedMotion();
-  const researchSignals = Array.from(new Set(projects.flatMap((project) => project.tags))).slice(0, 10);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

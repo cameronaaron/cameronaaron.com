@@ -56,7 +56,7 @@ describe('targeted coverage gaps', () => {
     expect(nav.className).toContain('backdrop-blur-md');
 
     const homeLink = screen.getByRole('link', { name: 'Home' });
-    expect(homeLink.className).toContain('hover:text-primary');
+    expect(homeLink.className).toContain('hover:text-cyan-100');
   });
 
   it('covers structured-data fallback when dates are missing or invalid', async () => {

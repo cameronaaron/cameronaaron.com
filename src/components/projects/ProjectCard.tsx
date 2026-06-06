@@ -5,33 +5,19 @@ import { useState } from 'react';
 import type { Project } from '@/data/projects';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { calculateCardTiltTargets, getProjectCardCta, getProjectReadingMinutes } from '@/components/projects/card-logic';
+
+export { calculateCardTiltTargets } from '@/components/projects/card-logic';
 
 interface ProjectCardProps {
   project: Project;
   index: number;
 }
 
-export function calculateCardTiltTargets(
-  rect: { left: number; top: number; width: number; height: number },
-  clientX: number,
-  clientY: number
-) {
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-
-  const percentX = (clientX - centerX) / (rect.width / 2);
-  const percentY = (clientY - centerY) / (rect.height / 2);
-
-  return {
-    x: 0.5 + percentX * 0.5,
-    y: 0.5 + percentY * 0.5,
-  };
-}
-
 export default function ProjectCard({ project, index }: ProjectCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const readingMinutes = Math.max(2, Math.ceil(project.description.length / 130));
+  const readingMinutes = getProjectReadingMinutes(project.description);
   
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
@@ -156,7 +142,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           transition={{ duration: 0.2 }}
         >
           {/* v8 ignore next */}
-          {project.cta ?? 'Read More'}
+          {getProjectCardCta(project.cta)}
           <motion.svg 
             className="w-4 h-4 ml-2" 
             fill="none" 

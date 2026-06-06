@@ -3,6 +3,13 @@
 import { motion } from 'framer-motion';
 import type { Testimonial } from '@/data/testimonials';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import {
+  getCompanyAriaLabel,
+  getOriginalPostAriaLabel,
+  getProfileAriaLabel,
+  getRelationshipMeta,
+  getTestimonialCardClass,
+} from '@/components/testimonials/card-logic';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -18,7 +25,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
       transition={{ delay: index * 0.1 }}
       className="h-full"
     >
-      <SpotlightCard className={`h-full p-6 ${testimonial.featured ? 'border-purple-500/30' : ''}`}>
+      <SpotlightCard className={getTestimonialCardClass(testimonial.featured)}>
         {/* Quote Icon */}
         <div className="text-purple-500 text-4xl mb-4 font-serif">"</div>
         
@@ -37,7 +44,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-cyan-300 transition-colors"
-                  aria-label={`Open ${testimonial.name}'s LinkedIn profile`}
+                  aria-label={getProfileAriaLabel(testimonial.name)}
                 >
                   {testimonial.name}
                 </a>
@@ -54,7 +61,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-purple-300 transition-colors"
-                    aria-label={`Open ${testimonial.company} website`}
+                    aria-label={getCompanyAriaLabel(testimonial.company)}
                   >
                     {testimonial.company}
                   </a>
@@ -64,7 +71,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">
-              {testimonial.relationship} • {testimonial.date}
+              {getRelationshipMeta(testimonial.relationship, testimonial.date)}
             </p>
             {testimonial.originalPostUrl ? (
               <p className="text-xs text-gray-500 mt-2">
@@ -73,7 +80,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-cyan-300 transition-colors"
-                  aria-label={`Open the original post for ${testimonial.name}`}
+                  aria-label={getOriginalPostAriaLabel(testimonial.name)}
                 >
                   Original post
                 </a>

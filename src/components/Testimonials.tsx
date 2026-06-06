@@ -3,52 +3,34 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { testimonials } from '@/data/testimonials';
-import { sortByDateDesc } from '@/data/dateOrdering';
 import SectionHeader from '@/components/ui/SectionHeader';
 import TestimonialCard from '@/components/testimonials/TestimonialCard';
 import SpotlightCard from '@/components/ui/SpotlightCard';
-
-type RelationshipFilter = 'all' | 'manager' | 'mentor' | 'colleague';
+import {
+  cycleSpotlightIndex,
+  filterTestimonialsByRelationship,
+  getFeaturedTestimonials,
+  getSpotlightTestimonial,
+  RELATIONSHIP_OPTIONS,
+  sortTestimonialsByDate,
+  type RelationshipFilter,
+} from '@/components/testimonials/logic';
 
 export default function Testimonials() {
   const [spotlightIndex, setSpotlightIndex] = useState(0);
   const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
-  const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
+  const sortedTestimonials = sortTestimonialsByDate(testimonials);
 
   // Featured testimonials drive the spotlight carousel.
-  const featuredTestimonials = sortedTestimonials.filter((testimonial) => testimonial.featured);
-  const spotlightTestimonial = featuredTestimonials[spotlightIndex] ?? featuredTestimonials[0];
+  const featuredTestimonials = getFeaturedTestimonials(sortedTestimonials);
+  const spotlightTestimonial = getSpotlightTestimonial(featuredTestimonials, spotlightIndex);
 
-  const visibleTestimonials = sortedTestimonials.filter((testimonial) => {
-    if (relationshipFilter === 'all') return true;
-
-    const relationship = testimonial.relationship.toLowerCase();
-
-    if (relationshipFilter === 'manager') {
-      return relationship.includes('manager');
-    }
-
-    if (relationshipFilter === 'mentor') {
-      return relationship.includes('mentor') || relationship.includes('professor');
-    }
-
-    return relationship.includes('colleague');
-  });
-
-  const relationshipOptions: Array<{ key: RelationshipFilter; label: string }> = [
-    { key: 'all', label: 'All Voices' },
-    { key: 'manager', label: 'Managers' },
-    { key: 'mentor', label: 'Mentors' },
-    { key: 'colleague', label: 'Colleagues' },
-  ];
+  const visibleTestimonials = filterTestimonialsByRelationship(sortedTestimonials, relationshipFilter);
 
   const cycleSpotlight = (direction: 1 | -1) => {
     if (featuredTestimonials.length === 0) return;
 
-    setSpotlightIndex((current) => {
-      const next = (current + direction + featuredTestimonials.length) % featuredTestimonials.length;
-      return next;
-    });
+    setSpotlightIndex((current) => cycleSpotlightIndex(current, direction, featuredTestimonials.length));
   };
 
   return (
@@ -130,7 +112,7 @@ export default function Testimonials() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="mx-auto mb-8 flex max-w-6xl flex-wrap items-center justify-center gap-2"
         >
-          {relationshipOptions.map((option) => {
+          {RELATIONSHIP_OPTIONS.map((option) => {
             const isActive = relationshipFilter === option.key;
 
             return (

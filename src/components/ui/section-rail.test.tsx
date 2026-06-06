@@ -73,7 +73,7 @@ describe('SectionRail', () => {
     const { container } = render(<SectionRail />);
     const first = container.querySelector(`[data-section-id="${RAIL_SECTIONS[0].id}"]`);
     expect(first?.getAttribute('data-active')).toBe('true');
-    expect(first?.getAttribute('aria-current')).toBe('true');
+    expect(first?.getAttribute('aria-current')).toBe('location');
   });
 
   it('switches active state when the intersection observer reports a different section', () => {
