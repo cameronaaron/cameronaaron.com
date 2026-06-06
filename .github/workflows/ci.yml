@@ -14,34 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  workflow-order-guard:
-    name: Enforce Deploy Ordering
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate deploy workflow trigger contract
-        run: |
-          set -euo pipefail
-
-          workflow_file=".github/workflows/deploy-production.yml"
-
-          grep -Eq '^\s*workflow_run:' "$workflow_file"
-          grep -Eq '^\s*workflows:\s*$|^\s*workflows:\s*\[\s*CI\s*\]' "$workflow_file"
-          grep -Eq '^\s*-\s*CI\s*$|^\s*workflows:\s*\[\s*CI\s*\]' "$workflow_file"
-          grep -Eq '^\s*-\s*completed\s*$|^\s*types:\s*\[\s*completed\s*\]' "$workflow_file"
-
-          if grep -Eq '^\s*push:\s*$' "$workflow_file"; then
-            echo "Direct push trigger detected in deploy workflow; deployment ordering is no longer enforced."
-            exit 1
-          fi
-
   modularization-guard:
     name: Modularization Guard
     runs-on: ubuntu-latest
-    needs: workflow-order-guard
 
     steps:
       - name: Checkout repository
@@ -63,7 +38,6 @@ jobs:
     name: Lint, Type Check, Build
     runs-on: ubuntu-latest
     needs:
-      - workflow-order-guard
       - modularization-guard
 
     steps:

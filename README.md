@@ -41,7 +41,6 @@ This check fails if required migration parity contracts drift:
 - host/canonical redirects in `public/_redirects`
 - security/cache/404 headers in `public/_headers`
 - Pages-first deploy script wiring in `package.json`
-- Pages deploy labels in `.github/workflows/deploy-production.yml`
 - no production worker deploy surface in `wrangler.toml`
 
 CI now runs this automatically before lint/typecheck/build.
@@ -82,7 +81,7 @@ Images go in `public/` as `.webp` files.
 
 ## 🚀 Deployment
 
-**Automatic:** Push to `master` → Live in 2 minutes via GitHub Actions
+**Automatic:** Push to `master` → Live via Cloudflare Pages Git integration
 
 **Manual (recommended):**
 
@@ -93,7 +92,6 @@ npm run deploy:prod       # Deploy to production
 
 **Requirements:**
 
-- GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 - Cloudflare Pages project: `cameronaaronsite`
 
 ### Pages Redirect Notes

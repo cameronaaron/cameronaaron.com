@@ -18,7 +18,6 @@ function assertMatches(content, checks, label, errors) {
 const redirects = read('public/_redirects');
 const headers = read('public/_headers');
 const pkgRaw = read('package.json');
-const workflow = read('.github/workflows/deploy-production.yml');
 const wrangler = read('wrangler.toml');
 
 const packageJson = JSON.parse(pkgRaw);
@@ -98,7 +97,7 @@ if (scripts['deploy:worker:prod'] !== undefined) {
   errors.push('package.json: deploy:worker:prod must not exist in a Pages-only deployment');
 }
 
-if (/wrangler\s+deploy\b/.test(pkgRaw) || /wrangler\s+deploy\b/.test(workflow)) {
+if (/wrangler\s+deploy\b/.test(pkgRaw)) {
   errors.push('Pages deployment contract must not reference wrangler deploy');
 }
 
@@ -108,14 +107,6 @@ if (/^\[env\.production\]$/m.test(wrangler) || /^routes\s*=\s*\[$/m.test(wrangle
 
 if (/public\/_worker\.js/.test(redirects) || /public\/_worker\.js/.test(headers)) {
   errors.push('Pages deployment contract must not reference public/_worker.js');
-}
-
-if (!/^\s*name:\s*Deploy to Cloudflare Pages \(Production\)\s*$/m.test(workflow)) {
-  errors.push('.github/workflows/deploy-production.yml: deploy job name must indicate Pages');
-}
-
-if (!/^\s*- name:\s*Deploy production pages site\s*$/m.test(workflow)) {
-  errors.push('.github/workflows/deploy-production.yml: deploy step label must indicate Pages');
 }
 
 if (errors.length > 0) {
