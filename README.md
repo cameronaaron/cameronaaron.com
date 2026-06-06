@@ -9,7 +9,7 @@ npm install
 npm run dev          # Development server
 npm run build        # Production build
 npm run lint         # ESLint checks
-npm run preview      # Test with Cloudflare Workers
+npm run preview      # Local preview with Wrangler
 ```
 
 ## ✅ Accessibility Automation
@@ -39,10 +39,10 @@ npm run test:pages:parity
 This check fails if required migration parity contracts drift:
 
 - host/canonical redirects in `public/_redirects`
-- host redirects and canonicalization edge logic in `public/_worker.js`
 - security/cache/404 headers in `public/_headers`
 - Pages-first deploy script wiring in `package.json`
 - Pages deploy labels in `.github/workflows/deploy-production.yml`
+- no production worker deploy surface in `wrangler.toml`
 
 CI now runs this automatically before lint/typecheck/build.
 
@@ -91,24 +91,20 @@ Images go in `public/` as `.webp` files.
 npm run deploy:prod       # Deploy to production
 ```
 
-Alternative worker deploy (KV-backed, subject to write limits):
-
-```bash
-npm run deploy:worker:prod
-```
-
 **Requirements:**
 
 - GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 - Cloudflare Pages project: `cameronaaronsite`
 
-### Worker Parity Notes (Pages Migration)
+### Pages Redirect Notes
 
-The previous Worker behavior has been mapped as follows:
+The production redirect behavior is enforced by `public/_redirects` and `public/_headers`:
 
-- `workshop.cameronaaron.com/* -> https://cameronaaron.com/` is enforced by `public/_worker.js`.
-- `www -> apex` canonical redirect is enforced by `public/_worker.js`.
-- `/index.html -> /` canonical redirect is enforced by `public/_worker.js` and backed by `public/_redirects`.
+- `https://www.cameronaaron.com/* -> https://cameronaaron.com/:splat`
+- `https://workshop.cameronaaron.com/* -> https://cameronaaron.com/`
+- `https://2eschool.org/* -> https://cameronaaron.com/`
+- `https://www.2eschool.org/* -> https://cameronaaron.com/`
+- `/index.html -> /`
 - Security headers are provided by `public/_headers` (including `X-Frame-Options: DENY`).
 
 Dashboard-level items that are not code-configured in this repo:
@@ -127,7 +123,7 @@ Dashboard-level items that are not code-configured in this repo:
    - `https://www.cameronaaron.com` returns 301 to apex
    - `https://workshop.cameronaaron.com` returns 301 to apex
    - missing route returns 404 with expected body
-6. Only after all probes pass, remove legacy Worker custom-domain and Worker route bindings.
+6. Only after all probes pass, confirm there are no legacy Worker custom-domain or Worker route bindings left.
 
 ## 📊 Performance
 

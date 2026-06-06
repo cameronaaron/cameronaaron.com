@@ -17,9 +17,9 @@ function assertMatches(content, checks, label, errors) {
 
 const redirects = read('public/_redirects');
 const headers = read('public/_headers');
-const worker = read('public/_worker.js');
 const pkgRaw = read('package.json');
 const workflow = read('.github/workflows/deploy-production.yml');
+const wrangler = read('wrangler.toml');
 
 const packageJson = JSON.parse(pkgRaw);
 const scripts = packageJson.scripts ?? {};
@@ -59,30 +59,6 @@ assertMatches(
 );
 
 assertMatches(
-  worker,
-  [
-    {
-      description: 'canonical host constant',
-      pattern: /const CANONICAL_HOST = 'cameronaaron\.com';/m,
-    },
-    {
-      description: 'www host redirect set',
-      pattern: /HOSTS_REDIRECT_WITH_PATH = new Set\(\['www\.cameronaaron\.com'\]\);/m,
-    },
-    {
-      description: 'workshop host redirect set',
-      pattern: /HOSTS_REDIRECT_TO_ROOT = new Set\(\[[^\]]*'workshop\.cameronaaron\.com'[^\]]*'2eschool\.org'[^\]]*'www\.2eschool\.org'[^\]]*\]\);/m,
-    },
-    {
-      description: 'index.html canonicalization in worker',
-      pattern: /if \(url\.pathname === '\/index\.html'\)/m,
-    },
-  ],
-  'public/_worker.js',
-  errors
-);
-
-assertMatches(
   headers,
   [
     {
@@ -116,6 +92,22 @@ if (scripts['deploy:prod'] !== 'npm run deploy:pages:prod') {
 
 if (typeof scripts['deploy:pages:prod'] !== 'string' || !scripts['deploy:pages:prod'].includes('wrangler pages deploy out')) {
   errors.push('package.json: deploy:pages:prod must run wrangler pages deploy out');
+}
+
+if (scripts['deploy:worker:prod'] !== undefined) {
+  errors.push('package.json: deploy:worker:prod must not exist in a Pages-only deployment');
+}
+
+if (/wrangler\s+deploy\b/.test(pkgRaw) || /wrangler\s+deploy\b/.test(workflow)) {
+  errors.push('Pages deployment contract must not reference wrangler deploy');
+}
+
+if (/^\[env\.production\]$/m.test(wrangler) || /^routes\s*=\s*\[$/m.test(wrangler)) {
+  errors.push('wrangler.toml: production worker route config must not exist in a Pages-only deployment');
+}
+
+if (/public\/_worker\.js/.test(redirects) || /public\/_worker\.js/.test(headers)) {
+  errors.push('Pages deployment contract must not reference public/_worker.js');
 }
 
 if (!/^\s*name:\s*Deploy to Cloudflare Pages \(Production\)\s*$/m.test(workflow)) {

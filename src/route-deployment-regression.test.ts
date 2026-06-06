@@ -27,11 +27,12 @@ describe('route deployment regression checks', () => {
     expect(redirects).toContain('/internet/ /internet.html 200');
   });
 
-  it('keeps the workshop subdomain on a zone route instead of a conflicting custom domain', () => {
+  it('does not ship a production worker deployment surface in a Pages-only setup', () => {
     const wranglerConfig = fs.readFileSync(path.join(repoRoot, 'wrangler.toml'), 'utf8');
 
-    expect(wranglerConfig).toContain('{ pattern = "workshop.cameronaaron.com/*", zone_name = "cameronaaron.com" }');
-    expect(wranglerConfig).not.toContain('{ pattern = "workshop.cameronaaron.com", custom_domain = true }');
+    expect(wranglerConfig).not.toContain('[env.production]');
+    expect(wranglerConfig).not.toContain('routes = [');
+    expect(fs.existsSync(path.join(repoRoot, 'public/_worker.js'))).toBe(false);
   });
 
   it('serves HTML 200 responses with a bfcache-safe Cache-Control (never no-store)', () => {

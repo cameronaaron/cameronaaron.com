@@ -8,7 +8,6 @@
     "preview": "wrangler dev",
     "deploy:prod": "npm run deploy:pages:prod",
     "deploy:pages:prod": "npm run build && wrangler pages deploy out --project-name cameronaaronsite --branch=master",
-    "deploy:worker:prod": "npm run build && wrangler deploy --env production",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",

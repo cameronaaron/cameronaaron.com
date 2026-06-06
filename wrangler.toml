@@ -7,13 +7,3 @@ preview_urls = true
 
 [site]
 bucket = "./out"
-
-[env.production]
-name = "cameronaaronsite-production"
-routes = [
-	{ pattern = "cameronaaron.com", custom_domain = true },
-	{ pattern = "www.cameronaaron.com", custom_domain = true },
-	{ pattern = "workshop.cameronaaron.com/*", zone_name = "cameronaaron.com" },
-	{ pattern = "2eschool.org/*", zone_name = "2eschool.org" },
-	{ pattern = "www.2eschool.org/*", zone_name = "2eschool.org" },
-]
