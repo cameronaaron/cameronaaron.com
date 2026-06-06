@@ -213,4 +213,77 @@ describe('ui coverage hardening', () => {
     delete (window as Window & { caches?: CacheStorage }).caches;
     process.env.NODE_ENV = originalNodeEnv;
   });
+
+  it('covers manifest guard and idle callback cleanup branches for service worker registration', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    window.sessionStorage.setItem('sw-cleanup-complete', 'true');
+
+    const originalRequestIdle = (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
+    const originalCancelIdle = (window as Window & { cancelIdleCallback?: unknown }).cancelIdleCallback;
+
+    const initialManifest = document.createElement('link');
+    initialManifest.rel = 'manifest';
+    initialManifest.href = '/manifest.json';
+    document.head.appendChild(initialManifest);
+
+    render(<ServiceWorkerRegistration />);
+    expect(document.querySelectorAll('link[rel="manifest"]').length).toBe(1);
+
+    document.head.removeChild(initialManifest);
+
+    const requestIdleSpy = vi.fn((callback: () => void) => {
+      void callback;
+      return 11;
+    });
+    const cancelIdleSpy = vi.fn();
+
+    Object.defineProperty(window, 'requestIdleCallback', {
+      configurable: true,
+      value: requestIdleSpy,
+    });
+
+    Object.defineProperty(window, 'cancelIdleCallback', {
+      configurable: true,
+      value: cancelIdleSpy,
+    });
+
+    const { unmount } = render(<ServiceWorkerRegistration />);
+    expect(requestIdleSpy).toHaveBeenCalledTimes(1);
+
+    const callback = requestIdleSpy.mock.calls[0]?.[0] as (() => void) | undefined;
+    expect(callback).toBeTruthy();
+
+    const callbackManifest = document.createElement('link');
+    callbackManifest.rel = 'manifest';
+    callbackManifest.href = '/manifest.json';
+    document.head.appendChild(callbackManifest);
+
+    callback?.();
+    expect(document.querySelectorAll('link[rel="manifest"]').length).toBe(1);
+
+    unmount();
+    expect(cancelIdleSpy).toHaveBeenCalledWith(11);
+
+    document.head.removeChild(callbackManifest);
+    process.env.NODE_ENV = originalNodeEnv;
+
+    if (typeof originalRequestIdle === 'undefined') {
+      delete (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
+    } else {
+      Object.defineProperty(window, 'requestIdleCallback', {
+        configurable: true,
+        value: originalRequestIdle,
+      });
+    }
+
+    if (typeof originalCancelIdle === 'undefined') {
+      delete (window as Window & { cancelIdleCallback?: unknown }).cancelIdleCallback;
+    } else {
+      Object.defineProperty(window, 'cancelIdleCallback', {
+        configurable: true,
+        value: originalCancelIdle,
+      });
+    }
+  });
 });
