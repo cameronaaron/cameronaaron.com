@@ -7,7 +7,7 @@ export const dynamic = 'force-static';
 const baseUrl = 'https://cameronaaron.com';
 const pageUrl = `${baseUrl}/capstone`;
 
-function toYouTubeEmbedUrl(url: string): string | undefined {
+export function toYouTubeEmbedUrl(url: string): string | undefined {
   const shortMatch = url.match(/^https?:\/\/youtu\.be\/([^?&/]+)/i);
   if (shortMatch?.[1]) {
     return `https://www.youtube.com/embed/${shortMatch[1]}`;
