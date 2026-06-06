@@ -124,6 +124,7 @@ next-env.d.ts
 
 # Local personal/reference artifacts (not part of deployed site)
 /Cameron_Aaron_Medical_Resume*.md
+/_local_archive/
 
 # DNS and Cloudflare one-off operational artifacts (not part of deployed site)
 2eschool.org.bind.zone
