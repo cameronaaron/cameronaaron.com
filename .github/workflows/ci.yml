@@ -34,6 +34,9 @@ jobs:
       - name: Run modularization and logic-module guard tests
         run: npm run test:modularization
 
+      - name: Run repository hygiene contract tests
+        run: npm run test:repo:hygiene
+
   quality-checks:
     name: Lint, Type Check, Build
     runs-on: ubuntu-latest

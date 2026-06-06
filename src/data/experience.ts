@@ -50,7 +50,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Dutchie",
-    logo: "/Dutchie.svg",
+    logo: "/dutchie.svg",
     websiteUrl: "https://dutchie.com/",
     positions: [
       {

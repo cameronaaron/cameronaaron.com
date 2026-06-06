@@ -94,5 +94,8 @@ describe('module testability contract', () => {
     expect(modularizationScript).toContain('src/modularization-contract.test.ts');
     expect(modularizationScript).toContain('src/module-testability-contract.test.ts');
     expect(modularizationScript).toContain('floating-badge-icon.test.tsx');
+
+    const repoHygieneScript = packageJson.scripts?.['test:repo:hygiene'] ?? '';
+    expect(repoHygieneScript).toContain('src/repo-hygiene-contract.test.ts');
   });
 });
