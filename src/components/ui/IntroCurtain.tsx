@@ -19,26 +19,28 @@ const useIsomorphicLayoutEffect =
 
 export default function IntroCurtain({ holdMs = 520 }: IntroCurtainProps = {}) {
   const prefersReducedMotion = useReducedMotion();
+  const reducedMotion = Boolean(prefersReducedMotion);
   // Initial state MUST match SSR (true) — collapsed synchronously below if skipping.
   const [visible, setVisible] = useState(true);
 
   useIsomorphicLayoutEffect(() => {
-    if (prefersReducedMotion || shouldSkipInitialCurtain()) {
+    if (shouldSkipInitialCurtain()) {
       setVisible(false);
     }
-  }, [prefersReducedMotion]);
+  }, []);
 
   useEffect(() => {
     if (!visible) {
       markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
       return;
     }
+    const effectiveHoldMs = reducedMotion ? Math.min(holdMs, 220) : holdMs;
     const timer = window.setTimeout(() => {
       setVisible(false);
       markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
-    }, holdMs);
+    }, effectiveHoldMs);
     return () => window.clearTimeout(timer);
-  }, [holdMs, visible]);
+  }, [holdMs, reducedMotion, visible]);
 
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
@@ -61,7 +63,7 @@ export default function IntroCurtain({ holdMs = 520 }: IntroCurtainProps = {}) {
           className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center bg-background"
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.55, ease: 'easeInOut' } }}
+          exit={{ opacity: 0, transition: { duration: reducedMotion ? 0 : 0.55, ease: 'easeInOut' } }}
         >
           <motion.div
             className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(103,232,249,0.22),transparent_55%),radial-gradient(circle_at_70%_30%,rgba(139,92,246,0.18),transparent_60%)]"

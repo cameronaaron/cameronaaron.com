@@ -128,12 +128,15 @@ describe('IntroCurtain', () => {
     if (original) Object.defineProperty(window, 'sessionStorage', original);
   });
 
-  it('skips the reveal entirely when prefers-reduced-motion is set', async () => {
+  it('still shows once with reduced motion, then dismisses quickly', async () => {
     mockNavigationType('navigate');
     const fm = await import('framer-motion');
     const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
 
     render(<IntroCurtain holdMs={300} />);
+    expect(screen.getByTestId('intro-curtain')).toBeTruthy();
+
+    act(() => vi.advanceTimersByTime(230));
     expect(screen.queryByTestId('intro-curtain')).toBeNull();
 
     spy.mockRestore();

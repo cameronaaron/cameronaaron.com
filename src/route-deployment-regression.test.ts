@@ -15,16 +15,18 @@ describe('route deployment regression checks', () => {
     expect(fs.existsSync(path.join(repoRoot, 'src/app/internet.html/page.tsx'))).toBe(false);
   });
 
-  it('keeps extensionless Cloudflare rewrites for key exported pages', () => {
+  it('uses loop-safe legacy .html redirects without extensionless self-rewrites', () => {
     const redirectsPath = path.join(repoRoot, 'public/_redirects');
     const redirects = fs.readFileSync(redirectsPath, 'utf8');
 
-    expect(redirects).toContain('/capstone /capstone.html 200');
-    expect(redirects).toContain('/capstone/ /capstone.html 200');
-    expect(redirects).toContain('/credentials /credentials.html 200');
-    expect(redirects).toContain('/credentials/ /credentials.html 200');
-    expect(redirects).toContain('/internet /internet.html 200');
-    expect(redirects).toContain('/internet/ /internet.html 200');
+    expect(redirects).toContain('/capstone.html /capstone 301');
+    expect(redirects).toContain('/credentials.html /credentials 301');
+    expect(redirects).toContain('/internet.html /internet 301');
+
+    // Guard against rewrite loops like /route -> /route.html 200 combined with /route.html -> /route 301.
+    expect(redirects).not.toContain('/capstone /capstone.html 200');
+    expect(redirects).not.toContain('/credentials /credentials.html 200');
+    expect(redirects).not.toContain('/internet /internet.html 200');
   });
 
   it('does not ship a production worker deployment surface in a Pages-only setup', () => {
