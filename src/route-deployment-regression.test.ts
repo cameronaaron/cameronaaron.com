@@ -29,6 +29,55 @@ describe('route deployment regression checks', () => {
     expect(redirects).not.toContain('/internet /internet.html 200');
   });
 
+  it('prevents rewrite/redirect cycles for extensionless and .html route pairs', () => {
+    const redirectsPath = path.join(repoRoot, 'public/_redirects');
+    const redirects = fs.readFileSync(redirectsPath, 'utf8');
+
+    const routeRules = redirects
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#') && line.startsWith('/'))
+      .map((line) => {
+        const [from, to, status] = line.split(/\s+/);
+        return { from, to, status };
+      })
+      .filter((rule) => rule.from && rule.to && rule.status);
+
+    const rewriteToHtml = new Set(
+      routeRules
+        .filter((rule) => rule.status === '200' && /\.html$/.test(rule.to) && !/\.html$/.test(rule.from))
+        .map((rule) => `${rule.from}=>${rule.to}`)
+    );
+
+    const redirectFromHtml = new Set(
+      routeRules
+        .filter((rule) => /^30[1278]$/.test(rule.status) && /\.html$/.test(rule.from) && !/\.html$/.test(rule.to))
+        .map((rule) => `${rule.from}=>${rule.to}`)
+    );
+
+    const loops: string[] = [];
+    for (const rewrite of rewriteToHtml) {
+      const [from, to] = rewrite.split('=>');
+      const reverseKey = `${to}=>${from}`;
+      if (redirectFromHtml.has(reverseKey)) {
+        loops.push(`${from} <-> ${to}`);
+      }
+    }
+
+    expect(loops).toEqual([]);
+  });
+
+  it('does not include a GitHub deploy workflow that requires Cloudflare secrets', () => {
+    const deployWorkflowPath = path.join(repoRoot, '.github/workflows/deploy-production.yml');
+    expect(fs.existsSync(deployWorkflowPath)).toBe(false);
+
+    const ciWorkflow = fs.readFileSync(path.join(repoRoot, '.github/workflows/ci.yml'), 'utf8');
+    expect(ciWorkflow).not.toContain('workflow-order-guard');
+    expect(ciWorkflow).not.toContain('deploy-production.yml');
+    expect(ciWorkflow).not.toContain('CLOUDFLARE_API_TOKEN');
+    expect(ciWorkflow).not.toContain('CLOUDFLARE_ACCOUNT_ID');
+  });
+
   it('does not ship a production worker deployment surface in a Pages-only setup', () => {
     const wranglerConfig = fs.readFileSync(path.join(repoRoot, 'wrangler.toml'), 'utf8');
 

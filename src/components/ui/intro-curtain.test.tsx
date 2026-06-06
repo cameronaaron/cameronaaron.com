@@ -142,6 +142,35 @@ describe('IntroCurtain', () => {
     spy.mockRestore();
   });
 
+  it('keeps reduced-motion hold bounded when a long hold is provided', async () => {
+    mockNavigationType('navigate');
+    const fm = await import('framer-motion');
+    const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
+
+    render(<IntroCurtain holdMs={5000} />);
+    expect(screen.getByTestId('intro-curtain')).toBeTruthy();
+
+    act(() => vi.advanceTimersByTime(219));
+    expect(screen.queryByTestId('intro-curtain')).toBeTruthy();
+
+    act(() => vi.advanceTimersByTime(2));
+    expect(screen.queryByTestId('intro-curtain')).toBeNull();
+
+    spy.mockRestore();
+  });
+
+  it('still skips immediately for returning sessions even with reduced motion', async () => {
+    mockNavigationType('navigate');
+    window.sessionStorage.setItem(STORAGE_KEY, '1');
+    const fm = await import('framer-motion');
+    const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
+
+    render(<IntroCurtain holdMs={300} />);
+    expect(screen.queryByTestId('intro-curtain')).toBeNull();
+
+    spy.mockRestore();
+  });
+
   it('does not throw when the curtain receives a click before exiting', () => {
     mockNavigationType('navigate');
     render(<IntroCurtain holdMs={300} />);

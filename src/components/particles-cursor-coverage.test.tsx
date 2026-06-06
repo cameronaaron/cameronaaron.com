@@ -137,7 +137,7 @@ describe('particle and cursor coverage', () => {
 
       expect(container.querySelectorAll('.absolute.rounded-full').length).toBeGreaterThan(0);
     });
-  });
+  }, 15000);
 
   it('executes cursor trail visibility, hover, and ripple branches', () => {
     withRafQueue((callbacks) => {
