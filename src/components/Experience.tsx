@@ -107,7 +107,6 @@ export default function Experience() {
         </motion.div>
 
         <div className="max-w-5xl mx-auto relative">
-          {/* Timeline Line */}
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
             <motion.div 
               style={{ scaleY, transformOrigin: "top" }}
@@ -153,8 +152,7 @@ export default function Experience() {
                 }}
                 className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
               >
-                
-                {/* Timeline Dot */}
+
                 <motion.div
                   className="absolute left-8 md:left-1/2 z-20 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-background md:block"
                   animate={
@@ -173,7 +171,6 @@ export default function Experience() {
                   transition={isLiteMotion ? { duration: 0.2, ease: 'easeOut' } : { type: 'spring', stiffness: 280, damping: 22 }}
                 />
 
-                {/* Content */}
                 <div
                   className="w-full pl-20 md:w-[calc(50%-2rem)] md:pl-0"
                   onMouseEnter={() => setActiveExperienceIndex(index)}

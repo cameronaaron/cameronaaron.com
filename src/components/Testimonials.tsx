@@ -21,7 +21,6 @@ export default function Testimonials() {
   const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
   const sortedTestimonials = sortTestimonialsByDate(testimonials);
 
-  // Featured testimonials drive the spotlight carousel.
   const featuredTestimonials = getFeaturedTestimonials(sortedTestimonials);
   const spotlightTestimonial = getSpotlightTestimonial(featuredTestimonials, spotlightIndex);
 
@@ -35,7 +34,6 @@ export default function Testimonials() {
 
   return (
     <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
@@ -135,7 +133,6 @@ export default function Testimonials() {
           })}
         </motion.div>
 
-        {/* Testimonials Grid */}
         <motion.div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
           <AnimatePresence mode="popLayout">
             {visibleTestimonials.length === 0 ? (

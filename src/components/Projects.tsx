@@ -23,7 +23,6 @@ export default function Projects() {
 
   return (
     <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
-      {/* Background Elements with Parallax */}
       <motion.div 
         style={{ y: backgroundY, rotate }}
         className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" 
@@ -90,7 +89,6 @@ export default function Projects() {
           </motion.div>
         </div>
 
-        {/* Featured Projects */}
         <motion.div 
           className="space-y-20 mb-20"
           initial="hidden"
@@ -121,7 +119,6 @@ export default function Projects() {
           ))}
         </motion.div>
 
-        {/* Other Projects Grid */}
         <motion.div 
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
           initial="hidden"

@@ -23,8 +23,7 @@ export default function Hero() {
   const { x: mouseX, y: mouseY } = useMousePosition();
   const rawPointerX = useMotionValue(0);
   const rawPointerY = useMotionValue(0);
-  
-  // Parallax transformations
+
   const yParallax = useTransform(scrollY, [0, 500], [0, parallaxDepth]);
   const opacityFade = useTransform(scrollY, [0, 300], [1, 0]);
   const scaleDown = useTransform(scrollY, [0, 500], [1, scaleFloor]);
@@ -74,7 +73,6 @@ export default function Hero() {
         />
       ) : null}
 
-      {/* Ambient Background Glow with parallax */}
       <motion.div 
         className="absolute inset-0 bg-hero-glow opacity-40" 
         style={shouldUseParallax ? { y: yParallax, opacity: opacityFade } : { opacity: 0.32 }}
@@ -99,7 +97,6 @@ export default function Hero() {
         style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Text Content */}
           <motion.div
             initial={false}
             animate={{ opacity: 1, x: 0 }}
@@ -195,7 +192,6 @@ export default function Hero() {
               ))}
             </motion.div>
 
-            {/* Stats with hover effects */}
             <motion.div
               initial={false}
               animate={{ opacity: 1, y: 0 }}
@@ -216,7 +212,6 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Image with parallax */}
           <motion.div 
             className="relative"
             style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}

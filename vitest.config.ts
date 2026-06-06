@@ -19,8 +19,6 @@ export default defineConfig({
       exclude: [
         'src/**/*.d.ts',
         'src/**/*.test.{ts,tsx,js,jsx}',
-        // Presentation-heavy and animation-driven modules are protected by
-        // contract/component tests, but excluded from strict deterministic coverage.
         'src/app/capstone/page.tsx',
         'src/app/credentials/page.tsx',
         'src/app/internet/page.tsx',

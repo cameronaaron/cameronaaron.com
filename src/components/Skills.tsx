@@ -32,7 +32,6 @@ export default function Skills() {
 
   return (
     <section id="skills" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
-      {/* Background decoration with parallax */}
       <motion.div 
         style={{ y, opacity }}
         className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-purple-900/10 to-transparent pointer-events-none" 
@@ -125,7 +124,6 @@ export default function Skills() {
             },
           }}
         >
-          {/* Technical Skills */}
           <motion.div
             variants={{
               hidden: { opacity: 0, x: isLiteMotion ? 0 : -36, y: entryYOffset },
@@ -175,7 +173,6 @@ export default function Skills() {
             </div>
           </motion.div>
 
-          {/* Domain Expertise */}
           <motion.div
             variants={{
               hidden: { opacity: 0, x: isLiteMotion ? 0 : 36, y: entryYOffset },
@@ -216,7 +213,6 @@ export default function Skills() {
               ))}
             </div>
 
-            {/* Certifications */}
             <motion.h3 
               className="text-2xl font-bold mt-12 mb-6 text-white"
               initial={{ opacity: 0, y: -20 }}
