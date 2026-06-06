@@ -1,5 +1,5 @@
 const CANONICAL_HOST = 'cameronaaron.com';
-const HOSTS_REDIRECT_TO_ROOT = new Set(['workshop.cameronaaron.com']);
+const HOSTS_REDIRECT_TO_ROOT = new Set(['workshop.cameronaaron.com', '2eschool.org', 'www.2eschool.org']);
 const HOSTS_REDIRECT_WITH_PATH = new Set(['www.cameronaaron.com']);
 
 let cachedManifestKeys;

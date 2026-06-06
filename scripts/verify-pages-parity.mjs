@@ -38,6 +38,14 @@ assertMatches(
       pattern: /^https:\/\/workshop\.cameronaaron\.com\/\*\s+https:\/\/cameronaaron\.com\/\s+301$/m,
     },
     {
+      description: '2eschool host redirect rule',
+      pattern: /^https:\/\/2eschool\.org\/\*\s+https:\/\/cameronaaron\.com\/\s+301$/m,
+    },
+    {
+      description: 'www 2eschool host redirect rule',
+      pattern: /^https:\/\/www\.2eschool\.org\/\*\s+https:\/\/cameronaaron\.com\/\s+301$/m,
+    },
+    {
       description: 'index canonicalization rule',
       pattern: /^\/index\.html\s+\/\s+301$/m,
     },
@@ -63,7 +71,7 @@ assertMatches(
     },
     {
       description: 'workshop host redirect set',
-      pattern: /HOSTS_REDIRECT_TO_ROOT = new Set\(\['workshop\.cameronaaron\.com'\]\);/m,
+      pattern: /HOSTS_REDIRECT_TO_ROOT = new Set\(\[[^\]]*'workshop\.cameronaaron\.com'[^\]]*'2eschool\.org'[^\]]*'www\.2eschool\.org'[^\]]*\]\);/m,
     },
     {
       description: 'index.html canonicalization in worker',

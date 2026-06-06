@@ -8,6 +8,12 @@ https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 https://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
 http://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
 
+# Legacy 2eschool host redirect
+https://2eschool.org/* https://cameronaaron.com/ 301
+http://2eschool.org/* https://cameronaaron.com/ 301
+https://www.2eschool.org/* https://cameronaaron.com/ 301
+http://www.2eschool.org/* https://cameronaaron.com/ 301
+
 # Force HTTPS (Cloudflare handles this automatically, but can be explicit)
 http://cameronaaron.com/* https://cameronaaron.com/:splat 301
 http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
