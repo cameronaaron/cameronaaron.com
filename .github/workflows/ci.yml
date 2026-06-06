@@ -71,6 +71,9 @@ jobs:
       - name: Run production build
         run: npm run build
 
+      - name: Run static performance budget contracts
+        run: npm run test:performance:contracts
+
       - name: Run SEO integrity checks
         run: npm run seo:check
 

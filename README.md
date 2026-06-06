@@ -45,6 +45,16 @@ This check fails if required migration parity contracts drift:
 
 CI now runs this automatically before lint/typecheck/build.
 
+## ✅ Performance Testing
+
+```bash
+npm run test:performance:contracts   # Static output budget checks (HTML/JS/CSS/images)
+npm run test:performance             # Build + budget checks + Lighthouse CI assertions
+```
+
+`test:performance:contracts` validates deterministic build-time budgets from `out/`.
+Lighthouse assertions remain active in CI for runtime UX metrics (FCP, LCP, CLS, TBT, Speed Index, and Interactivity).
+
 ## 📁 Project Structure
 
 ```text

@@ -13,6 +13,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:repo:hygiene": "vitest run src/repo-hygiene-contract.test.ts",
+    "test:performance:contracts": "node scripts/performance-budgets.mjs",
+    "test:performance": "npm run build && npm run test:performance:contracts && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "test:modularization": "sh -c 'vitest run src/modularization-contract.test.ts src/module-testability-contract.test.ts $(find src/components -type f \\( -name logic.test.ts -o -name \\*-logic.test.ts -o -name engine.test.ts -o -name builders.test.ts \\) | sort) src/components/projects/FeaturedIcon.test.tsx src/components/contact/SocialPlatformIcon.test.tsx src/components/ui/brain-cursor.test.tsx src/components/ui/floating-badge-icon.test.tsx src/components/ui/section-transitions.test.tsx'",
     "test:coverage": "vitest run --coverage",
     "test:a11y:contracts": "vitest run src/app/wcag-contract.test.tsx src/app/a11y-regressions.test.tsx src/components/sections-a11y.test.tsx src/components/navigation-a11y.test.tsx src/components/faq-a11y.test.tsx src/components/ui/keyboard-shortcuts.test.tsx",
