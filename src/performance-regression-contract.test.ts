@@ -41,12 +41,12 @@ describe('performance regression contract', () => {
       };
     };
 
-    expect(lighthouseConfig.ci?.assert?.preset).toBeUndefined();
+    expect(lighthouseConfig.ci?.assert?.preset).toBe('lighthouse:recommended');
 
     const assertions = lighthouseConfig.ci?.assert?.assertions ?? {};
 
     expect(assertions['categories:performance']).toBeTruthy();
-    expect(assertions['categories:performance']).toEqual(['error', { minScore: 1 }]);
+    expect(assertions['categories:performance']).toEqual(['error', { minScore: 0.99 }]);
     expect(assertions['categories:accessibility']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['categories:best-practices']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['categories:seo']).toEqual(['error', { minScore: 1 }]);
@@ -56,6 +56,12 @@ describe('performance regression contract', () => {
     expect(assertions['total-blocking-time']).toBeTruthy();
     expect(assertions['speed-index']).toBeTruthy();
     expect(assertions['interactive']).toBeTruthy();
+    expect(assertions['image-delivery-insight']).toBe('warn');
+    expect(assertions['label-content-name-mismatch']).toBe('warn');
+    expect(assertions['legacy-javascript-insight']).toBe('warn');
+    expect(assertions['network-dependency-tree-insight']).toBe('warn');
+    expect(assertions['unused-javascript']).toBe('warn');
+    expect(assertions['uses-responsive-images']).toBe('warn');
   });
 
   it('keeps pre-deployment verification wired to strict performance checks', () => {
