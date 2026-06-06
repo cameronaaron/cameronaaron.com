@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const SOURCE = 'public/profile.webp';
+const BRIDGES_SOURCE = 'public/ba.webp';
 const OUTPUT_DIR = 'public';
 const BRAND = {
   name: 'Cameron Aaron',
@@ -93,6 +94,29 @@ async function generateIcons() {
         .toFile(outputPath);
       
       console.log(`Generated ${name} (${size}x${size})`);
+    }
+
+    await sharp(sourceBuffer)
+      .resize(384, 384, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .webp({ quality: 86 })
+      .toFile(join(OUTPUT_DIR, 'profile-hero.webp'));
+    console.log('Generated profile-hero.webp (384x384)');
+
+    try {
+      const bridgesBuffer = readFileSync(BRIDGES_SOURCE);
+      await sharp(bridgesBuffer)
+        .resize(64, 64, {
+          fit: 'contain',
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        })
+        .webp({ quality: 92 })
+        .toFile(join(OUTPUT_DIR, 'ba-logo.webp'));
+      console.log('Generated ba-logo.webp (64x64)');
+    } catch {
+      console.warn('Skipped ba-logo.webp generation (source not found)');
     }
 
     const socialAssets = [

@@ -14,7 +14,7 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     company: "Bridges Academy",
-    logo: "/ba.webp",
+    logo: "/ba-logo.webp",
     websiteUrl: "https://bridges.edu/",
     positions: [
       {

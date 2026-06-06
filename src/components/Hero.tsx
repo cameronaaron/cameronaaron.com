@@ -232,7 +232,7 @@ export default function Hero() {
                  ))}
                </>
              ) : null}
-             <ProfileImage src={profile.image} alt={profile.name} />
+             <ProfileImage src="/profile-hero.webp" alt={profile.name} />
           </motion.div>
         </div>
       </motion.div>

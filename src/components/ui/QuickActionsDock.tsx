@@ -59,7 +59,7 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-black/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 shadow-lg shadow-cyan-500/20 backdrop-blur-md"
           aria-expanded={open}
           aria-controls={open ? 'quick-actions-menu' : undefined}
-          aria-label="Toggle quick actions"
+          aria-label="Explore quick actions"
         >
           <motion.span
             animate={open && !reduced ? { rotate: 45 } : { rotate: 0 }}

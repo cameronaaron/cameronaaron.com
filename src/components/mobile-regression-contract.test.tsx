@@ -75,7 +75,7 @@ describe('mobile regression contract', () => {
     expect(dock.className).toContain('right-5');
     expect(dock.className).toContain('sm:bottom-6');
 
-    fireEvent.click(screen.getByRole('button', { name: /toggle quick actions/i }));
+    fireEvent.click(screen.getByRole('button', { name: /explore quick actions/i }));
     expect(screen.getByRole('link', { name: /credentials/i })).toBeTruthy();
   });
 

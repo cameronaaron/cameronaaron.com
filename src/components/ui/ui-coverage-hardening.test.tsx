@@ -24,7 +24,7 @@ describe('ui coverage hardening', () => {
   it('covers quick-actions dock open/close interactions in full and reduced modes', () => {
     const { rerender } = render(<QuickActionsDock performanceTier="full" />);
 
-    const toggle = screen.getByRole('button', { name: 'Toggle quick actions' });
+    const toggle = screen.getByRole('button', { name: 'Explore quick actions' });
     fireEvent.click(toggle);
     expect(screen.getByRole('link', { name: 'Credentials' })).toBeTruthy();
 
@@ -32,7 +32,7 @@ describe('ui coverage hardening', () => {
     expect(screen.queryByRole('link', { name: 'Credentials' })).toBeNull();
 
     rerender(<QuickActionsDock performanceTier="reduced" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Toggle quick actions' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Explore quick actions' }));
     expect(screen.getByRole('link', { name: 'Experience' })).toBeTruthy();
   });
 
