@@ -100,6 +100,8 @@ Images go in `public/` as `.webp` files.
 npm run deploy:prod       # Deploy to production
 ```
 
+Deployment is now blocked unless strict Lighthouse/performance checks pass (100 category scores + metric assertions via `test:performance`).
+
 **Requirements:**
 
 - Cloudflare Pages project: `cameronaaronsite`

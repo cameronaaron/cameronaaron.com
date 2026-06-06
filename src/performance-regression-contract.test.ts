@@ -19,6 +19,7 @@ describe('performance regression contract', () => {
     expect(scripts['test:performance']).toContain('npm run build');
     expect(scripts['test:performance']).toContain('npm run test:performance:contracts');
     expect(scripts['test:performance']).toContain('@lhci/cli');
+    expect(scripts['deploy:pages:prod']).toContain('npm run test:performance');
   });
 
   it('keeps CI performance checks in both build contracts and lighthouse assertions', () => {
@@ -42,11 +43,21 @@ describe('performance regression contract', () => {
     const assertions = lighthouseConfig.ci?.assert?.assertions ?? {};
 
     expect(assertions['categories:performance']).toBeTruthy();
+    expect(assertions['categories:performance']).toEqual(['error', { minScore: 1 }]);
+    expect(assertions['categories:accessibility']).toEqual(['error', { minScore: 1 }]);
+    expect(assertions['categories:best-practices']).toEqual(['error', { minScore: 1 }]);
+    expect(assertions['categories:seo']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['first-contentful-paint']).toBeTruthy();
     expect(assertions['largest-contentful-paint']).toBeTruthy();
     expect(assertions['cumulative-layout-shift']).toBeTruthy();
     expect(assertions['total-blocking-time']).toBeTruthy();
     expect(assertions['speed-index']).toBeTruthy();
     expect(assertions['interactive']).toBeTruthy();
+  });
+
+  it('keeps pre-deployment verification wired to strict performance checks', () => {
+    const verifyScript = read('verify-deployment.sh');
+
+    expect(verifyScript).toContain('npm run test:performance');
   });
 });

@@ -31,13 +31,13 @@ else
     npm install --legacy-peer-deps
 fi
 
-# Check 3: Build test
-echo -n "✓ Testing production build... "
-if npm run build > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Build successful${NC}"
+# Check 3: Strict Lighthouse + performance gate
+echo -n "✓ Running strict Lighthouse/performance gate... "
+if npm run test:performance > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ Passed${NC}"
 else
-    echo -e "${RED}✗ Build failed${NC}"
-    echo "Run 'npm run build' to see errors"
+    echo -e "${RED}✗ Failed${NC}"
+    echo "Run 'npm run test:performance' to see errors"
     exit 1
 fi
 

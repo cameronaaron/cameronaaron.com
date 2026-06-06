@@ -7,7 +7,7 @@
     "build": "next build",
     "preview": "wrangler dev",
     "deploy:prod": "npm run deploy:pages:prod",
-    "deploy:pages:prod": "npm run build && wrangler pages deploy out --project-name cameronaaronsite --branch=master",
+    "deploy:pages:prod": "npm run test:performance && wrangler pages deploy out --project-name cameronaaronsite --branch=master",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
