@@ -35,10 +35,13 @@ describe('performance regression contract', () => {
     const lighthouseConfig = JSON.parse(read('lighthouserc.json')) as {
       ci?: {
         assert?: {
+          preset?: string;
           assertions?: Record<string, unknown>;
         };
       };
     };
+
+    expect(lighthouseConfig.ci?.assert?.preset).toBeUndefined();
 
     const assertions = lighthouseConfig.ci?.assert?.assertions ?? {};
 
