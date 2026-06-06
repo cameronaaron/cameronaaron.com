@@ -21,9 +21,7 @@ http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 # Canonicalize /index.html to /
 /index.html / 301
 
-# Static export rewrite required by parity contract
-/capstone /capstone.html 200
-
 # Legacy route compatibility
+/capstone.html /capstone 301
 /credentials.html /credentials 301
 /internet.html /internet 301

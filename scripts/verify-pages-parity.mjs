@@ -50,8 +50,8 @@ assertMatches(
       pattern: /^\/index\.html\s+\/\s+301$/m,
     },
     {
-      description: 'extensionless capstone rewrite',
-      pattern: /^\/capstone\s+\/capstone\.html\s+200$/m,
+      description: 'legacy capstone html redirect rule',
+      pattern: /^\/capstone\.html\s+\/capstone\s+301$/m,
     },
   ],
   'public/_redirects',
