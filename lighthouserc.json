@@ -2,8 +2,8 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "npm run build && npx serve -s out -l 3000",
-      "startServerReadyPattern": "Accepting connections",
+      "startServerCommand": "npx wrangler pages dev out --port 3000 --ip 127.0.0.1",
+      "startServerReadyPattern": "Ready on http://127.0.0.1:3000",
       "url": [
         "http://localhost:3000"
       ],

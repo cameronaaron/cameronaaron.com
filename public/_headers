@@ -41,7 +41,7 @@
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
   Link: </icon-192x192.png>; rel=preload; as=image; type=image/png
-  Link: </profile.webp>; rel=preload; as=image; type=image/webp
+  Link: </profile-hero.webp>; rel=preload; as=image; type=image/webp
 
 # Manifest with proper caching
 /manifest.json

@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { motion, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useEffect } from 'react';
 import { profile } from '@/data/profile';
@@ -8,13 +9,14 @@ import StatCard from '@/components/ui/StatCard';
 import TextReveal from '@/components/ui/TextReveal';
 import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
-import BackgroundParticles from '@/components/hero/BackgroundParticles';
-import InteractiveParticles from '@/components/hero/InteractiveParticles';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
+
+const BackgroundParticles = dynamic(() => import('@/components/hero/BackgroundParticles'), { ssr: false });
+const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), { ssr: false });
 
 export default function Hero() {
   const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();

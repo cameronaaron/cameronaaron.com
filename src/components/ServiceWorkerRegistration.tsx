@@ -4,6 +4,42 @@ import { useEffect } from 'react';
 
 export default function ServiceWorkerRegistration() {
   useEffect(() => {
+    if (typeof window === 'undefined' || process.env.NODE_ENV !== 'production') {
+      return;
+    }
+
+    if (document.querySelector('link[rel="manifest"]')) {
+      return;
+    }
+
+    const appendManifestLink = () => {
+      if (document.querySelector('link[rel="manifest"]')) {
+        return;
+      }
+
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = '/manifest.json';
+      document.head.appendChild(link);
+    };
+
+    const requestIdle = window.requestIdleCallback;
+    const cancelIdle = window.cancelIdleCallback;
+
+    if (typeof requestIdle === 'function') {
+      const idleId = requestIdle(appendManifestLink, { timeout: 3000 });
+      return () => {
+        if (typeof cancelIdle === 'function') {
+          cancelIdle(idleId);
+        }
+      };
+    }
+
+    const timeoutId = setTimeout(appendManifestLink, 1200);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
     if (
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&

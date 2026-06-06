@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
@@ -9,13 +9,6 @@ import IframeTitleGuard from "@/components/ui/IframeTitleGuard";
 const manrope = Manrope({ 
   subsets: ["latin"],
   display: 'swap',
-  preload: true,
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: 'swap',
-  variable: '--font-display',
   preload: true,
 });
 
@@ -117,7 +110,6 @@ export const metadata: Metadata = {
       'application/rss+xml': 'https://cameronaaron.com/feed.xml',
     },
   },
-  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/icon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -229,15 +221,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* DNS Prefetch and Preconnect for performance */}
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* Critical resource preload */}
-        <link rel="preload" href="/profile.webp" as="image" type="image/webp" fetchPriority="high" />
         <link rel="prefetch" href="/icon-192x192.png" />
-        
+
         {/* PWA Configuration */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -245,7 +230,7 @@ export default function RootLayout({
         
         <StructuredData />
       </head>
-      <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <body className={manrope.className} suppressHydrationWarning>
         <SmoothScroll />
         <ServiceWorkerRegistration />
         <IframeTitleGuard />

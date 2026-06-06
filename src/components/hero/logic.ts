@@ -22,11 +22,11 @@ export const HERO_FLOATING_BADGES: HeroFloatingBadge[] = [
 ];
 
 export function getHeroMotionConfig(performanceTier: PerformanceTier): HeroMotionConfig {
-  const shouldUseParallax = performanceTier === 'full' || performanceTier === 'balanced';
+  const shouldUseParallax = performanceTier === 'full';
 
   return {
     shouldUseParallax,
-    showFloatingBadges: shouldUseParallax,
+    showFloatingBadges: performanceTier === 'full',
     parallaxDepth: performanceTier === 'full' ? 150 : performanceTier === 'balanced' ? 100 : 45,
     scaleFloor: performanceTier === 'full' ? 0.8 : performanceTier === 'balanced' ? 0.88 : 0.94,
   };

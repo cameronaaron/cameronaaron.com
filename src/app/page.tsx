@@ -1,6 +1,8 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import Certifications from '@/components/Certifications';
@@ -10,21 +12,44 @@ import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
 import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
-import AmbientBackground from '@/components/ui/AmbientBackground';
-import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import BackToTop from '@/components/ui/BackToTop';
-import IntroCurtain from '@/components/ui/IntroCurtain';
-import SectionRail from '@/components/ui/SectionRail';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+const AmbientBackground = dynamic(() => import('@/components/ui/AmbientBackground'), { ssr: false });
+const QuickActionsDock = dynamic(() => import('@/components/ui/QuickActionsDock'), { ssr: false });
+const IntroCurtain = dynamic(() => import('@/components/ui/IntroCurtain'), { ssr: false });
+const SectionRail = dynamic(() => import('@/components/ui/SectionRail'), { ssr: false });
+
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const { performanceTier } = usePerformanceProfile();
-  const showFloatingOverlays = performanceTier === 'full' || performanceTier === 'balanced';
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  useEffect(() => {
+    if (hasInteracted) return;
+
+    const onFirstInteraction = () => {
+      setHasInteracted(true);
+    };
+
+    window.addEventListener('pointerdown', onFirstInteraction, { passive: true });
+    window.addEventListener('keydown', onFirstInteraction);
+    window.addEventListener('touchstart', onFirstInteraction, { passive: true });
+    window.addEventListener('scroll', onFirstInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', onFirstInteraction);
+      window.removeEventListener('keydown', onFirstInteraction);
+      window.removeEventListener('touchstart', onFirstInteraction);
+      window.removeEventListener('scroll', onFirstInteraction);
+    };
+  }, [hasInteracted]);
+
+  const showFloatingOverlays = hasInteracted && (performanceTier === 'full' || performanceTier === 'balanced');
   const showSectionHandoffs = performanceTier === 'full' || performanceTier === 'balanced';
   const pageProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 32, mass: 0.45 });
 
@@ -34,7 +59,7 @@ export default function Home() {
       <AmbientBackground performanceTier={performanceTier} />
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <SectionRail /> : null}
-      {showFloatingOverlays ? <KeyboardShortcuts /> : null}
+      <KeyboardShortcuts />
       <BackToTop />
 
       {showFloatingOverlays ? (
