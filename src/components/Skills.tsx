@@ -31,15 +31,16 @@ export default function Skills() {
   const strongestSkill = getStrongestSkill(technicalSkills);
 
   return (
-    <section id="skills" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
+    <section id="skills" className="py-20 bg-background relative overflow-hidden" ref={containerRef} aria-labelledby="skills-heading">
       <motion.div 
         style={{ y, opacity }}
         className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-purple-900/10 to-transparent pointer-events-none" 
       />
 
       <div className="container mx-auto px-6 relative z-10">
-        <SectionHeader 
-          title="Clinical & Technical Skills" 
+        <SectionHeader
+          headingId="skills-heading"
+          title="Clinical & Technical Skills"
           subtitle="Clinical strengths, research tools, and technical skills"
           className="[&>h2]:font-display"
         />
@@ -130,15 +131,9 @@ export default function Skills() {
               visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
             }}
           >
-            <motion.h3 
-              className="text-2xl font-bold mb-6 text-white"
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
+            <h3 className="text-2xl font-bold mb-6 text-white">
               Core Competencies
-            </motion.h3>
+            </h3>
             {strongestSkill ? (
               <motion.p
                 key={`${technicalView}-${strongestSkill.name}`}
@@ -179,15 +174,9 @@ export default function Skills() {
               visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
             }}
           >
-            <motion.h3 
-              className="text-2xl font-bold mb-6 text-white"
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
+            <h3 className="text-2xl font-bold mb-6 text-white">
               Domain Expertise
-            </motion.h3>
+            </h3>
             <div className="grid grid-cols-2 gap-4">
               {skills.domains.map((domain, index) => (
                 <motion.div
@@ -213,15 +202,9 @@ export default function Skills() {
               ))}
             </div>
 
-            <motion.h3 
-              className="text-2xl font-bold mt-12 mb-6 text-white"
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-            >
+            <h3 className="text-2xl font-bold mt-12 mb-6 text-white">
               Certification Highlights
-            </motion.h3>
+            </h3>
             <div className="space-y-3">
               {skills.certifications.map((cert, index) => (
                 <motion.div

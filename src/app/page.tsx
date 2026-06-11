@@ -14,6 +14,7 @@ import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
+import IntroCurtain from '@/components/ui/IntroCurtain';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
@@ -21,7 +22,6 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 const AmbientBackground = dynamic(() => import('@/components/ui/AmbientBackground'), { ssr: false });
 const QuickActionsDock = dynamic(() => import('@/components/ui/QuickActionsDock'), { ssr: false });
-const IntroCurtain = dynamic(() => import('@/components/ui/IntroCurtain'), { ssr: false });
 const SectionRail = dynamic(() => import('@/components/ui/SectionRail'), { ssr: false });
 
 export default function Home() {
@@ -73,12 +73,6 @@ export default function Home() {
         </div>
       ) : null}
 
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg"
-      >
-        Skip to main content
-      </a>
       <main className="min-h-screen" id="main-content">
         <Navigation />
         <SectionReveal index={0}>
@@ -112,7 +106,8 @@ export default function Home() {
         <SectionReveal index={7}>
           <Contact />
         </SectionReveal>
-      
+      </main>
+
       {/* Footer */}
       <motion.footer
         className="bg-slate-900 text-white py-8 relative overflow-hidden"
@@ -133,7 +128,6 @@ export default function Home() {
           </p>
         </div>
       </motion.footer>
-    </main>
     </>
   );
 }

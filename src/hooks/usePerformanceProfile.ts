@@ -90,6 +90,6 @@ export function usePerformanceProfile() {
     shouldRenderCursorTrail: performanceTier === 'full',
     shouldRenderHeavyEffects: performanceTier === 'full',
     shouldRenderAmbientEffects: performanceTier === 'full' || performanceTier === 'balanced',
-    shouldRenderParticles: performanceTier === 'full' || performanceTier === 'balanced',
+    shouldRenderParticles: performanceTier === 'full',
   };
 }

@@ -35,7 +35,7 @@ export default function Navigation() {
 
     updateActiveSection();
     window.addEventListener('scroll', updateActiveSection, { passive: true });
-    window.addEventListener('resize', updateActiveSection);
+    window.addEventListener('resize', updateActiveSection, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', updateActiveSection);
@@ -66,7 +66,7 @@ export default function Navigation() {
       }
     };
 
-    window.addEventListener('resize', closeOnDesktop);
+    window.addEventListener('resize', closeOnDesktop, { passive: true });
 
     return () => {
       window.removeEventListener('resize', closeOnDesktop);
@@ -83,7 +83,6 @@ export default function Navigation() {
         style={{ scaleX }}
       />
 
-      {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-6 focus:py-3 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/50"

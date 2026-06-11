@@ -150,6 +150,32 @@ describe('ui coverage hardening', () => {
     windowScrollSpy.mockRestore();
   });
 
+  it('skips Lenis RAF loop on coarse-pointer (touch) devices and still restores scrollRestoration', () => {
+    const originalRestoration = window.history.scrollRestoration;
+
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => ({
+      matches: query === '(pointer: coarse)',
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn().mockReturnValue(false),
+    }) as unknown as MediaQueryList);
+
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
+    const { unmount } = render(<SmoothScroll />);
+
+    // Lenis RAF loop must not have started — no rAF calls on touch
+    expect(rafSpy).not.toHaveBeenCalled();
+
+    unmount();
+    // Cleanup must still restore scroll-restoration regardless
+    expect(window.history.scrollRestoration).toBe(originalRestoration);
+    rafSpy.mockRestore();
+  });
+
   it('covers service worker cleanup branches, including early-return and error handling', async () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   calculateProfilePointerTargets,
   getProfileFloatAnimation,
@@ -19,7 +20,9 @@ interface ProfileImageProps {
 
 export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const reducedMotion = Boolean(prefersReducedMotion);
+  const { isCoarsePointer } = usePerformanceProfile();
+  // Treat touch devices as reduced-motion to skip expensive infinite animations
+  const reducedMotion = Boolean(prefersReducedMotion) || isCoarsePointer;
 
   // Mouse position tracking for 3D tilt effect
   const mouseX = useMotionValue(0);
@@ -49,7 +52,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [enableHoverMotion, mouseX, mouseY]);
 
@@ -83,7 +86,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         {/* Glowing background with depth */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'translateZ(-50px)' }} />
+        <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full blur-3xl opacity-30 ${reducedMotion ? '' : 'animate-pulse'}`} style={{ transform: 'translateZ(-50px)' }} />
         
         {/* Secondary glow layer */}
         <motion.div 

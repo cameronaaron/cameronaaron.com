@@ -58,10 +58,6 @@ export default function ExperienceCard({
   return (
     <SpotlightCard
       as={motion.div}
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
       whileHover={
         enableHoverMotion
           ? {
@@ -143,12 +139,7 @@ export default function ExperienceCard({
         </motion.div>
 
         <div className="flex-1">
-          <motion.h3
-            className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
             {experience.websiteUrl ? (
               <a
                 href={experience.websiteUrl}
@@ -165,24 +156,18 @@ export default function ExperienceCard({
             ) : (
               <span>{experience.company}</span>
             )}
-          </motion.h3>
+          </h3>
           
           <div className="space-y-4">
             {experience.positions.map((pos, posIndex) => (
-              <motion.div 
-                key={posIndex} 
+              <motion.div
+                key={posIndex}
                 className="border-l-2 border-primary/30 pl-4 hover:border-primary/80 transition-colors group/position relative"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + posIndex * 0.1 }}
                 whileHover={enableHoverMotion ? { x: 5 } : undefined}
               >
                 {/* Dot indicator */}
                 <motion.div
                   className="absolute -left-[5px] top-2 w-2 h-2 bg-primary rounded-full"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  transition={{ delay: 0.4 + posIndex * 0.1 }}
                   whileHover={enableHoverMotion ? { scale: 1.5 } : undefined}
                 />
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">

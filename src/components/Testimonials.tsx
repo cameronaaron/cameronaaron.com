@@ -33,11 +33,12 @@ export default function Testimonials() {
   };
 
   return (
-    <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
+    <section id="testimonials" className="py-20 bg-background relative overflow-hidden" aria-labelledby="testimonials-heading">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
+          headingId="testimonials-heading"
           title="What People Say"
           subtitle="Recommendations from colleagues, managers, and mentors"
         />

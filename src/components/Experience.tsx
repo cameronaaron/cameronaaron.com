@@ -34,9 +34,10 @@ export default function Experience() {
   };
 
   return (
-    <section id="experience" className="py-20 bg-background relative overflow-hidden">
+    <section id="experience" className="py-20 bg-background relative overflow-hidden" aria-labelledby="experience-heading">
       <div className="container mx-auto px-6 relative z-10" ref={containerRef}>
         <SectionHeader
+          headingId="experience-heading"
           title="Healthcare & Technology Experience"
           subtitle="Clinical, research, and operations experience across aerospace medicine, neuroscience, and healthcare technology"
           className="[&>h2]:font-display"

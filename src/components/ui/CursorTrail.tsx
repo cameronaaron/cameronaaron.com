@@ -106,11 +106,13 @@ export default function CursorTrail() {
       animationFrameId = window.requestAnimationFrame(cleanup);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseover', handleMouseOver);
-    window.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', () => setIsVisible(true));
+    const handleMouseEnter = () => setIsVisible(true);
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    document.addEventListener('mouseenter', handleMouseEnter, { passive: true });
 
     animationFrameId = window.requestAnimationFrame(cleanup);
 
@@ -119,6 +121,7 @@ export default function CursorTrail() {
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
       window.cancelAnimationFrame(animationFrameId);
     };
   }, [cursorX, cursorY, isCoarsePointer, prefersReducedMotion]);

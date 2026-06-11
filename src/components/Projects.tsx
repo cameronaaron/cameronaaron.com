@@ -18,18 +18,19 @@ export default function Projects() {
   });
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const backgroundY2 = useTransform(scrollYProgress, [0, 1], [100, -50]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
   const chapterProgress = useSpring(scrollYProgress, { stiffness: 150, damping: 28, mass: 0.35 });
 
   return (
-    <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef}>
+    <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef} aria-labelledby="projects-heading">
       <motion.div 
         style={{ y: backgroundY, rotate }}
         className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" 
       />
-      <motion.div 
-        style={{ y: useTransform(scrollYProgress, [0, 1], [100, -50]) }}
-        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none" 
+      <motion.div
+        style={{ y: backgroundY2 }}
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none"
       />
       <motion.div
         className="pointer-events-none absolute -right-24 top-36 hidden h-64 w-64 rounded-full border border-cyan-300/20 lg:block"
@@ -66,6 +67,7 @@ export default function Projects() {
         </div>
 
         <SectionHeader
+          headingId="projects-heading"
           title="Research & Publications"
           subtitle="Selected publications, conference presentations, and research projects"
           className="[&>h2]:font-display"

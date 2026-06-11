@@ -107,6 +107,8 @@ describe('usePerformanceProfile', () => {
     expect(result.current.performanceTier).toBe('balanced');
     expect(result.current.shouldRenderCursorTrail).toBe(false);
     expect(result.current.shouldRenderAmbientEffects).toBe(true);
+    // Particle systems (canvas RAF loops) must not run on mobile
+    expect(result.current.shouldRenderParticles).toBe(false);
   });
 
   it('returns "lite" when save-data is enabled', () => {

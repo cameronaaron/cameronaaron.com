@@ -30,6 +30,31 @@ describe('data module coverage', () => {
     expect(skills.certifications.length).toBeGreaterThan(0);
   });
 
+  it('records the four recently-completed nursing prerequisite courses with A grades', () => {
+    const find = (courseFragment: string) =>
+      prerequisiteCourses.find((c) => c.course.includes(courseFragment));
+
+    const anatomy = find('ANATOMY 001');
+    expect(anatomy?.grade).toBe('A');
+    expect(anatomy?.gpa).toBe('4.00');
+    expect(anatomy?.status).toBe('Completed');
+
+    const physiology = find('PHYSIOL 001');
+    expect(physiology?.grade).toBe('A');
+    expect(physiology?.gpa).toBe('4.00');
+    expect(physiology?.status).toBe('Completed');
+
+    const childDev = find('CH DEV 001');
+    expect(childDev?.grade).toBe('A');
+    expect(childDev?.gpa).toBe('4.00');
+    expect(childDev?.status).toBe('Completed');
+
+    const sociology = find('SOC 001');
+    expect(sociology?.grade).toBe('A');
+    expect(sociology?.gpa).toBe('4.00');
+    expect(sociology?.status).toBe('Completed');
+  });
+
   it('preserves testimonial source links for externally referenced recommendations', () => {
     const joy = testimonials.find((testimonial) => testimonial.name === 'Dr. Joy Lawson Davis, Ed.D.');
 

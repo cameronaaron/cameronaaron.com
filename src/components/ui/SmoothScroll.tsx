@@ -9,6 +9,13 @@ export default function SmoothScroll() {
 
     window.history.scrollRestoration = 'manual';
 
+    // Touch devices have native momentum scrolling — Lenis fights it and causes lag
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      return () => {
+        window.history.scrollRestoration = previousScrollRestoration;
+      };
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       orientation: 'vertical',

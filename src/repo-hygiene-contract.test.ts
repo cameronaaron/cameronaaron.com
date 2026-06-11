@@ -7,6 +7,7 @@ const PROJECT_ROOT = process.cwd();
 const EXPECTED_ROOT_FILES = [
   '.env.example',
   '.gitignore',
+  'CLAUDE.md',
   'README.md',
   'eslint.config.mjs',
   'lighthouserc.json',

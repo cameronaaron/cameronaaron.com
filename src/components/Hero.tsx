@@ -98,12 +98,12 @@ export default function Hero() {
         className="container mx-auto px-6 relative z-10"
         style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
           <motion.div
             initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-foreground"
+            className="text-foreground order-2 md:order-1"
           >
             <motion.div
               initial={false}
@@ -125,14 +125,12 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-4xl md:text-6xl font-bold mb-6 tracking-tight font-display"
+              className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight font-display bg-gradient-to-r from-white via-cyan-300 to-emerald-400 bg-clip-text text-transparent"
             >
-              <span className="text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
-                <TypewriterEffect text={profile.name} typingSpeed={80} />
-              </span>
+              <TypewriterEffect text={profile.name} typingSpeed={80} />
             </motion.h1>
 
-            <div className="text-xl sm:text-2xl md:text-3xl font-light mb-8 text-muted-foreground leading-tight">
+            <div className="text-lg sm:text-2xl md:text-3xl font-light mb-6 md:mb-8 text-muted-foreground leading-tight">
               <TextReveal text={profile.title} delay={1.5} />
             </div>
 
@@ -140,7 +138,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-lg text-foreground/90 mb-10 leading-relaxed max-w-xl"
+              className="text-base md:text-lg text-foreground/90 mb-6 md:mb-10 leading-relaxed max-w-xl"
             >
               {profile.tagline}
             </motion.p>
@@ -149,7 +147,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-wrap gap-4"
+              className="flex flex-wrap gap-3 md:gap-4"
             >
               <Magnetic strength={0.15}>
                 <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
@@ -187,7 +185,7 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 + index * 0.08 }}
                   whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
-                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-foreground"
+                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-foreground whitespace-nowrap"
                 >
                   {chip}
                 </motion.span>
@@ -198,7 +196,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 border-t border-white/5 pt-8"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/5 pt-6 md:pt-8"
             >
               {profile.stats.map((stat, index) => (
                 <motion.div
@@ -214,10 +212,11 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          <motion.div 
-            className="relative"
+          <motion.div
+            className="relative order-1 md:order-2 flex justify-center md:block"
             style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}
           >
+            <div className="w-full max-w-[200px] sm:max-w-xs md:max-w-none">
              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl -z-10" />
              {showFloatingBadges ? (
                <>
@@ -235,6 +234,7 @@ export default function Hero() {
                </>
              ) : null}
              <ProfileImage src="/profile-hero.webp" alt={profile.name} />
+            </div>
           </motion.div>
         </div>
       </motion.div>

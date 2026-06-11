@@ -125,11 +125,11 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize, { passive: true });
 
     if (activeConfig.useMousePull) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseout', handleMouseLeave);
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      window.addEventListener('mouseout', handleMouseLeave, { passive: true });
     }
     
     resize();

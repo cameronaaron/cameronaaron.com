@@ -108,9 +108,9 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       frameRef.current = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('mousemove', handlePointerMove);
-    window.addEventListener('mouseout', handlePointerLeave);
-    window.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('mousemove', handlePointerMove, { passive: true });
+    window.addEventListener('mouseout', handlePointerLeave, { passive: true });
+    window.addEventListener('mousedown', handlePointerDown, { passive: true });
     frameRef.current = requestAnimationFrame(animate);
 
     return () => {
