@@ -49,12 +49,21 @@ describe('modularization contract', () => {
     expect(source).not.toContain("const sectionId = item.href.replace('#', '');");
   });
 
-  it('keeps Skills sorting logic extracted', () => {
+  it('keeps Skills sorting, motion config, and static data extracted', () => {
     const source = read('src/components/Skills.tsx');
 
     expect(source).toContain("from '@/components/skills/logic'");
+    // Sort logic
     expect(source).not.toContain("return [...skills.technical].sort((a, b) => b.level - a.level);");
     expect(source).not.toContain("return [...skills.technical].sort((a, b) => a.name.localeCompare(b.name));");
+    // Motion config must come from logic, not be derived inline
+    expect(source).not.toContain("performanceTier === 'lite' || performanceTier === 'reduced'");
+    expect(source).toContain('getSkillsMotionConfig(performanceTier)');
+    // Phase chips must come from the exported constant, not be inlined
+    expect(source).toContain('SKILLS_JOURNEY_PHASES');
+    expect(source).not.toContain("['Assess', 'Apply', 'Validate']");
+    // Skill bar entry transition must use the extracted helper
+    expect(source).toContain('getSkillBarEntryTransition(isLiteMotion, index)');
   });
 
   it('keeps Hero motion config and static badge/chip catalogs extracted', () => {
