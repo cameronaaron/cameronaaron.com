@@ -153,7 +153,7 @@ export default function Hero() {
                 <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
                   <span className="relative z-10">View Credentials</span>
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-fuchsia-700 to-rose-800"
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-emerald-600"
                     initial={{ x: '-100%' }}
                     whileHover={{ x: 0 }}
                     transition={{ duration: 0.3 }}

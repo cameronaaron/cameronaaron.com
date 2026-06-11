@@ -9,7 +9,7 @@ import {
 
 describe('testimonial card logic', () => {
   it('builds class names for featured and standard cards', () => {
-    expect(getTestimonialCardClass(true)).toContain('border-purple-500/30');
+    expect(getTestimonialCardClass(true)).toContain('border-cyan-500/30');
     expect(getTestimonialCardClass(false)).toBe('h-full p-6 ');
   });
 

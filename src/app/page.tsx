@@ -110,7 +110,7 @@ export default function Home() {
 
       {/* Footer */}
       <motion.footer
-        className="bg-slate-900 text-white py-8 relative overflow-hidden"
+        className="border-t border-white/5 bg-background/80 text-white py-10 relative overflow-hidden"
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -123,7 +123,7 @@ export default function Home() {
           aria-hidden="true"
         />
         <div className="container mx-auto px-6 text-center relative z-10">
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             © {CURRENT_YEAR} Cameron Aaron. All rights reserved.
           </p>
         </div>

@@ -49,10 +49,10 @@ describe('experience logic', () => {
       expect(active.backgroundColor).toContain('34 211 238');
     });
 
-    it('returns purple inactive state when isActive is false', () => {
+    it('returns emerald inactive state when isActive is false', () => {
       const inactive = getTimelineDotAnimation(false, false);
       expect(inactive.scale).toBe(1);
-      expect(inactive.backgroundColor).toContain('168 85 247');
+      expect(inactive.backgroundColor).toContain('16 185 129');
     });
 
     it('uses dimmer boxShadow on lite motion', () => {

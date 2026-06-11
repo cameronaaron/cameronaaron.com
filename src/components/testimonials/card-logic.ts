@@ -1,5 +1,5 @@
 export function getTestimonialCardClass(featured?: boolean): string {
-  return `h-full p-6 ${featured ? 'border-purple-500/30' : ''}`;
+  return `h-full p-6 ${featured ? 'border-cyan-500/30' : ''}`;
 }
 
 export function getProfileAriaLabel(name: string): string {

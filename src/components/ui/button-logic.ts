@@ -16,7 +16,7 @@ export const BUTTON_SIZE_STYLES = {
 export const BUTTON_VARIANT_STYLES = {
   primary: 'bg-gradient-to-r from-cyan-700 to-emerald-700 text-white shadow-lg hover:shadow-cyan-400/45',
   secondary: 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20',
-  outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white',
+  outline: 'border-2 border-cyan-400/70 text-cyan-300 hover:bg-cyan-400 hover:text-slate-950',
 } as const;
 
 export function getButtonStyles(

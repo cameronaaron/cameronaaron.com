@@ -21,7 +21,7 @@ export default function SkillBar({ name, level, index }: SkillBarProps) {
           whileInView={{ width: `${level}%` }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: index * 0.1, ease: "easeOut" }}
-          className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full relative overflow-hidden"
+          className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full relative overflow-hidden"
         >
           <motion.div 
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full -translate-x-full"

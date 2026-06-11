@@ -47,7 +47,7 @@ export default function Skills() {
     >
       <motion.div
         style={{ y, opacity }}
-        className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-purple-900/10 to-transparent pointer-events-none"
+        className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-emerald-900/10 to-transparent pointer-events-none"
       />
 
       <div className="container mx-auto px-6 relative z-10">
@@ -205,7 +205,7 @@ export default function Skills() {
                     whileHover={isCinematic ? { rotate: 360, scale: 1.2 } : undefined}
                     transition={{ duration: isLiteMotion ? 0.25 : 0.5 }}
                   >
-                    <svg className="w-5 h-5 text-purple-500 group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <svg className="w-5 h-5 text-emerald-400 group-hover:text-cyan-300 transition-colors" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   </motion.div>

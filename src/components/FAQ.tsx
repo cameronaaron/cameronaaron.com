@@ -13,7 +13,7 @@ export default function FAQ() {
   return (
     <section id="faq" className="py-20 bg-background relative overflow-hidden" aria-label="Frequently asked questions">
       {/* Background decoration */}
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-cyan-900/20 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
 
       <div className="container mx-auto px-6 relative z-10">

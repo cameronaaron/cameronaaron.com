@@ -79,7 +79,7 @@ export default function Navigation() {
     <>
       {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-pink-600 origin-left z-[60]"
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-primary to-secondary origin-left z-[60]"
         style={{ scaleX }}
       />
 

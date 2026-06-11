@@ -27,7 +27,7 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
     >
       <SpotlightCard className={getTestimonialCardClass(testimonial.featured)}>
         {/* Quote Icon */}
-        <div className="text-purple-500 text-4xl mb-4 font-serif">"</div>
+        <div className="text-cyan-400 text-4xl mb-4 font-serif">"</div>
         
         {/* Testimonial Text */}
         <p className="text-gray-300 mb-6 leading-relaxed line-clamp-4">
@@ -54,13 +54,13 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
             </h3>
             <p className="text-sm text-gray-400">{testimonial.role}</p>
             {testimonial.company && (
-              <p className="text-sm text-purple-400">
+              <p className="text-sm text-emerald-300">
                 {testimonial.companyUrl ? (
                   <a
                     href={testimonial.companyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-purple-300 transition-colors"
+                    className="hover:text-emerald-200 transition-colors"
                     aria-label={getCompanyAriaLabel(testimonial.company)}
                   >
                     {testimonial.company}

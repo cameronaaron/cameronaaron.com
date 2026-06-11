@@ -21,11 +21,11 @@ export default function BrainCursor({ active }: BrainCursorProps) {
         <radialGradient id="brainCoreGradient" cx="50%" cy="45%" r="55%">
           <stop offset="0%" stopColor="#a5f3fc" stopOpacity="0.95" />
           <stop offset="55%" stopColor="#22d3ee" stopOpacity="0.75" />
-          <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#10b981" stopOpacity="0.55" />
         </radialGradient>
         <linearGradient id="brainStroke" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#67e8f9" />
-          <stop offset="100%" stopColor="#a855f7" />
+          <stop offset="100%" stopColor="#34d399" />
         </linearGradient>
       </defs>
 
@@ -94,7 +94,7 @@ export default function BrainCursor({ active }: BrainCursorProps) {
           cx="26"
           cy="13.5"
           r="0.9"
-          fill="#c4b5fd"
+          fill="#6ee7b7"
           animate={{ opacity: [0.2, 1, 0.2], r: [0.7, 1.1, 0.7] }}
           transition={{ duration: active ? 0.7 : 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
         />
@@ -110,7 +110,7 @@ export default function BrainCursor({ active }: BrainCursorProps) {
           cx="11"
           cy="25"
           r="0.8"
-          fill="#f9a8d4"
+          fill="#7dd3fc"
           animate={{ opacity: [0.15, 0.9, 0.15], r: [0.6, 1, 0.6] }}
           transition={{ duration: active ? 1 : 2, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
         />

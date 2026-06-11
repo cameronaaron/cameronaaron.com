@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import IframeTitleGuard from "@/components/ui/IframeTitleGuard";
 
-const manrope = Manrope({ 
+const manrope = Manrope({
   subsets: ["latin"],
   display: 'swap',
   preload: true,
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -230,7 +236,7 @@ export default function RootLayout({
         
         <StructuredData />
       </head>
-      <body className={manrope.className} suppressHydrationWarning>
+      <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <SmoothScroll />
         <ServiceWorkerRegistration />
         <IframeTitleGuard />

@@ -13,7 +13,7 @@ export default function ProjectPattern({ index }: { index: number }) {
     </div>,
     // Pattern 3: Diagonal Lines
     <div key="3" className="absolute inset-0 opacity-10">
-      <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#7c3aed_10px,#7c3aed_11px)]" />
+      <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#22d3ee_10px,#22d3ee_11px)]" />
     </div>
   ];
 

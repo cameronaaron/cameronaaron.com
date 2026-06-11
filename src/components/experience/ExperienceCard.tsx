@@ -102,7 +102,7 @@ export default function ExperienceCard({
       
       {/* Border glow effect */}
       <motion.div
-        className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-0 group-hover:opacity-10 blur-lg transition-opacity duration-500"
+        className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-10 blur-lg transition-opacity duration-500"
         initial={false}
       />
       
@@ -171,7 +171,7 @@ export default function ExperienceCard({
                   whileHover={enableHoverMotion ? { scale: 1.5 } : undefined}
                 />
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                  <h4 className="text-lg font-semibold text-primary group-hover/position:text-pink-400 transition-colors">{pos.title}</h4>
+                  <h4 className="text-lg font-semibold text-primary group-hover/position:text-cyan-300 transition-colors">{pos.title}</h4>
                   <span className="text-sm text-muted-foreground font-medium">{pos.period}</span>
                 </div>
                 <p className="text-muted-foreground/80 leading-relaxed">{pos.description}</p>

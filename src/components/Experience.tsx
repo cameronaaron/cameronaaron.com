@@ -113,7 +113,7 @@ export default function Experience() {
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
             <motion.div 
               style={{ scaleY, transformOrigin: "top" }}
-              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-purple-500 via-pink-500 to-purple-500"
+              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-400 via-emerald-400 to-cyan-400"
             />
           </div>
 

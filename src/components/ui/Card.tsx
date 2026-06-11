@@ -15,7 +15,7 @@ export default function Card({ children, className = '', hover = true, delay = 0
   const baseStyles = 'rounded-xl p-6 transition-all duration-300';
   const hoverStyles = hover ? 'hover:shadow-xl hover:scale-[1.02]' : '';
   const bgStyles = gradient 
-    ? 'bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100' 
+    ? 'bg-gradient-to-br from-cyan-50 to-emerald-50 border border-cyan-100'
     : 'bg-white shadow-lg';
 
   return (

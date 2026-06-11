@@ -53,8 +53,8 @@ export function getTimelineDotAnimation(isLiteMotion: boolean, isActive: boolean
   }
   return {
     scale: 1,
-    backgroundColor: 'rgb(168 85 247)',
-    boxShadow: isLiteMotion ? '0 0 6px rgba(168, 85, 247, 0.35)' : '0 0 10px rgba(168, 85, 247, 0.5)',
+    backgroundColor: 'rgb(16 185 129)',
+    boxShadow: isLiteMotion ? '0 0 6px rgba(16, 185, 129, 0.35)' : '0 0 10px rgba(16, 185, 129, 0.5)',
   };
 }
 
