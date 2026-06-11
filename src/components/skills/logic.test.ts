@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   SKILLS_JOURNEY_PHASES,
+  getDomainCardHoverTransition,
   getSkillBarEntryTransition,
+  getSkillColumnVariants,
   getSkillsMotionConfig,
   getStrongestSkill,
   sortTechnicalSkills,
@@ -78,6 +80,48 @@ describe('skills logic', () => {
       const config = getSkillsMotionConfig('balanced');
       expect(config.isLiteMotion).toBe(false);
       expect(config.isCinematic).toBe(false);
+    });
+  });
+
+  describe('getSkillColumnVariants', () => {
+    it('slides left column in from the left on full motion', () => {
+      const v = getSkillColumnVariants(false, 'left', 20);
+      expect((v.hidden as { x: number }).x).toBe(-36);
+      expect(v.hidden.y).toBe(20);
+      expect(v.visible.x).toBe(0);
+    });
+
+    it('slides right column in from the right on full motion', () => {
+      const v = getSkillColumnVariants(false, 'right', 20);
+      expect((v.hidden as { x: number }).x).toBe(36);
+    });
+
+    it('uses no horizontal offset on lite motion', () => {
+      const v = getSkillColumnVariants(true, 'left', 10);
+      expect((v.hidden as { x: number }).x).toBe(0);
+      expect(v.hidden.y).toBe(10);
+    });
+
+    it('uses faster duration on lite motion', () => {
+      const lite = getSkillColumnVariants(true, 'left', 10);
+      const full = getSkillColumnVariants(false, 'left', 20);
+      expect(lite.visible.transition.duration).toBeLessThan(full.visible.transition.duration);
+    });
+  });
+
+  describe('getDomainCardHoverTransition', () => {
+    it('returns tween with no spring props on lite motion', () => {
+      const t = getDomainCardHoverTransition(true);
+      expect(t.type).toBe('tween');
+      expect(t).not.toHaveProperty('stiffness');
+      expect(t).not.toHaveProperty('damping');
+    });
+
+    it('returns spring with stiffness and damping on full motion', () => {
+      const t = getDomainCardHoverTransition(false);
+      expect(t.type).toBe('spring');
+      expect(t).toHaveProperty('stiffness');
+      expect(t).toHaveProperty('damping');
     });
   });
 

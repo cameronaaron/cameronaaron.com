@@ -50,7 +50,7 @@ export default function Navigation() {
       }
     };
 
-    window.addEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleEscape, { passive: true });
 
     return () => {
       window.removeEventListener('keydown', handleEscape);

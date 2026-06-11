@@ -10,6 +10,8 @@ import {
   EXPERIENCE_FLOW_PHASES,
   getExperienceItemId,
   getExperienceMotionConfig,
+  getTimelineDotAnimation,
+  getTimelineDotTransition,
   sortExperiencesForTimeline,
 } from '@/components/experience/logic';
 
@@ -131,7 +133,7 @@ export default function Experience() {
           >
             {sortedExperiences.map((exp, index) => (
               <motion.div
-                key={index}
+                key={exp.company}
                 id={getExperienceItemId(index)}
                 data-testid={`experience-item-${index}`}
                 data-latest-period={exp.latestPeriod}
@@ -156,20 +158,8 @@ export default function Experience() {
 
                 <motion.div
                   className="absolute left-8 md:left-1/2 z-20 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-background md:block"
-                  animate={
-                    activeExperienceIndex === index
-                      ? {
-                          scale: 1.35,
-                          backgroundColor: 'rgb(34 211 238)',
-                          boxShadow: isLiteMotion ? '0 0 10px rgba(34, 211, 238, 0.55)' : '0 0 16px rgba(34, 211, 238, 0.85)',
-                        }
-                      : {
-                          scale: 1,
-                          backgroundColor: 'rgb(168 85 247)',
-                          boxShadow: isLiteMotion ? '0 0 6px rgba(168, 85, 247, 0.35)' : '0 0 10px rgba(168, 85, 247, 0.5)',
-                        }
-                  }
-                  transition={isLiteMotion ? { duration: 0.2, ease: 'easeOut' } : { type: 'spring', stiffness: 280, damping: 22 }}
+                  animate={getTimelineDotAnimation(isLiteMotion, activeExperienceIndex === index)}
+                  transition={getTimelineDotTransition(isLiteMotion)}
                 />
 
                 <div

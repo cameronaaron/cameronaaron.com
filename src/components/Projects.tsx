@@ -107,7 +107,7 @@ export default function Projects() {
         >
           {featuredProjects.map((project, index) => (
             <motion.div
-              key={index}
+              key={project.title}
               data-testid={`featured-project-item-${index}`}
               data-period={project.period}
               variants={{
@@ -137,7 +137,7 @@ export default function Projects() {
         >
           {otherProjects.map((project, index) => (
             <motion.div
-              key={index}
+              key={project.title}
               variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.9 },
                 visible: { opacity: 1, y: 0, scale: 1 }

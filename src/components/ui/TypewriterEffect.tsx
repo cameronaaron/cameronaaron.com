@@ -50,7 +50,7 @@ export default function TypewriterEffect({
       }
     };
 
-    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pageshow', handlePageShow, { passive: true });
     return () => window.removeEventListener('pageshow', handlePageShow);
   }, [storageKey, text]);
 

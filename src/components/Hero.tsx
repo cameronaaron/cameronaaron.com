@@ -200,7 +200,7 @@ export default function Hero() {
             >
               {profile.stats.map((stat, index) => (
                 <motion.div
-                  key={index}
+                  key={stat.label}
                   initial={false}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1 }}

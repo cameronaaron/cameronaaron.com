@@ -4,6 +4,8 @@ import {
   EXPERIENCE_FLOW_PHASES,
   getExperienceItemId,
   getExperienceMotionConfig,
+  getTimelineDotAnimation,
+  getTimelineDotTransition,
   sortExperiencesForTimeline,
 } from '@/components/experience/logic';
 
@@ -38,5 +40,41 @@ describe('experience logic', () => {
 
   it('builds deterministic DOM ids for experience items', () => {
     expect(getExperienceItemId(3)).toBe('experience-item-3');
+  });
+
+  describe('getTimelineDotAnimation', () => {
+    it('returns cyan active state when isActive is true', () => {
+      const active = getTimelineDotAnimation(false, true);
+      expect(active.scale).toBe(1.35);
+      expect(active.backgroundColor).toContain('34 211 238');
+    });
+
+    it('returns purple inactive state when isActive is false', () => {
+      const inactive = getTimelineDotAnimation(false, false);
+      expect(inactive.scale).toBe(1);
+      expect(inactive.backgroundColor).toContain('168 85 247');
+    });
+
+    it('uses dimmer boxShadow on lite motion', () => {
+      const lite = getTimelineDotAnimation(true, true);
+      const full = getTimelineDotAnimation(false, true);
+      expect(lite.boxShadow).toContain('0.55');
+      expect(full.boxShadow).toContain('0.85');
+    });
+  });
+
+  describe('getTimelineDotTransition', () => {
+    it('returns tween transition on lite motion', () => {
+      const t = getTimelineDotTransition(true);
+      expect(t).not.toHaveProperty('type', 'spring');
+      expect(t).toHaveProperty('duration', 0.2);
+    });
+
+    it('returns spring transition on full motion', () => {
+      const t = getTimelineDotTransition(false);
+      expect(t).toHaveProperty('type', 'spring');
+      expect(t).toHaveProperty('stiffness', 280);
+      expect(t).toHaveProperty('damping', 22);
+    });
   });
 });

@@ -68,7 +68,7 @@ export default function SmoothScroll() {
     syncScrollState();
     window.setTimeout(syncScrollState, 0);
 
-    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pageshow', handlePageShow, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafId);

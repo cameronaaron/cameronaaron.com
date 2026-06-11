@@ -64,6 +64,12 @@ describe('modularization contract', () => {
     expect(source).not.toContain("['Assess', 'Apply', 'Validate']");
     // Skill bar entry transition must use the extracted helper
     expect(source).toContain('getSkillBarEntryTransition(isLiteMotion, index)');
+    // Column variants must use the extracted helper (no inline ±36 magic numbers)
+    expect(source).toContain("getSkillColumnVariants(isLiteMotion, 'left', entryYOffset)");
+    expect(source).toContain("getSkillColumnVariants(isLiteMotion, 'right', entryYOffset)");
+    // Domain card hover transition must not mix tween type with spring props
+    expect(source).toContain('getDomainCardHoverTransition(isLiteMotion)');
+    expect(source).not.toContain("type: isLiteMotion ? 'tween' : 'spring'");
   });
 
   it('keeps Hero motion config and static badge/chip catalogs extracted', () => {
@@ -81,6 +87,10 @@ describe('modularization contract', () => {
     expect(source).not.toContain('const isLiteMotion = performanceTier === \'lite\' || performanceTier === \'reduced\';');
     expect(source).not.toContain("['Clinical operations', 'Research translation', 'Security and systems']");
     expect(source).not.toContain('const sortedExperiences = [...experiences]');
+    // Timeline dot animation and transition must use extracted helpers
+    expect(source).toContain('getTimelineDotAnimation(isLiteMotion, activeExperienceIndex === index)');
+    expect(source).toContain('getTimelineDotTransition(isLiteMotion)');
+    expect(source).not.toContain("boxShadow: isLiteMotion ? '0 0 10px");
   });
 
   it('keeps Projects data grouping and signal derivation extracted', () => {

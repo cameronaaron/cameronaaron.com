@@ -28,7 +28,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
       }
     };
 
-    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pageshow', handlePageShow, { passive: true });
     return () => window.removeEventListener('pageshow', handlePageShow);
   }, [forceVisible, storageKey]);
 

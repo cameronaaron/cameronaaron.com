@@ -48,7 +48,7 @@ export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps = {}) {
         setVisible(false);
       }
     };
-    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pageshow', handlePageShow, { passive: true });
     return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 

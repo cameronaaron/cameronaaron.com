@@ -42,3 +42,25 @@ export function sortExperiencesForTimeline(items: Experience[]): ExperienceTimel
 export function getExperienceItemId(index: number): string {
   return `experience-item-${index}`;
 }
+
+export function getTimelineDotAnimation(isLiteMotion: boolean, isActive: boolean) {
+  if (isActive) {
+    return {
+      scale: 1.35,
+      backgroundColor: 'rgb(34 211 238)',
+      boxShadow: isLiteMotion ? '0 0 10px rgba(34, 211, 238, 0.55)' : '0 0 16px rgba(34, 211, 238, 0.85)',
+    };
+  }
+  return {
+    scale: 1,
+    backgroundColor: 'rgb(168 85 247)',
+    boxShadow: isLiteMotion ? '0 0 6px rgba(168, 85, 247, 0.35)' : '0 0 10px rgba(168, 85, 247, 0.5)',
+  };
+}
+
+export function getTimelineDotTransition(isLiteMotion: boolean) {
+  if (isLiteMotion) {
+    return { duration: 0.2, ease: 'easeOut' as const };
+  }
+  return { type: 'spring' as const, stiffness: 280, damping: 22 };
+}

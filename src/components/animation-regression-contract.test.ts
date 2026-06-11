@@ -132,12 +132,39 @@ describe('animation regression contract', () => {
     }
   });
 
-  it('Navigation resize listeners are passive', () => {
+  it('Navigation resize and keydown listeners are passive', () => {
     const source = read('src/components/Navigation.tsx');
     const resizeLines = source.split('\n').filter((l) => l.includes("addEventListener('resize'"));
     expect(resizeLines.length).toBeGreaterThan(0);
     for (const line of resizeLines) {
       expect(line).toContain('passive: true');
+    }
+    const keydownLines = source.split('\n').filter((l) => l.includes("addEventListener('keydown'"));
+    for (const line of keydownLines) {
+      expect(line).toContain('passive: true');
+    }
+  });
+
+  it('useMousePosition and useScrollPosition hooks use passive listeners', () => {
+    const mouse = read('src/hooks/useMousePosition.ts');
+    const scroll = read('src/hooks/useScrollPosition.ts');
+    expect(mouse.split('\n').find((l) => l.includes("addEventListener('mousemove'"))).toContain('passive: true');
+    expect(scroll.split('\n').find((l) => l.includes("addEventListener('scroll'"))).toContain('passive: true');
+  });
+
+  it('pageshow listeners in bfcache-aware components are passive', () => {
+    for (const path of [
+      'src/components/ui/IntroCurtain.tsx',
+      'src/components/ui/SmoothScroll.tsx',
+      'src/components/ui/TypewriterEffect.tsx',
+      'src/components/ui/TextReveal.tsx',
+    ]) {
+      const source = read(path);
+      const pagesShowLines = source.split('\n').filter((l) => l.includes("addEventListener('pageshow'"));
+      expect(pagesShowLines.length).toBeGreaterThan(0);
+      for (const line of pagesShowLines) {
+        expect(line, `${path} pageshow listener missing passive: true`).toContain('passive: true');
+      }
     }
   });
 

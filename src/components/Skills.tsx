@@ -9,7 +9,9 @@ import SpotlightCard from '@/components/ui/SpotlightCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   SKILLS_JOURNEY_PHASES,
+  getDomainCardHoverTransition,
   getSkillBarEntryTransition,
+  getSkillColumnVariants,
   getSkillsMotionConfig,
   getStrongestSkill,
   sortTechnicalSkills,
@@ -74,7 +76,7 @@ export default function Skills() {
               transition={{ delay: index * (isLiteMotion ? 0.04 : 0.1), duration: 0.36, ease: 'easeOut' }}
               className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-950/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" aria-hidden="true" />
               {phase}
             </motion.div>
           ))}
@@ -134,12 +136,7 @@ export default function Skills() {
             },
           }}
         >
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, x: isLiteMotion ? 0 : -36, y: entryYOffset },
-              visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
-            }}
-          >
+          <motion.div variants={getSkillColumnVariants(isLiteMotion, 'left', entryYOffset)}>
             <h3 className="text-2xl font-bold mb-6 text-white">Core Competencies</h3>
             {strongestSkill ? (
               <motion.p
@@ -168,12 +165,7 @@ export default function Skills() {
             </div>
           </motion.div>
 
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, x: isLiteMotion ? 0 : 36, y: entryYOffset },
-              visible: { opacity: 1, x: 0, y: 0, transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' } },
-            }}
-          >
+          <motion.div variants={getSkillColumnVariants(isLiteMotion, 'right', entryYOffset)}>
             <h3 className="text-2xl font-bold mb-6 text-white">Domain Expertise</h3>
             <div className="grid grid-cols-2 gap-4">
               {skills.domains.map((domain, index) => (
@@ -188,7 +180,7 @@ export default function Skills() {
                     className="p-4 flex items-center justify-center text-center h-full group cursor-default"
                     as={motion.div}
                     whileHover={isCinematic ? { scale: 1.05, y: -5, boxShadow: '0 10px 30px rgba(168, 85, 247, 0.3)' } : undefined}
-                    transition={{ type: isLiteMotion ? 'tween' : 'spring', duration: isLiteMotion ? 0.2 : undefined, stiffness: 400, damping: 15 }}
+                    transition={getDomainCardHoverTransition(isLiteMotion)}
                   >
                     <p className="text-gray-300 font-medium group-hover:text-primary transition-colors">{domain}</p>
                   </SpotlightCard>

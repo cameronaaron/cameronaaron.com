@@ -29,7 +29,7 @@ export default function FAQ() {
             const buttonId = getFaqTriggerId(index);
 
             return (
-              <li key={index} className="list-none">
+              <li key={faq.question} className="list-none">
                 <SpotlightCard
                   as={motion.div}
                   initial={{ opacity: 0, y: 20 }}

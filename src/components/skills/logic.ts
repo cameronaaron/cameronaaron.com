@@ -48,3 +48,23 @@ export function getSkillBarEntryTransition(isLiteMotion: boolean, index: number)
   }
   return { type: 'spring' as const, delay, duration: 0.42, stiffness: 280, damping: 24 };
 }
+
+export function getSkillColumnVariants(isLiteMotion: boolean, direction: 'left' | 'right', entryYOffset: number) {
+  const x = isLiteMotion ? 0 : direction === 'left' ? -36 : 36;
+  return {
+    hidden: { opacity: 0, x, y: entryYOffset },
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      transition: { duration: isLiteMotion ? 0.42 : 0.62, ease: 'easeOut' as const },
+    },
+  };
+}
+
+export function getDomainCardHoverTransition(isLiteMotion: boolean) {
+  if (isLiteMotion) {
+    return { type: 'tween' as const, duration: 0.2 };
+  }
+  return { type: 'spring' as const, stiffness: 400, damping: 15 };
+}
