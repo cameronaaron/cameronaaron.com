@@ -26,8 +26,14 @@ describe('branch coverage targets', () => {
   it('toggles FAQ interactive branches and renders testimonials actions', () => {
     render(<Testimonials />);
     expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
-    expect(screen.getByRole('button', { name: /show previous testimonial/i })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /show next testimonial/i })).toBeTruthy();
+
+    const prevBtn = screen.queryByRole('button', { name: /show previous testimonial/i });
+    const nextBtn = screen.queryByRole('button', { name: /show next testimonial/i });
+    expect(prevBtn).toBeTruthy();
+    expect(nextBtn).toBeTruthy();
+    // Click both cycle buttons to cover the inline onClick functions (lines 62, 72)
+    if (prevBtn) fireEvent.click(prevBtn);
+    if (nextBtn) fireEvent.click(nextBtn);
 
     const { container } = render(<FAQ />);
     fireEvent.click(screen.getByText("What's your background?"));
@@ -59,17 +65,25 @@ describe('branch coverage targets', () => {
   });
 
   it('covers experience/project hover and icon branches', () => {
+    // Render with websiteUrl to cover true branch, and without to cover false branch
+    const expWithoutUrl = { ...experiences[0], websiteUrl: undefined };
     render(
       <>
         <ExperienceCard experience={experiences[0]} index={0} />
+        <ExperienceCard experience={expWithoutUrl} index={1} />
         <FeaturedProject project={projects[0]} index={1} />
         <FeaturedProject project={projects[0]} index={2} />
         <ProjectCard project={projects[0]} index={0} />
       </>
     );
 
-    const companyImage = screen.getByAltText(experiences[0].company);
-    fireEvent.error(companyImage);
+    // Fire mouseEnter on card to cover the onMouseEnter inline function (line 68)
+    const card = screen.getByTestId('experience-card-0');
+    fireEvent.mouseEnter(card);
+    fireEvent.mouseLeave(card);
+
+    const companyImages = screen.getAllByAltText(experiences[0].company);
+    fireEvent.error(companyImages[0]);
 
     const projectLinks = screen.getAllByRole('link');
     const projectCardLink = projectLinks.find((node) => node.getAttribute('href') === projects[0].link);

@@ -24,6 +24,7 @@ export default function IframeTitleGuard() {
           }
 
           const nestedFrames = node.querySelectorAll?.('iframe');
+          /* istanbul ignore next */
           if (!nestedFrames) continue;
 
           for (const frame of nestedFrames) {

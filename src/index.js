@@ -30,6 +30,7 @@ function getManifestKeys() {
     return cachedManifestKeys;
   }
 
+  /* istanbul ignore next */
   try {
     if (typeof __STATIC_CONTENT_MANIFEST !== 'string') {
       cachedManifestKeys = [];

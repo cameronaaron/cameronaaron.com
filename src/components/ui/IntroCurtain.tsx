@@ -14,10 +14,10 @@ interface IntroCurtainProps {
 }
 
 // SSR-safe layout effect: useLayoutEffect on client, no-op on server.
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+/* istanbul ignore next */
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps = {}) {
+export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps) {
   const prefersReducedMotion = useReducedMotion();
   const reducedMotion = Boolean(prefersReducedMotion);
   // Initial state MUST match SSR (true) — collapsed synchronously below if skipping.

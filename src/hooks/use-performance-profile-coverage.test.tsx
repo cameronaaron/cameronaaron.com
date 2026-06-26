@@ -140,4 +140,37 @@ describe('usePerformanceProfile coverage', () => {
     expect(result.current.isCoarsePointer).toBe(true);
     expect(result.current.performanceTier).toBe('balanced');
   });
+
+  it('falls back to 8 cores when hardwareConcurrency is undefined (covers ?? 8 branch)', () => {
+    Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'connection', { configurable: true, value: undefined });
+
+    const { result } = renderHook(() => usePerformanceProfile());
+    // undefined ?? 8 = 8, 8 <= 4 is false → not low hardware → full tier
+    expect(result.current.lowHardware).toBe(false);
+  });
+
+  it('covers ?? 8 fallback in handleConnectionChange callback (lines 63-64)', () => {
+    let connectionListener: (() => void) | undefined;
+    const mockConnection = {
+      saveData: false,
+      addEventListener: vi.fn().mockImplementation((_: string, cb: () => void) => {
+        connectionListener = cb;
+      }),
+      removeEventListener: vi.fn(),
+    };
+    Object.defineProperty(navigator, 'connection', { configurable: true, value: mockConnection });
+    Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: undefined });
+
+    renderHook(() => usePerformanceProfile());
+
+    act(() => { connectionListener?.(); });
+    // Just needs to not throw — covers the ?? 8 branches in handleConnectionChange
+
+    Object.defineProperty(navigator, 'connection', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: 8 });
+    Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: 8 });
+  });
 });

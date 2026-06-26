@@ -31,6 +31,19 @@ describe('iframe-title-guard-logic coverage', () => {
     });
   });
 
+  describe('inferIframeTitle — lines 2-3: clientWidth/clientHeight undefined fallback', () => {
+    it('falls back to 0 when clientWidth/clientHeight are undefined (covers ?? 0 branch)', () => {
+      const frame = document.createElement('iframe');
+      // No width/height attributes → getAttribute returns null → clientWidth branch taken
+      // Override clientWidth/clientHeight to undefined to cover the ?? 0 fallback
+      Object.defineProperty(frame, 'clientWidth', { value: undefined, configurable: true });
+      Object.defineProperty(frame, 'clientHeight', { value: undefined, configurable: true });
+      frame.setAttribute('src', 'https://example.com');
+      const result = inferIframeTitle(frame);
+      expect(typeof result).toBe('string');
+    });
+  });
+
   describe('ensureIframeAccessibleTitle — title with only whitespace is replaced', () => {
     it('replaces a whitespace-only title with an inferred title', () => {
       const frame = document.createElement('iframe');

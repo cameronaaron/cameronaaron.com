@@ -49,13 +49,21 @@ const mockCtx = {
 
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', { writable: true, value: mockMQ() });
-  let rafCount = 0;
+  // Use synchronous 1-shot RAF to exercise the draw() callback without infinite recursion
+  let rafActive = true;
   vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-    if (rafCount++ < 3) setTimeout(() => cb(performance.now()), 0);
-    return rafCount;
+    if (rafActive) {
+      rafActive = false;
+      cb(performance.now());
+      rafActive = true;
+    }
+    return 1;
   });
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(mockCtx as unknown as CanvasRenderingContext2D);
+  // Non-zero dimensions so initParticles() creates actual particles
+  vi.stubGlobal('innerWidth', 1000);
+  vi.stubGlobal('innerHeight', 800);
   Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: 8 });
   Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: 8 });
   window.sessionStorage.clear();
@@ -63,7 +71,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  vi.resetModules();
   vi.unstubAllGlobals();
   window.sessionStorage.clear();
 });

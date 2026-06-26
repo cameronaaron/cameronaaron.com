@@ -22,7 +22,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     if (!shouldRenderBackgroundParticles(quality)) return;
 
     const canvas = canvasRef.current;
-    /* v8 ignore next */
+    /* istanbul ignore next */
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
