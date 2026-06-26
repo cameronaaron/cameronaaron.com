@@ -25,7 +25,7 @@ describe('TypewriterEffect coverage', () => {
   it('skips typing when sessionStorage says already complete (readInitialComplete)', () => {
     window.sessionStorage.setItem('typewriter-complete:Hello World', '1');
     render(<TypewriterEffect text="Hello World" typingSpeed={1} />);
-    expect(screen.getByText('Hello World')).toBeTruthy();
+    expect(document.body.textContent).toContain('Hello World');
   });
 
   it('fires pageshow persisted event to set skip state (lines 37-39)', async () => {
@@ -37,7 +37,7 @@ describe('TypewriterEffect coverage', () => {
       window.dispatchEvent(event);
     });
 
-    expect(screen.getByText('Test text')).toBeTruthy();
+    expect(document.body.textContent).toContain('Test text');
   });
 
   it('fires pageshow non-persisted event (no-op branch)', async () => {

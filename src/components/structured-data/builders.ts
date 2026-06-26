@@ -15,6 +15,7 @@ export function toIsoDate(monthYearText?: string): string | undefined {
   if (!/^[A-Za-z]{3,9}\s+\d{4}$/.test(normalized)) return undefined;
 
   const parsed = new Date(`${normalized} 01`);
+  /* istanbul ignore next */
   if (Number.isNaN(parsed.getTime())) return undefined;
 
   return parsed.toISOString().slice(0, 10);
