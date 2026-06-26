@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
-import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
+import { buildEducationCollections, formatGradeDisplay, isNonFinalizedCourseStatus } from '@/components/education/logic';
 
 export default function Education() {
   const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses } =
@@ -19,7 +19,7 @@ export default function Education() {
           className="[&>h2]:font-display"
         />
 
-        <div className="grid lg:grid-cols-3 gap-6 mb-14">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-14">
           {sortedEducationItems.map((item, index) => (
             <motion.article
               key={`${item.institution}-${item.credential}`}
@@ -46,15 +46,15 @@ export default function Education() {
                 ) : (
                   <p className="text-muted-foreground">{item.institution}</p>
                 )}
-                {item.verificationLinks?.length ? (
+                {item.verificationLinks && item.verificationLinks.length > 1 ? (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {item.verificationLinks.map((link) => (
+                    {item.verificationLinks.slice(1).map((link) => (
                       <a
                         key={link.url}
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100 hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors"
+                        className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100 hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                       >
                         {link.label}
                       </a>
@@ -133,7 +133,15 @@ export default function Education() {
                 <p className="col-span-5 text-muted-foreground text-sm">{course.course}</p>
                 <p className="col-span-1 text-muted-foreground text-sm">{course.units}</p>
                 <p className="col-span-1 text-muted-foreground text-sm">{formatGradeDisplay(course.grade, course.gpa)}</p>
-                <p className="col-span-2 text-sm text-cyan-300">{course.status}</p>
+                <p className="col-span-2 text-sm text-cyan-300 flex items-center gap-1.5">
+                  {isNonFinalizedCourseStatus(course.status) ? (
+                    <span className="relative flex h-1.5 w-1.5 flex-shrink-0" aria-hidden="true">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400/60" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                    </span>
+                  ) : null}
+                  {course.status}
+                </p>
               </div>
             ))}
           </div>
@@ -142,19 +150,32 @@ export default function Education() {
         <div>
           <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Honors & Affiliations</h3>
           <div className="flex flex-wrap gap-3">
-            {sortedHonorsAndAffiliations.map((honor, index) => (
-              <motion.span
-                key={honor}
-                data-testid={`honor-pill-${index}`}
-                initial={{ opacity: 0, scale: 0.92 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.04 }}
-                className="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-100 text-sm"
-              >
-                {honor}
-              </motion.span>
-            ))}
+            {sortedHonorsAndAffiliations.map((honor, index) => {
+              const pillClass = "px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-100 text-sm";
+              const sharedProps = {
+                'data-testid': `honor-pill-${index}`,
+                initial: { opacity: 0, scale: 0.92 },
+                whileInView: { opacity: 1, scale: 1 },
+                viewport: { once: true },
+                transition: { delay: index * 0.04 },
+              };
+              return honor.url ? (
+                <motion.a
+                  key={honor.label}
+                  {...sharedProps}
+                  href={honor.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${pillClass} hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background`}
+                >
+                  {honor.label}
+                </motion.a>
+              ) : (
+                <motion.span key={honor.label} {...sharedProps} className={pillClass}>
+                  {honor.label}
+                </motion.span>
+              );
+            })}
           </div>
         </div>
       </div>

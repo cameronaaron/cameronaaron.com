@@ -45,16 +45,16 @@ export default function Certifications() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.04 }}
-              className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors"
+              className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-cyan-500/5 hover:border-cyan-500/10 transition-colors duration-200 cursor-default"
             >
-              <p className="col-span-4 text-foreground font-semibold">{cert.name}</p>
-              <p className="col-span-3 text-muted-foreground">{cert.issuer}</p>
+              <p className="col-span-4 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">{cert.name}</p>
+              <p className="col-span-3 text-muted-foreground group-hover:text-foreground/70 transition-colors">{cert.issuer}</p>
               <p className="col-span-3 text-cyan-300">{cert.status}</p>
               <a
                 href={buildVerificationHref(cert)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="col-span-2 text-cyan-300 text-sm underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
+                className="col-span-2 text-cyan-300/70 text-sm underline decoration-cyan-500/30 underline-offset-4 hover:text-cyan-200 group-hover:text-cyan-300 group-hover:decoration-cyan-400/60 transition-colors"
                 aria-label={`Verify ${cert.name} credential ${cert.credentialId}`}
               >
                 {cert.credentialId}
@@ -105,7 +105,13 @@ export default function Certifications() {
                 transition={{ delay: 0.15 + index * 0.08 }}
                 className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-5"
               >
-                <p className="text-foreground font-semibold">{cert.name}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-foreground font-semibold">{cert.name}</p>
+                  <span className="relative flex h-2.5 w-2.5 flex-shrink-0 mt-1" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  </span>
+                </div>
                 <p className="text-emerald-300 text-sm mt-1">Expected: {cert.expectedCompletion}</p>
                 <p className="text-muted-foreground text-sm mt-1">{cert.status}</p>
               </motion.div>

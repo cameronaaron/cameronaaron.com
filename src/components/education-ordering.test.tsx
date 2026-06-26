@@ -13,9 +13,10 @@ describe('education ordering contract', () => {
     const cards = Array.from(container.querySelectorAll('[data-testid^="education-card-"]'));
     const periods = cards.map((card) => card.getAttribute('data-period'));
 
-    expect(periods[0]).toBe('May 2023 - Jun 2026');
-    expect(periods[1]).toBe('Aug 2023 - Jun 2024');
-    expect(periods[2]).toBe('Aug 2017 - May 2021');
+    expect(periods[0]).toBe('Sep 2025 - Aug 2026');
+    expect(periods[1]).toBe('May 2023 - Jun 2026');
+    expect(periods[2]).toBe('Aug 2023 - Jun 2024');
+    expect(periods[3]).toBe('Aug 2017 - May 2021');
   });
 
   it('keeps non-finalized prerequisite coursework entries at the bottom', () => {
@@ -40,7 +41,26 @@ describe('education ordering contract', () => {
     const honorPills = Array.from(container.querySelectorAll('[data-testid^="honor-pill-"]'));
     const values = honorPills.map((pill) => pill.textContent ?? '');
 
-    expect(values[0]).toContain('(Jun 2025)');
-    expect(values[1]).toContain('(May 2024)');
+    expect(values[0]).toContain('(Jun 2026)');
+    expect(values[1]).toContain('(Jun 2025)');
+  });
+
+  it('renders pulse indicators only on in-progress prerequisite rows in the desktop table', () => {
+    const { container } = render(<Education />);
+    const rows = Array.from(container.querySelectorAll('[data-testid^="prereq-desktop-row-"]'));
+
+    const inProgressRows = rows.filter((row) => row.getAttribute('data-status') === 'In Progress');
+    const completedRows = rows.filter((row) => row.getAttribute('data-status') === 'Completed');
+
+    expect(inProgressRows.length).toBeGreaterThan(0);
+    expect(completedRows.length).toBeGreaterThan(0);
+
+    for (const row of inProgressRows) {
+      expect(row.querySelector('.animate-ping')).not.toBeNull();
+    }
+
+    for (const row of completedRows) {
+      expect(row.querySelector('.animate-ping')).toBeNull();
+    }
   });
 });

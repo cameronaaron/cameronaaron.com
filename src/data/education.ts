@@ -11,6 +11,11 @@ export interface EducationVerificationLink {
   url: string;
 }
 
+export interface HonorItem {
+  label: string;
+  url?: string;
+}
+
 export interface PrerequisiteCourse {
   requirement: string;
   course: string;
@@ -22,6 +27,32 @@ export interface PrerequisiteCourse {
 }
 
 export const educationItems: EducationItem[] = [
+  {
+    institution: "Los Angeles Community College District",
+    credential: "Nursing Prerequisite Coursework",
+    period: "Sep 2025 - Aug 2026",
+    details: [
+      "Cumulative GPA: 3.69 | Units Earned: 36.00 (LACCD credit record)",
+      "Spring 2026: 4.0 GPA — Full Time Dean's Honor List (Anatomy, Child Dev, Microbiology, Physiology, Sociology — all A's)",
+      "Certificates of Completion: Certified Nursing Assistant (CNA) & Community Health Worker (CHW) — Dec 2025",
+      "Current enrollment: CHEM 051 – Fundamentals of Chemistry I (Summer 2026)",
+      "Non-credit completions: EKG Technician, Behavioral Tech Prep, Hardware & OS Networking, Digital Video Production",
+    ],
+    verificationLinks: [
+      {
+        label: "LACCD District Website",
+        url: "https://www.laccd.edu/",
+      },
+      {
+        label: "CA Dept. of Public Health — CNA",
+        url: "https://cvl.cdph.ca.gov/DetailPage.aspx?cert_holder_id=797902",
+      },
+      {
+        label: "Parchment — Community Health Worker",
+        url: "https://www.parchment.com/lp/award/5ed28264-10a0-4798-b16b-f94393e0b7da",
+      },
+    ],
+  },
   {
     institution: "Elmbridge University (formerly Bridges Graduate School)",
     credential: "Master of Education (M.Ed.) - Cognitive Diversity",
@@ -85,6 +116,10 @@ export const educationItems: EducationItem[] = [
       {
         label: "Digital Diploma Verification",
         url: "https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/",
+      },
+      {
+        label: "Ammerman Center for Arts and Technology",
+        url: "https://www.conncoll.edu/ammerman/",
       },
       {
         label: "Accreditation - New England Commission of Higher Education",
@@ -283,26 +318,49 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
   },
   {
     requirement: "Organic Chemistry and lab",
-    course: "CHEM 051 - Fundamentals of Chemistry I",
+    course: "CHEM 051 – Fundamentals of Chemistry I (LAVC)",
     units: "5.00",
-    grade: "Planned",
-    status: "Planned",
+    grade: "In Progress",
+    status: "In Progress",
   },
   {
     requirement: "Biochemistry",
-    course: "CHEM 051 - Fundamentals of Chemistry I (includes biochemistry topics)",
+    course: "CHEM 051 – Fundamentals of Chemistry I (LAVC, includes biochemistry topics)",
     units: "5.00",
-    grade: "Planned",
-    status: "Planned",
+    grade: "In Progress",
+    status: "In Progress",
   },
 ];
 
-export const honorsAndAffiliations: string[] = [
-  "Delta Epsilon Tau International Honor Society (Jun 2025)",
-  "2eASD Grant Scholarship, UCONN (May 2024)",
-  "Ammerman Center Bridget Baird Award (2021)",
-  "Top Emerging Talent, Pangea.app Accelerator (Jun 2021)",
-  "Jacobs Design Prize First Place - C19 BayShield (Jun 2020)",
-  "GitHub Arctic Code Vault Contributor (Jun 2020)",
-  "Impact Labs Fellow (Jan 2020)",
+export const honorsAndAffiliations: HonorItem[] = [
+  {
+    label: "Full Time Dean's Honor List, LACCD (Jun 2026)",
+  },
+  {
+    label: "Delta Epsilon Tau International Honor Society (Jun 2025)",
+    url: "https://www.deltaepsilontau.org/",
+  },
+  {
+    label: "2eASD Grant Scholarship, UCONN (May 2024)",
+  },
+  {
+    label: "Ammerman Center Bridget Baird Award (2021)",
+    url: "https://www.conncoll.edu/ammerman/",
+  },
+  {
+    label: "Top Emerging Talent, Pangea.app Accelerator (Jun 2021)",
+    url: "https://pangea.app/",
+  },
+  {
+    label: "Jacobs Design Prize First Place - C19 BayShield (Jun 2020)",
+    url: "https://jacobsinstitute.berkeley.edu/",
+  },
+  {
+    label: "GitHub Arctic Code Vault Contributor (Jun 2020)",
+    url: "https://archiveprogram.github.com/arctic-vault/",
+  },
+  {
+    label: "Impact Labs Fellow (Jan 2020)",
+    url: "https://www.impactlabs.io/",
+  },
 ];

@@ -7,6 +7,7 @@ import { experiences } from './experience';
 import { projects } from './projects';
 import { skills } from './skills';
 import { testimonials } from './testimonials';
+import { sortByDateDesc } from './dateOrdering';
 
 describe('data module coverage', () => {
   it('contains populated clinical and education data', () => {
@@ -53,6 +54,47 @@ describe('data module coverage', () => {
     expect(sociology?.grade).toBe('A');
     expect(sociology?.gpa).toBe('4.00');
     expect(sociology?.status).toBe('Completed');
+  });
+
+  it('records LACCD nursing prerequisite coursework with current transcript GPA and Dean’s Honor', () => {
+    const laccd = educationItems.find((item) =>
+      item.institution.includes('Los Angeles Community College District')
+    );
+
+    expect(laccd).toBeDefined();
+    expect(laccd?.period).toBe('Sep 2025 - Aug 2026');
+    expect(laccd?.details.some((d) => d.includes('3.69'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes("Dean's Honor List"))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('CHEM 051'))).toBe(true);
+
+    const sortedByDate = sortByDateDesc(educationItems, (item) => item.period);
+    expect(sortedByDate[0].institution).toContain('Los Angeles Community College District');
+  });
+
+  it('marks both CHEM 051 prerequisite entries as in-progress for the current summer term', () => {
+    const chem051Entries = prerequisiteCourses.filter((c) => c.course.includes('CHEM 051'));
+
+    expect(chem051Entries.length).toBeGreaterThanOrEqual(2);
+    for (const entry of chem051Entries) {
+      expect(entry.status).toBe('In Progress');
+      expect(entry.grade).toBe('In Progress');
+    }
+
+    const plannedChem = prerequisiteCourses.filter(
+      (c) => c.course.includes('CHEM') && c.status === 'Planned'
+    );
+    expect(plannedChem).toHaveLength(0);
+  });
+
+  it('includes Spring 2026 Full Time Dean’s Honor List in honors and affiliations', () => {
+    const springHonor = honorsAndAffiliations.find((h) => h.label.includes('Jun 2026'));
+
+    expect(springHonor).toBeDefined();
+    expect(springHonor?.label).toContain("Dean's Honor List");
+    expect(springHonor?.label).toContain('LACCD');
+
+    const sortedHonors = sortByDateDesc(honorsAndAffiliations, (h) => h.label);
+    expect(sortedHonors[0].label).toContain('Jun 2026');
   });
 
   it('preserves testimonial source links for externally referenced recommendations', () => {

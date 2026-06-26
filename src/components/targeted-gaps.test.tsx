@@ -2,6 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import Certifications from './Certifications';
 import CustomCursor from './ui/CustomCursor';
 import { experiences } from '@/data/experience';
 import { profile } from '@/data/profile';
@@ -345,5 +346,25 @@ describe('targeted coverage gaps', () => {
     });
 
     expect(hook.result.current.isCoarsePointer).toBe(true);
+  });
+
+  it('renders pulsing status dot on in-progress certification cards and not on completed rows', () => {
+    const { container } = render(<Certifications />);
+
+    const inProgressCards = Array.from(
+      container.querySelectorAll('[data-testid^="cert-mobile-row-"]')
+    );
+    expect(inProgressCards.length).toBeGreaterThan(0);
+
+    const inProgressSection = container.querySelector('h3 + div');
+    expect(inProgressSection).not.toBeNull();
+
+    const pulseDots = container.querySelectorAll('.animate-ping');
+    expect(pulseDots.length).toBeGreaterThan(0);
+
+    const completedRows = Array.from(container.querySelectorAll('[data-testid^="cert-row-"]'));
+    for (const row of completedRows) {
+      expect(row.querySelector('.animate-ping')).toBeNull();
+    }
   });
 });

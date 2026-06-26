@@ -15,7 +15,7 @@ npm run lint         # ESLint
 - **Next.js 16** App Router, `output: 'export'` (static), deployed on **Cloudflare Pages**
 - **React 19**, **TypeScript 6**, **Tailwind CSS v4**, **Framer Motion 12**
 - **Lenis** smooth scroll (desktop only — disabled on touch devices)
-- **Vitest** + **Testing Library** — 435+ tests, all must pass
+- **Vitest 4** + **Testing Library** — 480+ tests, all must pass
 
 ## Architecture
 
@@ -68,6 +68,8 @@ src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression
 src/hooks/use-performance-profile.test.tsx  # tier derivation, reactive updates
 src/components/ui/ui-coverage-hardening.test.tsx  # AmbientBackground, SmoothScroll…
+src/data/data-complete.test.ts         # data completeness + LACCD/CHEM 051/Dean's Honor assertions
+src/components/education-ordering.test.tsx  # education card order + pulse indicator contract
 ```
 
 Run a focused subset: `npx vitest run src/components/animation-regression-contract.test.ts`
@@ -118,7 +120,23 @@ const backgroundY = useTransform(scrollYProgress, [0, 1], [100, -50]);
 style={{ y: backgroundY }}
 ```
 
-### 7. Hero mobile layout: image must come before text
+### 7. Education grid is 4-column (xl) / 2-column (sm) — not 3-column
+
+`Education.tsx` uses `sm:grid-cols-2 xl:grid-cols-4` because there are now **4** education items (LACCD, Elmbridge M.Ed., Elmbridge Certificate, Connecticut College). If the count changes, update the grid class accordingly. Contract tests assert the sorted order: LACCD first (`Sep 2025 - Aug 2026`), then Elmbridge M.Ed. (`May 2023 - Jun 2026`).
+
+### 8. In-progress prerequisite courses show a pulsing cyan dot
+
+`Education.tsx` calls `isNonFinalizedCourseStatus(course.status)` to conditionally render an `.animate-ping` span in the status cell of the desktop prereq table. Contract tests in `education-ordering.test.tsx` assert that in-progress rows have this dot and completed rows do not. The same `animate-ping` pattern is used in `Certifications.tsx` for in-progress certification cards.
+
+### 9. Education `verificationLinks[0]` is the institution link — not a pill
+
+`Education.tsx` renders `verificationLinks[0].url` as the clickable institution name and shows `verificationLinks.slice(1)` as pill links. This means:
+
+- `verificationLinks[0]` **must always be the institution's main website** (e.g. `laccd.edu`, `conncoll.edu`)
+- Credential/verification links go at index 1+
+- Violating this causes the institution name to link to the wrong place and that same link to appear twice (once as the institution name, once as a pill)
+
+### 10. Hero mobile layout: image must come before text
 
 The image column uses `order-1 md:order-2` and the text column uses `order-2 md:order-1` so that on mobile the profile photo appears above the name/title, above the fold.
 
@@ -132,7 +150,7 @@ Site content lives in `src/data/`:
 | `experience.ts` | Work history (sorted newest-first per company) |
 | `projects.ts` | Portfolio projects |
 | `certifications.ts` | Certs with verification URLs |
-| `education.ts` | Degrees + prerequisite coursework |
+| `education.ts` | Degrees + prerequisite coursework (4 items; LACCD sorts first as most recent); `honorsAndAffiliations` is `HonorItem[]` (`{ label: string; url?: string }`) not `string[]` |
 | `testimonials.ts` | LinkedIn recommendations |
 
 ## Deployment

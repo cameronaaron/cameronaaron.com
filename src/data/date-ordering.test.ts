@@ -30,11 +30,11 @@ describe('date ordering utility', () => {
     const sortedProjects = sortByDateDesc(projects, (project) => project.period);
     const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
     const sortedEducation = sortByDateDesc(educationItems, (item) => item.period);
-    const sortedHonors = sortByDateDesc(honorsAndAffiliations, (item) => item);
+    const sortedHonors = sortByDateDesc(honorsAndAffiliations, (item) => item.label);
 
     expect(sortedProjects[0].title).toContain('Bridging Transitions');
     expect(sortedCertifications[0].name).toBe('Certified Nursing Assistant (CNA)');
-    expect(sortedEducation[0].credential).toContain('Master of Education');
-    expect(sortedHonors[0]).toContain('(Jun 2025)');
+    expect(sortedEducation[0].credential).toContain('Nursing Prerequisite Coursework');
+    expect(sortedHonors[0].label).toContain('(Jun 2026)');
   });
 });

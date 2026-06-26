@@ -1,5 +1,5 @@
 import { sortByDateDesc } from '@/data/dateOrdering';
-import type { EducationItem, PrerequisiteCourse } from '@/data/education';
+import type { EducationItem, HonorItem, PrerequisiteCourse } from '@/data/education';
 
 const NON_FINALIZED_STATUS_TOKENS = [
   'in progress',
@@ -12,7 +12,7 @@ const NON_FINALIZED_STATUS_TOKENS = [
 
 export interface EducationCollections {
   sortedEducationItems: EducationItem[];
-  sortedHonorsAndAffiliations: string[];
+  sortedHonorsAndAffiliations: HonorItem[];
   sortedPrerequisiteCourses: PrerequisiteCourse[];
 }
 
@@ -42,11 +42,11 @@ export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): Prerequi
 export function buildEducationCollections(
   educationItems: EducationItem[],
   prerequisiteCourses: PrerequisiteCourse[],
-  honorsAndAffiliations: string[]
+  honorsAndAffiliations: HonorItem[]
 ): EducationCollections {
   return {
     sortedEducationItems: sortByDateDesc(educationItems, (item) => item.period),
-    sortedHonorsAndAffiliations: sortByDateDesc(honorsAndAffiliations, (item) => item),
+    sortedHonorsAndAffiliations: sortByDateDesc(honorsAndAffiliations, (item) => item.label),
     sortedPrerequisiteCourses: sortPrerequisiteCourses(prerequisiteCourses),
   };
 }

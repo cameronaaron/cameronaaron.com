@@ -30,8 +30,8 @@ describe('education logic', () => {
   it('builds all sorted education collections used by the component', () => {
     const collections = buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations);
 
-    expect(collections.sortedEducationItems[0]?.period).toBe('May 2023 - Jun 2026');
-    expect(collections.sortedHonorsAndAffiliations[0]).toContain('(Jun 2025)');
+    expect(collections.sortedEducationItems[0]?.period).toBe('Sep 2025 - Aug 2026');
+    expect(collections.sortedHonorsAndAffiliations[0].label).toContain('(Jun 2026)');
     expect(collections.sortedPrerequisiteCourses.length).toBe(prerequisiteCourses.length);
   });
 });
