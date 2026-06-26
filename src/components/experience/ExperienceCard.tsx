@@ -8,8 +8,6 @@ import SpotlightCard from '@/components/ui/SpotlightCard';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { buildCompanyMonogram, calculateTiltTargets } from '@/components/experience/card-logic';
 
-export { calculateTiltTargets } from '@/components/experience/card-logic';
-
 interface ExperienceCardProps {
   experience: Experience;
   index: number;

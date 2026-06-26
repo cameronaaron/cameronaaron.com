@@ -34,7 +34,7 @@ export const internetFeatures: InternetFeature[] = [
   {
     title: '4me Welcomes Cameron Aaron',
     organization: 'Xurrent',
-    period: '2020',
+    period: '2023',
     summary: 'Featured profile post highlighting professional trajectory and technical leadership.',
     category: 'Media',
     url: 'https://www.xurrent.com/blog/4me-welcomes-cameron-aaron',

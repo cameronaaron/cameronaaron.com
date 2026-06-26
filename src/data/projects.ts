@@ -80,7 +80,7 @@ export const projects: Project[] = [
     description: "Public profile feature discussing background across software, operations, and interdisciplinary career development.",
     link: "https://www.xurrent.com/blog/4me-welcomes-cameron-aaron",
     tags: ["Profile", "Technology", "Career"],
-    period: "2020",
+    period: "2023",
     cta: "Read Feature",
   },
   {

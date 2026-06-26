@@ -63,10 +63,10 @@ export const additionalCredentials: AdditionalCredential[] = [
   },
   {
     name: 'Suite of Tools Level 2',
-    issuer: 'Bridges Graduate School of Cognitive Diversity in Education',
+    issuer: 'Elmbridge University (formerly Bridges Graduate School)',
     issued: 'Apr 2024',
     credentialId: 'Suite-of-Tools-Level-2',
-    verificationUrl: 'https://www.bridges.edu/',
+    verificationUrl: 'https://elmbridge.edu/',
     notes: 'Institutional training credential.',
   },
   {

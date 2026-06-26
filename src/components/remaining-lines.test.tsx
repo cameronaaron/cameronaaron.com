@@ -2,7 +2,8 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import ExperienceCard, { calculateTiltTargets } from './experience/ExperienceCard';
+import ExperienceCard from './experience/ExperienceCard';
+import { calculateTiltTargets } from './experience/card-logic';
 import ProfileImage from './hero/ProfileImage';
 import FeaturedProject from './projects/FeaturedProject';
 import ProjectCard, { calculateCardTiltTargets } from './projects/ProjectCard';

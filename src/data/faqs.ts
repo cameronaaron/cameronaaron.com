@@ -9,15 +9,15 @@ export const faqs = [
   },
   {
     question: "What are you working on right now?",
-    answer: "I'm always tinkering with AI and web apps. Lately, I've been focused on projects that bridge the gap between complex data and user experience—things like AI-powered feedback tools and bioinformatics visualizations."
+    answer: "Finishing my nursing prerequisite coursework at LACCD — currently in Chemistry — while applying to Nurse Practitioner programs. On the tech side I keep a few projects going, but healthcare is the main focus right now."
   },
   {
     question: "Are you open to new opportunities?",
-    answer: "I'm always happy to chat! Whether it's a cool project idea, a tech role, or just geeking out over the latest in AI or Neuroscience, feel free to reach out."
+    answer: "I'm always happy to chat, especially about healthcare, clinical research, or interdisciplinary work at the intersection of medicine and technology. Feel free to reach out."
   },
   {
     question: "What's your favorite tech stack?",
-    answer: "I'm big on the React ecosystem (Next.js is a favorite) paired with Python for the heavy lifting. I also love working with cloud infrastructure—AWS and GCP are my go-to playgrounds."
+    answer: "React and Next.js on the frontend, Python for data and scripting, and Cloudflare for deployment. This site is a Next.js static export on Cloudflare Pages."
   },
   {
     question: "I saw you have a background in Neuroscience?",
