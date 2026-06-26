@@ -43,6 +43,8 @@ describe('branch coverage targets', () => {
         <Button href="#go" variant="secondary">Secondary Link</Button>
         <Button variant="outline">Outline</Button>
         <Card hover={false} gradient={false}>Plain Card</Card>
+        <Card className="extra" delay={0.2}>With className and delay</Card>
+        <Card>Default gradient</Card>
       </>
     );
 

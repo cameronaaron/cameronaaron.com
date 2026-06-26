@@ -32,6 +32,7 @@ describe('ui component smoke coverage', () => {
         <CursorTrail />
         <CustomCursor />
         <FadeInWhenVisible direction="left">Fade</FadeInWhenVisible>
+        <FadeInWhenVisible>Default direction</FadeInWhenVisible>
         <FloatingBadge icon="innovation" position="top-right" />
         <FloatingBadge icon="neuro" position="bottom-left" delay={0.2} />
         <Magnetic><span>Magnetic</span></Magnetic>

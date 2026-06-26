@@ -8,7 +8,7 @@ interface BackToTopProps {
   threshold?: number;
 }
 
-export default function BackToTop({ threshold = 600 }: BackToTopProps = {}) {
+export default function BackToTop({ threshold = 600 }: BackToTopProps) {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 

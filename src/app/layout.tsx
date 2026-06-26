@@ -103,9 +103,9 @@ export const metadata: Metadata = {
     "Institutional Training",
     "Educational Video Series"
   ],
-  authors: [{ name: "Cameron Aaron", url: "https://cameronaaron.com" }],
-  creator: "Cameron Aaron",
-  publisher: "Cameron Aaron",
+  authors: [{ name: "Cameron Aaron, M.Ed.", url: "https://cameronaaron.com" }],
+  creator: "Cameron Aaron, M.Ed.",
+  publisher: "Cameron Aaron, M.Ed.",
   alternates: {
     canonical: "https://cameronaaron.com/",
     languages: {
@@ -134,8 +134,8 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "Cameron Aaron Official Site | EMT, CNA, Software Engineer",
-    description: "Official Cameron Aaron portfolio with healthcare credentials, software engineering work, and arts-based capstone research on thrice-exceptional Black male students and higher education transition.",
+    title: "Cameron Aaron, M.Ed. | EMT, CNA, Software Engineer",
+    description: "Official site of Cameron Aaron, M.Ed. — healthcare credentials, software engineering work, and arts-based capstone research on thrice-exceptional Black male students and higher education transition.",
     url: "https://cameronaaron.com/",
     siteName: "Cameron Aaron",
     images: [
@@ -156,8 +156,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cameron Aaron Official Site | EMT, CNA, Software Engineer",
-    description: "Official portfolio of Cameron Aaron featuring healthcare credentials, technical work, and graduate arts-based research in gifted education and higher education transition.",
+    title: "Cameron Aaron, M.Ed. | EMT, CNA, Software Engineer",
+    description: "Official portfolio of Cameron Aaron, M.Ed. featuring healthcare credentials, technical work, and graduate arts-based research in gifted education and higher education transition.",
     images: {
       url: "https://cameronaaron.com/twitter-image.png",
       alt: "Cameron Aaron | EMT, CNA, Software Engineer, Security Researcher & Future NP",
@@ -182,7 +182,7 @@ export const metadata: Metadata = {
   referrer: 'origin-when-cross-origin',
   appleWebApp: {
     capable: true,
-    title: 'Cameron Aaron',
+    title: 'Cameron Aaron, M.Ed.',
     statusBarStyle: 'black-translucent',
   },
   formatDetection: {

@@ -28,7 +28,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
   const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
 
-  /* v8 ignore next 10 */
+  /* istanbul ignore next 10 */
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!enableHoverMotion) return;
 
@@ -141,7 +141,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           whileHover={enableHoverMotion ? { x: 8 } : undefined}
           transition={{ duration: 0.2 }}
         >
-          {/* v8 ignore next */}
+          {/* istanbul ignore next */}
           {getProjectCardCta(project.cta)}
           <motion.svg 
             className="w-4 h-4 ml-2" 

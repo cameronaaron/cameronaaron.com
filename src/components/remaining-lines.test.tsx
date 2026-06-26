@@ -82,6 +82,14 @@ describe('remaining line coverage', () => {
     expect(screen.getByAltText(profile.name)).toBeTruthy();
   });
 
+  it('covers ProfileImage mousemove when getElementById returns null', () => {
+    render(<ProfileImage src={profile.image} alt={profile.name} />);
+    const spy = vi.spyOn(document, 'getElementById').mockReturnValue(null);
+    fireEvent.mouseMove(window, { clientX: 180, clientY: 210 });
+    spy.mockRestore();
+    expect(screen.getByAltText(profile.name)).toBeTruthy();
+  });
+
   it('covers ProjectCard hover branches and fallback CTA in featured project', () => {
     render(<ProjectCard project={projects[0]} index={0} />);
 
@@ -96,6 +104,7 @@ describe('remaining line coverage', () => {
     fireEvent.mouseLeave(card);
 
     render(<FeaturedProject project={{ ...projects[0], cta: undefined }} index={0} />);
+    render(<FeaturedProject project={projects[1]} />);
     expect(screen.getByText('View Publication')).toBeTruthy();
   });
 

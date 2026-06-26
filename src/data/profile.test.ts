@@ -3,7 +3,7 @@ import { profile } from './profile';
 
 describe('profile data', () => {
   it('contains expected identity and contact fields', () => {
-    expect(profile.name).toBe('Cameron Aaron');
+    expect(profile.name).toBe('Cameron Aaron, M.Ed.');
     expect(profile.email).toContain('@');
     expect(profile.location).toContain('CA');
     expect(profile.image.endsWith('.webp')).toBe(true);

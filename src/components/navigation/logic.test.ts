@@ -61,6 +61,10 @@ describe('navigation logic', () => {
     expect(pickActiveHref([], 140, '#contact')).toBe('#contact');
   });
 
+  it('uses default triggerLine and fallbackHref when called with only sections', () => {
+    expect(pickActiveHref([])).toBe('#home');
+  });
+
   it('computes active label and desktop close behavior', () => {
     const items = [
       { name: 'Home', href: '#home' },

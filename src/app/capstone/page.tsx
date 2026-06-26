@@ -108,7 +108,7 @@ export default function CapstonePage() {
         mainEntityOfPage: { '@id': `${pageUrl}#webpage` },
         author: {
           '@type': 'Person',
-          name: 'Cameron Aaron',
+          name: 'Cameron Aaron, M.Ed.',
           url: baseUrl,
         },
         publisher: {
@@ -148,7 +148,7 @@ export default function CapstonePage() {
         name: `${capstone.shortTitle} Video Series`,
         creator: {
           '@type': 'Person',
-          name: 'Cameron Aaron',
+          name: 'Cameron Aaron, M.Ed.',
         },
         inLanguage: 'en-US',
         isAccessibleForFree: true,

@@ -54,6 +54,13 @@ describe('hooks coverage', () => {
     expect(scrolled.result.current).toBe(true);
   });
 
+  it('useParallax and useScrollPosition use default parameters when called without args', () => {
+    const parallax = renderHook(() => useParallax());
+    const scrolled = renderHook(() => useScrollPosition());
+    expect(parallax.result.current).toBe(0);
+    expect(scrolled.result.current).toBe(false);
+  });
+
   it('returns interaction mode flags', () => {
     const { result } = renderHook(() => useInteractionMode());
 

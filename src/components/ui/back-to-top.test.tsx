@@ -24,6 +24,11 @@ describe('BackToTop', () => {
     Object.defineProperty(window, 'scrollTo', { configurable: true, writable: true, value: originalScrollTo });
   });
 
+  it('renders without props using default threshold', () => {
+    render(<BackToTop />);
+    expect(screen.queryByTestId('back-to-top')).toBeNull();
+  });
+
   it('does not render the button when scroll position is below threshold', () => {
     render(<BackToTop threshold={400} />);
     expect(screen.queryByTestId('back-to-top')).toBeNull();

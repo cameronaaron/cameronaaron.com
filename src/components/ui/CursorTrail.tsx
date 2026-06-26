@@ -19,7 +19,7 @@ export default function CursorTrail() {
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
-    /* v8 ignore next */
+    /* istanbul ignore next */
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(pointer: coarse)').matches;
   });
@@ -41,7 +41,7 @@ export default function CursorTrail() {
 
   useEffect(() => {
     const pointerMedia = window.matchMedia('(pointer: coarse)');
-    /* v8 ignore next 3 */
+    /* istanbul ignore next 3 */
     const updatePointerMode = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);
     };
@@ -74,7 +74,7 @@ export default function CursorTrail() {
     const sampleTrail = (x: number, y: number) => {
       const now = performance.now();
       // Sample at ~60fps max to avoid over-updating on high polling mice.
-      /* v8 ignore next */
+      /* istanbul ignore next */
       if (!shouldSampleTrail(lastSampleRef.current, now)) return;
       lastSampleRef.current = now;
 

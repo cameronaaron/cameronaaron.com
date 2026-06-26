@@ -44,6 +44,7 @@ export default function KeyboardShortcuts() {
         behavior: prefersReducedMotion ? 'auto' : 'smooth',
         block: 'start',
       });
+      /* istanbul ignore next */
       if (typeof history !== 'undefined' && history.replaceState) {
         history.replaceState(null, '', `#${targetId}`);
       }

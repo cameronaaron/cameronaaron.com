@@ -312,4 +312,50 @@ describe('ui coverage hardening', () => {
       });
     }
   });
+
+  it('covers idle cleanup false branch when cancelIdleCallback is absent', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    window.sessionStorage.setItem('sw-cleanup-complete', 'true');
+
+    const originalCancelIdle = (window as Window & { cancelIdleCallback?: unknown }).cancelIdleCallback;
+    delete (window as Window & { cancelIdleCallback?: unknown }).cancelIdleCallback;
+
+    Object.defineProperty(window, 'requestIdleCallback', {
+      configurable: true,
+      value: vi.fn(() => 99),
+    });
+
+    const { unmount } = render(<ServiceWorkerRegistration />);
+    unmount();
+
+    process.env.NODE_ENV = originalNodeEnv;
+    if (typeof originalCancelIdle === 'undefined') {
+      delete (window as Window & { cancelIdleCallback?: unknown }).cancelIdleCallback;
+    } else {
+      Object.defineProperty(window, 'cancelIdleCallback', { configurable: true, value: originalCancelIdle });
+    }
+    delete (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
+  });
+
+  it('covers service worker cleanup with empty registrations and no caches API', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    window.sessionStorage.removeItem('sw-cleanup-complete');
+
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: { getRegistrations: vi.fn().mockResolvedValue([]), controller: null },
+    });
+
+    delete (window as Window & { caches?: CacheStorage }).caches;
+
+    render(<ServiceWorkerRegistration />);
+
+    await waitFor(() => {
+      expect(window.sessionStorage.getItem('sw-cleanup-complete')).toBe('true');
+    });
+
+    process.env.NODE_ENV = originalNodeEnv;
+  });
 });

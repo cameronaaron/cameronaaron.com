@@ -21,7 +21,7 @@ export interface Profile {
 }
 
 export const profile: Profile = {
-  name: "Cameron Aaron",
+  name: "Cameron Aaron, M.Ed.",
   title: "EMT, CNA, Software Engineer, Security Researcher & Future Nurse Practitioner",
   tagline: "Interdisciplinary professional bridging emergency care, neuroscience research, software engineering, and cybersecurity while preparing for Nurse Practitioner school.",
   bio: "Dedicated healthcare and technology professional with experience in aerospace medicine, clinical research, public health operations, software engineering, and security research. My next stage is Nurse Practitioner training, while continuing to build secure, high-impact technology for health and science.",
