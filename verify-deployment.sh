@@ -33,11 +33,11 @@ fi
 
 # Check 3: Strict Lighthouse + performance gate
 echo -n "✓ Running strict Lighthouse/performance gate... "
-if npm run test:performance > /dev/null 2>&1; then
+if pnpm run test:performance > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Passed${NC}"
 else
     echo -e "${RED}✗ Failed${NC}"
-    echo "Run 'npm run test:performance' to see errors"
+    echo "Run 'pnpm run test:performance' to see errors"
     exit 1
 fi
 

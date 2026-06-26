@@ -16,10 +16,10 @@ describe('performance regression contract', () => {
     const scripts = packageJson.scripts ?? {};
 
     expect(scripts['test:performance:contracts']).toBe('node scripts/performance-budgets.mjs');
-    expect(scripts['test:performance']).toContain('npm run build');
-    expect(scripts['test:performance']).toContain('npm run test:performance:contracts');
+    expect(scripts['test:performance']).toContain('pnpm run build');
+    expect(scripts['test:performance']).toContain('pnpm run test:performance:contracts');
     expect(scripts['test:performance']).toContain('@lhci/cli');
-    expect(scripts['deploy:pages:prod']).toContain('npm run test:performance');
+    expect(scripts['deploy:pages:prod']).toContain('pnpm run test:performance');
   });
 
   it('keeps CI performance checks in both build contracts and lighthouse assertions', () => {
@@ -67,6 +67,6 @@ describe('performance regression contract', () => {
   it('keeps pre-deployment verification wired to strict performance checks', () => {
     const verifyScript = read('verify-deployment.sh');
 
-    expect(verifyScript).toContain('npm run test:performance');
+    expect(verifyScript).toContain('pnpm run test:performance');
   });
 });
