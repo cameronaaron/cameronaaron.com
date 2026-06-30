@@ -12,7 +12,7 @@ export interface Particle {
 }
 
 export interface Connection {
-  id: string;
+  id: number;
   x1: number;
   y1: number;
   x2: number;
@@ -115,17 +115,18 @@ export function buildConnections(
 ): Connection[] {
   const lines: Connection[] = [];
 
+  const connectDist2 = connectionDistance * connectionDistance;
   for (let i = 0; i < particles.length; i += 1) {
     for (let j = i + 1; j < particles.length; j += 1) {
       const a = particles[i];
       const b = particles[j];
       const dx = a.x - b.x;
       const dy = a.y - b.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < connectionDistance) {
+      const dist2 = dx * dx + dy * dy;
+      if (dist2 < connectDist2) {
+        const distance = Math.sqrt(dist2);
         lines.push({
-          id: `${a.id}-${b.id}`,
+          id: a.id * 1000 + b.id,
           x1: a.x,
           y1: a.y,
           x2: b.x,
@@ -196,9 +197,9 @@ export function stepParticles(
     if (pointer.active) {
       const dx = pointer.x - nextX;
       const dy = pointer.y - nextY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < 22 && distance > 0.001) {
+      const dist2 = dx * dx + dy * dy;
+      if (dist2 < 484 && dist2 > 0.000001) {
+        const distance = Math.sqrt(dist2);
         const pull = (22 - distance) / 22;
         const attractionStrength = quality === 'full' ? 0.012 : 0.008;
         velocityX += (dx / distance) * pull * attractionStrength * step;

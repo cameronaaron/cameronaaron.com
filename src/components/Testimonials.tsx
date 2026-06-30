@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { testimonials } from '@/data/testimonials';
 import SectionHeader from '@/components/ui/SectionHeader';
 import TestimonialCard from '@/components/testimonials/TestimonialCard';
