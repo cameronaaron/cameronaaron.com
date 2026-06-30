@@ -265,4 +265,21 @@ describe('ExperienceCard and ProjectCard handleMouseMove with enableHoverMotion:
     fireEvent.mouseMove(card, { clientX: 200, clientY: 100 });
     expect(card).toBeTruthy();
   });
+
+  it('executes handleMouseMove body when enableHoverMotion is true (ProjectCard)', async () => {
+    vi.doMock('@/hooks/useInteractionMode', () => ({
+      useInteractionMode: () => ({ enableHoverMotion: true, prefersReducedMotion: false }),
+    }));
+    const { default: ProjectCard } = await import('@/components/projects/ProjectCard');
+    const { projects } = await import('@/data/projects');
+    const { container } = render(<ProjectCard project={projects[0]} index={0} />);
+    const card = container.querySelector('[data-testid="project-card-0"]') as HTMLElement;
+    expect(card).toBeTruthy();
+    Object.defineProperty(card, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ left: 0, top: 0, width: 400, height: 200 }),
+    });
+    fireEvent.mouseMove(card, { clientX: 200, clientY: 100 });
+    expect(card).toBeTruthy();
+  });
 });

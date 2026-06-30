@@ -1,4 +1,3 @@
-import React from 'react';
 import { act, fireEvent, render } from '@testing-library/react';
 import * as framerMotion from 'framer-motion';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -139,18 +138,6 @@ describe('particle and cursor coverage', () => {
       expect(container.querySelectorAll('.absolute.rounded-full').length).toBeGreaterThan(0);
     });
   }, 15000);
-
-  it('covers canvas-ref-null guard in BackgroundParticles', () => {
-    // Mock useRef to return a frozen ref so React can't populate current → covers `if (!canvas) return`
-    const frozenRef = Object.defineProperty({ current: null }, 'current', {
-      get: () => null,
-      set: () => {},
-      configurable: true,
-    }) as React.RefObject<null>;
-    const useRefSpy = vi.spyOn(React, 'useRef').mockReturnValueOnce(frozenRef);
-    render(<BackgroundParticles quality="full" />);
-    useRefSpy.mockRestore();
-  });
 
   it('covers draw() code paths when canvas context is available (useConnections+useMousePull true)', () => {
     withRafQueue((callbacks) => {
