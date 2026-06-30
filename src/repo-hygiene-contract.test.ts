@@ -11,6 +11,7 @@ const EXPECTED_ROOT_FILES = [
   'README.md',
   'eslint.config.mjs',
   'lighthouserc.json',
+  'lighthouserc.mobile.json',
   'meoninternet.md',
   'next.config.mjs',
   'package.json',

@@ -1,12 +1,8 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  getTypewriterStorageKey,
-  markTypewriterComplete,
-  readInitialComplete,
-} from '@/components/ui/typewriter-effect-logic';
+import { getVisibleTypedText } from '@/components/ui/typewriter-effect-logic';
 
 interface TypewriterEffectProps {
   text: string;
@@ -15,49 +11,32 @@ interface TypewriterEffectProps {
   typingSpeed?: number;
 }
 
-// SSR-safe layout effect.
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-export default function TypewriterEffect({ 
-  text, 
+export default function TypewriterEffect({
+  text,
   className = "",
   cursorClassName = "",
   typingSpeed = 100
 }: TypewriterEffectProps) {
-  const storageKey = getTypewriterStorageKey(text);
-  // Initial state MUST match SSR. Collapse to complete state synchronously below if skipping.
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skipTyping, setSkipTyping] = useState(false);
   const isComplete = currentIndex >= text.length;
 
-  useIsomorphicLayoutEffect(() => {
-    if (readInitialComplete(storageKey)) {
-      setDisplayedText(text);
-      setCurrentIndex(text.length);
-      setSkipTyping(true);
-    }
-  }, [storageKey, text]);
-
+  // Only a true bfcache restore (the browser resumes a frozen page instead of
+  // re-running JS) should jump straight to the finished state — every other
+  // load, including reloads and back/forward without bfcache, types it out.
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         setDisplayedText(text);
         setCurrentIndex(text.length);
         setSkipTyping(true);
-        markTypewriterComplete(storageKey);
       }
     };
 
     window.addEventListener('pageshow', handlePageShow, { passive: true });
     return () => window.removeEventListener('pageshow', handlePageShow);
-  }, [storageKey, text]);
-
-  useEffect(() => {
-    if (isComplete) {
-      markTypewriterComplete(storageKey);
-    }
-  }, [isComplete, storageKey]);
+  }, [text]);
 
   useEffect(() => {
     if (skipTyping) {
@@ -69,7 +48,7 @@ export default function TypewriterEffect({
         setDisplayedText(text.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
       }, typingSpeed);
-      
+
       return () => clearTimeout(timer);
     }
   }, [currentIndex, skipTyping, text, typingSpeed]);
@@ -89,7 +68,7 @@ export default function TypewriterEffect({
       <span aria-hidden="true" className={className} style={{ visibility: 'hidden' }}>{text}</span>
       {/* Visible typed text + cursor overlaid at the same origin as the spacer */}
       <span aria-hidden="true" className={className} style={{ position: 'absolute', left: 0, top: 0 }}>
-        {displayedText || text.charAt(0)}
+        {getVisibleTypedText(displayedText, text)}
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: isComplete ? 0 : 1 }}

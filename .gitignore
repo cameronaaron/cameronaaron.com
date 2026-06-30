@@ -27,6 +27,12 @@ dist/
 coverage/
 .nyc_output/
 
+# Playwright artifacts
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
 # Lighthouse and local audit artifacts
 .lighthouseci/
 .chrome-bin/
@@ -34,6 +40,15 @@ lighthouse-*.report.html
 lighthouse-*.report.json
 lighthouse-live*.json
 lighthouse-local*.json
+# Catch-all for ad-hoc local `lighthouse`/`lhci` CLI output (any naming scheme
+# the CLI's --output-path produces, not just the lighthouse-*/lhci-* prefixes above).
+lh-*.json
+lh-*.html
+lh-*.report.json
+lh-*.report.html
+lhr-*.json
+lhr-*.html
+*.lighthouseci/
 # Lighthouse trace artifacts (Chrome DevTools protocol output).
 # The "false/" directory name comes from CLI runs where --output-path was
 # accidentally set to a boolean-string path component instead of a real path.

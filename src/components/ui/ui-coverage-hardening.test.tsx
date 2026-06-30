@@ -96,9 +96,6 @@ describe('ui coverage hardening', () => {
       Object.defineProperty(pageShow, 'persisted', { value: true });
       window.dispatchEvent(pageShow);
 
-      const key = 'typewriter-complete:Typing';
-      expect(window.sessionStorage.getItem(key)).toBe('1');
-
       rerender(<TypewriterEffect text="Typing" typingSpeed={1} className="heading" cursorClassName="cursor" />);
       expect(screen.getAllByText('Typing').length).toBeGreaterThan(0);
     } finally {

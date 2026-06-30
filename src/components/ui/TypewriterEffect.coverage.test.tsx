@@ -22,10 +22,17 @@ afterEach(() => {
 });
 
 describe('TypewriterEffect coverage', () => {
-  it('skips typing when sessionStorage says already complete (readInitialComplete)', () => {
+  it('always types out from scratch on a fresh mount, ignoring any stale sessionStorage', () => {
     window.sessionStorage.setItem('typewriter-complete:Hello World', '1');
     render(<TypewriterEffect text="Hello World" typingSpeed={1} />);
-    expect(document.body.textContent).toContain('Hello World');
+    // Full text is always present (sr-only span + hidden spacer for layout reservation),
+    // but the visible glyph span starts at just the first character — no stale
+    // sessionStorage flag should jump it straight to the finished state.
+    // Spacer span (visibility:hidden) holds the full text; the visible span is the second.
+    const ariaHiddenSpans = document.querySelectorAll('span[aria-hidden="true"]');
+    const visibleSpan = ariaHiddenSpans[1];
+    expect(visibleSpan?.textContent?.startsWith('Hello World')).toBe(false);
+    expect(visibleSpan?.textContent?.startsWith('H')).toBe(true);
   });
 
   it('fires pageshow persisted event to set skip state (lines 37-39)', async () => {
