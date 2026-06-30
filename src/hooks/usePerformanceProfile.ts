@@ -29,47 +29,44 @@ function getConnection(): NetworkInformationLike | null {
     ?? null;
 }
 
+function readLowHardware(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const cores = navigator.hardwareConcurrency ?? DEFAULT_HARDWARE_CONCURRENCY;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? DEFAULT_DEVICE_MEMORY_GB;
+  return cores <= LOW_HARDWARE_CORES_THRESHOLD || memory <= LOW_HARDWARE_MEMORY_GB_THRESHOLD;
+}
+
 export function usePerformanceProfile() {
   const prefersReducedMotion = useReducedMotion();
 
-  const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(pointer: coarse)').matches;
-  });
-
-  const [saveDataEnabled, setSaveDataEnabled] = useState(() => {
-    const connection = getConnection();
-    return Boolean(connection?.saveData);
-  });
-
-  const [lowHardware, setLowHardware] = useState(() => {
-    if (typeof navigator === 'undefined') return false;
-
-    const cores = navigator.hardwareConcurrency ?? DEFAULT_HARDWARE_CONCURRENCY;
-    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? DEFAULT_DEVICE_MEMORY_GB;
-
-    return cores <= LOW_HARDWARE_CORES_THRESHOLD || memory <= LOW_HARDWARE_MEMORY_GB_THRESHOLD;
-  });
+  // Initial state is always false to match the SSR/build-time output.
+  // Reading real browser values (matchMedia, hardwareConcurrency) in a lazy useState initializer
+  // runs during the client's first render, before React has hydrated — causing mismatch with the
+  // static HTML (where window/navigator are undefined) and triggering React error #418.
+  // useEffect defers the real detection until after hydration is complete.
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const [saveDataEnabled, setSaveDataEnabled] = useState(false);
+  const [lowHardware, setLowHardware] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: coarse)');
+    const connection = getConnection();
+
+    // Sync to real device values immediately after hydration
+    setIsCoarsePointer(media.matches);
+    setSaveDataEnabled(Boolean(connection?.saveData));
+    setLowHardware(readLowHardware());
 
     const handlePointerChange = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);
     };
 
-    media.addEventListener('change', handlePointerChange);
-
-    const connection = getConnection();
-
     const handleConnectionChange = () => {
       setSaveDataEnabled(Boolean(connection?.saveData));
-
-      const cores = navigator.hardwareConcurrency ?? DEFAULT_HARDWARE_CONCURRENCY;
-      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? DEFAULT_DEVICE_MEMORY_GB;
-      setLowHardware(cores <= LOW_HARDWARE_CORES_THRESHOLD || memory <= LOW_HARDWARE_MEMORY_GB_THRESHOLD);
+      setLowHardware(readLowHardware());
     };
 
+    media.addEventListener('change', handlePointerChange);
     connection?.addEventListener?.('change', handleConnectionChange);
 
     return () => {

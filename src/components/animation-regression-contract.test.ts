@@ -24,6 +24,13 @@
  * 5. shouldRenderParticles on mobile (2026-06)
  *    Canvas particle systems ran on the 'balanced' (mobile) tier.
  *    Fix: shouldRenderParticles is restricted to 'full' tier only.
+ *
+ * 6. usePerformanceProfile React hydration error #418 (2026-06)
+ *    useState lazy initializers read window.matchMedia() and navigator.hardwareConcurrency
+ *    during the client's first render, before hydration. On mobile these return different values
+ *    than at SSR build-time (where window/navigator are undefined), causing the client's initial
+ *    render to differ from the static HTML → React #418 "Hydration failed".
+ *    Fix: all three state values start as `false` (matching SSR), real values set in useEffect.
  */
 
 import { readFileSync } from 'node:fs';
@@ -176,6 +183,16 @@ describe('animation regression contract', () => {
   it('Hero signal chips use whitespace-nowrap to prevent mid-word wrapping on mobile', () => {
     const source = read('src/components/Hero.tsx');
     expect(source).toContain('whitespace-nowrap');
+  });
+
+  it('usePerformanceProfile uses false initial state (not lazy browser-API initializers) to prevent React #418 hydration error', () => {
+    const source = read('src/hooks/usePerformanceProfile.ts');
+    // Must NOT use lazy initializers that read window/navigator during the first render.
+    // Those read real browser values on mobile (coarse pointer, low cores) but the SSR HTML
+    // was built with all-false defaults — the mismatch causes React error #418.
+    expect(source).not.toContain('useState(() =>');
+    // Must use safe false defaults; real values are set in useEffect after hydration.
+    expect(source).toContain('useState(false)');
   });
 
   it('Skills section headings are plain h3 elements inside the stagger container (no standalone whileInView inside stagger)', () => {

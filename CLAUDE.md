@@ -136,7 +136,24 @@ style={{ y: backgroundY }}
 - Credential/verification links go at index 1+
 - Violating this causes the institution name to link to the wrong place and that same link to appear twice (once as the institution name, once as a pill)
 
-### 10. Hero mobile layout: image must come before text
+### 10. `usePerformanceProfile` initial state must be `false` — not a lazy browser-API reader
+
+```ts
+// ✅ correct — initial state matches SSR (window/navigator undefined at build time)
+const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+const [saveDataEnabled, setSaveDataEnabled] = useState(false);
+const [lowHardware, setLowHardware] = useState(false);
+// Real values set in useEffect after hydration completes
+
+// ❌ wrong — causes React #418 hydration error on mobile
+const [isCoarsePointer, setIsCoarsePointer] = useState(() => window.matchMedia('(pointer: coarse)').matches);
+```
+
+The site is a static export. HTML is built with `window === undefined`, so all tier flags default to `false` → `performanceTier = 'full'`. On mobile, a lazy `useState` initializer reads `matchMedia` immediately during the first client render — before hydration — returning `true`, making `performanceTier = 'balanced'`. The HTML has e.g. 7 ambient orbs; the client wants to render 4. React throws #418 and re-renders the entire root from scratch.
+
+Fix: `useState(false)` always. `useEffect` syncs the real values after hydration. There's a brief flash from 'full' to 'balanced' on mobile but no hydration error.
+
+### 11. Hero mobile layout: image must come before text
 
 The image column uses `order-1 md:order-2` and the text column uses `order-2 md:order-1` so that on mobile the profile photo appears above the name/title, above the fold.
 

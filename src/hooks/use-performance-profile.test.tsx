@@ -216,7 +216,7 @@ describe('usePerformanceProfile', () => {
     expect(conn.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
   });
 
-  it('covers navigator-undefined guard in getConnection and lowHardware useState', () => {
+  it('covers navigator-undefined guard in getConnection and readLowHardware', () => {
     installMatchMedia(false);
 
     // Stub navigator to undefined so typeof navigator === 'undefined' paths are taken
@@ -226,7 +226,7 @@ describe('usePerformanceProfile', () => {
 
     try {
       const { result } = renderHook(() => usePerformanceProfile());
-      // getConnection() returns null (line 15), lowHardware returns false (line 41)
+      // getConnection() returns null; readLowHardware() returns false (navigator is undefined)
       expect(result.current.saveDataEnabled).toBe(false);
       expect(result.current.performanceTier).toBe('full');
     } finally {

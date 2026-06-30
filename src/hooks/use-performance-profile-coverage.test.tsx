@@ -141,7 +141,7 @@ describe('usePerformanceProfile coverage', () => {
     expect(result.current.performanceTier).toBe('balanced');
   });
 
-  it('falls back to 8 cores when hardwareConcurrency is undefined (covers ?? 8 branch)', () => {
+  it('falls back to DEFAULT_HARDWARE_CONCURRENCY when hardwareConcurrency is undefined', () => {
     Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: undefined });
     Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: undefined });
     Object.defineProperty(navigator, 'connection', { configurable: true, value: undefined });
