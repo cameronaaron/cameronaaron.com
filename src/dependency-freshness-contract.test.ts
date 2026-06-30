@@ -1,15 +1,20 @@
 /**
  * Dependency freshness contract.
  *
- * Enforces two invariants that must hold at all times:
+ * Enforces three invariants that must hold at all times:
  *   1. Every direct and transitive package is at its latest published version.
  *   2. There are zero known security vulnerabilities in the dependency tree.
+ *   3. The wrangler CLI binary in node_modules/.bin matches the version declared
+ *      in package.json devDependencies — prevents stale global tools from silently
+ *      being used instead of the project-managed one.
  *
  * Failure messages name the offending packages so the fix is one command away.
  *
  * To fix outdated:     pnpm update --latest
  * To fix CVEs:        check pnpm audit output; add overrides to pnpm-workspace.yaml if needed
+ * To fix wrangler:    pnpm install  (re-syncs node_modules to pnpm-lock.yaml)
  */
+import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -80,5 +85,33 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
     ).toBe(0);
 
     expect(status, 'pnpm audit exited non-zero; run "pnpm audit" to review').toBe(0);
+  });
+
+  // ─── wrangler CLI version ──────────────────────────────────────────────────
+
+  it('wrangler CLI in node_modules/.bin matches the version declared in package.json', () => {
+    // Prevents the class of bug where a stale global wrangler (e.g. homebrew)
+    // silently takes precedence over the project-managed version. This test
+    // verifies the local binary is installed and matches package.json — so
+    // npm scripts and CI always run the correct version.
+    const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as {
+      devDependencies?: Record<string, string>;
+    };
+
+    const declared = (pkg.devDependencies?.wrangler ?? '').replace(/^\^|~/, '');
+    expect(declared, 'wrangler not found in devDependencies').toBeTruthy();
+
+    const result = spawnSync(join(ROOT, 'node_modules/.bin/wrangler'), ['--version'], {
+      encoding: 'utf8',
+      cwd: ROOT,
+    });
+
+    const installed = result.stdout.trim().replace(/^wrangler\s+/i, '').split(/\s/)[0] ?? '';
+
+    expect(
+      installed,
+      `node_modules/.bin/wrangler version "${installed}" does not match package.json "${declared}".\n` +
+        'Run "pnpm install" to sync, or "pnpm update --latest wrangler" to upgrade.',
+    ).toBe(declared);
   });
 });
