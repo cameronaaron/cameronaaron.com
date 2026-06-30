@@ -1,0 +1,24 @@
+# Cameron Aaron, M.Ed.
+
+> Interdisciplinary professional bridging emergency care, neuroscience research, software engineering, and cybersecurity while preparing for Nurse Practitioner school — Los Angeles, CA.
+
+Dedicated healthcare and technology professional with experience in aerospace medicine, clinical research, public health operations, software engineering, and security research. My next stage is Nurse Practitioner training, while continuing to build secure, high-impact technology for health and science.
+
+## Pages
+
+- [Home](https://cameronaaron.com/): Overview of Cameron's interdisciplinary background, featured projects, work experience, education, and certifications.
+- [Capstone Research](https://cameronaaron.com/capstone): Arts-based graduate dissertation on thrice-exceptional Black male students in higher education transition — a five-part educational video series.
+- [Credentials](https://cameronaaron.com/credentials): Complete list of clinical certifications, academic credentials, and verification links.
+- [My Internet Presence](https://cameronaaron.com/internet): Publications, media appearances, and links to Cameron's online presence.
+
+## Contact
+
+- [Email](mailto:cameronthescientist@pm.me): cameronthescientist@pm.me
+- [GitHub](https://github.com/cameronaaron): Open-source projects and code repositories
+- [LinkedIn](https://www.linkedin.com/in/kamisama): Professional profile and endorsements
+
+## Optional
+
+- [llms-full.txt](https://cameronaaron.com/llms-full.txt): Extended content including full project descriptions, detailed experience history, and complete certifications list.
+- [MCP Manifest](https://cameronaaron.com/mcp.json): Machine-readable tool manifest for AI assistants (WebMCP).
+- [Sitemap](https://cameronaaron.com/sitemap.xml): Complete site map for crawling.

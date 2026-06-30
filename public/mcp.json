@@ -1,0 +1,102 @@
+{
+  "mcpVersion": "0.1",
+  "name": "Cameron Aaron Portfolio",
+  "description": "WebMCP manifest for cameronaaron.com — a portfolio site for Cameron Aaron, M.Ed., EMT, CNA, Software Engineer, Security Researcher & Future Nurse Practitioner.",
+  "version": "1.0.0",
+  "baseUrl": "https://cameronaaron.com",
+  "tools": [
+    {
+      "name": "get_profile",
+      "description": "Returns Cameron Aaron's professional profile including name, title, bio, location, and social links.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com"
+    },
+    {
+      "name": "get_projects",
+      "description": "Returns Cameron Aaron's portfolio projects including research, software, and security projects.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "featured": {
+            "type": "boolean",
+            "description": "When true, returns only featured projects."
+          }
+        },
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com/#projects"
+    },
+    {
+      "name": "get_experience",
+      "description": "Returns Cameron Aaron's professional work experience history sorted by recency.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com/#experience"
+    },
+    {
+      "name": "get_education",
+      "description": "Returns Cameron Aaron's academic education, degrees, and current prerequisite coursework.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com/#education"
+    },
+    {
+      "name": "get_certifications",
+      "description": "Returns Cameron Aaron's active clinical and professional certifications with verification links.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com/credentials"
+    },
+    {
+      "name": "get_contact_info",
+      "description": "Returns contact information for Cameron Aaron including email address and social profile links.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "endpoint": "https://cameronaaron.com/#contact"
+    }
+  ],
+  "forms": {
+    "contact": {
+      "description": "Contact Cameron Aaron via email. This site is statically hosted; contact is via mailto link.",
+      "submitVia": "mailto:cameronthescientist@pm.me",
+      "fields": {
+        "to": {
+          "type": "string",
+          "format": "email",
+          "const": "cameronthescientist@pm.me"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Subject line of the email."
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Body of the email message."
+        }
+      },
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ]
+    }
+  }
+}

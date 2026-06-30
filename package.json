@@ -43,7 +43,8 @@
     "seo:audit": "pnpm run build && pnpm run seo:check && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "cf-typegen": "wrangler types",
     "generate:icons": "node scripts/generate-icons.mjs",
-    "prebuild": "node scripts/generate-icons.mjs",
+    "generate:ai-discovery": "node scripts/generate-ai-discovery.mjs",
+    "prebuild": "node scripts/generate-icons.mjs && node scripts/generate-ai-discovery.mjs",
     "lighthouse": "pnpm run lighthouse:desktop",
     "lighthouse:desktop": "lighthouse http://localhost:3000 --preset=desktop --view",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --preset=mobile --view"

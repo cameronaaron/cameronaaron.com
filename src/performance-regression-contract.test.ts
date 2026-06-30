@@ -46,7 +46,8 @@ describe('performance regression contract', () => {
     const assertions = lighthouseConfig.ci?.assert?.assertions ?? {};
 
     expect(assertions['categories:performance']).toBeTruthy();
-    expect(assertions['categories:performance']).toEqual(['error', { minScore: 0.85 }]);
+    // Score must be 1.0 (100) — we achieved this via CLS elimination and hold the line.
+    expect(assertions['categories:performance']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['categories:accessibility']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['categories:best-practices']).toEqual(['error', { minScore: 1 }]);
     expect(assertions['categories:seo']).toEqual(['error', { minScore: 1 }]);

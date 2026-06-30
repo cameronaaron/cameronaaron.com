@@ -34,6 +34,15 @@ lighthouse-*.report.html
 lighthouse-*.report.json
 lighthouse-live*.json
 lighthouse-local*.json
+# Lighthouse trace artifacts (Chrome DevTools protocol output).
+# The "false/" directory name comes from CLI runs where --output-path was
+# accidentally set to a boolean-string path component instead of a real path.
+false/
+/trace.json
+/artifacts.json
+/devtoolslog.json
+# LHCI per-run trace bundles (any directory named after a run ID)
+/lhci-*/
 
 # Environment variables
 .env
