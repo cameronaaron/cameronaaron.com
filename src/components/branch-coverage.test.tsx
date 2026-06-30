@@ -139,7 +139,8 @@ describe('branch coverage targets', () => {
       vi.advanceTimersByTime(20);
     });
 
-    expect(screen.getByText('Done')).toBeTruthy();
+    // TypewriterEffect now renders "Done" in both sr-only and the invisible spacer span
+    expect(screen.getAllByText('Done').length).toBeGreaterThan(0);
     rafSpy.mockRestore();
   });
 

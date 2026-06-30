@@ -110,10 +110,11 @@ describe('SSR/client first-paint parity (hydration safety)', () => {
       const html = renderToString(
         <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
       );
-      // The visible (aria-hidden) span must show "C", not the full text,
-      // even when sessionStorage says the animation is complete.
-      // Full text appears only in the sr-only span.
-      expect(html).toContain('aria-hidden="true">C</span>');
+      // The invisible spacer always holds the full text to reserve layout space (prevents CLS).
+      expect(html).toContain('style="visibility:hidden">Cameron Aaron</span>');
+      // The visible (absolutely positioned) span shows only "C" at SSR time —
+      // sessionStorage is not read during renderToString; real state is set post-hydration.
+      expect(html).toContain('style="position:absolute;left:0;top:0">C');
       // sr-only always carries the full string for screen readers.
       expect(html).toContain('Cameron Aaron');
     });

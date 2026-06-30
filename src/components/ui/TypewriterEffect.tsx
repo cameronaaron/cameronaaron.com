@@ -75,15 +75,23 @@ export default function TypewriterEffect({
   }, [currentIndex, skipTyping, text, typingSpeed]);
 
   return (
-    <span className={className}>
+    // position:relative + display:inline-block makes this a positioning context for
+    // the absolutely-placed visible text, while the invisible full-text span always
+    // occupies the same layout space → h1 height never changes during typing → zero CLS.
+    <span className={className} style={{ position: 'relative', display: 'inline-block' }}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true">{displayedText || text.charAt(0)}</span>
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isComplete ? 0 : 1 }}
-        transition={{ duration: 0.5, repeat: isComplete ? 0 : Infinity, repeatType: "reverse" }}
-        className={`inline-block w-[2px] h-[1em] bg-primary ml-1 align-middle ${cursorClassName}`}
-      />
+      {/* Always-present invisible spacer — reserves the exact dimensions the full text needs */}
+      <span aria-hidden="true" style={{ visibility: 'hidden' }}>{text}</span>
+      {/* Visible typed text + cursor overlaid at the same origin as the spacer */}
+      <span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0 }}>
+        {displayedText || text.charAt(0)}
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isComplete ? 0 : 1 }}
+          transition={{ duration: 0.5, repeat: isComplete ? 0 : Infinity, repeatType: "reverse" }}
+          className={`inline-block w-[2px] h-[1em] bg-primary ml-1 align-middle ${cursorClassName}`}
+        />
+      </span>
     </span>
   );
 }
