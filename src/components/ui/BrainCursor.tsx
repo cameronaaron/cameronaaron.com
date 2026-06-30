@@ -119,3 +119,5 @@ function BrainCursor({ active }: BrainCursorProps) {
     </svg>
   );
 }
+
+export default memo(BrainCursor);
