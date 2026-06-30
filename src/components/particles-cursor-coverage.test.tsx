@@ -143,7 +143,7 @@ describe('particle and cursor coverage', () => {
     withRafQueue((callbacks) => {
       const mockCtx = {
         clearRect: vi.fn(), beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(),
-        moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(),
+        moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(), setTransform: vi.fn(),
         fillStyle: '', strokeStyle: '', lineWidth: 1,
       };
       const ctxSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
@@ -178,7 +178,7 @@ describe('particle and cursor coverage', () => {
     withRafQueue((callbacks) => {
       const mockCtx = {
         clearRect: vi.fn(), beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(),
-        moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(),
+        moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(), setTransform: vi.fn(),
         fillStyle: '', strokeStyle: '', lineWidth: 1,
       };
       const ctxSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')

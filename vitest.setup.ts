@@ -206,6 +206,7 @@ beforeAll(() => {
       moveTo: vi.fn(),
       lineTo: vi.fn(),
       stroke: vi.fn(),
+      setTransform: vi.fn(),
       fillStyle: '',
       strokeStyle: '',
       lineWidth: 1,

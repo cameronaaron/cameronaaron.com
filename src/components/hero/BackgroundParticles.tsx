@@ -39,11 +39,16 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       radius: activeConfig.mouseRadius
     };
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       initParticles();
     };
 
@@ -52,9 +57,8 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     };
 
     const handleMouseLeave = () => {
@@ -62,63 +66,87 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       mouse.y = -1000;
     };
 
+    const connectDist2 = activeConfig.connectDistance * activeConfig.connectDistance;
+    const mouseRadius2 = mouse.radius * mouse.radius;
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      
-      particles.forEach((p, i) => {
-        // Update particle position, opacity and wrapping.
+
+      // ── Advance all particles ─────────────────────────────────────────────
+      for (const p of particles) {
         advanceBackgroundParticle(p, width, height);
+      }
 
-        // Mouse interaction
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
-        const distance = getDistance(dx, dy);
-
-        if (activeConfig.useMousePull && distance < mouse.radius) {
-          // Draw line to mouse
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(147, 51, 234, ${1 - distance / mouse.radius})`;
-          ctx.lineWidth = 1;
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.stroke();
-          
-          // Slight attraction
-          const forceDirectionX = dx / distance;
-          const forceDirectionY = dy / distance;
-          const force = (mouse.radius - distance) / mouse.radius;
-          const directionX = forceDirectionX * force * 0.5;
-          const directionY = forceDirectionY * force * 0.5;
-          
-          p.x += directionX;
-          p.y += directionY;
+      // ── Mouse-pull physics (separate from drawing) ────────────────────────
+      if (activeConfig.useMousePull && mouse.x > -900) {
+        for (const p of particles) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < mouseRadius2 && d2 > 0) {
+            const distance = getDistance(dx, dy);
+            const force = (mouse.radius - distance) / mouse.radius;
+            p.x += (dx / distance) * force * 0.5;
+            p.y += (dy / distance) * force * 0.5;
+          }
         }
+      }
 
-        // Draw particle
+      // ── Batch connections — one path, one stroke() ────────────────────────
+      if (activeConfig.useConnections) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(168, 85, 247, ${p.opacity})`; // Purple-500
-        ctx.fill();
-        
-        // Connect nearby particles
-        if (activeConfig.useConnections) {
-          for (let j = i; j < particles.length; j++) {
-            const p2 = particles[j];
-            const dx2 = p.x - p2.x;
-            const dy2 = p.y - p2.y;
-            const distance2 = getDistance(dx2, dy2);
-            
-            if (distance2 < activeConfig.connectDistance) {
-              ctx.beginPath();
-              ctx.strokeStyle = `rgba(147, 51, 234, ${0.2 * (1 - distance2 / activeConfig.connectDistance)})`;
-              ctx.lineWidth = 0.5;
+        ctx.strokeStyle = 'rgba(147, 51, 234, 0.12)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length - 1; i++) {
+          const p = particles[i];
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            if (dx * dx + dy * dy < connectDist2) {
               ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.stroke();
+              ctx.lineTo(q.x, q.y);
             }
           }
         }
-      });
+        ctx.stroke();
+      }
+
+      // ── Batch mouse-pull lines — one path, one stroke() ──────────────────
+      if (activeConfig.useMousePull && mouse.x > -900) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(147, 51, 234, 0.55)';
+        ctx.lineWidth = 1;
+        for (const p of particles) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          if (dx * dx + dy * dy < mouseRadius2) {
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+          }
+        }
+        ctx.stroke();
+      }
+
+      // ── Batch particles in 3 opacity tiers — 3 fill() calls ──────────────
+      const OPACITY_TIERS = [
+        { threshold: 0.3,      style: 'rgba(168, 85, 247, 0.2)'  },
+        { threshold: 0.45,     style: 'rgba(168, 85, 247, 0.38)' },
+        { threshold: Infinity, style: 'rgba(168, 85, 247, 0.55)' },
+      ] as const;
+      let prevThreshold = 0;
+      for (const tier of OPACITY_TIERS) {
+        ctx.beginPath();
+        ctx.fillStyle = tier.style;
+        for (const p of particles) {
+          if (p.opacity > prevThreshold && p.opacity <= tier.threshold) {
+            ctx.moveTo(p.x + p.size, p.y);
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          }
+        }
+        ctx.fill();
+        prevThreshold = tier.threshold;
+      }
 
       animationFrameId = requestAnimationFrame(draw);
     };

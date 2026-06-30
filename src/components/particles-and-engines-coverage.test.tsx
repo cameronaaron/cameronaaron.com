@@ -42,6 +42,7 @@ vi.mock('framer-motion', () => ({
 const mockCtx = {
   clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), arc: vi.fn(),
   fill: vi.fn(), stroke: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(),
+  setTransform: vi.fn(),
   createRadialGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
   save: vi.fn(), restore: vi.fn(), translate: vi.fn(), scale: vi.fn(),
   globalAlpha: 1, strokeStyle: '', fillStyle: '', lineWidth: 1,
@@ -133,6 +134,18 @@ describe('BackgroundParticles coverage (line 151)', () => {
     const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
     const { container } = render(<BackgroundParticles quality="lite" />);
     expect(container.firstChild).toBeNull();
+  });
+
+  it('covers devicePixelRatio || 1 fallback when devicePixelRatio is 0', async () => {
+    const origDescriptor = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 0 });
+    try {
+      const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+      const { unmount } = render(<BackgroundParticles quality="full" />);
+      unmount();
+    } finally {
+      if (origDescriptor) Object.defineProperty(window, 'devicePixelRatio', origDescriptor);
+    }
   });
 });
 
