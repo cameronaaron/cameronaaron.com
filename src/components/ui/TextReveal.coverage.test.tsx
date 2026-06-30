@@ -45,9 +45,10 @@ afterEach(() => {
 });
 
 describe('TextReveal coverage', () => {
-  it('starts forced-visible when sessionStorage already set (forceVisible=true branch)', () => {
+  it('becomes forced-visible via effect when sessionStorage already set (deferred readInitialReveal branch)', () => {
     window.sessionStorage.setItem('text-reveal-complete:Hello', '1');
     render(<TextReveal text="Hello" />);
+    // render() flushes effects; readInitialReveal finds '1' → setForceVisible(true)
     expect(document.body).toBeTruthy();
   });
 

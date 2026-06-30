@@ -18,9 +18,8 @@ export default function CursorTrail() {
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [isCoarsePointer, setIsCoarsePointer] = useState(
-    () => window.matchMedia('(pointer: coarse)').matches
-  );
+  // Start false to match SSR — window.matchMedia is undefined at build time.
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
   const [isInteractiveHover, setIsInteractiveHover] = useState(false);
 
   const prefersReducedMotion = useReducedMotion();
@@ -39,6 +38,8 @@ export default function CursorTrail() {
 
   useEffect(() => {
     const pointerMedia = window.matchMedia('(pointer: coarse)');
+    setIsCoarsePointer(pointerMedia.matches);
+
     const updatePointerMode = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);
     };

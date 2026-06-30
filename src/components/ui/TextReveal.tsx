@@ -14,12 +14,14 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
   const storageKey = `text-reveal-complete:${text}`;
-  const [forceVisible, setForceVisible] = useState(() => readInitialReveal(storageKey));
+  // Start false to match SSR output — readInitialReveal reads sessionStorage and
+  // performance APIs unavailable at build time. Lazy useState initializers run
+  // synchronously before hydration, so a non-false value (when sessionStorage has
+  // '1' from a prior visit) would differ from the SSR HTML → React #418.
+  const [forceVisible, setForceVisible] = useState(false);
 
   useEffect(() => {
-    if (forceVisible) {
-      window.sessionStorage.setItem(storageKey, '1');
-    }
+    if (readInitialReveal(storageKey)) setForceVisible(true);
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
@@ -30,7 +32,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
 
     window.addEventListener('pageshow', handlePageShow, { passive: true });
     return () => window.removeEventListener('pageshow', handlePageShow);
-  }, [forceVisible, storageKey]);
+  }, [storageKey]);
 
   const shouldReveal = isInView || forceVisible;
 

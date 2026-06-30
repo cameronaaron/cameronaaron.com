@@ -25,12 +25,13 @@
  *    Canvas particle systems ran on the 'balanced' (mobile) tier.
  *    Fix: shouldRenderParticles is restricted to 'full' tier only.
  *
- * 6. usePerformanceProfile React hydration error #418 (2026-06)
- *    useState lazy initializers read window.matchMedia() and navigator.hardwareConcurrency
- *    during the client's first render, before hydration. On mobile these return different values
- *    than at SSR build-time (where window/navigator are undefined), causing the client's initial
- *    render to differ from the static HTML → React #418 "Hydration failed".
- *    Fix: all three state values start as `false` (matching SSR), real values set in useEffect.
+ * 6. React hydration error #418 — lazy useState initializers reading browser APIs (2026-06)
+ *    usePerformanceProfile: lazy initializers read window.matchMedia() and navigator.hardwareConcurrency
+ *    before hydration, causing mismatch on every mobile visit.
+ *    TextReveal: lazy initializer called readInitialReveal() which reads sessionStorage and
+ *    performance.getEntriesByType() — mismatched on return visits in the same session.
+ *    Fix (both): useState(false) for SSR-matching initial state; real detection deferred to useEffect.
+ *    Broader prevention: src/ssr-hydration-contract.test.ts scans all 'use client' files.
  */
 
 import { readFileSync } from 'node:fs';
@@ -185,14 +186,17 @@ describe('animation regression contract', () => {
     expect(source).toContain('whitespace-nowrap');
   });
 
-  it('usePerformanceProfile uses false initial state (not lazy browser-API initializers) to prevent React #418 hydration error', () => {
-    const source = read('src/hooks/usePerformanceProfile.ts');
-    // Must NOT use lazy initializers that read window/navigator during the first render.
-    // Those read real browser values on mobile (coarse pointer, low cores) but the SSR HTML
-    // was built with all-false defaults — the mismatch causes React error #418.
-    expect(source).not.toContain('useState(() =>');
-    // Must use safe false defaults; real values are set in useEffect after hydration.
-    expect(source).toContain('useState(false)');
+  it('usePerformanceProfile and TextReveal use false initial state (not lazy browser-API initializers) to prevent React #418', () => {
+    const perfProfile = read('src/hooks/usePerformanceProfile.ts');
+    const textReveal = read('src/components/ui/TextReveal.tsx');
+
+    // Both had lazy initializers that read browser APIs before hydration, causing #418.
+    // Fix: useState(false) matches SSR; real values set in useEffect post-hydration.
+    expect(perfProfile).not.toContain('useState(() =>');
+    expect(perfProfile).toContain('useState(false)');
+
+    expect(textReveal).not.toContain('useState(() =>');
+    expect(textReveal).toContain('useState(false)');
   });
 
   it('Skills section headings are plain h3 elements inside the stagger container (no standalone whileInView inside stagger)', () => {
