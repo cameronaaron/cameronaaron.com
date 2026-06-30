@@ -68,6 +68,108 @@ export function getDistance(dx: number, dy: number): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+// ── Spatial grid (typed-array backed, zero GC per frame) ────────────────────
+
+export interface SpatialGrid {
+  /** Flat particle-index store: data[cell * maxPerCell + slot] = particle index */
+  data: Int16Array;
+  /** Occupied slot count per cell */
+  count: Uint8Array;
+  cols: number;
+  rows: number;
+  maxPerCell: number;
+}
+
+/** Compute grid dimensions so each cell covers connectDistance × connectDistance. */
+export function getGridDimensions(
+  width: number,
+  height: number,
+  cellSize: number,
+): { cols: number; rows: number } {
+  return {
+    cols: Math.ceil(width / cellSize) + 1,
+    rows: Math.ceil(height / cellSize) + 1,
+  };
+}
+
+/** Allocate a spatial grid. Call once per viewport change; reuse every frame. */
+export function createSpatialGrid(
+  cols: number,
+  rows: number,
+  maxPerCell = 32,
+): SpatialGrid {
+  return {
+    data: new Int16Array(cols * rows * maxPerCell),
+    count: new Uint8Array(cols * rows),
+    cols,
+    rows,
+    maxPerCell,
+  };
+}
+
+/**
+ * Clear and repopulate the grid in O(n).
+ * Particles outside [0, width) × [0, height) are clamped to boundary cells.
+ * If a cell exceeds maxPerCell, the extra particle is silently skipped —
+ * acceptable for a visual effect where rare clustered edge cases lose one line.
+ */
+export function rebuildSpatialGrid(
+  sg: SpatialGrid,
+  particles: Particle[],
+  cellSize: number,
+): void {
+  sg.count.fill(0);
+  for (let i = 0; i < particles.length; i++) {
+    const col = Math.min(Math.max(0, Math.floor(particles[i].x / cellSize)), sg.cols - 1);
+    const row = Math.min(Math.max(0, Math.floor(particles[i].y / cellSize)), sg.rows - 1);
+    const cell = row * sg.cols + col;
+    if (sg.count[cell] < sg.maxPerCell) {
+      sg.data[cell * sg.maxPerCell + sg.count[cell]] = i;
+      sg.count[cell]++;
+    }
+  }
+}
+
+/**
+ * Iterate unique connected pairs using the spatial grid in O(n·k).
+ * k ≈ average particles in a 3 × 3 cell neighbourhood (~12 on typical viewports).
+ * Each pair (i, j) where i < j and distance² < connectDist2 is emitted once.
+ */
+export function forEachConnectedPair(
+  sg: SpatialGrid,
+  particles: Particle[],
+  cellSize: number,
+  connectDist2: number,
+  callback: (i: number, j: number, pi: Particle, pj: Particle) => void,
+): void {
+  const { cols, rows, data, count, maxPerCell } = sg;
+  for (let i = 0; i < particles.length; i++) {
+    const pi = particles[i];
+    const pc = Math.min(Math.max(0, Math.floor(pi.x / cellSize)), cols - 1);
+    const pr = Math.min(Math.max(0, Math.floor(pi.y / cellSize)), rows - 1);
+    for (let dr = -1; dr <= 1; dr++) {
+      const nr = pr + dr;
+      if (nr < 0 || nr >= rows) continue;
+      for (let dc = -1; dc <= 1; dc++) {
+        const nc = pc + dc;
+        if (nc < 0 || nc >= cols) continue;
+        const cellBase = (nr * cols + nc) * maxPerCell;
+        const n = count[nr * cols + nc];
+        for (let k = 0; k < n; k++) {
+          const j = data[cellBase + k];
+          if (j <= i) continue;
+          const pj = particles[j];
+          const dx = pi.x - pj.x;
+          const dy = pi.y - pj.y;
+          if (dx * dx + dy * dy < connectDist2) {
+            callback(i, j, pi, pj);
+          }
+        }
+      }
+    }
+  }
+}
+
 export function advanceBackgroundParticle(particle: Particle, width: number, height: number): void {
   particle.x += particle.speedX;
   particle.y += particle.speedY;

@@ -4,11 +4,16 @@ import { useEffect, useRef } from 'react';
 import {
   advanceBackgroundParticle,
   createBackgroundParticles,
+  createSpatialGrid,
+  forEachConnectedPair,
   getBackgroundParticleConfig,
   getDistance,
+  getGridDimensions,
+  rebuildSpatialGrid,
   shouldRenderBackgroundParticles,
   type Particle,
   type ParticleQuality,
+  type SpatialGrid,
 } from '@/components/hero/background-particles/engine';
 
 interface BackgroundParticlesProps {
@@ -40,6 +45,9 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     };
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const gridCellSize = activeConfig.connectDistance || 1;
+    // Assigned on first resize; only accessed when activeConfig.useConnections is true
+    let spatialGrid!: SpatialGrid;
 
     const resize = () => {
       width = window.innerWidth;
@@ -49,6 +57,10 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       canvas.style.width = '100%';
       canvas.style.height = '100%';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (activeConfig.useConnections) {
+        const { cols, rows } = getGridDimensions(width, height, gridCellSize);
+        spatialGrid = createSpatialGrid(cols, rows);
+      }
       initParticles();
     };
 
@@ -92,23 +104,16 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
         }
       }
 
-      // ── Batch connections — one path, one stroke() ────────────────────────
+      // ── Spatial-grid connections: O(n·k) → one path, one stroke() ───────
       if (activeConfig.useConnections) {
+        rebuildSpatialGrid(spatialGrid, particles, gridCellSize);
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(147, 51, 234, 0.12)';
         ctx.lineWidth = 0.5;
-        for (let i = 0; i < particles.length - 1; i++) {
-          const p = particles[i];
-          for (let j = i + 1; j < particles.length; j++) {
-            const q = particles[j];
-            const dx = p.x - q.x;
-            const dy = p.y - q.y;
-            if (dx * dx + dy * dy < connectDist2) {
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(q.x, q.y);
-            }
-          }
-        }
+        forEachConnectedPair(spatialGrid, particles, gridCellSize, connectDist2, (_i, _j, pi, pj) => {
+          ctx.moveTo(pi.x, pi.y);
+          ctx.lineTo(pj.x, pj.y);
+        });
         ctx.stroke();
       }
 

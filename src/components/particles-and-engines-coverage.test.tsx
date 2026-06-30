@@ -149,6 +149,90 @@ describe('BackgroundParticles coverage (line 151)', () => {
   });
 });
 
+// ── Cross-browser DPR scaling ───────────────────────────────────────────────
+describe('BackgroundParticles — devicePixelRatio cross-browser behaviour', () => {
+  // Each test restores DPR via afterEach (vi.unstubAllGlobals covers window stubs).
+
+  it('DPR=1 (standard display): canvas width = innerWidth, setTransform(1,0,0,1,0,0)', async () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 });
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    mockCtx.setTransform.mockClear();
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    const { container, unmount } = render(<BackgroundParticles quality="full" />);
+    const canvas = container.querySelector('canvas')!;
+
+    expect(canvas.width).toBe(1280);        // Math.round(1280 * 1)
+    expect(canvas.height).toBe(800);
+    expect(mockCtx.setTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
+    expect(canvas.style.width).toBe('100%');
+    expect(canvas.style.height).toBe('100%');
+    unmount();
+  });
+
+  it('DPR=2 (Retina / HiDPI): canvas width = innerWidth × 2', async () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 2 });
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    mockCtx.setTransform.mockClear();
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    const { container, unmount } = render(<BackgroundParticles quality="full" />);
+    const canvas = container.querySelector('canvas')!;
+
+    expect(canvas.width).toBe(2560);        // Math.round(1280 * 2)
+    expect(canvas.height).toBe(1600);
+    expect(mockCtx.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
+    unmount();
+  });
+
+  it('DPR=3 capped to 2 (prevents excessive resolution on 3× displays)', async () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 3 });
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    mockCtx.setTransform.mockClear();
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    const { container, unmount } = render(<BackgroundParticles quality="full" />);
+    const canvas = container.querySelector('canvas')!;
+
+    expect(canvas.width).toBe(2560);        // capped: Math.min(3, 2) = 2 → 1280*2
+    expect(mockCtx.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
+    unmount();
+  });
+
+  it('DPR=1.5 (Windows 150% scaling): canvas width = Math.round(innerWidth × 1.5)', async () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1.5 });
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    mockCtx.setTransform.mockClear();
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    const { container, unmount } = render(<BackgroundParticles quality="full" />);
+    const canvas = container.querySelector('canvas')!;
+
+    expect(canvas.width).toBe(1920);        // Math.round(1280 * 1.5)
+    expect(mockCtx.setTransform).toHaveBeenCalledWith(1.5, 0, 0, 1.5, 0, 0);
+    unmount();
+  });
+
+  it('DPR=undefined falls back to 1 (very old browsers)', async () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: undefined });
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    mockCtx.setTransform.mockClear();
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    const { container, unmount } = render(<BackgroundParticles quality="full" />);
+    const canvas = container.querySelector('canvas')!;
+
+    expect(canvas.width).toBe(1280);        // undefined || 1 = 1
+    expect(mockCtx.setTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
+    unmount();
+  });
+});
+
 // ── InteractiveParticles component ──────────────────────────────────────────
 describe('InteractiveParticles coverage (line 125)', () => {
   it('renders with quality=full', async () => {
