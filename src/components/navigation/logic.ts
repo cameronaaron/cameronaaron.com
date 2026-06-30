@@ -52,6 +52,10 @@ export function pickActiveHref(
   return closest?.href ?? fallbackHref;
 }
 
+export function buildNavLabelMap(items: NavItem[]): ReadonlyMap<string, string> {
+  return new Map(items.map((item) => [item.href, item.name]));
+}
+
 export function getActiveNavLabel(items: NavItem[], activeHref: string, fallback = 'Home'): string {
   return items.find((item) => item.href === activeHref)?.name ?? fallback;
 }

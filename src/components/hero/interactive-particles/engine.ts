@@ -45,6 +45,11 @@ export interface ParticleQualityConfig {
   maxBursts: number;
 }
 
+export const POINTER_ATTRACT_RADIUS = 22;
+export const POINTER_ATTRACT_RADIUS_SQ = POINTER_ATTRACT_RADIUS * POINTER_ATTRACT_RADIUS;
+export const ATTRACTION_STRENGTH_FULL = 0.012;
+export const ATTRACTION_STRENGTH_BALANCED = 0.008;
+
 export const PARTICLE_COLORS = [
   'rgba(34, 211, 238, 0.65)',
   'rgba(45, 212, 191, 0.6)',
@@ -114,10 +119,11 @@ export function buildConnections(
   maxConnections: number
 ): Connection[] {
   const lines: Connection[] = [];
-
   const connectDist2 = connectionDistance * connectionDistance;
-  for (let i = 0; i < particles.length; i += 1) {
+
+  outer: for (let i = 0; i < particles.length; i += 1) {
     for (let j = i + 1; j < particles.length; j += 1) {
+      if (lines.length >= maxConnections) break outer;
       const a = particles[i];
       const b = particles[j];
       const dx = a.x - b.x;
@@ -137,7 +143,7 @@ export function buildConnections(
     }
   }
 
-  return lines.slice(0, maxConnections);
+  return lines;
 }
 
 export function normalizePointerToPercent(
@@ -198,10 +204,10 @@ export function stepParticles(
       const dx = pointer.x - nextX;
       const dy = pointer.y - nextY;
       const dist2 = dx * dx + dy * dy;
-      if (dist2 < 484 && dist2 > 0.000001) {
+      if (dist2 < POINTER_ATTRACT_RADIUS_SQ && dist2 > 0.000001) {
         const distance = Math.sqrt(dist2);
-        const pull = (22 - distance) / 22;
-        const attractionStrength = quality === 'full' ? 0.012 : 0.008;
+        const pull = (POINTER_ATTRACT_RADIUS - distance) / POINTER_ATTRACT_RADIUS;
+        const attractionStrength = quality === 'full' ? ATTRACTION_STRENGTH_FULL : ATTRACTION_STRENGTH_BALANCED;
         velocityX += (dx / distance) * pull * attractionStrength * step;
         velocityY += (dy / distance) * pull * attractionStrength * step;
         nextX += velocityX;
@@ -233,14 +239,19 @@ export function stepParticles(
 }
 
 export function stepBursts(bursts: BurstParticle[], step: number): BurstParticle[] {
-  return bursts
-    .map((burst) => ({
-      ...burst,
-      x: burst.x + burst.vx * step,
-      y: burst.y + burst.vy * step,
-      vx: burst.vx * 0.985,
-      vy: burst.vy * 0.985,
-      life: burst.life - 0.03 * step,
-    }))
-    .filter((burst) => burst.life > 0);
+  const result: BurstParticle[] = [];
+  for (const burst of bursts) {
+    const newLife = burst.life - 0.03 * step;
+    if (newLife > 0) {
+      result.push({
+        ...burst,
+        x: burst.x + burst.vx * step,
+        y: burst.y + burst.vy * step,
+        vx: burst.vx * 0.985,
+        vy: burst.vy * 0.985,
+        life: newLife,
+      });
+    }
+  }
+  return result;
 }

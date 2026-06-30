@@ -153,6 +153,97 @@ Site content lives in `src/data/`:
 | `education.ts` | Degrees + prerequisite coursework (4 items; LACCD sorts first as most recent); `honorsAndAffiliations` is `HonorItem[]` (`{ label: string; url?: string }`) not `string[]` |
 | `testimonials.ts` | LinkedIn recommendations |
 
+## Algorithm and data-structure standards
+
+These patterns are enforced by `src/components/algorithm-and-datastructure-contract.test.tsx`. Fix the **source**, not the test, when a check fails.
+
+### Single-pass over map+filter
+
+Never `.map(transform).filter(alive)` — it allocates a full intermediate array. Use a `for` loop with conditional `push()`:
+
+```ts
+// ✅ single-pass — stepBursts, decayTrailPoints
+const result: T[] = [];
+for (const item of items) {
+  const next = transform(item);
+  if (alive(next)) result.push(next);
+}
+return result;
+```
+
+### Early-exit over build-then-slice
+
+When collecting up to `maxN` items, break as soon as the limit is hit rather than building the full collection and calling `.slice()`:
+
+```ts
+// ✅ labeled break — buildConnections
+outer: for (let i = 0; i < particles.length; i++) {
+  for (let j = i + 1; j < particles.length; j++) {
+    if (lines.length >= maxConnections) break outer;
+    // ...push
+  }
+}
+```
+
+### Map over Array.find for label lookups
+
+Build a `Map` once with `useMemo`; use `map.get(key)` (O(1)) instead of `array.find(…)` (O(n)) on every render:
+
+```ts
+// ✅ Navigation.tsx
+const navLabelMap = useMemo(() => buildNavLabelMap(navItems), []);
+const activeNavLabel = navLabelMap.get(activeHref) ?? 'Home';
+
+// ❌ wrong — O(n) scan on every render
+const activeNavLabel = getActiveNavLabel(navItems, activeHref);
+```
+
+### Dispatch tables over if-chains
+
+Replace sequential `if/else if` branches with a module-level `Record<Key, Fn>` dispatch table. The key is looked up once (O(1)); the branch logic lives in the value function:
+
+```ts
+// ✅ testimonials/logic.ts
+const RELATIONSHIP_MATCHERS: Record<NonAllFilter, (rel: string) => boolean> = {
+  manager: (rel) => rel.includes('manager'),
+  mentor:  (rel) => rel.includes('mentor') || rel.includes('professor'),
+  colleague: (rel) => rel.includes('colleague'),
+};
+export function filterTestimonialsByRelationship(items, filter) {
+  if (filter === 'all') return items; // early-return avoids new-array allocation
+  return items.filter((t) => RELATIONSHIP_MATCHERS[filter](t.relationship.toLowerCase()));
+}
+```
+
+### Functional state updaters to prevent object churn
+
+When a state value might not have actually changed, use the functional form and return `prev` unchanged to skip a re-render:
+
+```ts
+// ✅ useMousePosition.ts — avoids allocating a new {x,y} object every mousemove
+setMousePosition((prev) =>
+  prev.x === e.clientX && prev.y === e.clientY ? prev : { x: e.clientX, y: e.clientY }
+);
+```
+
+### Named constants for physics and hardware thresholds
+
+Never inline magic numbers in logic. Export named constants so they are self-documenting and testable:
+
+```ts
+// ✅ usePerformanceProfile.ts
+export const LOW_HARDWARE_CORES_THRESHOLD = 4;
+export const LOW_HARDWARE_MEMORY_GB_THRESHOLD = 4;
+export const DEFAULT_HARDWARE_CONCURRENCY = 8;
+export const DEFAULT_DEVICE_MEMORY_GB = 8;
+
+// ✅ engine.ts
+export const POINTER_ATTRACT_RADIUS = 22;
+export const POINTER_ATTRACT_RADIUS_SQ = POINTER_ATTRACT_RADIUS * POINTER_ATTRACT_RADIUS;
+export const ATTRACTION_STRENGTH_FULL = 0.012;
+export const ATTRACTION_STRENGTH_BALANCED = 0.008;
+```
+
 ## Deployment
 
 ```bash

@@ -1,14 +1,14 @@
 'use client';
 
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems } from '@/data/navigation';
 import Magnetic from '@/components/ui/Magnetic';
 import {
   ACTIVE_SECTION_TRIGGER_LINE,
+  buildNavLabelMap,
   computeSectionBounds,
-  getActiveNavLabel,
   pickActiveHref,
   shouldCloseMobileMenuOnResize,
 } from '@/components/navigation/logic';
@@ -73,7 +73,8 @@ export default function Navigation() {
     };
   }, [mobileMenuOpen]);
 
-  const activeNavLabel = getActiveNavLabel(navItems, activeHref);
+  const navLabelMap = useMemo(() => buildNavLabelMap(navItems), []);
+  const activeNavLabel = navLabelMap.get(activeHref) ?? 'Home';
 
   return (
     <>

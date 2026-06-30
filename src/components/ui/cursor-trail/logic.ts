@@ -40,17 +40,17 @@ export function appendTrailPoint(
 }
 
 export function decayTrailPoints(previous: TrailPoint[]): TrailPoint[] {
-  return previous
-    .map((point, index, all) => {
-      const relativeAge = 1 - index / Math.max(1, all.length);
-      const decay = 0.035 + relativeAge * 0.02;
-
-      return {
-        ...point,
-        life: point.life - decay,
-      };
-    })
-    .filter((point) => point.life > 0);
+  const n = previous.length;
+  const result: TrailPoint[] = [];
+  for (let i = 0; i < n; i++) {
+    const point = previous[i];
+    const relativeAge = 1 - i / Math.max(1, n);
+    const newLife = point.life - (0.035 + relativeAge * 0.02);
+    if (newLife > 0) {
+      result.push({ ...point, life: newLife });
+    }
+  }
+  return result;
 }
 
 export function isInteractiveTarget(target: EventTarget | null): boolean {

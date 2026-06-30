@@ -1,7 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { usePerformanceProfile } from './usePerformanceProfile';
+import {
+  DEFAULT_DEVICE_MEMORY_GB,
+  DEFAULT_HARDWARE_CONCURRENCY,
+  LOW_HARDWARE_CORES_THRESHOLD,
+  LOW_HARDWARE_MEMORY_GB_THRESHOLD,
+  usePerformanceProfile,
+} from './usePerformanceProfile';
 
 interface MediaQueryListLike {
   matches: boolean;
@@ -78,6 +84,29 @@ function setHardware(cores: number, memory: number) {
     value: memory,
   });
 }
+
+describe('usePerformanceProfile — exported constants', () => {
+  it('hardware threshold constants have correct values', () => {
+    expect(LOW_HARDWARE_CORES_THRESHOLD).toBe(4);
+    expect(LOW_HARDWARE_MEMORY_GB_THRESHOLD).toBe(4);
+    expect(DEFAULT_HARDWARE_CONCURRENCY).toBe(8);
+    expect(DEFAULT_DEVICE_MEMORY_GB).toBe(8);
+  });
+
+  it('lite tier triggers at exactly the threshold boundary (cores === threshold → lite)', () => {
+    installMatchMedia(false);
+    setHardware(LOW_HARDWARE_CORES_THRESHOLD, 16);
+    const { result } = renderHook(() => usePerformanceProfile());
+    expect(result.current.performanceTier).toBe('lite');
+  });
+
+  it('full tier triggers one step above the threshold (cores === threshold + 1)', () => {
+    installMatchMedia(false);
+    setHardware(LOW_HARDWARE_CORES_THRESHOLD + 1, LOW_HARDWARE_MEMORY_GB_THRESHOLD + 1);
+    const { result } = renderHook(() => usePerformanceProfile());
+    expect(result.current.performanceTier).toBe('full');
+  });
+});
 
 describe('usePerformanceProfile', () => {
   beforeEach(() => {

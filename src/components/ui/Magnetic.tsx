@@ -3,6 +3,7 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode, type MouseEvent } from 'react';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { calculateMagneticOffset } from './magnetic-logic';
 
 interface MagneticProps {
   children: ReactNode;
@@ -22,15 +23,9 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!enableHoverMotion || !ref.current) return;
 
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const centerX = left + width / 2;
-    const centerY = top + height / 2;
-
-    const distanceX = e.clientX - centerX;
-    const distanceY = e.clientY - centerY;
-
-    x.set(distanceX * strength);
-    y.set(distanceY * strength);
+    const offset = calculateMagneticOffset(ref.current.getBoundingClientRect(), e.clientX, e.clientY, strength);
+    x.set(offset.x);
+    y.set(offset.y);
   };
 
   const handleMouseLeave = () => {

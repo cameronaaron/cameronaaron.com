@@ -27,25 +27,21 @@ export function cycleSpotlightIndex(current: number, direction: 1 | -1, count: n
   return (current + direction + count) % count;
 }
 
+type NonAllRelationshipFilter = Exclude<RelationshipFilter, 'all'>;
+
+const RELATIONSHIP_MATCHERS: Record<NonAllRelationshipFilter, (rel: string) => boolean> = {
+  manager: (rel) => rel.includes('manager'),
+  mentor: (rel) => rel.includes('mentor') || rel.includes('professor'),
+  colleague: (rel) => rel.includes('colleague'),
+};
+
 export function filterTestimonialsByRelationship(
   items: Testimonial[],
   relationshipFilter: RelationshipFilter
 ): Testimonial[] {
-  return items.filter((testimonial) => {
-    if (relationshipFilter === 'all') return true;
-
-    const relationship = testimonial.relationship.toLowerCase();
-
-    if (relationshipFilter === 'manager') {
-      return relationship.includes('manager');
-    }
-
-    if (relationshipFilter === 'mentor') {
-      return relationship.includes('mentor') || relationship.includes('professor');
-    }
-
-    return relationship.includes('colleague');
-  });
+  if (relationshipFilter === 'all') return items;
+  const matcher = RELATIONSHIP_MATCHERS[relationshipFilter];
+  return items.filter((t) => matcher(t.relationship.toLowerCase()));
 }
 
 export function getTestimonialStaggerDelay(index: number): number {

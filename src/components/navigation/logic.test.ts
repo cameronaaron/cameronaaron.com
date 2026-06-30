@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ACTIVE_SECTION_TRIGGER_LINE,
+  buildNavLabelMap,
   computeSectionBounds,
   getActiveNavLabel,
   hrefToSectionId,
@@ -75,5 +76,24 @@ describe('navigation logic', () => {
     expect(getActiveNavLabel(items, '#missing')).toBe('Home');
     expect(shouldCloseMobileMenuOnResize(500)).toBe(false);
     expect(shouldCloseMobileMenuOnResize(1024)).toBe(true);
+  });
+
+  it('buildNavLabelMap returns a ReadonlyMap with O(1) href→name lookup', () => {
+    const items = [
+      { name: 'Home', href: '#home' },
+      { name: 'Skills', href: '#skills' },
+      { name: 'Contact', href: '#contact' },
+    ];
+    const map = buildNavLabelMap(items);
+
+    expect(map.get('#home')).toBe('Home');
+    expect(map.get('#skills')).toBe('Skills');
+    expect(map.get('#contact')).toBe('Contact');
+    expect(map.get('#missing')).toBeUndefined();
+    expect(map.size).toBe(3);
+  });
+
+  it('buildNavLabelMap returns empty map for empty items list', () => {
+    expect(buildNavLabelMap([]).size).toBe(0);
   });
 });

@@ -7,7 +7,9 @@ export function useMousePosition() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      setMousePosition((prev) =>
+        prev.x === e.clientX && prev.y === e.clientY ? prev : { x: e.clientX, y: e.clientY }
+      );
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });

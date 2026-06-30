@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ATTRACTION_STRENGTH_BALANCED,
+  ATTRACTION_STRENGTH_FULL,
+  POINTER_ATTRACT_RADIUS,
+  POINTER_ATTRACT_RADIUS_SQ,
   buildConnections,
   createBurstParticles,
   createInitialParticles,
@@ -12,6 +16,14 @@ import {
 } from './engine';
 
 describe('interactive particle engine', () => {
+  it('exports named constants with correct physics values', () => {
+    expect(POINTER_ATTRACT_RADIUS).toBe(22);
+    expect(POINTER_ATTRACT_RADIUS_SQ).toBe(22 * 22);
+    expect(ATTRACTION_STRENGTH_FULL).toBeGreaterThan(ATTRACTION_STRENGTH_BALANCED);
+    expect(ATTRACTION_STRENGTH_FULL).toBeCloseTo(0.012);
+    expect(ATTRACTION_STRENGTH_BALANCED).toBeCloseTo(0.008);
+  });
+
   it('creates deterministic seeded random streams', () => {
     const a = createSeededRandom(42);
     const b = createSeededRandom(42);

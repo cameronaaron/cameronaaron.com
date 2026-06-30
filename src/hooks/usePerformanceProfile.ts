@@ -5,6 +5,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 export type PerformanceTier = 'full' | 'balanced' | 'lite' | 'reduced';
 
+export const LOW_HARDWARE_CORES_THRESHOLD = 4;
+export const LOW_HARDWARE_MEMORY_GB_THRESHOLD = 4;
+export const DEFAULT_HARDWARE_CONCURRENCY = 8;
+export const DEFAULT_DEVICE_MEMORY_GB = 8;
+
 interface NetworkInformationLike {
   saveData?: boolean;
   addEventListener?: (type: string, listener: EventListener) => void;
@@ -40,10 +45,10 @@ export function usePerformanceProfile() {
   const [lowHardware, setLowHardware] = useState(() => {
     if (typeof navigator === 'undefined') return false;
 
-    const cores = navigator.hardwareConcurrency ?? 8;
-    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cores = navigator.hardwareConcurrency ?? DEFAULT_HARDWARE_CONCURRENCY;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? DEFAULT_DEVICE_MEMORY_GB;
 
-    return cores <= 4 || memory <= 4;
+    return cores <= LOW_HARDWARE_CORES_THRESHOLD || memory <= LOW_HARDWARE_MEMORY_GB_THRESHOLD;
   });
 
   useEffect(() => {
@@ -60,9 +65,9 @@ export function usePerformanceProfile() {
     const handleConnectionChange = () => {
       setSaveDataEnabled(Boolean(connection?.saveData));
 
-      const cores = navigator.hardwareConcurrency ?? 8;
-      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
-      setLowHardware(cores <= 4 || memory <= 4);
+      const cores = navigator.hardwareConcurrency ?? DEFAULT_HARDWARE_CONCURRENCY;
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? DEFAULT_DEVICE_MEMORY_GB;
+      setLowHardware(cores <= LOW_HARDWARE_CORES_THRESHOLD || memory <= LOW_HARDWARE_MEMORY_GB_THRESHOLD);
     };
 
     connection?.addEventListener?.('change', handleConnectionChange);

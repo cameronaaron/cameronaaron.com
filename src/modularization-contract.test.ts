@@ -335,4 +335,20 @@ describe('modularization contract', () => {
     expect(source).not.toContain("performanceTier === 'full'\n      ? ORBS.length");
     expect(source).not.toContain("const animateOrbs = performanceTier === 'full'");
   });
+
+  it('keeps SpotlightCard mouse-position offset extracted to spotlight-card-logic module', () => {
+    const source = read('src/components/ui/SpotlightCard.tsx');
+
+    expect(source).toContain("from './spotlight-card-logic'");
+    expect(source).not.toContain('e.clientX - rect.left');
+    expect(source).not.toContain('e.clientY - rect.top');
+  });
+
+  it('keeps Magnetic center-distance offset extracted to magnetic-logic module', () => {
+    const source = read('src/components/ui/Magnetic.tsx');
+
+    expect(source).toContain("from './magnetic-logic'");
+    expect(source).not.toContain('rect.width / 2');
+    expect(source).not.toContain('distanceX * strength');
+  });
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
+import { calculateSpotlightPosition } from './spotlight-card-logic';
 
 interface SpotlightCardProps<T extends ElementType> {
   children: React.ReactNode;
@@ -32,8 +33,7 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    setPosition(calculateSpotlightPosition(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY));
   };
 
   const handleMouseEnter = () => {
