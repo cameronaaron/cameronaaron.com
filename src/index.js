@@ -3,7 +3,6 @@ import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 const CANONICAL_HOST = 'cameronaaron.com';
 const REDIRECT_HOSTS = new Set(['workshop.cameronaaron.com']);
 
-/* istanbul ignore next */
 if (typeof addEventListener === 'function') {
   addEventListener('fetch', event => {
     event.respondWith(handleRequest(event));
@@ -26,7 +25,6 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/* istanbul ignore next */
 function getManifestKeys() {
   if (cachedManifestKeys) {
     return cachedManifestKeys;

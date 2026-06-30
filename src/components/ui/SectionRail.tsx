@@ -67,7 +67,6 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
       block: 'start',
     });
     setActiveId(id);
-    /* istanbul ignore next */
     if (typeof history !== 'undefined' && history.replaceState) {
       history.replaceState(null, '', `#${id}`);
     }

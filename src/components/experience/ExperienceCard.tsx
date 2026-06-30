@@ -35,7 +35,6 @@ export default function ExperienceCard({
   const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
   const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
 
-  /* istanbul ignore next */
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!enableHoverMotion) return;
     const rect = e.currentTarget.getBoundingClientRect();

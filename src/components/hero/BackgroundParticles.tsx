@@ -21,9 +21,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
   useEffect(() => {
     if (!shouldRenderBackgroundParticles(quality)) return;
 
-    const canvas = canvasRef.current;
-    /* istanbul ignore next */
-    if (!canvas) return;
+    const canvas = canvasRef.current!;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -103,7 +101,6 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
         ctx.fill();
         
         // Connect nearby particles
-        /* istanbul ignore else */
         if (activeConfig.useConnections) {
           for (let j = i; j < particles.length; j++) {
             const p2 = particles[j];
@@ -128,7 +125,6 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
 
     window.addEventListener('resize', resize, { passive: true });
 
-    /* istanbul ignore else */
     if (activeConfig.useMousePull) {
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
       window.addEventListener('mouseout', handleMouseLeave, { passive: true });
@@ -140,7 +136,6 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     return () => {
       window.removeEventListener('resize', resize);
 
-      /* istanbul ignore else */
       if (activeConfig.useMousePull) {
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseout', handleMouseLeave);

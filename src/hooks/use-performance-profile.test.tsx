@@ -187,6 +187,26 @@ describe('usePerformanceProfile', () => {
     expect(conn.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
   });
 
+  it('covers navigator-undefined guard in getConnection and lowHardware useState', () => {
+    installMatchMedia(false);
+
+    // Stub navigator to undefined so typeof navigator === 'undefined' paths are taken
+    const origDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+      ?? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(globalThis) as object, 'navigator');
+    Object.defineProperty(globalThis, 'navigator', { value: undefined, configurable: true, writable: true });
+
+    try {
+      const { result } = renderHook(() => usePerformanceProfile());
+      // getConnection() returns null (line 15), lowHardware returns false (line 41)
+      expect(result.current.saveDataEnabled).toBe(false);
+      expect(result.current.performanceTier).toBe('full');
+    } finally {
+      if (origDescriptor) {
+        Object.defineProperty(globalThis, 'navigator', origDescriptor);
+      }
+    }
+  });
+
   it('tolerates browsers without navigator.connection', () => {
     installMatchMedia(false);
     setHardware(16, 16);

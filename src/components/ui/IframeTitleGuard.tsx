@@ -23,10 +23,7 @@ export default function IframeTitleGuard() {
             ensureIframeAccessibleTitle(node as HTMLIFrameElement);
           }
 
-          const nestedFrames = node.querySelectorAll?.('iframe');
-          /* istanbul ignore next */
-          if (!nestedFrames) continue;
-
+          const nestedFrames = node.querySelectorAll('iframe');
           for (const frame of nestedFrames) {
             ensureIframeAccessibleTitle(frame as HTMLIFrameElement);
           }

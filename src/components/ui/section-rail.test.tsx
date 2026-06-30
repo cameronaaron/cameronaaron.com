@@ -141,6 +141,18 @@ describe('SectionRail', () => {
     (globalThis as unknown as { IntersectionObserver?: unknown }).IntersectionObserver = original;
   });
 
+  it('skips replaceState when history.replaceState is not available', () => {
+    const origReplaceState = history.replaceState;
+    Object.defineProperty(history, 'replaceState', { value: undefined, configurable: true, writable: true });
+
+    render(<SectionRail />);
+    const target = document.getElementById('projects');
+    target!.scrollIntoView = vi.fn();
+    expect(() => fireEvent.click(screen.getByLabelText('Jump to Research'))).not.toThrow();
+
+    Object.defineProperty(history, 'replaceState', { value: origReplaceState, configurable: true, writable: true });
+  });
+
   it('respects prefers-reduced-motion by using auto scroll behaviour', async () => {
     const fm = await import('framer-motion');
     const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);

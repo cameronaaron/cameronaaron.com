@@ -261,6 +261,20 @@ describe('KeyboardShortcuts', () => {
     spy.mockRestore();
   });
 
+  it('skips replaceState when history.replaceState is not available', () => {
+    const origReplaceState = history.replaceState;
+    Object.defineProperty(history, 'replaceState', { value: undefined, configurable: true, writable: true });
+
+    render(<KeyboardShortcuts />);
+    act(() => {
+      fireEvent.keyDown(window, { key: 'g' });
+      fireEvent.keyDown(window, { key: 'h' });
+    });
+    expect(document.getElementById('home')!.scrollIntoView).toHaveBeenCalled();
+
+    Object.defineProperty(history, 'replaceState', { value: origReplaceState, configurable: true, writable: true });
+  });
+
   it('removes its keydown listener on unmount', () => {
     const removeSpy = vi.spyOn(window, 'removeEventListener');
     const { unmount } = render(<KeyboardShortcuts />);

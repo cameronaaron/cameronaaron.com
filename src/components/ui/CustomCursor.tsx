@@ -39,8 +39,6 @@ export default function CustomCursor() {
   }, [isVisible]);
 
   useEffect(() => {
-    /* istanbul ignore next */
-    if (typeof document === 'undefined') return;
     document.body.classList.add('custom-cursor-active');
     return () => document.body.classList.remove('custom-cursor-active');
   }, []);

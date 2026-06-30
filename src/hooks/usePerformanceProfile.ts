@@ -12,7 +12,6 @@ interface NetworkInformationLike {
 }
 
 function getConnection(): NetworkInformationLike | null {
-  /* istanbul ignore next */
   if (typeof navigator === 'undefined') return null;
 
   return (navigator as Navigator & {
@@ -29,7 +28,6 @@ export function usePerformanceProfile() {
   const prefersReducedMotion = useReducedMotion();
 
   const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
-    /* istanbul ignore next */
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(pointer: coarse)').matches;
   });
@@ -40,7 +38,6 @@ export function usePerformanceProfile() {
   });
 
   const [lowHardware, setLowHardware] = useState(() => {
-    /* istanbul ignore next */
     if (typeof navigator === 'undefined') return false;
 
     const cores = navigator.hardwareConcurrency ?? 8;

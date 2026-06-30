@@ -50,7 +50,6 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
             <motion.span
               key={j}
               initial={{ y: "100%" }}
-              /* istanbul ignore next */
               animate={shouldReveal ? { y: 0 } : {}}
               transition={{
                 duration: 0.5,

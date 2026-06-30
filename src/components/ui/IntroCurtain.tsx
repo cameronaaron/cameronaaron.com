@@ -14,7 +14,6 @@ interface IntroCurtainProps {
 }
 
 // SSR-safe layout effect: useLayoutEffect on client, no-op on server.
-/* istanbul ignore next */
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps) {

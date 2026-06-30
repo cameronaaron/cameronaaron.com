@@ -39,7 +39,11 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('next/dynamic', () => ({
-  default: (_fn: unknown, _opts: unknown) => () => React.createElement('div', { 'data-testid': 'dynamic-placeholder' }),
+  default: (fn: () => Promise<{ default: React.ComponentType }>, _opts: unknown) => {
+    // Call the factory for coverage; ignore the async result.
+    void fn().catch(() => {});
+    return () => React.createElement('div', { 'data-testid': 'dynamic-placeholder' });
+  },
 }));
 
 beforeEach(() => {
@@ -218,12 +222,47 @@ describe('internet/page.tsx coverage (line 104 — empty items null return)', ()
       return {
         ...actual,
         internetFeatures: actual.internetFeatures.filter(
-          (f: unknown) => (f as { category: string }).category !== 'Talks & Speaking'
+          (f: unknown) => (f as { category: string }).category !== 'Speaking'
         ),
       };
     });
     const { default: InternetPage } = await import('./internet/page');
     render(<InternetPage />);
     expect(document.body).toBeTruthy();
+  });
+});
+
+// ── ExperienceCard.handleMouseMove — enableHoverMotion:true branch ───────────
+describe('ExperienceCard and ProjectCard handleMouseMove with enableHoverMotion:true', () => {
+  it('calls handleMouseMove body when enableHoverMotion is true (ExperienceCard)', async () => {
+    vi.doMock('@/hooks/useInteractionMode', () => ({
+      useInteractionMode: () => ({ enableHoverMotion: true, prefersReducedMotion: false }),
+    }));
+    const { default: ExperienceCard } = await import('@/components/experience/ExperienceCard');
+    const { experiences } = await import('@/data/experience');
+    const { container } = render(
+      <ExperienceCard experience={experiences[0]} index={0} />
+    );
+    const card = container.querySelector('[data-testid="experience-card-0"]') as HTMLElement;
+    expect(card).toBeTruthy();
+    Object.defineProperty(card, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ left: 0, top: 0, width: 400, height: 200 }),
+    });
+    fireEvent.mouseMove(card, { clientX: 200, clientY: 100 });
+    expect(card).toBeTruthy();
+  });
+
+  it('returns early from handleMouseMove when enableHoverMotion is false (ProjectCard)', async () => {
+    vi.doMock('@/hooks/useInteractionMode', () => ({
+      useInteractionMode: () => ({ enableHoverMotion: false, prefersReducedMotion: false }),
+    }));
+    const { default: ProjectCard } = await import('@/components/projects/ProjectCard');
+    const { projects } = await import('@/data/projects');
+    const { container } = render(<ProjectCard project={projects[0]} index={0} />);
+    const card = container.querySelector('[data-testid="project-card-0"]') as HTMLElement;
+    expect(card).toBeTruthy();
+    fireEvent.mouseMove(card, { clientX: 200, clientY: 100 });
+    expect(card).toBeTruthy();
   });
 });

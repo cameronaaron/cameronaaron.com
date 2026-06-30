@@ -132,6 +132,8 @@ vi.mock('lenis', () => ({
 }));
 
 beforeAll(() => {
+  if (typeof window === 'undefined') return;
+
   const listeners = new Map<string, Set<(event: Event) => void>>();
 
   const matchMedia = vi.fn().mockImplementation((query: string) => {

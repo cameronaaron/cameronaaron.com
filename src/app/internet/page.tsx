@@ -101,7 +101,6 @@ export default function InternetPage() {
           <div className="space-y-10">
             {categoryOrder.map((category) => {
               const items = sortedFeatures.filter((feature) => feature.category === category);
-              /* istanbul ignore next */
               if (!items.length) return null;
 
               return (
