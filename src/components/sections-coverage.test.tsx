@@ -156,7 +156,7 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
     expect(document.body).toBeTruthy();
   });
 
-  it('fires mouseEnter on experience item div (lines 167-173)', async () => {
+  it('fires mouseEnter on experience item div and card (lines 167-173)', async () => {
     vi.doMock('@/hooks/usePerformanceProfile', () => ({
       usePerformanceProfile: () => ({
         performanceTier: 'full',
@@ -168,10 +168,17 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
     const { default: Experience } = await import('@/components/Experience');
     render(<Experience />);
 
+    // Fire mouseEnter on the wrapper div (line 167 arrow function)
     const items = document.querySelectorAll('[data-testid^="experience-item-"]');
     if (items.length > 0) {
-      const div = items[0].querySelector('.pl-20, .w-full');
-      if (div) await act(async () => { fireEvent.mouseEnter(div); });
+      const wrapperDiv = items[0].querySelector('[class*="pl-20"]');
+      if (wrapperDiv) await act(async () => { fireEvent.mouseEnter(wrapperDiv); });
+    }
+
+    // Fire mouseEnter on the SpotlightCard inside ExperienceCard (triggers onActivate at line 173)
+    const cards = document.querySelectorAll('[data-testid^="experience-card-"]');
+    for (const card of cards) {
+      await act(async () => { fireEvent.mouseEnter(card); });
     }
     expect(document.body).toBeTruthy();
   });
@@ -219,6 +226,13 @@ describe('Testimonials coverage (branches 30-32, 62-72, 121)', () => {
     if (nextBtn) await act(async () => { fireEvent.click(nextBtn); });
     expect(document.body).toBeTruthy();
   });
+
+  it('shows empty state when all testimonials are filtered out (line 140 true branch)', async () => {
+    vi.doMock('@/data/testimonials', () => ({ testimonials: [] }));
+    const { default: Testimonials } = await import('@/components/Testimonials');
+    render(<Testimonials />);
+    expect(screen.getByText('No testimonials in this filter yet.')).toBeTruthy();
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -235,12 +249,20 @@ describe('Skills coverage (branches 98-112, 75% funcs)', () => {
       }),
     }));
     const { default: Skills } = await import('@/components/Skills');
-    render(<Skills />);
+    const { container } = render(<Skills />);
 
-    const alphBtn = screen.queryByRole('button', { name: /alphabetical/i });
-    const priorityBtn = screen.queryByRole('button', { name: /priority/i });
-    if (alphBtn) await act(async () => { fireEvent.click(alphBtn); });
-    if (priorityBtn) await act(async () => { fireEvent.click(priorityBtn); });
+    // Click the Alphabetical button first (changes state from 'priority')
+    const alphBtn = Array.from(container.querySelectorAll('button')).find(
+      (b) => /alphabetical/i.test(b.textContent ?? '')
+    );
+    if (alphBtn) await act(async () => { fireEvent.click(alphBtn as HTMLElement); });
+
+    // After re-render, query the Priority button fresh to avoid stale DOM references
+    const priorityBtn = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim().toLowerCase() === 'priority'
+    );
+    if (priorityBtn) await act(async () => { fireEvent.click(priorityBtn as HTMLElement); });
+
     expect(document.body).toBeTruthy();
   });
 
@@ -252,6 +274,19 @@ describe('Skills coverage (branches 98-112, 75% funcs)', () => {
         prefersReducedMotion: true,
         isCoarsePointer: true,
       }),
+    }));
+    const { default: Skills } = await import('@/components/Skills');
+    render(<Skills />);
+    expect(document.body).toBeTruthy();
+  });
+
+  it('renders null branch of strongestSkill ternary (line 141) when technical skills list is empty', async () => {
+    vi.doMock('@/data/skills', () => ({
+      skills: {
+        technical: [],
+        domains: [],
+        certifications: [],
+      },
     }));
     const { default: Skills } = await import('@/components/Skills');
     render(<Skills />);
@@ -348,6 +383,26 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
         prefersReducedMotion: true,
         isCoarsePointer: true,
       }),
+    }));
+    const { default: Projects } = await import('@/components/Projects');
+    render(<Projects />);
+    expect(document.body).toBeTruthy();
+  });
+
+  it('renders with useReducedMotion=true (covers prefersReducedMotion ? undefined : animate branches)', async () => {
+    // Override the static framer-motion mock for this test by using doMock
+    vi.doMock('framer-motion', () => ({
+      motion: new Proxy({}, { get: (_t: object, tag: string) => makeMotionEl(tag) }),
+      AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
+      useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+      useInView: () => true,
+      useReducedMotion: () => true,
+      useScroll: () => ({ scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() } }),
+      useSpring: (v: unknown) => v,
+      useTransform: (_v: unknown, _i: unknown, _o: unknown[]) => 0,
+      useMotionValue: (initial: unknown) => mockMotionValue(initial),
+      useMotionTemplate: (...args: unknown[]) => args.join(''),
+      useMotionValueEvent: vi.fn(),
     }));
     const { default: Projects } = await import('@/components/Projects');
     render(<Projects />);

@@ -2,6 +2,29 @@ import React from 'react';
 import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Mock framer-motion with useInView returning false so the || forceVisible branch is exercised
+vi.mock('framer-motion', () => ({
+  motion: new Proxy({}, {
+    get: (_t: object, tag: string) => {
+      const SAFE = ['div','section','span','p','h1','h2','button','ul','li'];
+      const El = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+        React.createElement(SAFE.includes(tag as string) ? (tag as string) : 'div',
+          Object.fromEntries(Object.entries(props).filter(([k]) =>
+            !['initial','animate','whileHover','whileTap','whileInView','transition','viewport','variants','exit','style'].includes(k))),
+          children);
+      El.displayName = `motion.${tag}`;
+      return El;
+    },
+  }),
+  AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
+  useInView: () => false,
+  useReducedMotion: () => false,
+  useScroll: () => ({ scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() } }),
+  useTransform: () => 0,
+  useMotionValue: (v: unknown) => ({ get: () => v, set: vi.fn() }),
+  useSpring: (v: unknown) => v,
+}));
+
 import TextReveal from './TextReveal';
 
 beforeEach(() => {

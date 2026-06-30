@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CapstonePage, { dynamic as capstoneDynamic, metadata as capstoneMetadata, toYouTubeEmbedUrl } from './capstone/page';
 import CredentialsPage, { dynamic as credentialsDynamic, metadata as credentialsMetadata } from './credentials/page';
@@ -62,4 +62,27 @@ describe('route pages coverage hardening', () => {
     const schema = container.querySelector('script[type="application/ld+json"]');
     expect(schema?.textContent).toContain('"Internet Features and Mentions"');
   });
+
+  it('covers credentials page null credentialId branch (line 106)', async () => {
+    // Mock academicVerificationResources to include a resource WITHOUT credentialId
+    vi.doMock('@/data/additionalCredentials', () => ({
+      academicVerificationResources: [
+        {
+          institution: 'Test School',
+          name: 'Test Cert',
+          description: 'A test',
+          url: 'https://test.edu',
+          // No credentialId — covers the : null branch
+        },
+      ],
+      additionalCredentials: [],
+    }));
+    const { default: CredentialsPageDynamic } = await import('./credentials/page');
+    render(<CredentialsPageDynamic />);
+    expect(screen.getByText('Test Cert')).toBeTruthy();
+  });
+});
+
+afterEach(() => {
+  vi.resetModules();
 });

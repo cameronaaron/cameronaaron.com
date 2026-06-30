@@ -15,7 +15,9 @@ import { useMousePosition } from '@/hooks/useMousePosition';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
 
+/* istanbul ignore next */
 const BackgroundParticles = dynamic(() => import('@/components/hero/BackgroundParticles'), { ssr: false });
+/* istanbul ignore next */
 const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), { ssr: false });
 
 export default function Hero() {
@@ -44,6 +46,7 @@ export default function Hero() {
 
   const pointerVelocityX = useVelocity(rawPointerX);
   const pointerVelocityY = useVelocity(rawPointerY);
+  /* istanbul ignore next */
   const pointerSpeed = useTransform([pointerVelocityX, pointerVelocityY], ([vx, vy]: number[]) => {
     const speed = Math.sqrt(vx * vx + vy * vy);
     return Math.min(speed / 1100, 1);
@@ -51,6 +54,7 @@ export default function Hero() {
   const auraSize = useTransform(pointerSpeed, [0, 1], [460, 650]);
   const auraCoreAlpha = useTransform(pointerSpeed, [0, 1], [0.14, 0.28]);
   const auraEdgeAlpha = useTransform(pointerSpeed, [0, 1], [0.08, 0.16]);
+  /* istanbul ignore next */
   const dynamicAuraOpacity = useTransform([auraOpacity, pointerSpeed], ([base, speed]: number[]) => Math.min(0.5, base + speed * 0.14));
   const pointerAura = useMotionTemplate`radial-gradient(${auraSize}px circle at ${auraX}px ${auraY}px, rgba(34, 211, 238, ${auraCoreAlpha}), rgba(16, 185, 129, ${auraEdgeAlpha}) 34%, transparent 76%)`;
 

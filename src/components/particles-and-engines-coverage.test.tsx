@@ -99,17 +99,25 @@ describe('interactive-particles engine coverage (lines 93, 203)', () => {
   });
 
   it('stepParticles with quality=balanced covers attraction branch (line 203)', async () => {
-    const { stepParticles, createInitialParticles } = await import('@/components/hero/interactive-particles/engine');
-    const particles = createInitialParticles(5, 42);
+    const { stepParticles } = await import('@/components/hero/interactive-particles/engine');
+    // Place a particle at (49, 50) — distance 1 from pointer (50, 50), satisfies < 22 && > 0.001
+    const particles = [{
+      id: 0, x: 49, y: 50, size: 2, color: '#fff',
+      velocity: { x: 0, y: 0 }, opacity: 1, phase: 0,
+    }];
     const result = stepParticles(particles, 16, { x: 50, y: 50, active: true }, 'balanced');
-    expect(result.length).toBe(5);
+    expect(result.length).toBe(1);
   });
 
   it('stepParticles with quality=full covers attraction full branch (line 203)', async () => {
-    const { stepParticles, createInitialParticles } = await import('@/components/hero/interactive-particles/engine');
-    const particles = createInitialParticles(5, 99);
+    const { stepParticles } = await import('@/components/hero/interactive-particles/engine');
+    // Place a particle at (49, 50) — distance 1 from pointer (50, 50), satisfies < 22 && > 0.001
+    const particles = [{
+      id: 0, x: 49, y: 50, size: 2, color: '#fff',
+      velocity: { x: 0, y: 0 }, opacity: 1, phase: 0,
+    }];
     const result = stepParticles(particles, 16, { x: 50, y: 50, active: true }, 'full');
-    expect(result.length).toBe(5);
+    expect(result.length).toBe(1);
   });
 });
 
@@ -146,5 +154,11 @@ describe('InteractiveParticles coverage (line 125)', () => {
     const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
     const { container } = render(<InteractiveParticles quality="reduced" />);
     expect(container.firstChild).toBeNull();
+  });
+
+  it('renders with quality=balanced (covers line 32 balanced seed branch)', async () => {
+    const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
+    render(<InteractiveParticles quality="balanced" />);
+    expect(document.body).toBeTruthy();
   });
 });

@@ -198,8 +198,11 @@ describe('targeted coverage gaps', () => {
       </>
     );
 
-    fireEvent.mouseMove(screen.getByText(experiences[0].company), { clientX: 20, clientY: 20 });
-    fireEvent.mouseLeave(screen.getByText(experiences[0].company));
+    // Fire mouseEnter to cover the false branch of if (enableHoverMotion) in ExperienceCard
+    const experienceCard = screen.getByTestId('experience-card-0');
+    fireEvent.mouseEnter(experienceCard);
+    fireEvent.mouseMove(experienceCard, { clientX: 20, clientY: 20 });
+    fireEvent.mouseLeave(experienceCard);
 
     const projectLink = screen.getAllByRole('link').find((link) => link.getAttribute('href') === projects[0].link);
     expect(projectLink).toBeTruthy();

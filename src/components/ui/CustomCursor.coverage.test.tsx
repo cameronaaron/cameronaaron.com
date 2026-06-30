@@ -42,7 +42,8 @@ describe('CustomCursor coverage', () => {
     document.body.appendChild(btn);
 
     await act(async () => {
-      fireEvent(window, new MouseEvent('mouseover', { bubbles: true, target: btn } as MouseEventInit));
+      // Fire on the btn element so e.target is an HTMLElement with .closest()
+      fireEvent(btn, new MouseEvent('mouseover', { bubbles: true }));
     });
 
     expect(document.body).toBeTruthy();
@@ -56,7 +57,8 @@ describe('CustomCursor coverage', () => {
     document.body.appendChild(div);
 
     await act(async () => {
-      fireEvent(window, new MouseEvent('mouseover', { bubbles: true }));
+      // Fire on the div element (not window) so e.target is an HTMLElement with .closest()
+      fireEvent(div, new MouseEvent('mouseover', { bubbles: true }));
     });
 
     expect(document.body).toBeTruthy();

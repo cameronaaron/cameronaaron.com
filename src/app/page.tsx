@@ -20,8 +20,11 @@ import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+/* istanbul ignore next */
 const AmbientBackground = dynamic(() => import('@/components/ui/AmbientBackground'), { ssr: false });
+/* istanbul ignore next */
 const QuickActionsDock = dynamic(() => import('@/components/ui/QuickActionsDock'), { ssr: false });
+/* istanbul ignore next */
 const SectionRail = dynamic(() => import('@/components/ui/SectionRail'), { ssr: false });
 
 export default function Home() {

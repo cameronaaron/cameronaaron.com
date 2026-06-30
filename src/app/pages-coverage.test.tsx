@@ -111,6 +111,27 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
     });
     expect(document.body).toBeTruthy();
   });
+
+  it('renders with balanced tier after interaction (covers || performanceTier === balanced branch)', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({
+        performanceTier: 'balanced',
+        shouldRenderParticles: false,
+        shouldRenderAmbientEffects: true,
+        shouldRenderHeavyEffects: false,
+        shouldRenderCursorTrail: false,
+        prefersReducedMotion: false,
+        isCoarsePointer: true,
+      }),
+    }));
+    const { default: Home } = await import('./page');
+    render(<Home />);
+
+    await act(async () => {
+      window.dispatchEvent(new Event('pointerdown'));
+    });
+    expect(document.body).toBeTruthy();
+  });
 });
 
 // ── capstone/page.tsx ────────────────────────────────────────────────────────

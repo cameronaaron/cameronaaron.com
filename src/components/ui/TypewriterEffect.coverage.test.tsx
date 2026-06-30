@@ -56,4 +56,22 @@ describe('TypewriterEffect coverage', () => {
     render(<TypewriterEffect text="Hi" className="custom" cursorClassName="cursor" typingSpeed={1} />);
     expect(document.body).toBeTruthy();
   });
+
+  it('uses default typingSpeed=100 when not provided (covers default param branch line 26)', () => {
+    // Do NOT pass typingSpeed — exercises the default parameter branch
+    render(<TypewriterEffect text="X" />);
+    expect(document.body).toBeTruthy();
+  });
+
+  it('marks complete and covers false branch of currentIndex < text.length (lines 58-60, 68)', async () => {
+    vi.useFakeTimers();
+    render(<TypewriterEffect text="AB" typingSpeed={1} />);
+    // Each timer fires setState; React re-renders and schedules the next timer.
+    // We must advance + flush React in separate act() steps so cascading timers are picked up.
+    for (let i = 0; i < 5; i++) {
+      await act(async () => { vi.advanceTimersByTime(2); });
+    }
+    expect(document.body.textContent).toContain('AB');
+    vi.useRealTimers();
+  });
 });

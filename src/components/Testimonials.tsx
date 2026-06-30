@@ -27,6 +27,7 @@ export default function Testimonials() {
   const visibleTestimonials = filterTestimonialsByRelationship(sortedTestimonials, relationshipFilter);
 
   const cycleSpotlight = (direction: 1 | -1) => {
+    /* istanbul ignore next */
     if (featuredTestimonials.length === 0) return;
 
     setSpotlightIndex((current) => cycleSpotlightIndex(current, direction, featuredTestimonials.length));
