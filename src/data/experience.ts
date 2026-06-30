@@ -37,18 +37,6 @@ export const experiences: Experience[] = [
     ],
   },
   {
-    company: "Google Fi",
-    logo: "/google.webp",
-    websiteUrl: "https://fi.google.com/",
-    positions: [
-      {
-        title: "Senior Product Expert (Volunteer)",
-        period: "2019 - 2022",
-        description: "Provided advanced multi-platform technical support and contributed expert guidance to community user support channels.",
-      },
-    ],
-  },
-  {
     company: "Dutchie",
     logo: "/dutchie.svg",
     websiteUrl: "https://dutchie.com/",
