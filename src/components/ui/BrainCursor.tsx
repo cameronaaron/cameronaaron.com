@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 interface BrainCursorProps {
   active: boolean;
 }
 
-export default function BrainCursor({ active }: BrainCursorProps) {
+function BrainCursor({ active }: BrainCursorProps) {
   // Two hemispheres made of stacked curves + a few "synapse" sparks that
   // pulse faster when hovering interactive targets. ~32px square.
   return (

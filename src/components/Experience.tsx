@@ -20,7 +20,7 @@ export default function Experience() {
   const { performanceTier } = usePerformanceProfile();
   const { isLiteMotion, isCinematic, entryYOffset, timelineTravel, timelineStagger } =
     getExperienceMotionConfig(performanceTier);
-  const sortedExperiences = sortExperiencesForTimeline(experiences);
+  const sortedExperiences = useMemo(() => sortExperiencesForTimeline(experiences), []);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

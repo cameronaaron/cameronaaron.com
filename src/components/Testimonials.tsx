@@ -19,12 +19,18 @@ import {
 export default function Testimonials() {
   const [spotlightIndex, setSpotlightIndex] = useState(0);
   const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
-  const sortedTestimonials = sortTestimonialsByDate(testimonials);
 
-  const featuredTestimonials = getFeaturedTestimonials(sortedTestimonials);
+  const { sortedTestimonials, featuredTestimonials } = useMemo(() => {
+    const sorted = sortTestimonialsByDate(testimonials);
+    return { sortedTestimonials: sorted, featuredTestimonials: getFeaturedTestimonials(sorted) };
+  }, []);
+
   const spotlightTestimonial = getSpotlightTestimonial(featuredTestimonials, spotlightIndex);
 
-  const visibleTestimonials = filterTestimonialsByRelationship(sortedTestimonials, relationshipFilter);
+  const visibleTestimonials = useMemo(
+    () => filterTestimonialsByRelationship(sortedTestimonials, relationshipFilter),
+    [sortedTestimonials, relationshipFilter],
+  );
 
   const cycleSpotlight = (direction: 1 | -1) => {
     setSpotlightIndex((current) => cycleSpotlightIndex(current, direction, featuredTestimonials.length));

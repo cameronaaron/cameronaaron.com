@@ -9,7 +9,10 @@ import ProjectCard from '@/components/projects/ProjectCard';
 import { buildProjectCollections } from '@/components/projects/logic';
 
 export default function Projects() {
-  const { featuredProjects, otherProjects, researchSignals } = buildProjectCollections(projects);
+  const { featuredProjects, otherProjects, researchSignals } = useMemo(
+    () => buildProjectCollections(projects),
+    [],
+  );
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
