@@ -125,9 +125,13 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight font-display bg-gradient-to-r from-white via-cyan-300 to-emerald-400 bg-clip-text text-transparent"
+              className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight font-display"
             >
-              <TypewriterEffect text={profile.name} typingSpeed={80} />
+              <TypewriterEffect
+                text={profile.name}
+                typingSpeed={80}
+                className="bg-gradient-to-r from-white via-cyan-300 to-emerald-400 bg-clip-text text-transparent"
+              />
             </motion.h1>
 
             <div className="text-lg sm:text-2xl md:text-3xl font-light mb-6 md:mb-8 text-muted-foreground leading-tight">

@@ -78,12 +78,17 @@ export default function TypewriterEffect({
     // position:relative + display:inline-block makes this a positioning context for
     // the absolutely-placed visible text, while the invisible full-text span always
     // occupies the same layout space → h1 height never changes during typing → zero CLS.
-    <span className={className} style={{ position: 'relative', display: 'inline-block' }}>
+    // className (e.g. a bg-clip-text gradient) must be applied directly to the spans that
+    // hold the actual text glyphs, not this wrapper — background-clip: text only clips a
+    // background to glyphs painted by that same element. The visible span below is
+    // position:absolute (its own stacking context), so a gradient set only on this wrapper
+    // never reaches it and the text renders fully transparent/invisible.
+    <span style={{ position: 'relative', display: 'inline-block' }}>
       <span className="sr-only">{text}</span>
       {/* Always-present invisible spacer — reserves the exact dimensions the full text needs */}
-      <span aria-hidden="true" style={{ visibility: 'hidden' }}>{text}</span>
+      <span aria-hidden="true" className={className} style={{ visibility: 'hidden' }}>{text}</span>
       {/* Visible typed text + cursor overlaid at the same origin as the spacer */}
-      <span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0 }}>
+      <span aria-hidden="true" className={className} style={{ position: 'absolute', left: 0, top: 0 }}>
         {displayedText || text.charAt(0)}
         <motion.span
           initial={{ opacity: 0 }}
