@@ -47,3 +47,7 @@ export function filterTestimonialsByRelationship(
     return relationship.includes('colleague');
   });
 }
+
+export function getTestimonialStaggerDelay(index: number): number {
+  return Math.min(index * 0.04, 0.16);
+}

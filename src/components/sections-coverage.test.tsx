@@ -217,6 +217,7 @@ describe('Testimonials coverage (branches 30-32, 62-72, 121)', () => {
       filterTestimonialsByRelationship: (t: unknown[]) => t,
       sortTestimonialsByDate: (t: unknown[]) => t,
       cycleSpotlightIndex: vi.fn(),
+      getTestimonialStaggerDelay: () => 0,
       RELATIONSHIP_OPTIONS: [{ key: 'all', label: 'All' }],
     }));
     const { default: Testimonials } = await import('@/components/Testimonials');

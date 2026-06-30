@@ -9,7 +9,10 @@ import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   EXPERIENCE_FLOW_PHASES,
   getExperienceItemId,
+  getExperienceItemX,
   getExperienceMotionConfig,
+  getExperienceNavStaggerDelay,
+  getExperiencePhaseStaggerDelay,
   getTimelineDotAnimation,
   getTimelineDotTransition,
   sortExperiencesForTimeline,
@@ -60,7 +63,7 @@ export default function Experience() {
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * (isLiteMotion ? 0.04 : 0.1), duration: 0.4, ease: 'easeOut' }}
+              transition={{ delay: getExperiencePhaseStaggerDelay(index, isLiteMotion), duration: 0.4, ease: 'easeOut' }}
               className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
@@ -88,7 +91,7 @@ export default function Experience() {
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * (isLiteMotion ? 0.02 : 0.05), duration: 0.35, ease: 'easeOut' }}
+                transition={{ delay: getExperienceNavStaggerDelay(index, isLiteMotion), duration: 0.35, ease: 'easeOut' }}
                 onClick={() => handleJumpToExperience(index)}
                 onMouseEnter={() => setActiveExperienceIndex(index)}
                 onFocus={() => setActiveExperienceIndex(index)}
@@ -141,7 +144,7 @@ export default function Experience() {
                   hidden: {
                     opacity: 0,
                     y: entryYOffset,
-                    x: isLiteMotion ? 0 : index % 2 === 0 ? -timelineTravel : timelineTravel,
+                    x: getExperienceItemX(index, isLiteMotion, timelineTravel),
                   },
                   visible: {
                     opacity: 1,

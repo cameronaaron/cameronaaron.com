@@ -4,7 +4,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildShortcutJumpMap,
+  processKeySequence,
   shouldIgnoreShortcutEvent,
+  type KeySequenceState,
 } from '@/components/ui/keyboard-shortcuts-logic';
 
 interface Shortcut {
@@ -31,7 +33,7 @@ const JUMP_MAP: Record<string, string> = buildShortcutJumpMap(SHORTCUTS);
 export default function KeyboardShortcuts() {
   const [open, setOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-  const sequenceRef = useRef<{ leader: string | null; expires: number }>({ leader: null, expires: 0 });
+  const sequenceRef = useRef<KeySequenceState>({ leader: null, expires: 0 });
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const close = useCallback(() => setOpen(false), []);
@@ -71,22 +73,18 @@ export default function KeyboardShortcuts() {
         return;
       }
 
-      const now = Date.now();
-      const state = sequenceRef.current;
+      const { action, nextState } = processKeySequence(
+        sequenceRef.current,
+        event.key,
+        JUMP_MAP,
+        Date.now()
+      );
+      sequenceRef.current = nextState;
 
-      if (state.leader === 'g' && now < state.expires) {
-        const target = JUMP_MAP[event.key.toLowerCase()];
-        sequenceRef.current = { leader: null, expires: 0 };
-        if (target) {
-          event.preventDefault();
-          jumpTo(target);
-          setOpen(false);
-        }
-        return;
-      }
-
-      if (event.key === 'g') {
-        sequenceRef.current = { leader: 'g', expires: now + 1200 };
+      if (action.kind === 'jump') {
+        event.preventDefault();
+        jumpTo(action.targetId);
+        setOpen(false);
       }
     };
 

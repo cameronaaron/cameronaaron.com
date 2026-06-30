@@ -11,6 +11,7 @@ import {
   filterTestimonialsByRelationship,
   getFeaturedTestimonials,
   getSpotlightTestimonial,
+  getTestimonialStaggerDelay,
   RELATIONSHIP_OPTIONS,
   sortTestimonialsByDate,
   type RelationshipFilter,
@@ -161,7 +162,7 @@ export default function Testimonials() {
                   initial={{ opacity: 0, y: 22, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                  transition={{ duration: 0.34, ease: 'easeOut', delay: Math.min(index * 0.04, 0.16) }}
+                  transition={{ duration: 0.34, ease: 'easeOut', delay: getTestimonialStaggerDelay(index) }}
                 >
                   <TestimonialCard testimonial={testimonial} index={index} />
                 </motion.div>

@@ -5,6 +5,7 @@ import {
   filterTestimonialsByRelationship,
   getFeaturedTestimonials,
   getSpotlightTestimonial,
+  getTestimonialStaggerDelay,
   RELATIONSHIP_OPTIONS,
   sortTestimonialsByDate,
 } from '@/components/testimonials/logic';
@@ -50,5 +51,23 @@ describe('testimonials logic', () => {
     const featured = getFeaturedTestimonials(sortTestimonialsByDate(testimonials));
 
     expect(getSpotlightTestimonial(featured, 999)).toBe(featured[0]);
+  });
+
+  describe('getTestimonialStaggerDelay', () => {
+    it('returns 0 for the first item', () => {
+      expect(getTestimonialStaggerDelay(0)).toBe(0);
+    });
+
+    it('scales linearly up to the cap', () => {
+      expect(getTestimonialStaggerDelay(1)).toBeCloseTo(0.04);
+      expect(getTestimonialStaggerDelay(2)).toBeCloseTo(0.08);
+      expect(getTestimonialStaggerDelay(3)).toBeCloseTo(0.12);
+      expect(getTestimonialStaggerDelay(4)).toBeCloseTo(0.16);
+    });
+
+    it('caps at 0.16 for indexes beyond 4', () => {
+      expect(getTestimonialStaggerDelay(5)).toBeCloseTo(0.16);
+      expect(getTestimonialStaggerDelay(100)).toBeCloseTo(0.16);
+    });
   });
 });

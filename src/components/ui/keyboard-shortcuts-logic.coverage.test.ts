@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildShortcutJumpMap,
   isEditableTarget,
+  processKeySequence,
+  SEQUENCE_TIMEOUT_MS,
   shouldIgnoreShortcutEvent,
 } from '@/components/ui/keyboard-shortcuts-logic';
 
@@ -141,6 +143,66 @@ describe('keyboard-shortcuts-logic — coverage hardening', () => {
       const event = new KeyboardEvent('keydown', { key: 'g' });
       // default target for a detached event is null
       expect(shouldIgnoreShortcutEvent(event)).toBe(false);
+    });
+  });
+
+  // ─── processKeySequence ──────────────────────────────────────────────────
+
+  describe('processKeySequence', () => {
+    const jumpMap = { h: 'home', e: 'experience', d: 'education' };
+    const idle = { leader: null, expires: 0 };
+
+    it('starts a leader sequence when g is pressed', () => {
+      const { action, nextState } = processKeySequence(idle, 'g', jumpMap, 1000);
+      expect(action.kind).toBe('none');
+      expect(nextState.leader).toBe('g');
+      expect(nextState.expires).toBe(1000 + SEQUENCE_TIMEOUT_MS);
+    });
+
+    it('resolves a jump when the second key is in the map and sequence is active', () => {
+      const active = { leader: 'g', expires: 2000 };
+      const { action, nextState } = processKeySequence(active, 'h', jumpMap, 1500);
+      expect(action).toEqual({ kind: 'jump', targetId: 'home' });
+      expect(nextState).toEqual({ leader: null, expires: 0 });
+    });
+
+    it('resolves no-op and clears state when second key is not in the map', () => {
+      const active = { leader: 'g', expires: 2000 };
+      const { action, nextState } = processKeySequence(active, 'z', jumpMap, 1500);
+      expect(action.kind).toBe('none');
+      expect(nextState).toEqual({ leader: null, expires: 0 });
+    });
+
+    it('ignores the sequence when it has expired', () => {
+      const expired = { leader: 'g', expires: 1000 };
+      const { action, nextState } = processKeySequence(expired, 'h', jumpMap, 2500);
+      // 'h' is not a leader key, so state is unchanged and no jump occurs
+      expect(action.kind).toBe('none');
+      expect(nextState).toEqual(expired);
+    });
+
+    it('is case-insensitive for the second key', () => {
+      const active = { leader: 'g', expires: 2000 };
+      const { action } = processKeySequence(active, 'H', jumpMap, 1500);
+      expect(action).toEqual({ kind: 'jump', targetId: 'home' });
+    });
+
+    it('accepts a jump exactly at the boundary (now === expires - 1)', () => {
+      const active = { leader: 'g', expires: 2000 };
+      const { action } = processKeySequence(active, 'e', jumpMap, 1999);
+      expect(action).toEqual({ kind: 'jump', targetId: 'experience' });
+    });
+
+    it('rejects a jump exactly at expiry (now === expires)', () => {
+      const active = { leader: 'g', expires: 2000 };
+      const { action } = processKeySequence(active, 'e', jumpMap, 2000);
+      expect(action.kind).toBe('none');
+    });
+
+    it('returns no-op for arbitrary non-leader keys with idle state', () => {
+      const { action, nextState } = processKeySequence(idle, 'x', jumpMap, 1000);
+      expect(action.kind).toBe('none');
+      expect(nextState).toEqual(idle);
     });
   });
 });

@@ -3,7 +3,10 @@ import { experiences } from '@/data/experience';
 import {
   EXPERIENCE_FLOW_PHASES,
   getExperienceItemId,
+  getExperienceItemX,
   getExperienceMotionConfig,
+  getExperienceNavStaggerDelay,
+  getExperiencePhaseStaggerDelay,
   getTimelineDotAnimation,
   getTimelineDotTransition,
   sortExperiencesForTimeline,
@@ -75,6 +78,53 @@ describe('experience logic', () => {
       expect(t).toHaveProperty('type', 'spring');
       expect(t).toHaveProperty('stiffness', 280);
       expect(t).toHaveProperty('damping', 22);
+    });
+  });
+
+  describe('getExperiencePhaseStaggerDelay', () => {
+    it('returns 0 for the first chip', () => {
+      expect(getExperiencePhaseStaggerDelay(0, false)).toBe(0);
+      expect(getExperiencePhaseStaggerDelay(0, true)).toBe(0);
+    });
+
+    it('scales by 0.1 in full motion', () => {
+      expect(getExperiencePhaseStaggerDelay(2, false)).toBeCloseTo(0.2);
+    });
+
+    it('scales by 0.04 in lite motion', () => {
+      expect(getExperiencePhaseStaggerDelay(2, true)).toBeCloseTo(0.08);
+    });
+  });
+
+  describe('getExperienceNavStaggerDelay', () => {
+    it('returns 0 for the first nav button', () => {
+      expect(getExperienceNavStaggerDelay(0, false)).toBe(0);
+      expect(getExperienceNavStaggerDelay(0, true)).toBe(0);
+    });
+
+    it('scales by 0.05 in full motion', () => {
+      expect(getExperienceNavStaggerDelay(3, false)).toBeCloseTo(0.15);
+    });
+
+    it('scales by 0.02 in lite motion', () => {
+      expect(getExperienceNavStaggerDelay(3, true)).toBeCloseTo(0.06);
+    });
+  });
+
+  describe('getExperienceItemX', () => {
+    it('returns 0 for all items in lite motion', () => {
+      expect(getExperienceItemX(0, true, 32)).toBe(0);
+      expect(getExperienceItemX(1, true, 32)).toBe(0);
+    });
+
+    it('returns negative travel for even-index items in full motion', () => {
+      expect(getExperienceItemX(0, false, 32)).toBe(-32);
+      expect(getExperienceItemX(2, false, 32)).toBe(-32);
+    });
+
+    it('returns positive travel for odd-index items in full motion', () => {
+      expect(getExperienceItemX(1, false, 32)).toBe(32);
+      expect(getExperienceItemX(3, false, 32)).toBe(32);
     });
   });
 });

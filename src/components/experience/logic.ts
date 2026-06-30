@@ -64,3 +64,19 @@ export function getTimelineDotTransition(isLiteMotion: boolean) {
   }
   return { type: 'spring' as const, stiffness: 280, damping: 22 };
 }
+
+export function getExperiencePhaseStaggerDelay(index: number, isLiteMotion: boolean): number {
+  return index * (isLiteMotion ? 0.04 : 0.1);
+}
+
+export function getExperienceNavStaggerDelay(index: number, isLiteMotion: boolean): number {
+  return index * (isLiteMotion ? 0.02 : 0.05);
+}
+
+export function getExperienceItemX(
+  index: number,
+  isLiteMotion: boolean,
+  timelineTravel: number
+): number {
+  return isLiteMotion ? 0 : index % 2 === 0 ? -timelineTravel : timelineTravel;
+}

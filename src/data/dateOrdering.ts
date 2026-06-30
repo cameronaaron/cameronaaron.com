@@ -1,3 +1,12 @@
+const MONTH_ALTERNATIVES =
+  'jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?' +
+  '|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|spring|summer|fall|autumn|winter';
+const ANCHORED_MONTH_YEAR_RE = new RegExp(`^(${MONTH_ALTERNATIVES})\\s+(\\d{4})$`);
+const MONTH_YEAR_ANYWHERE_RE = new RegExp(`(${MONTH_ALTERNATIVES})\\s+(\\d{4})`, 'i');
+const YEAR_ONLY_RE = /^(\d{4})$/;
+const PAREN_CONTENT_RE = /\(([^)]+)\)/;
+const YEAR_ANYWHERE_RE = /(\d{4})/;
+
 const monthMap: Record<string, number> = {
   jan: 0,
   january: 0,
@@ -37,9 +46,7 @@ function toMonthKey(year: number, month: number): number {
 function parseSingleDateToken(token: string, useRangeEndMonth: boolean): number {
   const normalized = token.trim().toLowerCase();
 
-  const monthYearMatch = normalized.match(
-    /^(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|spring|summer|fall|autumn|winter)\s+(\d{4})$/
-  );
+  const monthYearMatch = normalized.match(ANCHORED_MONTH_YEAR_RE);
 
   if (monthYearMatch) {
     const month = monthMap[monthYearMatch[1]];
@@ -47,7 +54,7 @@ function parseSingleDateToken(token: string, useRangeEndMonth: boolean): number 
     return toMonthKey(year, month);
   }
 
-  const yearOnlyMatch = normalized.match(/^(\d{4})$/);
+  const yearOnlyMatch = normalized.match(YEAR_ONLY_RE);
   if (yearOnlyMatch) {
     const year = Number(yearOnlyMatch[1]);
     return toMonthKey(year, useRangeEndMonth ? 11 : 0);
@@ -75,34 +82,30 @@ function parseDateText(rawValue?: string | null): number {
     if (startKey !== Number.NEGATIVE_INFINITY) return startKey;
   }
 
-  const parenMatch = value.match(/\(([^)]+)\)/);
+  const parenMatch = value.match(PAREN_CONTENT_RE);
   if (parenMatch) {
     const parenText = parenMatch[1];
-    const parenMonthYear = parenText.match(
-      /(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|spring|summer|fall|autumn|winter)\s+(\d{4})/i
-    );
+    const parenMonthYear = parenText.match(MONTH_YEAR_ANYWHERE_RE);
     if (parenMonthYear) {
       const month = monthMap[parenMonthYear[1].toLowerCase()];
       const year = Number(parenMonthYear[2]);
       return toMonthKey(year, month);
     }
 
-    const parenYear = parenText.match(/(\d{4})/);
+    const parenYear = parenText.match(YEAR_ANYWHERE_RE);
     if (parenYear) {
       return toMonthKey(Number(parenYear[1]), 11);
     }
   }
 
-  const inlineMonthYear = value.match(
-    /(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|spring|summer|fall|autumn|winter)\s+(\d{4})/i
-  );
+  const inlineMonthYear = value.match(MONTH_YEAR_ANYWHERE_RE);
   if (inlineMonthYear) {
     const month = monthMap[inlineMonthYear[1].toLowerCase()];
     const year = Number(inlineMonthYear[2]);
     return toMonthKey(year, month);
   }
 
-  const inlineYear = value.match(/(\d{4})/);
+  const inlineYear = value.match(YEAR_ANYWHERE_RE);
   if (inlineYear) {
     return toMonthKey(Number(inlineYear[1]), 11);
   }
