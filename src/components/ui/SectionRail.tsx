@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
+import { getMostVisibleEntry } from './section-rail-logic';
 import { useEffect, useState } from 'react';
 
 export interface SectionRailItem {
@@ -44,11 +45,9 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) {
-          setActiveId(visible[0].target.id);
+        const mostVisible = getMostVisibleEntry(entries);
+        if (mostVisible) {
+          setActiveId(mostVisible.target.id);
         }
       },
       { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }

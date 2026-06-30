@@ -294,4 +294,45 @@ describe('modularization contract', () => {
     expect(source).toContain("from '@/components/ui/BrainCursor'");
     expect(source).not.toContain('function BrainCursor({ active }: { active: boolean }) {');
   });
+
+  it('keeps capstone YouTube embed helper extracted to logic module', () => {
+    const page = read('src/app/capstone/page.tsx');
+    const logic = read('src/app/capstone/logic.ts');
+
+    expect(page).toContain("from './logic'");
+    expect(page).not.toContain('function toYouTubeEmbedUrl(');
+    expect(logic).toContain('export function toYouTubeEmbedUrl(');
+  });
+
+  it('keeps SectionTransitions glow-tone helper extracted to logic module', () => {
+    const source = read('src/components/ui/SectionTransitions.tsx');
+
+    expect(source).toContain("from './section-transitions-logic'");
+    expect(source).not.toContain("index % 2 === 0 ? 'from-cyan-400/10");
+    expect(source).not.toContain("'from-emerald-400/10 via-secondary/12 to-transparent'");
+  });
+
+  it('keeps Tilt mouse-offset math extracted to tilt-logic module', () => {
+    const source = read('src/components/ui/Tilt.tsx');
+
+    expect(source).toContain("from './tilt-logic'");
+    expect(source).not.toContain('rect.left - rect.width / 2');
+    expect(source).not.toContain('mouseXFromCenter / width');
+  });
+
+  it('keeps SectionRail most-visible entry sort extracted to section-rail-logic module', () => {
+    const source = read('src/components/ui/SectionRail.tsx');
+
+    expect(source).toContain("from './section-rail-logic'");
+    expect(source).not.toContain('.filter((entry) => entry.isIntersecting)');
+    expect(source).not.toContain('.sort((a, b) => b.intersectionRatio - a.intersectionRatio)');
+  });
+
+  it('keeps AmbientBackground orb-count and animate-flag extracted to logic module', () => {
+    const source = read('src/components/ui/AmbientBackground.tsx');
+
+    expect(source).toContain("from './ambient-background-logic'");
+    expect(source).not.toContain("performanceTier === 'full'\n      ? ORBS.length");
+    expect(source).not.toContain("const animateOrbs = performanceTier === 'full'");
+  });
 });

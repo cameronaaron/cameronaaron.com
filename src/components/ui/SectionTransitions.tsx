@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { getSectionGlowTone } from './section-transitions-logic';
 
 interface SectionRevealProps {
   index: number;
@@ -15,10 +16,7 @@ interface SectionHandoffProps {
 }
 
 export function SectionReveal({ index, children }: SectionRevealProps) {
-  const glowTone =
-    index % 2 === 0
-      ? 'from-cyan-400/10 via-primary/12 to-transparent'
-      : 'from-emerald-400/10 via-secondary/12 to-transparent';
+  const glowTone = getSectionGlowTone(index);
 
   return (
     <motion.div

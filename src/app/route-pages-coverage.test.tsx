@@ -2,7 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import CapstonePage, { dynamic as capstoneDynamic, metadata as capstoneMetadata, toYouTubeEmbedUrl } from './capstone/page';
+import CapstonePage, { dynamic as capstoneDynamic, metadata as capstoneMetadata } from './capstone/page';
+import { toYouTubeEmbedUrl } from './capstone/logic';
 import CredentialsPage, { dynamic as credentialsDynamic, metadata as credentialsMetadata } from './credentials/page';
 import InternetPage, { dynamic as internetDynamic, metadata as internetMetadata } from './internet/page';
 

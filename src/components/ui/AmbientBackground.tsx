@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
+import { getAmbientOrbCount, shouldAnimateOrbs } from './ambient-background-logic';
 
 interface AmbientBackgroundProps {
   performanceTier?: PerformanceTier;
@@ -61,16 +62,8 @@ const ORBS: OrbSpec[] = [
 ];
 
 export default function AmbientBackground({ performanceTier = 'full' }: AmbientBackgroundProps) {
-  const orbCount =
-    performanceTier === 'full'
-      ? ORBS.length
-      : performanceTier === 'balanced'
-        ? 4
-        : performanceTier === 'lite'
-          ? 2
-          : 1;
-
-  const animateOrbs = performanceTier === 'full';
+  const orbCount = getAmbientOrbCount(performanceTier, ORBS.length);
+  const animateOrbs = shouldAnimateOrbs(performanceTier);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">

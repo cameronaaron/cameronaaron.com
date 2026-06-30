@@ -61,10 +61,15 @@ describe('animation regression contract', () => {
   });
 
   it('AmbientBackground restricts animated (Framer Motion) orbs to the full tier only', () => {
-    const source = read('src/components/ui/AmbientBackground.tsx');
-    expect(source).toContain("const animateOrbs = performanceTier === 'full';");
-    // Must NOT enable animation for 'balanced' (mobile) tier
-    expect(source).not.toMatch(/animateOrbs\s*=.*balanced/);
+    const component = read('src/components/ui/AmbientBackground.tsx');
+    const logic = read('src/components/ui/ambient-background-logic.ts');
+    // The component must delegate the decision to the extracted helper
+    expect(component).toContain('shouldAnimateOrbs(performanceTier)');
+    // The logic module must enforce full-only animation
+    expect(logic).toContain("return performanceTier === 'full'");
+    // Neither file must gate animation on the balanced (mobile) tier
+    expect(component).not.toMatch(/animateOrbs\s*=.*balanced/);
+    expect(logic).not.toMatch(/animateOrbs.*balanced/);
   });
 
   it('SmoothScroll bails out before creating Lenis when the pointer is coarse', () => {

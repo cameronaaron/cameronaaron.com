@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { type ReactNode, type MouseEvent } from 'react';
+import { calculateTiltOffset } from './tilt-logic';
 
 interface TiltProps {
   children: ReactNode;
@@ -27,14 +28,9 @@ export default function Tilt({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    
-    const mouseXFromCenter = e.clientX - rect.left - width / 2;
-    const mouseYFromCenter = e.clientY - rect.top - height / 2;
-
-    x.set(mouseXFromCenter / width);
-    y.set(mouseYFromCenter / height);
+    const offset = calculateTiltOffset(rect, e.clientX, e.clientY);
+    x.set(offset.x);
+    y.set(offset.y);
   };
 
   const handleMouseLeave = () => {

@@ -1,25 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { capstone } from '@/data/capstone';
+import { toYouTubeEmbedUrl } from './logic';
 
 export const dynamic = 'force-static';
 
 const baseUrl = 'https://cameronaaron.com';
 const pageUrl = `${baseUrl}/capstone`;
-
-export function toYouTubeEmbedUrl(url: string): string | undefined {
-  const shortMatch = url.match(/^https?:\/\/youtu\.be\/([^?&/]+)/i);
-  if (shortMatch?.[1]) {
-    return `https://www.youtube.com/embed/${shortMatch[1]}`;
-  }
-
-  const longMatch = url.match(/[?&]v=([^?&]+)/i);
-  if (longMatch?.[1]) {
-    return `https://www.youtube.com/embed/${longMatch[1]}`;
-  }
-
-  return undefined;
-}
 
 export const metadata: Metadata = {
   title: 'Bridging Transitions Capstone Defense',
