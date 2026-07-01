@@ -502,6 +502,105 @@ describe('Hero — pointer tracking writes directly into motion values, not Reac
 // 12. Named constants — usePerformanceProfile hardware thresholds
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 13. InteractiveParticles — canvas rendering, zero per-frame React work
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('InteractiveParticles — canvas rendering, no per-frame React state', () => {
+  it('renders through a canvas and never drives the simulation through useState', () => {
+    const src = read('src/components/hero/InteractiveParticles.tsx');
+    expect(src).toContain('<canvas');
+    // The old implementation reconciled ~130 absolutely-positioned DOM nodes
+    // through setState + left/top at 60fps — reconciliation AND layout per frame.
+    expect(src).not.toContain('useState');
+    expect(src).not.toContain('setParticles');
+    expect(src).not.toContain('setConnections');
+    expect(src).not.toContain('setBursts');
+  });
+
+  it('batches connection strokes per opacity tier instead of one stroke per line', () => {
+    const src = read('src/components/hero/InteractiveParticles.tsx');
+    expect(src).toContain('CONNECTION_OPACITY_TIERS');
+    expect(src).toContain('getConnectionOpacityTier');
+  });
+
+  it('pre-renders glow sprites — no per-particle shadowBlur or DOM box-shadow', () => {
+    const src = read('src/components/hero/InteractiveParticles.tsx');
+    expect(src).toContain('createRadialGradient');
+    expect(src).toContain('drawImage');
+    expect(src).not.toMatch(/\.shadowBlur\s*=/);
+    expect(src).not.toContain('boxShadow:');
+  });
+
+  it('follows the BackgroundParticles DPR contract (cap at 2, || 1 fallback, setTransform, Math.round)', () => {
+    const src = read('src/components/hero/InteractiveParticles.tsx');
+    expect(src).toContain(', 2)');
+    expect(src).toContain('|| 1');
+    expect(src).toContain('setTransform(dpr');
+    expect(src).not.toContain('ctx.scale(');
+    expect(src).toContain('Math.round(width * dpr)');
+    expect(src).toContain('Math.round(height * dpr)');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 14. SpotlightCard — CSS custom properties bypass React on mousemove
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('SpotlightCard — CSS variables for mousemove, state only for hover', () => {
+  it('writes --spotlight-x/--spotlight-y via ref, never setState per mousemove', () => {
+    const src = read('src/components/ui/SpotlightCard.tsx');
+    expect(src).toContain("setProperty('--spotlight-x'");
+    expect(src).toContain("setProperty('--spotlight-y'");
+    expect(src).toContain('var(--spotlight-x');
+    expect(src).toContain('var(--spotlight-y');
+    // The old pattern re-rendered the card AND all children on every mousemove
+    expect(src).not.toContain('setPosition');
+    expect(src).not.toMatch(/useState\(\{\s*x:/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 15. Navigation — single-pass bounds + rAF-coalesced scroll handler
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('Navigation — single-pass section bounds and rAF-coalesced updates', () => {
+  it('computeSectionBounds is a single-pass loop, not map().filter()', () => {
+    const logic = read('src/components/navigation/logic.ts');
+    const fnStart = logic.indexOf('export function computeSectionBounds');
+    const fnBody = logic.slice(fnStart, fnStart + 600);
+    expect(fnBody).not.toContain('.map(');
+    expect(fnBody).not.toContain('.filter(');
+    expect(fnBody).toContain('bounds.push(');
+  });
+
+  it('Navigation coalesces scroll/resize into at most one layout read per frame', () => {
+    const src = read('src/components/Navigation.tsx');
+    expect(src).toContain('requestAnimationFrame');
+    expect(src).toContain("addEventListener('scroll', scheduleUpdate, { passive: true })");
+    expect(src).toContain("addEventListener('resize', scheduleUpdate, { passive: true })");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 16. Structured-data builders — single-pass collection, no repeated parsing
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('structured-data builders — single-pass role collection', () => {
+  it('collects role names with one loop, not flatMap+map+filter', () => {
+    const src = read('src/components/structured-data/builders.ts');
+    expect(src).not.toMatch(/flatMap\([\s\S]{0,200}\.filter\(/);
+    expect(src).toContain('roleNameSet');
+  });
+
+  it('splitPeriod/toIsoDate results are computed once per item, not once per spread', () => {
+    const src = read('src/components/structured-data/builders.ts');
+    // The old pattern called splitPeriod(exp.positions[0]?.period) three times per experience
+    expect(src).not.toMatch(/\.\.\.\(splitPeriod\(/);
+    expect(src).not.toMatch(/\.\.\.\(toIsoDate\(/);
+  });
+});
+
 describe('usePerformanceProfile — exported named constants for hardware thresholds', () => {
   it('exports LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD, and defaults', () => {
     const src = read('src/hooks/usePerformanceProfile.ts');

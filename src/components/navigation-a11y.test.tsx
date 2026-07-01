@@ -123,6 +123,78 @@ describe('Navigation accessibility', () => {
     expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeTruthy();
   });
 
+  it('coalesces rapid scroll events into a single rAF update and flushes it', () => {
+    const callbacks: FrameRequestCallback[] = [];
+    const queuedRaf = vi.fn((cb: FrameRequestCallback) => {
+      callbacks.push(cb);
+      return callbacks.length;
+    });
+    const originalRaf = window.requestAnimationFrame;
+    const originalGlobalRaf = globalThis.requestAnimationFrame;
+    Object.defineProperty(window, 'requestAnimationFrame', { writable: true, value: queuedRaf });
+    Object.defineProperty(globalThis, 'requestAnimationFrame', { writable: true, value: queuedRaf });
+
+    try {
+      for (const item of navItems) {
+        const section = document.createElement('section');
+        section.id = item.href.replace('#', '');
+        document.body.appendChild(section);
+      }
+
+      render(<Navigation />);
+
+      act(() => {
+        fireEvent.scroll(window);
+        fireEvent.scroll(window);
+        fireEvent.resize(window);
+      });
+
+      // Three high-frequency events → exactly one scheduled frame
+      expect(queuedRaf).toHaveBeenCalledTimes(1);
+
+      // Flushing the frame recomputes the active section without errors,
+      // and the next scroll can schedule a fresh frame again.
+      act(() => {
+        callbacks[0]?.(16);
+      });
+      act(() => {
+        fireEvent.scroll(window);
+      });
+      expect(queuedRaf).toHaveBeenCalledTimes(2);
+    } finally {
+      Object.defineProperty(window, 'requestAnimationFrame', { writable: true, value: originalRaf });
+      Object.defineProperty(globalThis, 'requestAnimationFrame', { writable: true, value: originalGlobalRaf });
+      document.body.innerHTML = '';
+    }
+  });
+
+  it('cancels a pending scroll frame on unmount', () => {
+    const queuedRaf = vi.fn(() => 42);
+    const queuedCancel = vi.fn();
+    const originalRaf = window.requestAnimationFrame;
+    const originalGlobalRaf = globalThis.requestAnimationFrame;
+    const originalCancel = window.cancelAnimationFrame;
+    const originalGlobalCancel = globalThis.cancelAnimationFrame;
+    Object.defineProperty(window, 'requestAnimationFrame', { writable: true, value: queuedRaf });
+    Object.defineProperty(globalThis, 'requestAnimationFrame', { writable: true, value: queuedRaf });
+    Object.defineProperty(window, 'cancelAnimationFrame', { writable: true, value: queuedCancel });
+    Object.defineProperty(globalThis, 'cancelAnimationFrame', { writable: true, value: queuedCancel });
+
+    try {
+      const { unmount } = render(<Navigation />);
+      act(() => {
+        fireEvent.scroll(window);
+      });
+      unmount();
+      expect(queuedCancel).toHaveBeenCalledWith(42);
+    } finally {
+      Object.defineProperty(window, 'requestAnimationFrame', { writable: true, value: originalRaf });
+      Object.defineProperty(globalThis, 'requestAnimationFrame', { writable: true, value: originalGlobalRaf });
+      Object.defineProperty(window, 'cancelAnimationFrame', { writable: true, value: originalCancel });
+      Object.defineProperty(globalThis, 'cancelAnimationFrame', { writable: true, value: originalGlobalCancel });
+    }
+  });
+
   it('removes its keydown/scroll/resize listeners on unmount', () => {
     const remove = vi.spyOn(window, 'removeEventListener');
     const { unmount } = render(<Navigation />);

@@ -14,19 +14,19 @@ export function hrefToSectionId(href: string): string {
 }
 
 export function computeSectionBounds(items: NavItem[], root: Document = document): SectionBounds[] {
-  return items
-    .map((item) => {
-      const section = root.getElementById(hrefToSectionId(item.href));
-      if (!section) return null;
+  const bounds: SectionBounds[] = [];
+  for (const item of items) {
+    const section = root.getElementById(hrefToSectionId(item.href));
+    if (!section) continue;
 
-      const rect = section.getBoundingClientRect();
-      return {
-        href: item.href,
-        top: rect.top,
-        bottom: rect.bottom,
-      };
-    })
-    .filter((section): section is SectionBounds => Boolean(section));
+    const rect = section.getBoundingClientRect();
+    bounds.push({
+      href: item.href,
+      top: rect.top,
+      bottom: rect.bottom,
+    });
+  }
+  return bounds;
 }
 
 export function pickActiveHref(

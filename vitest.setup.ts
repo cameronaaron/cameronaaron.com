@@ -207,9 +207,13 @@ beforeAll(() => {
       lineTo: vi.fn(),
       stroke: vi.fn(),
       setTransform: vi.fn(),
+      fillRect: vi.fn(),
+      drawImage: vi.fn(),
+      createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
       fillStyle: '',
       strokeStyle: '',
       lineWidth: 1,
+      globalAlpha: 1,
     })),
   });
 

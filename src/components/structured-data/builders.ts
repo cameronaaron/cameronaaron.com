@@ -33,9 +33,13 @@ export function buildStructuredDataGraph(baseUrl = 'https://cameronaaron.com') {
   const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
   const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
   const researchThemes = Array.from(new Set(sortedProjects.flatMap((project) => project.tags)));
-  const roleNames = Array.from(
-    new Set(experiences.flatMap((exp) => exp.positions.map((position) => position.title).filter(Boolean)))
-  ) as string[];
+  const roleNameSet = new Set<string>();
+  for (const exp of experiences) {
+    for (const position of exp.positions) {
+      if (position.title) roleNameSet.add(position.title);
+    }
+  }
+  const roleNames = Array.from(roleNameSet);
 
   const capstoneUrl = `${baseUrl}/capstone`;
   const credentialsUrl = `${baseUrl}/credentials`;
@@ -191,50 +195,53 @@ export function buildStructuredDataGraph(baseUrl = 'https://cameronaaron.com') {
   const researchOutputSchema = {
     '@type': 'ItemList',
     name: 'Research and Publications',
-    itemListElement: sortedProjects.map((project, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': project.link.includes('/capstone') ? 'ScholarlyArticle' : 'CreativeWork',
-        name: project.title,
-        ...(project.link.includes('/capstone')
-          ? {
-              author: {
-                '@id': personId,
-              },
-              isAccessibleForFree: true,
-              educationalUse: 'Professional development and institutional training',
-            }
-          : {}),
-        description: project.description,
-        url: project.link,
-        keywords: project.tags.join(', '),
-        ...(toIsoDate(project.period) ? { datePublished: toIsoDate(project.period) } : {}),
-      },
-    })),
+    itemListElement: sortedProjects.map((project, index) => {
+      const isCapstone = project.link.includes('/capstone');
+      const datePublished = toIsoDate(project.period);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': isCapstone ? 'ScholarlyArticle' : 'CreativeWork',
+          name: project.title,
+          ...(isCapstone
+            ? {
+                author: {
+                  '@id': personId,
+                },
+                isAccessibleForFree: true,
+                educationalUse: 'Professional development and institutional training',
+              }
+            : {}),
+          description: project.description,
+          url: project.link,
+          keywords: project.tags.join(', '),
+          ...(datePublished ? { datePublished } : {}),
+        },
+      };
+    }),
   };
 
   const workExperienceSchema = {
     '@type': 'ItemList',
     name: 'Professional Experience',
-    itemListElement: experiences.map((exp, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'OrganizationRole',
-        roleName: exp.positions[0]?.title,
-        worksFor: {
-          '@type': 'Organization',
-          name: exp.company,
+    itemListElement: experiences.map((exp, index) => {
+      const { startDate, endDate } = splitPeriod(exp.positions[0]?.period);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'OrganizationRole',
+          roleName: exp.positions[0]?.title,
+          worksFor: {
+            '@type': 'Organization',
+            name: exp.company,
+          },
+          ...(startDate ? { startDate } : {}),
+          ...(endDate ? { endDate } : {}),
         },
-        ...(splitPeriod(exp.positions[0]?.period).startDate
-          ? { startDate: splitPeriod(exp.positions[0]?.period).startDate }
-          : {}),
-        ...(splitPeriod(exp.positions[0]?.period).endDate
-          ? { endDate: splitPeriod(exp.positions[0]?.period).endDate }
-          : {}),
-      },
-    })),
+      };
+    }),
   };
 
   const credentialSchema = {
@@ -259,21 +266,24 @@ export function buildStructuredDataGraph(baseUrl = 'https://cameronaaron.com') {
   const testimonialSchema = {
     '@type': 'ItemList',
     name: 'Professional Testimonials',
-    itemListElement: sortedTestimonials.slice(0, 12).map((testimonial, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'CreativeWork',
-        name: `Testimonial from ${testimonial.name}`,
-        text: testimonial.text,
-        ...(toIsoDate(testimonial.date) ? { datePublished: toIsoDate(testimonial.date) } : {}),
-        creator: {
-          '@type': 'Person',
-          name: testimonial.name,
-          jobTitle: testimonial.role,
+    itemListElement: sortedTestimonials.slice(0, 12).map((testimonial, index) => {
+      const datePublished = toIsoDate(testimonial.date);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: `Testimonial from ${testimonial.name}`,
+          text: testimonial.text,
+          ...(datePublished ? { datePublished } : {}),
+          creator: {
+            '@type': 'Person',
+            name: testimonial.name,
+            jobTitle: testimonial.role,
+          },
         },
-      },
-    })),
+      };
+    }),
   };
 
   return {

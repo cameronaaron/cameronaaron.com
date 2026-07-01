@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
+import { useRef, useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
 import { calculateSpotlightPosition } from './spotlight-card-logic';
 
 interface SpotlightCardProps<T extends ElementType> {
@@ -28,21 +28,25 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
     onMouseEnter?: (event: MouseEvent<HTMLElement>) => void;
     onMouseLeave?: (event: MouseEvent<HTMLElement>) => void;
   };
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+  // Hover enter/leave is low-frequency and drives conditional styling → React state.
+  // The spotlight position updates at mousemove rate — writing it into CSS custom
+  // properties on the spotlight layer keeps every move at zero React re-renders.
+  const spotlightRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
-    setPosition(calculateSpotlightPosition(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY));
+    // React assigns child refs before any pointer event can be dispatched.
+    const spotlight = spotlightRef.current!;
+    const { x, y } = calculateSpotlightPosition(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY);
+    spotlight.style.setProperty('--spotlight-x', `${x}px`);
+    spotlight.style.setProperty('--spotlight-y', `${y}px`);
   };
 
   const handleMouseEnter = () => {
-    setOpacity(1);
     setIsHovering(true);
   };
 
   const handleMouseLeave = () => {
-    setOpacity(0);
     setIsHovering(false);
   };
 
@@ -70,10 +74,11 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
       />
 
       <div
+        ref={spotlightRef}
         className="pointer-events-none absolute -inset-px opacity-0 transition duration-300"
         style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
+          opacity: isHovering ? 1 : 0,
+          background: `radial-gradient(600px circle at var(--spotlight-x, 0px) var(--spotlight-y, 0px), ${spotlightColor}, transparent 40%)`,
         }}
         aria-hidden="true"
       />

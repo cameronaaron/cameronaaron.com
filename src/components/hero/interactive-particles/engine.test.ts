@@ -3,12 +3,21 @@ import { describe, expect, it } from 'vitest';
 import {
   ATTRACTION_STRENGTH_BALANCED,
   ATTRACTION_STRENGTH_FULL,
+  CONNECTION_MAX_OPACITY,
+  CONNECTION_OPACITY_TIERS,
   POINTER_ATTRACT_RADIUS,
   POINTER_ATTRACT_RADIUS_SQ,
+  PULSE_BASE_DURATION_MS,
+  PULSE_DURATION_STEP_MS,
+  PULSE_DURATION_VARIANTS,
+  PULSE_OPACITY_AMPLITUDE,
+  PULSE_SCALE_AMPLITUDE,
   buildConnections,
   createBurstParticles,
   createInitialParticles,
   createSeededRandom,
+  getConnectionOpacityTier,
+  getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
   stepBursts,
@@ -111,5 +120,54 @@ describe('interactive particle engine', () => {
     expect(next).toHaveLength(1);
     expect(next[0].id).toBe(2);
     expect(next[0].life).toBeLessThan(1);
+  });
+
+  it('exports pulse constants matching the old Framer keyframe animation', () => {
+    expect(PULSE_BASE_DURATION_MS).toBe(2600);
+    expect(PULSE_DURATION_STEP_MS).toBe(300);
+    expect(PULSE_DURATION_VARIANTS).toBe(5);
+    expect(PULSE_SCALE_AMPLITUDE).toBe(0.35);
+    expect(PULSE_OPACITY_AMPLITUDE).toBe(0.4);
+  });
+
+  it('getParticlePulse starts at rest and peaks mid-period', () => {
+    const rest = getParticlePulse(0, 0);
+    expect(rest.scale).toBeCloseTo(1);
+    expect(rest.opacityMultiplier).toBeCloseTo(1);
+
+    const peak = getParticlePulse(PULSE_BASE_DURATION_MS / 2, 0);
+    expect(peak.scale).toBeCloseTo(1 + PULSE_SCALE_AMPLITUDE);
+    expect(peak.opacityMultiplier).toBeCloseTo(1 + PULSE_OPACITY_AMPLITUDE);
+
+    const fullCycle = getParticlePulse(PULSE_BASE_DURATION_MS, 0);
+    expect(fullCycle.scale).toBeCloseTo(1);
+  });
+
+  it('getParticlePulse staggers periods by particle id so neighbours stay out of phase', () => {
+    const time = PULSE_BASE_DURATION_MS / 2;
+    const idZero = getParticlePulse(time, 0);
+    const idTwo = getParticlePulse(time, 2);
+    expect(idZero.scale).not.toBeCloseTo(idTwo.scale);
+
+    // Period variants wrap at PULSE_DURATION_VARIANTS
+    const wrapped = getParticlePulse(time, PULSE_DURATION_VARIANTS);
+    expect(wrapped.scale).toBeCloseTo(idZero.scale);
+  });
+
+  it('getConnectionOpacityTier maps the opacity range onto tier indices with clamping', () => {
+    expect(getConnectionOpacityTier(0)).toBe(0);
+    expect(getConnectionOpacityTier(CONNECTION_MAX_OPACITY / 2)).toBe(1);
+    expect(getConnectionOpacityTier(CONNECTION_MAX_OPACITY)).toBe(CONNECTION_OPACITY_TIERS.length - 1);
+    // Out-of-range inputs clamp instead of indexing past the tier table
+    expect(getConnectionOpacityTier(-1)).toBe(0);
+    expect(getConnectionOpacityTier(1)).toBe(CONNECTION_OPACITY_TIERS.length - 1);
+  });
+
+  it('CONNECTION_OPACITY_TIERS is ascending and within the connection opacity range', () => {
+    for (let i = 0; i < CONNECTION_OPACITY_TIERS.length; i += 1) {
+      expect(CONNECTION_OPACITY_TIERS[i]).toBeGreaterThan(0);
+      expect(CONNECTION_OPACITY_TIERS[i]).toBeLessThanOrEqual(CONNECTION_MAX_OPACITY);
+      if (i > 0) expect(CONNECTION_OPACITY_TIERS[i]).toBeGreaterThan(CONNECTION_OPACITY_TIERS[i - 1]);
+    }
   });
 });

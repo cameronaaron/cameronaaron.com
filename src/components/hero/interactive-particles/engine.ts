@@ -238,6 +238,45 @@ export function stepParticles(
   });
 }
 
+// ── Canvas pulse + batching helpers (pure — the component only draws) ────────
+
+/** Mirrors the old Framer keyframes: scale [1, 1.35, 1] over 2.6s + (id % 5) * 0.3s. */
+export const PULSE_BASE_DURATION_MS = 2600;
+export const PULSE_DURATION_STEP_MS = 300;
+export const PULSE_DURATION_VARIANTS = 5;
+export const PULSE_SCALE_AMPLITUDE = 0.35;
+export const PULSE_OPACITY_AMPLITUDE = 0.4;
+
+export interface ParticlePulse {
+  scale: number;
+  opacityMultiplier: number;
+}
+
+/**
+ * Smooth 0 → 1 → 0 pulse derived from the frame timestamp. Staggering the
+ * period by particle id keeps neighbours out of phase, matching the old
+ * per-element Framer animation without any per-frame React work.
+ */
+export function getParticlePulse(timeMs: number, particleId: number): ParticlePulse {
+  const duration = PULSE_BASE_DURATION_MS + (particleId % PULSE_DURATION_VARIANTS) * PULSE_DURATION_STEP_MS;
+  const wave = 0.5 - 0.5 * Math.cos((Math.PI * 2 * timeMs) / duration);
+  return {
+    scale: 1 + PULSE_SCALE_AMPLITUDE * wave,
+    opacityMultiplier: 1 + PULSE_OPACITY_AMPLITUDE * wave,
+  };
+}
+
+/** Connection lines are batched into one canvas stroke per opacity tier. */
+export const CONNECTION_MAX_OPACITY = 0.28;
+export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;
+
+/** Map a connection opacity (0 … CONNECTION_MAX_OPACITY) to a tier index. */
+export function getConnectionOpacityTier(opacity: number): number {
+  const tierCount = CONNECTION_OPACITY_TIERS.length;
+  const tier = Math.floor((opacity / CONNECTION_MAX_OPACITY) * tierCount);
+  return Math.min(tierCount - 1, Math.max(0, tier));
+}
+
 export function stepBursts(bursts: BurstParticle[], step: number): BurstParticle[] {
   const result: BurstParticle[] = [];
   for (const burst of bursts) {

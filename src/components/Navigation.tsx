@@ -33,13 +33,25 @@ export default function Navigation() {
       });
     };
 
+    // Coalesce scroll/resize into one rAF tick: computeSectionBounds reads
+    // getBoundingClientRect per section, so at most one layout read per frame.
+    let frameId = 0;
+    const scheduleUpdate = () => {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = 0;
+        updateActiveSection();
+      });
+    };
+
     updateActiveSection();
-    window.addEventListener('scroll', updateActiveSection, { passive: true });
-    window.addEventListener('resize', updateActiveSection, { passive: true });
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', updateActiveSection);
-      window.removeEventListener('resize', updateActiveSection);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (frameId) cancelAnimationFrame(frameId);
     };
   }, []);
 
