@@ -123,7 +123,6 @@ describe('usePerformanceProfile', () => {
     setHardware(16, 16);
     const { result } = renderHook(() => usePerformanceProfile());
     expect(result.current.performanceTier).toBe('full');
-    expect(result.current.shouldRenderCursorTrail).toBe(true);
     expect(result.current.shouldRenderHeavyEffects).toBe(true);
     expect(result.current.shouldRenderAmbientEffects).toBe(true);
     expect(result.current.shouldRenderParticles).toBe(true);
@@ -134,7 +133,6 @@ describe('usePerformanceProfile', () => {
     setHardware(16, 16);
     const { result } = renderHook(() => usePerformanceProfile());
     expect(result.current.performanceTier).toBe('balanced');
-    expect(result.current.shouldRenderCursorTrail).toBe(false);
     expect(result.current.shouldRenderAmbientEffects).toBe(true);
     // Particle systems (canvas RAF loops) must not run on mobile
     expect(result.current.shouldRenderParticles).toBe(false);

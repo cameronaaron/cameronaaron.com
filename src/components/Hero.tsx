@@ -11,7 +11,6 @@ import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
-import { useMousePosition } from '@/hooks/useMousePosition';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
 
@@ -22,7 +21,6 @@ export default function Hero() {
   const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();
   const { shouldUseParallax, showFloatingBadges, parallaxDepth, scaleFloor } = getHeroMotionConfig(performanceTier);
   const { scrollY, scrollYProgress } = useScroll();
-  const { x: mouseX, y: mouseY } = useMousePosition();
   const rawPointerX = useMotionValue(0);
   const rawPointerY = useMotionValue(0);
 
@@ -34,13 +32,20 @@ export default function Hero() {
   const imageParallaxY = useTransform(scrollY, [0, 500], [0, -100]);
   const auraOpacity = useTransform(scrollY, [0, 500], [0.34, 0.12]);
   const chapterProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 });
-  const auraX = useSpring(mouseX, { stiffness: 105, damping: 24, mass: 0.45 });
-  const auraY = useSpring(mouseY, { stiffness: 105, damping: 24, mass: 0.45 });
+  const auraX = useSpring(rawPointerX, { stiffness: 105, damping: 24, mass: 0.45 });
+  const auraY = useSpring(rawPointerY, { stiffness: 105, damping: 24, mass: 0.45 });
 
+  // Track the pointer by writing straight into the motion values from the event
+  // handler — no React state, no re-render of this (large) tree on every mousemove.
   useEffect(() => {
-    rawPointerX.set(mouseX);
-    rawPointerY.set(mouseY);
-  }, [mouseX, mouseY, rawPointerX, rawPointerY]);
+    const handlePointerMove = (event: MouseEvent) => {
+      rawPointerX.set(event.clientX);
+      rawPointerY.set(event.clientY);
+    };
+
+    window.addEventListener('mousemove', handlePointerMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handlePointerMove);
+  }, [rawPointerX, rawPointerY]);
 
   const pointerVelocityX = useVelocity(rawPointerX);
   const pointerVelocityY = useVelocity(rawPointerY);

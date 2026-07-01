@@ -120,18 +120,8 @@ describe('animation regression contract', () => {
     expect(source).not.toMatch(/dynamic\s*\([^)]*IntroCurtain/);
   });
 
-  it('CursorTrail cleans up the mouseenter listener on unmount (memory leak fix)', () => {
-    const source = read('src/components/ui/CursorTrail.tsx');
-    // The mouseenter handler must be a named const so the same reference can be removed
-    expect(source).toContain('const handleMouseEnter');
-    expect(source).toContain("document.addEventListener('mouseenter', handleMouseEnter");
-    expect(source).toContain("document.removeEventListener('mouseenter', handleMouseEnter");
-  });
-
-  it('event listeners in cursor and particle components use passive flag', () => {
+  it('event listeners in particle components use passive flag', () => {
     for (const path of [
-      'src/components/ui/CursorTrail.tsx',
-      'src/components/ui/CustomCursor.tsx',
       'src/components/hero/BackgroundParticles.tsx',
       'src/components/hero/InteractiveParticles.tsx',
       'src/components/hero/ProfileImage.tsx',
@@ -158,10 +148,10 @@ describe('animation regression contract', () => {
     }
   });
 
-  it('useMousePosition and useScrollPosition hooks use passive listeners', () => {
-    const mouse = read('src/hooks/useMousePosition.ts');
+  it('Hero pointer tracking and useScrollPosition hooks use passive listeners', () => {
+    const hero = read('src/components/Hero.tsx');
     const scroll = read('src/hooks/useScrollPosition.ts');
-    expect(mouse.split('\n').find((l) => l.includes("addEventListener('mousemove'"))).toContain('passive: true');
+    expect(hero.split('\n').find((l) => l.includes("addEventListener('mousemove'"))).toContain('passive: true');
     expect(scroll.split('\n').find((l) => l.includes("addEventListener('scroll'"))).toContain('passive: true');
   });
 

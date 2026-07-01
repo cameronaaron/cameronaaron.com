@@ -3,7 +3,6 @@ import { act, fireEvent, render, renderHook, screen } from '@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Certifications from './Certifications';
-import CustomCursor from './ui/CustomCursor';
 import { experiences } from '@/data/experience';
 import { profile } from '@/data/profile';
 import { projects } from '@/data/projects';
@@ -274,52 +273,6 @@ describe('targeted coverage gaps', () => {
     expect(window.sessionStorage.getItem('sw-cleanup-complete')).toBe('true');
     expect(reloadSpy).toHaveBeenCalled();
     expect(errorSpy).not.toHaveBeenCalled();
-  });
-
-  it('covers custom cursor pointer and interaction branches', () => {
-    render(<CustomCursor />);
-
-    const anchor = document.createElement('a');
-    anchor.href = '#x';
-    const nested = document.createElement('span');
-    nested.textContent = 'nested';
-    anchor.appendChild(nested);
-
-    const plain = document.createElement('div');
-    plain.textContent = 'plain';
-
-    document.body.appendChild(anchor);
-    document.body.appendChild(plain);
-
-    fireEvent.mouseMove(window, { clientX: 60, clientY: 70 });
-    fireEvent.mouseOver(nested);
-    fireEvent.mouseOver(plain);
-
-    const originalMatchMedia = window.matchMedia;
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation((query: string) => ({
-        matches: query === '(pointer: coarse)',
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
-
-    const coarse = render(<CustomCursor />);
-    expect(coarse.container.firstChild).toBeNull();
-
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: originalMatchMedia,
-    });
-
-    document.body.removeChild(anchor);
-    document.body.removeChild(plain);
   });
 
   it('covers interaction-mode media change handler branch', async () => {

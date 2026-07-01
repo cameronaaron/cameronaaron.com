@@ -82,6 +82,9 @@ jobs:
       - name: Run test coverage gate
         run: pnpm run test:coverage
 
+      - name: Run V8 coverage cross-check
+        run: pnpm run test:coverage:v8
+
       - name: Run production build
         run: pnpm run build
 

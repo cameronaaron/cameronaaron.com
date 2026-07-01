@@ -71,7 +71,6 @@ describe('module testability contract', () => {
 
   it('requires extracted visual helper components to keep dedicated tests', () => {
     const requiredPairs: Array<[string, string]> = [
-      ['src/components/ui/BrainCursor.tsx', 'src/components/ui/brain-cursor.test.tsx'],
       ['src/components/ui/SectionTransitions.tsx', 'src/components/ui/section-transitions.test.tsx'],
       ['src/components/ui/floating-badge-icon.tsx', 'src/components/ui/floating-badge-icon.test.tsx'],
       ['src/components/projects/FeaturedIcon.tsx', 'src/components/projects/FeaturedIcon.test.tsx'],

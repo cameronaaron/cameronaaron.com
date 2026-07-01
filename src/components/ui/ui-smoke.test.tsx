@@ -5,8 +5,6 @@ import { describe, expect, it } from 'vitest';
 import AmbientBackground from './AmbientBackground';
 import Button from './Button';
 import Card from './Card';
-import CursorTrail from './CursorTrail';
-import CustomCursor from './CustomCursor';
 import FadeInWhenVisible from './FadeInWhenVisible';
 import FloatingBadge from './FloatingBadge';
 import Magnetic from './Magnetic';
@@ -29,8 +27,6 @@ describe('ui component smoke coverage', () => {
         <Button onClick={() => undefined}>Action</Button>
         <Button href="#contact" variant="secondary">Link</Button>
         <Card gradient>Card body</Card>
-        <CursorTrail />
-        <CustomCursor />
         <FadeInWhenVisible direction="left">Fade</FadeInWhenVisible>
         <FadeInWhenVisible>Default direction</FadeInWhenVisible>
         <FloatingBadge icon="innovation" position="top-right" />

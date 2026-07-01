@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockMQ = (matches = false) =>
@@ -13,6 +13,11 @@ const mockMQ = (matches = false) =>
 const mockMotionValue = (initial: unknown) => ({
   get: () => initial, set: vi.fn(), on: vi.fn(), subscribe: vi.fn(), destroy: vi.fn(),
 });
+
+// Captures every useMotionValue() instance in call order so tests can assert
+// which motion value a mousemove handler wrote into (Hero creates rawPointerX
+// then rawPointerY, in that order, and nothing else calls useMotionValue).
+const motionValueInstances: Array<ReturnType<typeof mockMotionValue>> = [];
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
@@ -34,7 +39,11 @@ vi.mock('framer-motion', () => ({
   useScroll: () => ({ scrollY: mockMotionValue(0), scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() } }),
   useSpring: (v: unknown) => mockMotionValue(v),
   useTransform: (_v: unknown, _i: unknown, _o: unknown[]) => mockMotionValue(0),
-  useMotionValue: (initial: unknown) => mockMotionValue(initial),
+  useMotionValue: (initial: unknown) => {
+    const instance = mockMotionValue(initial);
+    motionValueInstances.push(instance);
+    return instance;
+  },
   useMotionTemplate: (...args: unknown[]) => args.join(''),
   useMotionValueEvent: vi.fn(),
   useVelocity: (_v: unknown) => mockMotionValue(0),
@@ -49,6 +58,7 @@ beforeEach(() => {
   window.sessionStorage.clear();
   Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, value: 8 });
   Object.defineProperty(navigator, 'deviceMemory' as keyof Navigator, { configurable: true, value: 8 });
+  motionValueInstances.length = 0;
 });
 
 afterEach(() => {
@@ -65,7 +75,6 @@ describe('Hero coverage (lines 70-221, 242)', () => {
         shouldRenderParticles: true,
         shouldRenderAmbientEffects: true,
         shouldRenderHeavyEffects: true,
-        shouldRenderCursorTrail: true,
         prefersReducedMotion: false,
         isCoarsePointer: false,
       }),
@@ -83,7 +92,6 @@ describe('Hero coverage (lines 70-221, 242)', () => {
         shouldRenderParticles: false,
         shouldRenderAmbientEffects: false,
         shouldRenderHeavyEffects: false,
-        shouldRenderCursorTrail: false,
         prefersReducedMotion: true,
         isCoarsePointer: true,
       }),
@@ -101,7 +109,6 @@ describe('Hero coverage (lines 70-221, 242)', () => {
         shouldRenderParticles: false,
         shouldRenderAmbientEffects: true,
         shouldRenderHeavyEffects: false,
-        shouldRenderCursorTrail: false,
         prefersReducedMotion: false,
         isCoarsePointer: true,
       }),
@@ -110,5 +117,29 @@ describe('Hero coverage (lines 70-221, 242)', () => {
     const { default: Hero } = await import('@/components/Hero');
     render(<Hero />);
     expect(document.body).toBeTruthy();
+  });
+
+  it('writes pointer coordinates into motion values on mousemove, not React state', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({
+        performanceTier: 'full',
+        shouldRenderParticles: true,
+        shouldRenderAmbientEffects: true,
+        shouldRenderHeavyEffects: true,
+        prefersReducedMotion: false,
+        isCoarsePointer: false,
+      }),
+    }));
+
+    const { default: Hero } = await import('@/components/Hero');
+    render(<Hero />);
+
+    // Hero calls useMotionValue exactly twice, in order: rawPointerX, rawPointerY.
+    const [rawPointerX, rawPointerY] = motionValueInstances;
+
+    fireEvent.mouseMove(window, { clientX: 123, clientY: 456 });
+
+    expect(rawPointerX.set).toHaveBeenCalledWith(123);
+    expect(rawPointerY.set).toHaveBeenCalledWith(456);
   });
 });

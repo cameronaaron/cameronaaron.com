@@ -8,15 +8,6 @@ function read(path: string): string {
 }
 
 describe('modularization contract', () => {
-  it('keeps CursorTrail wired to extracted cursor-trail logic module', () => {
-    const source = read('src/components/ui/CursorTrail.tsx');
-
-    expect(source).toContain("from './cursor-trail/logic'");
-    expect(source).not.toContain('a, button, [role="button"], input, textarea, select, label, [data-cursor="interactive"]');
-    expect(source).not.toContain('const relativeAge = 1 - index / Math.max(1, all.length);');
-    expect(source).not.toContain('const decay = 0.035 + relativeAge * 0.02;');
-  });
-
   it('keeps InteractiveParticles wired to extracted simulation engine', () => {
     const source = read('src/components/hero/InteractiveParticles.tsx');
 
@@ -286,13 +277,6 @@ describe('modularization contract', () => {
 
     expect(source).toContain("from '@/components/contact/SocialPlatformIcon'");
     expect(source).not.toContain("function PlatformIcon({ platformKey }: Pick<SocialLinkProps, 'platformKey'>) {");
-  });
-
-  it('keeps CursorTrail brain cursor renderer extracted to dedicated module', () => {
-    const source = read('src/components/ui/CursorTrail.tsx');
-
-    expect(source).toContain("from '@/components/ui/BrainCursor'");
-    expect(source).not.toContain('function BrainCursor({ active }: { active: boolean }) {');
   });
 
   it('keeps capstone YouTube embed helper extracted to logic module', () => {

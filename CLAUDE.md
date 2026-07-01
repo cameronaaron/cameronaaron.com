@@ -54,7 +54,7 @@ src/
     contact/     # SocialLink, SocialPlatformIcon + logic
     …            # One directory per section, logic extracted alongside
   data/          # Static data files (experience.ts, profile.ts, projects.ts…)
-  hooks/         # usePerformanceProfile, useInteractionMode, useMousePosition…
+  hooks/         # usePerformanceProfile, useInteractionMode, use3DTilt…
 ```
 
 ## Test structure
@@ -179,7 +179,7 @@ These patterns are enforced by `src/components/algorithm-and-datastructure-contr
 Never `.map(transform).filter(alive)` — it allocates a full intermediate array. Use a `for` loop with conditional `push()`:
 
 ```ts
-// ✅ single-pass — stepBursts, decayTrailPoints
+// ✅ single-pass — stepBursts
 const result: T[] = [];
 for (const item of items) {
   const next = transform(item);
@@ -232,15 +232,29 @@ export function filterTestimonialsByRelationship(items, filter) {
 }
 ```
 
-### Functional state updaters to prevent object churn
+### Bypass React state for high-frequency pointer/scroll events
 
-When a state value might not have actually changed, use the functional form and return `prev` unchanged to skip a re-render:
+Don't drive a `useState` from `mousemove`-rate events when the value only feeds animation — every state update re-renders the whole subtree even though most consumers just want smooth motion. Write straight into a Framer Motion `useMotionValue` from the event handler instead; `useTransform`/`useSpring` consumers update without React ever re-rendering:
 
 ```ts
-// ✅ useMousePosition.ts — avoids allocating a new {x,y} object every mousemove
-setMousePosition((prev) =>
-  prev.x === e.clientX && prev.y === e.clientY ? prev : { x: e.clientX, y: e.clientY }
-);
+// ✅ Hero.tsx / use3DTilt.ts / ProfileImage.tsx
+const rawPointerX = useMotionValue(0);
+useEffect(() => {
+  const handlePointerMove = (event: MouseEvent) => rawPointerX.set(event.clientX);
+  window.addEventListener('mousemove', handlePointerMove, { passive: true });
+  return () => window.removeEventListener('mousemove', handlePointerMove);
+}, [rawPointerX]);
+
+// ❌ wrong — re-renders the whole tree on every mousemove just to feed a motion value
+const [x, setX] = useState(0);
+// ...setX(e.clientX) on mousemove, then useEffect(() => rawPointerX.set(x), [x])
+```
+
+When you genuinely need the value in React state (e.g. to conditionally render), use the functional updater form and return `prev` unchanged to skip a re-render:
+
+```ts
+// ✅ pattern for cases where state is actually required
+setValue((prev) => (prev.x === next.x && prev.y === next.y ? prev : next));
 ```
 
 ### Named constants for physics and hardware thresholds

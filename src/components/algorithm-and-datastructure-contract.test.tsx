@@ -10,9 +10,7 @@
  *   3. Squared-distance first — both engines avoid sqrt on far pairs
  *   4. Batch draw calls    — canvas stroke/fill counts per frame
  *   5. Numeric Connection.id — no per-frame string allocation
- *   6. Single DOM walk     — CustomCursor compound .closest()
  *   7. useMemo hot paths   — render-path computations are memoized
- *   8. React.memo          — animation sub-trees skip spurious re-renders
  */
 
 import { readFileSync } from 'node:fs';
@@ -30,7 +28,6 @@ import {
   buildConnections as buildIpConnections,
   type Particle as IpParticle,
 } from '@/components/hero/interactive-particles/engine';
-import { decayTrailPoints } from '@/components/ui/cursor-trail/logic';
 import { filterTestimonialsByRelationship } from '@/components/testimonials/logic';
 
 // ── read helper (same pattern as modularization-contract.test.ts) ──────────
@@ -121,7 +118,6 @@ describe('SpatialGrid — typed-array backing (zero GC per frame)', () => {
   });
 
   it('runtime: rebuildSpatialGrid clears previous frame before inserting', () => {
-    const sg = createSpatialGrid(3, 3);
     const { cols } = getGridDimensions(300, 300, 100);
     const sg2 = createSpatialGrid(cols, 3);
 
@@ -370,66 +366,6 @@ describe('interactive-particles Connection.id — numeric, not string', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5b. Single-pass decay — cursor trail
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('cursor-trail decayTrailPoints — single-pass (no map+filter double traversal)', () => {
-  it('uses a for loop with conditional push (one pass, no dead-object allocations)', () => {
-    const src = read('src/components/ui/cursor-trail/logic.ts');
-    // Must iterate once and push only survivors
-    expect(src).toContain('for (let i = 0; i < n; i++)');
-    expect(src).toContain('result.push(');
-    // Must NOT use the two-pass map().filter() pattern
-    expect(src).not.toMatch(/decayTrailPoints[\s\S]{0,200}\.map\([\s\S]{0,400}\.filter\(/);
-  });
-
-  it('runtime: produces same decay result as the original formula', () => {
-    const points = [
-      { id: 0, x: 0, y: 0, life: 1.0 },
-      { id: 1, x: 1, y: 1, life: 0.9 },
-      { id: 2, x: 2, y: 2, life: 0.01 },
-    ];
-    const result = decayTrailPoints(points);
-    // point[2] dies (0.01 - decay < 0), points [0] and [1] survive with reduced life
-    expect(result.length).toBe(2);
-    expect(result[0].id).toBe(0);
-    expect(result[1].id).toBe(1);
-    expect(result[0].life).toBeLessThan(1.0);
-    expect(result[1].life).toBeLessThan(0.9);
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 6. Single DOM walk — CustomCursor hover detection
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('CustomCursor — single compound .closest() call per mouseover', () => {
-  it('uses a single .closest() with a compound CSS selector (one DOM tree walk)', () => {
-    const src = read('src/components/ui/CustomCursor.tsx');
-    // Must have a compound selector in one call
-    expect(src).toContain(".closest('a, button");
-    // Only one .closest() invocation total in the file
-    const closestOccurrences = [...src.matchAll(/\.closest\(/g)];
-    expect(closestOccurrences).toHaveLength(1);
-  });
-
-  it('does not separately check tagName (redundant with closest which checks the element itself)', () => {
-    const src = read('src/components/ui/CustomCursor.tsx');
-    expect(src).not.toContain("target.tagName === 'A'");
-    expect(src).not.toContain("target.tagName === 'BUTTON'");
-    expect(src).not.toContain('target.tagName === "A"');
-    expect(src).not.toContain('target.tagName === "BUTTON"');
-  });
-
-  it('does not split the hover check into two separate .closest() calls', () => {
-    const src = read('src/components/ui/CustomCursor.tsx');
-    // Two separate calls would be: .closest('a') and .closest('button')
-    expect(src).not.toMatch(/\.closest\(['"]a['"]\)/);
-    expect(src).not.toMatch(/\.closest\(['"]button['"]\)/);
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
 // 7. useMemo on hot render-path computations
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -546,35 +482,19 @@ describe('Testimonials — dispatch table over if-chain in relationship filter',
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 11. Functional updater — useMousePosition avoids object churn
+// 11. Motion values bypass React state for high-frequency pointer tracking
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('useMousePosition — functional updater prevents object churn when coords unchanged', () => {
-  it('uses setMousePosition((prev) => ...) functional form', () => {
-    const src = read('src/hooks/useMousePosition.ts');
-    expect(src).toContain('setMousePosition((prev)');
-    expect(src).not.toContain('setMousePosition({ x: e.clientX, y: e.clientY })');
-  });
-
-  it('returns the same object reference when coordinates do not change', async () => {
-    const { useMousePosition } = await import('@/hooks/useMousePosition');
-    const { renderHook, act } = await import('@testing-library/react');
-
-    const { result } = renderHook(() => useMousePosition());
-
-    // Fire the same coordinates twice
-    act(() => {
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 42, clientY: 99 }));
-    });
-    const ref1 = result.current;
-
-    act(() => {
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 42, clientY: 99 }));
-    });
-    const ref2 = result.current;
-
-    // Same reference — no unnecessary re-render object
-    expect(ref1).toBe(ref2);
+describe('Hero — pointer tracking writes directly into motion values, not React state', () => {
+  it('never re-renders the tree on mousemove: no useState-backed pointer hook', () => {
+    const src = read('src/components/Hero.tsx');
+    // The old useMousePosition hook re-rendered all of Hero on every mousemove
+    // just to feed a Framer Motion value — writing straight into the motion
+    // value from the event handler (as use3DTilt.ts / ProfileImage.tsx already
+    // do) skips React entirely.
+    expect(src).not.toContain('useMousePosition');
+    expect(src).toContain('rawPointerX.set(event.clientX)');
+    expect(src).toContain('rawPointerY.set(event.clientY)');
   });
 });
 
@@ -595,29 +515,3 @@ describe('usePerformanceProfile — exported named constants for hardware thresh
   });
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 8. React.memo — animation sub-trees skip spurious re-renders
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('BrainCursor — React.memo prevents re-renders on every mousemove', () => {
-  it('source wraps the component in memo() before exporting', () => {
-    const src = read('src/components/ui/BrainCursor.tsx');
-    // Must use memo() export
-    expect(src).toContain('export default memo(BrainCursor)');
-    // Must NOT export the raw function directly
-    expect(src).not.toContain('export default function BrainCursor');
-    expect(src).not.toContain('export default BrainCursor;');
-  });
-
-  it('source imports memo from react', () => {
-    const src = read('src/components/ui/BrainCursor.tsx');
-    expect(src).toMatch(/import\s+\{[^}]*\bmemo\b[^}]*\}\s+from\s+['"]react['"]/);
-  });
-
-  it('runtime: BrainCursor default export carries the react.memo $$typeof marker', async () => {
-    const { default: BrainCursor } = await import('@/components/ui/BrainCursor');
-    expect(
-      (BrainCursor as unknown as { $$typeof: symbol }).$$typeof
-    ).toBe(Symbol.for('react.memo'));
-  });
-});

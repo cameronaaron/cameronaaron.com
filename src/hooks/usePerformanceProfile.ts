@@ -52,7 +52,11 @@ export function usePerformanceProfile() {
     const media = window.matchMedia('(pointer: coarse)');
     const connection = getConnection();
 
-    // Sync to real device values immediately after hydration
+    // Sync to real device values immediately after hydration. Intentional: this is
+    // the post-hydration half of the SSR-safe-initial-state pattern documented in
+    // CLAUDE.md (#10), not a synchronization anti-pattern — matchMedia/navigator are
+    // unavailable at SSR time, so the real values can only be read here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsCoarsePointer(media.matches);
     setSaveDataEnabled(Boolean(connection?.saveData));
     setLowHardware(readLowHardware());
@@ -89,7 +93,6 @@ export function usePerformanceProfile() {
     isCoarsePointer,
     saveDataEnabled,
     lowHardware,
-    shouldRenderCursorTrail: performanceTier === 'full',
     shouldRenderHeavyEffects: performanceTier === 'full',
     shouldRenderAmbientEffects: performanceTier === 'full' || performanceTier === 'balanced',
     shouldRenderParticles: performanceTier === 'full',

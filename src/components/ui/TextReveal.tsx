@@ -21,6 +21,10 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
   const [forceVisible, setForceVisible] = useState(false);
 
   useEffect(() => {
+    // Intentional: this is the post-hydration sync half of the SSR-safe-initial-state
+    // pattern documented in CLAUDE.md, not a synchronization anti-pattern — the
+    // effect reads client-only state (sessionStorage) that couldn't be known at SSR time.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (readInitialReveal(storageKey)) setForceVisible(true);
 
     const handlePageShow = (event: PageTransitionEvent) => {

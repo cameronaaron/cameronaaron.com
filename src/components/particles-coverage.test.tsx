@@ -1,11 +1,9 @@
 import { act, fireEvent, render } from '@testing-library/react';
-import * as framerMotion from 'framer-motion';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as engine from './hero/background-particles/engine';
 
 import BackgroundParticles from './hero/BackgroundParticles';
 import InteractiveParticles from './hero/InteractiveParticles';
-import CursorTrail from './ui/CursorTrail';
 
 function withRafQueue(testBody: (callbacks: FrameRequestCallback[]) => void) {
   const originalRaf = window.requestAnimationFrame;
@@ -200,125 +198,4 @@ describe('particle and cursor coverage', () => {
     });
   });
 
-  it('covers CursorTrail updatePointerMode via matchMedia change event', () => {
-    let changeHandler: ((e: Partial<MediaQueryListEvent>) => void) | undefined;
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation((query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn((_type: string, handler: (e: Partial<MediaQueryListEvent>) => void) => {
-          if (_type === 'change') changeHandler = handler;
-        }),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
-
-    render(<CursorTrail />);
-
-    act(() => {
-      changeHandler?.({ matches: true } as Partial<MediaQueryListEvent>);
-    });
-    act(() => {
-      changeHandler?.({ matches: false } as Partial<MediaQueryListEvent>);
-    });
-    expect(changeHandler).toBeDefined();
-  });
-
-  it('covers shouldSampleTrail false branch (same-timestamp consecutive mousemoves)', () => {
-    withRafQueue((callbacks) => {
-      let now = 0;
-      const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => now);
-
-      const { unmount } = render(<CursorTrail />);
-
-      // Two events at the same timestamp — second call to shouldSampleTrail returns false → return early
-      fireEvent.mouseMove(window, { clientX: 80, clientY: 70 });
-      fireEvent.mouseMove(window, { clientX: 82, clientY: 72 });
-
-      // Advance time so next event samples normally
-      now = 20;
-      fireEvent.mouseMove(window, { clientX: 85, clientY: 74 });
-
-      act(() => { callbacks[0]?.(16); });
-
-      nowSpy.mockRestore();
-      unmount();
-    });
-  });
-
-  it('executes cursor trail visibility, hover, and ripple branches', () => {
-    withRafQueue((callbacks) => {
-      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-      let now = 0;
-      vi.spyOn(performance, 'now').mockImplementation(() => {
-        now += 20;
-        return now;
-      });
-
-      const originalMatchMedia = window.matchMedia;
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: vi.fn().mockImplementation((query: string) => ({
-          matches: query === '(pointer: coarse)',
-          media: query,
-          onchange: null,
-          addListener: vi.fn(),
-          removeListener: vi.fn(),
-          addEventListener: vi.fn(),
-          removeEventListener: vi.fn(),
-          dispatchEvent: vi.fn(),
-        })),
-      });
-
-      const coarse = render(<CursorTrail />);
-      expect(coarse.container.firstChild).toBeNull();
-      coarse.unmount();
-
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: originalMatchMedia,
-      });
-
-      const reducedSpy = vi.spyOn(framerMotion, 'useReducedMotion');
-      reducedSpy.mockReturnValue(true);
-      const reduced = render(<CursorTrail />);
-      expect(reduced.container.firstChild).toBeNull();
-      reduced.unmount();
-      reducedSpy.mockRestore();
-
-      const { container } = render(<CursorTrail />);
-
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = 'interactive';
-      document.body.appendChild(button);
-
-      fireEvent.mouseMove(window, { clientX: 80, clientY: 70 });
-      fireEvent.mouseMove(window, { clientX: 85, clientY: 74 });
-      fireEvent.mouseOver(button);
-      fireEvent.mouseDown(window, { clientX: 80, clientY: 70 });
-      fireEvent.mouseLeave(document);
-      fireEvent.mouseEnter(document);
-
-      act(() => {
-        callbacks[0]?.(16);
-      });
-
-      act(() => {
-        callbacks[1]?.(36);
-      });
-
-      act(() => {
-        vi.advanceTimersByTime(450);
-      });
-
-      expect(container.querySelector('[aria-hidden="true"]')).toBeTruthy();
-      document.body.removeChild(button);
-    });
-  });
 });

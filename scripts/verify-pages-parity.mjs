@@ -85,8 +85,8 @@ assertMatches(
   errors
 );
 
-if (scripts['deploy:prod'] !== 'npm run deploy:pages:prod') {
-  errors.push('package.json: deploy:prod must point to npm run deploy:pages:prod');
+if (scripts['deploy:prod'] !== 'pnpm run deploy:pages:prod') {
+  errors.push('package.json: deploy:prod must point to pnpm run deploy:pages:prod');
 }
 
 if (typeof scripts['deploy:pages:prod'] !== 'string' || !scripts['deploy:pages:prod'].includes('wrangler pages deploy out')) {

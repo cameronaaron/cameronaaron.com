@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { act, fireEvent } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -69,7 +69,6 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
         shouldRenderParticles: true,
         shouldRenderAmbientEffects: true,
         shouldRenderHeavyEffects: true,
-        shouldRenderCursorTrail: true,
         prefersReducedMotion: false,
         isCoarsePointer: false,
       }),
@@ -86,7 +85,6 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
         shouldRenderParticles: false,
         shouldRenderAmbientEffects: false,
         shouldRenderHeavyEffects: false,
-        shouldRenderCursorTrail: false,
         prefersReducedMotion: true,
         isCoarsePointer: true,
       }),
@@ -123,7 +121,6 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
         shouldRenderParticles: false,
         shouldRenderAmbientEffects: true,
         shouldRenderHeavyEffects: false,
-        shouldRenderCursorTrail: false,
         prefersReducedMotion: false,
         isCoarsePointer: true,
       }),
