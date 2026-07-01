@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { internetFeatures } from '@/data/internetFeatures';
 import { sortByDateDesc } from '@/data/dateOrdering';
+import { groupFeaturesByCategory } from './logic';
 
 export const dynamic = 'force-static';
 
@@ -24,15 +25,9 @@ export const metadata: Metadata = {
   },
 };
 
-const categoryOrder: Array<(typeof internetFeatures)[number]['category']> = [
-  'Speaking',
-  'Media',
-  'Research',
-  'Profiles',
-];
-
 export default function InternetPage() {
   const sortedFeatures = sortByDateDesc(internetFeatures, (item) => item.period);
+  const featureGroups = groupFeaturesByCategory(sortedFeatures);
 
   const schemaGraph = {
     '@context': 'https://schema.org',
@@ -99,10 +94,7 @@ export default function InternetPage() {
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="space-y-10">
-            {categoryOrder.map((category) => {
-              const items = sortedFeatures.filter((feature) => feature.category === category);
-              if (!items.length) return null;
-
+            {featureGroups.map(({ category, items }) => {
               return (
                 <div key={category}>
                   <h2 className="mb-4 text-2xl font-bold text-white">{category}</h2>

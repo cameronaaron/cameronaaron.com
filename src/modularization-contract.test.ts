@@ -335,4 +335,39 @@ describe('modularization contract', () => {
     expect(source).not.toContain('rect.width / 2');
     expect(source).not.toContain('distanceX * strength');
   });
+
+  it('keeps InteractiveParticles draw math (sprite geometry, percent→px) in the engine', () => {
+    const source = read('src/components/hero/InteractiveParticles.tsx');
+
+    expect(source).toContain('GLOW_SPRITE_SIZE');
+    expect(source).toContain('GLOW_DIAMETER_MULTIPLIER');
+    expect(source).toContain('getGlowGradientStops');
+    expect(source).toContain('percentToPx');
+    // No inline sprite geometry or coordinate math left in the component
+    expect(source).not.toContain('const SPRITE_SIZE =');
+    expect(source).not.toMatch(/\/ 100\) \* width/);
+    expect(source).not.toMatch(/addColorStop\(0\.25/);
+  });
+
+  it('keeps BackgroundParticles mouse-pull physics and opacity tiers in the engine', () => {
+    const source = read('src/components/hero/BackgroundParticles.tsx');
+
+    expect(source).toContain('applyMousePull(');
+    expect(source).toContain('BACKGROUND_OPACITY_TIERS');
+    expect(source).toContain('MOUSE_INACTIVE_POSITION');
+    // The old inline physics and tier table must not return
+    expect(source).not.toContain('const OPACITY_TIERS');
+    expect(source).not.toContain('force * 0.5');
+    expect(source).not.toContain('mouse.x > -900');
+  });
+
+  it('keeps internet page category grouping extracted to its logic module', () => {
+    const source = read('src/app/internet/page.tsx');
+
+    expect(source).toContain("from './logic'");
+    expect(source).toContain('groupFeaturesByCategory(sortedFeatures)');
+    // No per-category filter scan inline in the page
+    expect(source).not.toContain('sortedFeatures.filter((feature) => feature.category === category)');
+    expect(source).not.toContain('const categoryOrder');
+  });
 });

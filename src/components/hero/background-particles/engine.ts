@@ -68,6 +68,59 @@ export function getDistance(dx: number, dy: number): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+// ── Mouse-pull physics (pure — the component only draws) ────────────────────
+
+export const MOUSE_PULL_STRENGTH = 0.5;
+/** Sentinel parked position while the pointer is off-screen. */
+export const MOUSE_INACTIVE_POSITION = -1000;
+/** The pointer counts as active once its x rises above this threshold. */
+export const MOUSE_ACTIVE_THRESHOLD = -900;
+
+/**
+ * Pull every particle within mouseRadius toward the pointer, scaled linearly
+ * by proximity. Mutates in place (same zero-allocation contract as
+ * advanceBackgroundParticle). Squared-distance guard first — sqrt only runs
+ * for particles actually inside the radius.
+ */
+export function applyMousePull(
+  particles: Particle[],
+  mouseX: number,
+  mouseY: number,
+  mouseRadius: number,
+  strength = MOUSE_PULL_STRENGTH
+): void {
+  const mouseRadius2 = mouseRadius * mouseRadius;
+  for (const p of particles) {
+    const dx = mouseX - p.x;
+    const dy = mouseY - p.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < mouseRadius2 && d2 > 0) {
+      const distance = getDistance(dx, dy);
+      const force = (mouseRadius - distance) / mouseRadius;
+      p.x += (dx / distance) * force * strength;
+      p.y += (dy / distance) * force * strength;
+    }
+  }
+}
+
+// ── Draw batching (data only — the component owns the canvas) ───────────────
+
+export interface OpacityTier {
+  threshold: number;
+  style: string;
+}
+
+/**
+ * Particles are drawn in three batches — one beginPath/fill per tier — instead
+ * of one fill per particle. Tier thresholds partition the 0.1–0.6 opacity
+ * range that advanceBackgroundParticle oscillates within.
+ */
+export const BACKGROUND_OPACITY_TIERS: readonly OpacityTier[] = [
+  { threshold: 0.3, style: 'rgba(168, 85, 247, 0.2)' },
+  { threshold: 0.45, style: 'rgba(168, 85, 247, 0.38)' },
+  { threshold: Infinity, style: 'rgba(168, 85, 247, 0.55)' },
+];
+
 // ── Spatial grid (typed-array backed, zero GC per frame) ────────────────────
 
 export interface SpatialGrid {

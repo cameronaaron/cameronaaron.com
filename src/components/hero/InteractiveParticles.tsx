@@ -7,14 +7,18 @@ import {
   type ParticleQuality,
   type PointerState,
   CONNECTION_OPACITY_TIERS,
+  GLOW_DIAMETER_MULTIPLIER,
+  GLOW_SPRITE_SIZE,
   PARTICLE_COLORS,
   buildConnections,
   createBurstParticles,
   createInitialParticles,
   getConnectionOpacityTier,
+  getGlowGradientStops,
   getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
+  percentToPx,
   stepBursts,
   stepParticles,
 } from './interactive-particles/engine';
@@ -23,29 +27,24 @@ interface InteractiveParticlesProps {
   quality?: ParticleQuality;
 }
 
-/** Sprite canvas edge in px; the glow gradient fills the full sprite. */
-const SPRITE_SIZE = 64;
-/** Draw diameter multiplier so the sprite covers the old core + box-shadow glow. */
-const GLOW_DIAMETER_MULTIPLIER = 6;
-
 /**
  * Pre-render one radial glow sprite per particle colour. Rendering glows via
  * drawImage is dramatically cheaper than per-particle shadowBlur or the old
- * per-particle DOM box-shadow.
+ * per-particle DOM box-shadow. Gradient geometry lives in the engine module.
  */
 function createGlowSprite(color: string): HTMLCanvasElement {
   const sprite = document.createElement('canvas');
-  sprite.width = SPRITE_SIZE;
-  sprite.height = SPRITE_SIZE;
+  sprite.width = GLOW_SPRITE_SIZE;
+  sprite.height = GLOW_SPRITE_SIZE;
   const spriteCtx = sprite.getContext('2d');
   if (spriteCtx) {
-    const half = SPRITE_SIZE / 2;
+    const half = GLOW_SPRITE_SIZE / 2;
     const gradient = spriteCtx.createRadialGradient(half, half, 0, half, half, half);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(0.25, color);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    for (const stop of getGlowGradientStops(color)) {
+      gradient.addColorStop(stop.offset, stop.color);
+    }
     spriteCtx.fillStyle = gradient;
-    spriteCtx.fillRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+    spriteCtx.fillRect(0, 0, GLOW_SPRITE_SIZE, GLOW_SPRITE_SIZE);
   }
   return sprite;
 }
@@ -122,8 +121,8 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     const drawGlow = (colorKey: string, xPercent: number, yPercent: number, diameter: number, alpha: number) => {
       // Every particle/burst colour comes from PARTICLE_COLORS, so the sprite always exists.
       const sprite = sprites.get(colorKey)!;
-      const x = (xPercent / 100) * width;
-      const y = (yPercent / 100) * height;
+      const x = percentToPx(xPercent, width);
+      const y = percentToPx(yPercent, height);
       ctx.globalAlpha = Math.min(1, alpha);
       ctx.drawImage(sprite, x - diameter / 2, y - diameter / 2, diameter, diameter);
     };
@@ -156,8 +155,8 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
         ctx.strokeStyle = `rgba(103, 232, 249, ${CONNECTION_OPACITY_TIERS[tier]})`;
         for (const line of lines) {
           if (getConnectionOpacityTier(line.opacity) !== tier) continue;
-          ctx.moveTo((line.x1 / 100) * width, (line.y1 / 100) * height);
-          ctx.lineTo((line.x2 / 100) * width, (line.y2 / 100) * height);
+          ctx.moveTo(percentToPx(line.x1, width), percentToPx(line.y1, height));
+          ctx.lineTo(percentToPx(line.x2, width), percentToPx(line.y2, height));
         }
         ctx.stroke();
       }

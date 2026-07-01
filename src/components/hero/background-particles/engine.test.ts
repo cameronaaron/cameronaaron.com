@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BACKGROUND_OPACITY_TIERS,
+  MOUSE_ACTIVE_THRESHOLD,
+  MOUSE_INACTIVE_POSITION,
+  MOUSE_PULL_STRENGTH,
   advanceBackgroundParticle,
+  applyMousePull,
   createBackgroundParticle,
   createBackgroundParticles,
   createSpatialGrid,
@@ -322,5 +327,77 @@ describe('forEachConnectedPair', () => {
     const brute = bruteForce(particles, connectDist * connectDist);
     const spatial = gridPairs(particles, connectDist, 200, 200);
     expect(spatial).toHaveLength(brute.length);
+  });
+});
+
+describe('applyMousePull — extracted pointer physics', () => {
+  it('exports named constants for strength and pointer sentinels', () => {
+    expect(MOUSE_PULL_STRENGTH).toBe(0.5);
+    expect(MOUSE_INACTIVE_POSITION).toBe(-1000);
+    expect(MOUSE_ACTIVE_THRESHOLD).toBe(-900);
+    // The parked position must read as inactive under the threshold check
+    expect(MOUSE_INACTIVE_POSITION).toBeLessThan(MOUSE_ACTIVE_THRESHOLD);
+  });
+
+  it('pulls a particle inside the radius toward the pointer, scaled by proximity', () => {
+    const near = makeParticle(90, 100);
+    const far = makeParticle(500, 500);
+    applyMousePull([near, far], 100, 100, 150);
+
+    // near: 10 units away, force = (150-10)/150; moved along +x only
+    expect(near.x).toBeCloseTo(90 + ((150 - 10) / 150) * MOUSE_PULL_STRENGTH);
+    expect(near.y).toBeCloseTo(100);
+    // far: outside the radius — untouched
+    expect(far.x).toBe(500);
+    expect(far.y).toBe(500);
+  });
+
+  it('closer particles receive a stronger pull than distant ones', () => {
+    const close = makeParticle(95, 100);
+    const distant = makeParticle(20, 100);
+    applyMousePull([close, distant], 100, 100, 150);
+    expect(close.x - 95).toBeGreaterThan(distant.x - 20);
+  });
+
+  it('skips a particle exactly at the pointer (d2 === 0 guard, no NaN)', () => {
+    const pinned = makeParticle(100, 100);
+    applyMousePull([pinned], 100, 100, 150);
+    expect(pinned.x).toBe(100);
+    expect(pinned.y).toBe(100);
+    expect(Number.isNaN(pinned.x)).toBe(false);
+  });
+
+  it('respects a custom strength parameter', () => {
+    const a = makeParticle(90, 100);
+    const b = makeParticle(90, 100);
+    applyMousePull([a], 100, 100, 150, 1);
+    applyMousePull([b], 100, 100, 150, 0.5);
+    expect(a.x - 90).toBeCloseTo((b.x - 90) * 2);
+  });
+});
+
+describe('BACKGROUND_OPACITY_TIERS — batched draw table', () => {
+  it('has exactly three ascending tiers ending at Infinity', () => {
+    expect(BACKGROUND_OPACITY_TIERS).toHaveLength(3);
+    expect(BACKGROUND_OPACITY_TIERS[2].threshold).toBe(Infinity);
+    for (let i = 1; i < BACKGROUND_OPACITY_TIERS.length; i += 1) {
+      expect(BACKGROUND_OPACITY_TIERS[i].threshold).toBeGreaterThan(BACKGROUND_OPACITY_TIERS[i - 1].threshold);
+    }
+  });
+
+  it('partitions the full opacity oscillation range of advanceBackgroundParticle (0.1–0.6)', () => {
+    // Every opacity a particle can reach falls into exactly one tier bucket
+    for (const opacity of [0.1, 0.29, 0.3, 0.44, 0.45, 0.59, 0.6]) {
+      let bucket = -1;
+      let prev = 0;
+      for (let i = 0; i < BACKGROUND_OPACITY_TIERS.length; i += 1) {
+        if (opacity > prev && opacity <= BACKGROUND_OPACITY_TIERS[i].threshold) {
+          bucket = i;
+          break;
+        }
+        prev = BACKGROUND_OPACITY_TIERS[i].threshold;
+      }
+      expect(bucket, `opacity ${opacity} must land in a tier`).toBeGreaterThanOrEqual(0);
+    }
   });
 });

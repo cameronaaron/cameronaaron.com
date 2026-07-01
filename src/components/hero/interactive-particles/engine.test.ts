@@ -5,6 +5,9 @@ import {
   ATTRACTION_STRENGTH_FULL,
   CONNECTION_MAX_OPACITY,
   CONNECTION_OPACITY_TIERS,
+  GLOW_CORE_STOP,
+  GLOW_DIAMETER_MULTIPLIER,
+  GLOW_SPRITE_SIZE,
   POINTER_ATTRACT_RADIUS,
   POINTER_ATTRACT_RADIUS_SQ,
   PULSE_BASE_DURATION_MS,
@@ -17,9 +20,11 @@ import {
   createInitialParticles,
   createSeededRandom,
   getConnectionOpacityTier,
+  getGlowGradientStops,
   getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
+  percentToPx,
   stepBursts,
   stepParticles,
 } from './engine';
@@ -161,6 +166,33 @@ describe('interactive particle engine', () => {
     // Out-of-range inputs clamp instead of indexing past the tier table
     expect(getConnectionOpacityTier(-1)).toBe(0);
     expect(getConnectionOpacityTier(1)).toBe(CONNECTION_OPACITY_TIERS.length - 1);
+  });
+
+  it('exports glow sprite geometry as named constants', () => {
+    expect(GLOW_SPRITE_SIZE).toBe(64);
+    expect(GLOW_DIAMETER_MULTIPLIER).toBe(6);
+    expect(GLOW_CORE_STOP).toBeGreaterThan(0);
+    expect(GLOW_CORE_STOP).toBeLessThan(1);
+  });
+
+  it('getGlowGradientStops builds a solid-core, transparent-edge gradient', () => {
+    const stops = getGlowGradientStops('rgba(34, 211, 238, 0.65)');
+    expect(stops).toEqual([
+      { offset: 0, color: 'rgba(34, 211, 238, 0.65)' },
+      { offset: GLOW_CORE_STOP, color: 'rgba(34, 211, 238, 0.65)' },
+      { offset: 1, color: 'rgba(0, 0, 0, 0)' },
+    ]);
+    // Offsets must be ascending — CanvasGradient.addColorStop requires it
+    for (let i = 1; i < stops.length; i += 1) {
+      expect(stops[i].offset).toBeGreaterThan(stops[i - 1].offset);
+    }
+  });
+
+  it('percentToPx maps the 0–100 simulation space onto canvas pixels', () => {
+    expect(percentToPx(0, 800)).toBe(0);
+    expect(percentToPx(50, 800)).toBe(400);
+    expect(percentToPx(100, 800)).toBe(800);
+    expect(percentToPx(25, 0)).toBe(0);
   });
 
   it('CONNECTION_OPACITY_TIERS is ascending and within the connection opacity range', () => {

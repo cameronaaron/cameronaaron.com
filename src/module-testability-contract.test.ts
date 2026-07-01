@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest';
 
 const PROJECT_ROOT = process.cwd();
 const COMPONENTS_ROOT = resolve(PROJECT_ROOT, 'src/components');
+const APP_ROOT = resolve(PROJECT_ROOT, 'src/app');
+const HOOKS_ROOT = resolve(PROJECT_ROOT, 'src/hooks');
 
 function walkFiles(path: string): string[] {
   const entries = readdirSync(path, { withFileTypes: true });
@@ -67,6 +69,33 @@ describe('module testability contract', () => {
 
     expect(helperModules.length).toBeGreaterThan(0);
     expect(missingCompanionTests).toEqual([]);
+  });
+
+  it('requires app-route logic modules to have co-located companion tests too', () => {
+    const allAppFiles = walkFiles(APP_ROOT).map(toWorkspacePath);
+    const helperModules = allAppFiles.filter(isExtractedLogicModule);
+
+    const missingCompanionTests = helperModules.filter((modulePath) => !hasCompanionTest(modulePath));
+
+    expect(helperModules.length).toBeGreaterThan(0);
+    expect(missingCompanionTests).toEqual([]);
+  });
+
+  it('requires every hook to be exercised by a test under src/hooks', () => {
+    const hookFiles = walkFiles(HOOKS_ROOT)
+      .map(toWorkspacePath)
+      .filter((path) => /\/use[A-Z]\w*\.ts$/.test(path));
+    const hookTests = walkFiles(HOOKS_ROOT)
+      .map(toWorkspacePath)
+      .filter((path) => /\.test\.tsx?$/.test(path))
+      .map((path) => readFileSync(resolve(PROJECT_ROOT, path), 'utf8'))
+      .join('\n');
+
+    expect(hookFiles.length).toBeGreaterThan(0);
+    for (const hookFile of hookFiles) {
+      const hookName = basename(hookFile).replace(/\.ts$/, '');
+      expect(hookTests, `${hookFile} has no direct test in src/hooks`).toContain(hookName);
+    }
   });
 
   it('requires extracted visual helper components to keep dedicated tests', () => {

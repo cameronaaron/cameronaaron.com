@@ -266,6 +266,32 @@ export function getParticlePulse(timeMs: number, particleId: number): ParticlePu
   };
 }
 
+/** Sprite canvas edge in px; the glow gradient fills the full sprite. */
+export const GLOW_SPRITE_SIZE = 64;
+/** Draw diameter multiplier so the sprite covers the old core + box-shadow glow. */
+export const GLOW_DIAMETER_MULTIPLIER = 6;
+/** Solid core out to 25% of the radius, then a soft falloff to transparent. */
+export const GLOW_CORE_STOP = 0.25;
+
+export interface GradientStop {
+  offset: number;
+  color: string;
+}
+
+/** Radial-gradient stop list for one pre-rendered glow sprite. */
+export function getGlowGradientStops(color: string): GradientStop[] {
+  return [
+    { offset: 0, color },
+    { offset: GLOW_CORE_STOP, color },
+    { offset: 1, color: 'rgba(0, 0, 0, 0)' },
+  ];
+}
+
+/** Convert a simulation coordinate (0–100 %) to a canvas pixel offset. */
+export function percentToPx(percent: number, extent: number): number {
+  return (percent / 100) * extent;
+}
+
 /** Connection lines are batched into one canvas stroke per opacity tier. */
 export const CONNECTION_MAX_OPACITY = 0.28;
 export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;

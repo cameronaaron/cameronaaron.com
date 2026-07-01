@@ -2,12 +2,15 @@
 
 import { useEffect, useRef } from 'react';
 import {
+  BACKGROUND_OPACITY_TIERS,
+  MOUSE_ACTIVE_THRESHOLD,
+  MOUSE_INACTIVE_POSITION,
   advanceBackgroundParticle,
+  applyMousePull,
   createBackgroundParticles,
   createSpatialGrid,
   forEachConnectedPair,
   getBackgroundParticleConfig,
-  getDistance,
   getGridDimensions,
   rebuildSpatialGrid,
   shouldRenderBackgroundParticles,
@@ -39,8 +42,8 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     const activeConfig = getBackgroundParticleConfig(quality);
     
     const mouse = {
-      x: -1000,
-      y: -1000,
+      x: MOUSE_INACTIVE_POSITION,
+      y: MOUSE_INACTIVE_POSITION,
       radius: activeConfig.mouseRadius
     };
 
@@ -74,8 +77,8 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     };
 
     const handleMouseLeave = () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
+      mouse.x = MOUSE_INACTIVE_POSITION;
+      mouse.y = MOUSE_INACTIVE_POSITION;
     };
 
     const connectDist2 = activeConfig.connectDistance * activeConfig.connectDistance;
@@ -89,19 +92,9 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
         advanceBackgroundParticle(p, width, height);
       }
 
-      // ── Mouse-pull physics (separate from drawing) ────────────────────────
-      if (activeConfig.useMousePull && mouse.x > -900) {
-        for (const p of particles) {
-          const dx = mouse.x - p.x;
-          const dy = mouse.y - p.y;
-          const d2 = dx * dx + dy * dy;
-          if (d2 < mouseRadius2 && d2 > 0) {
-            const distance = getDistance(dx, dy);
-            const force = (mouse.radius - distance) / mouse.radius;
-            p.x += (dx / distance) * force * 0.5;
-            p.y += (dy / distance) * force * 0.5;
-          }
-        }
+      // ── Mouse-pull physics (extracted to engine, mutates in place) ───────
+      if (activeConfig.useMousePull && mouse.x > MOUSE_ACTIVE_THRESHOLD) {
+        applyMousePull(particles, mouse.x, mouse.y, mouse.radius);
       }
 
       // ── Spatial-grid connections: O(n·k) → one path, one stroke() ───────
@@ -118,7 +111,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       }
 
       // ── Batch mouse-pull lines — one path, one stroke() ──────────────────
-      if (activeConfig.useMousePull && mouse.x > -900) {
+      if (activeConfig.useMousePull && mouse.x > MOUSE_ACTIVE_THRESHOLD) {
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(147, 51, 234, 0.55)';
         ctx.lineWidth = 1;
@@ -134,13 +127,8 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       }
 
       // ── Batch particles in 3 opacity tiers — 3 fill() calls ──────────────
-      const OPACITY_TIERS = [
-        { threshold: 0.3,      style: 'rgba(168, 85, 247, 0.2)'  },
-        { threshold: 0.45,     style: 'rgba(168, 85, 247, 0.38)' },
-        { threshold: Infinity, style: 'rgba(168, 85, 247, 0.55)' },
-      ] as const;
       let prevThreshold = 0;
-      for (const tier of OPACITY_TIERS) {
+      for (const tier of BACKGROUND_OPACITY_TIERS) {
         ctx.beginPath();
         ctx.fillStyle = tier.style;
         for (const p of particles) {
