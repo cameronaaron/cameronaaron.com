@@ -118,5 +118,13 @@ export function getDateSortKey(value?: string | null): number {
 }
 
 export function sortByDateDesc<T>(items: T[], getValue: (item: T) => string | undefined | null): T[] {
-  return [...items].sort((a, b) => getDateSortKey(getValue(b)) - getDateSortKey(getValue(a)));
+  // Decorate-sort-undecorate: parse each date string exactly once (O(n))
+  // instead of re-running the regex parser inside the comparator (O(n log n)
+  // parses). Array.prototype.sort is stable, so ties keep input order.
+  const decorated: Array<{ item: T; key: number }> = [];
+  for (const item of items) {
+    decorated.push({ item, key: getDateSortKey(getValue(item)) });
+  }
+  decorated.sort((a, b) => b.key - a.key);
+  return decorated.map((entry) => entry.item);
 }

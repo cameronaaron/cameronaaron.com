@@ -1,4 +1,4 @@
-import { getDateSortKey, sortByDateDesc } from '@/data/dateOrdering';
+import { sortByDateDesc } from '@/data/dateOrdering';
 import type { Experience } from '@/data/experience';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 
@@ -25,18 +25,20 @@ export function getExperienceMotionConfig(performanceTier: PerformanceTier) {
 }
 
 export function sortExperiencesForTimeline(items: Experience[]): ExperienceTimelineItem[] {
-  return [...items]
-    .map((experience) => {
-      const sortedPositions = sortByDateDesc(experience.positions, (position) => position.period);
-      const latestPeriod = sortedPositions[0]?.period ?? '';
+  const timelineItems = items.map((experience) => {
+    const sortedPositions = sortByDateDesc(experience.positions, (position) => position.period);
+    const latestPeriod = sortedPositions[0]?.period ?? '';
 
-      return {
-        ...experience,
-        positions: sortedPositions,
-        latestPeriod,
-      };
-    })
-    .sort((left, right) => getDateSortKey(right.latestPeriod) - getDateSortKey(left.latestPeriod));
+    return {
+      ...experience,
+      positions: sortedPositions,
+      latestPeriod,
+    };
+  });
+
+  // sortByDateDesc parses each latestPeriod once (decorate-sort-undecorate);
+  // a bare .sort() comparator would re-parse on every comparison.
+  return sortByDateDesc(timelineItems, (item) => item.latestPeriod);
 }
 
 export function getExperienceItemId(index: number): string {

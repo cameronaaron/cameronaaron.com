@@ -28,15 +28,24 @@ export function formatGradeDisplay(grade: string, gpa?: string): string {
 }
 
 export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): PrerequisiteCourse[] {
-  return [...courses].sort((left, right) => {
-    const bucketDiff = Number(isNonFinalizedCourseStatus(left.status)) - Number(isNonFinalizedCourseStatus(right.status));
+  // Decorate-sort-undecorate: the status token scan runs once per course,
+  // not once per comparison inside the sort.
+  const decorated = courses.map((course) => ({
+    course,
+    nonFinalized: Number(isNonFinalizedCourseStatus(course.status)),
+  }));
+
+  decorated.sort((left, right) => {
+    const bucketDiff = left.nonFinalized - right.nonFinalized;
     if (bucketDiff !== 0) return bucketDiff;
 
-    const requirementDiff = left.requirement.localeCompare(right.requirement);
+    const requirementDiff = left.course.requirement.localeCompare(right.course.requirement);
     if (requirementDiff !== 0) return requirementDiff;
 
-    return left.course.localeCompare(right.course);
+    return left.course.course.localeCompare(right.course.course);
   });
+
+  return decorated.map((entry) => entry.course);
 }
 
 export function buildEducationCollections(

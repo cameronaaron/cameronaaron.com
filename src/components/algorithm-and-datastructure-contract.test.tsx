@@ -671,6 +671,49 @@ describe('repo-wide — no setState wired to raw mousemove listeners', () => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 18. Decorate-sort-undecorate — sort keys computed once, never per comparison
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('sorting — expensive keys are precomputed, not recomputed per comparison', () => {
+  it('sortByDateDesc decorates with getDateSortKey once per item', () => {
+    const src = read('src/data/dateOrdering.ts');
+    // The comparator must compare precomputed numeric keys only
+    expect(src).toMatch(/decorated\.sort\(\(a, b\) => b\.key - a\.key\)/);
+    // getDateSortKey must never be called inside a comparator anywhere
+    expect(src).not.toMatch(/\.sort\(\([^)]*\)\s*=>[^;]*getDateSortKey/);
+  });
+
+  it('no comparator in production code calls getDateSortKey', () => {
+    for (const file of listProductionSources()) {
+      const src = readFileSync(file, 'utf8');
+      expect(
+        /\.sort\(\([^)]*\)\s*=>[^{;]*getDateSortKey/.test(src),
+        `${file} re-parses dates inside a sort comparator — decorate first`
+      ).toBe(false);
+    }
+  });
+
+  it('sortPrerequisiteCourses precomputes the non-finalized bucket', () => {
+    const src = read('src/components/education/logic.ts');
+    expect(src).toContain('nonFinalized: Number(isNonFinalizedCourseStatus(');
+    // The token scan must not run inside the comparator
+    expect(src).not.toMatch(/\.sort\([\s\S]{0,200}isNonFinalizedCourseStatus/);
+  });
+
+  it('runtime: sortByDateDesc calls the value getter exactly once per item', async () => {
+    const { sortByDateDesc } = await import('@/data/dateOrdering');
+    const items = ['Jan 2024', 'Mar 2020', 'Feb 2026', 'May 2022', 'Jun 2021'];
+    let getterCalls = 0;
+    const sorted = sortByDateDesc(items, (item) => {
+      getterCalls += 1;
+      return item;
+    });
+    expect(getterCalls).toBe(items.length);
+    expect(sorted).toEqual(['Feb 2026', 'Jan 2024', 'May 2022', 'Jun 2021', 'Mar 2020']);
+  });
+});
+
 describe('usePerformanceProfile — exported named constants for hardware thresholds', () => {
   it('exports LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD, and defaults', () => {
     const src = read('src/hooks/usePerformanceProfile.ts');
