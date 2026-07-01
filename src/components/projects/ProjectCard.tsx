@@ -1,13 +1,12 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import type { Project } from '@/data/projects';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import { use3DTilt } from '@/hooks/use3DTilt';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
-import { calculateCardTiltTargets, getProjectCardCta, getProjectReadingMinutes } from '@/components/projects/card-logic';
-
-export { calculateCardTiltTargets } from '@/components/projects/card-logic';
+import { getProjectCardCta, getProjectReadingMinutes } from '@/components/projects/card-logic';
 
 interface ProjectCardProps {
   project: Project;
@@ -18,29 +17,17 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
   const readingMinutes = getProjectReadingMinutes(project.description);
-  
-  const x = useMotionValue(0.5);
-  const y = useMotionValue(0.5);
-  
-  const rotateX = useTransform(y, [0, 1], [8, -8]);
-  const rotateY = useTransform(x, [0, 1], [-8, 8]);
-  
-  const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
-  const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
+
+  const { handleMouseMove: tiltMouseMove, handleMouseLeave: tiltMouseLeave, rotateX: springRotateX, rotateY: springRotateY } =
+    use3DTilt({ maxRotation: 8 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!enableHoverMotion) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const target = calculateCardTiltTargets(rect, e.clientX, e.clientY);
-
-    x.set(target.x);
-    y.set(target.y);
+    tiltMouseMove(e);
   };
 
   const handleMouseLeave = () => {
-    x.set(0.5);
-    y.set(0.5);
+    tiltMouseLeave();
     setIsHovering(false);
   };
 

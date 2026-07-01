@@ -1,12 +1,13 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState } from 'react';
 import type { Experience } from '@/data/experience';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import { use3DTilt } from '@/hooks/use3DTilt';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
-import { buildCompanyMonogram, calculateTiltTargets } from '@/components/experience/card-logic';
+import { buildCompanyMonogram } from '@/components/experience/card-logic';
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -25,27 +26,17 @@ export default function ExperienceCard({
   const [logoError, setLogoError] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
   const companyMonogram = buildCompanyMonogram(experience.company);
-  
-  const x = useMotionValue(0.5);
-  const y = useMotionValue(0.5);
-  
-  const rotateX = useTransform(y, [0, 1], [5, -5]);
-  const rotateY = useTransform(x, [0, 1], [-5, 5]);
-  
-  const springRotateX = useSpring(rotateX, { stiffness: 400, damping: 30 });
-  const springRotateY = useSpring(rotateY, { stiffness: 400, damping: 30 });
+
+  const { handleMouseMove: tiltMouseMove, handleMouseLeave: tiltMouseLeave, rotateX: springRotateX, rotateY: springRotateY } =
+    use3DTilt({ maxRotation: 5 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!enableHoverMotion) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const target = calculateTiltTargets(rect, e.clientX, e.clientY);
-    x.set(target.x);
-    y.set(target.y);
+    tiltMouseMove(e);
   };
 
   const handleMouseLeave = () => {
-    x.set(0.5);
-    y.set(0.5);
+    tiltMouseLeave();
     setIsHovering(false);
   };
 

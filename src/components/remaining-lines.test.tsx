@@ -3,10 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ExperienceCard from './experience/ExperienceCard';
-import { calculateTiltTargets } from './experience/card-logic';
 import ProfileImage from './hero/ProfileImage';
 import FeaturedProject from './projects/FeaturedProject';
-import ProjectCard, { calculateCardTiltTargets } from './projects/ProjectCard';
+import ProjectCard from './projects/ProjectCard';
 
 import { experiences } from '@/data/experience';
 import { profile } from '@/data/profile';
@@ -35,16 +34,6 @@ afterEach(() => {
 });
 
 describe('remaining line coverage', () => {
-  it('covers shared tilt target helpers', () => {
-    expect(
-      calculateTiltTargets({ left: 10, top: 10, width: 100, height: 100 }, 60, 60)
-    ).toEqual({ x: 0.5, y: 0.5 });
-
-    expect(
-      calculateCardTiltTargets({ left: 10, top: 10, width: 100, height: 100 }, 10, 10)
-    ).toEqual({ x: 0, y: 0 });
-  });
-
   it('covers ExperienceCard pointer math path', () => {
     render(<ExperienceCard experience={experiences[0]} index={0} />);
 
