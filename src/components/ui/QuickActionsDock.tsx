@@ -20,7 +20,10 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
   const reduced = performanceTier === 'reduced';
 
   return (
-    <nav className="pointer-events-none fixed bottom-5 right-5 z-50 sm:bottom-6 sm:right-6" aria-label="Quick navigation dock">
+    <nav
+      className="pointer-events-none fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-50 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] sm:right-6"
+      aria-label="Quick navigation dock"
+    >
       <div className="pointer-events-auto flex flex-col items-end gap-2">
         <AnimatePresence>
           {open ? (

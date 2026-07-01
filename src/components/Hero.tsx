@@ -62,7 +62,7 @@ export default function Hero() {
   return (
     <section 
       id="home"
-      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background"
+      className="min-h-svh flex items-center justify-center relative overflow-hidden bg-background"
       aria-label="Hero section"
     >
       <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/5" aria-hidden="true">

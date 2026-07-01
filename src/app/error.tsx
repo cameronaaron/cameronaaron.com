@@ -14,7 +14,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="min-h-svh flex items-center justify-center bg-background px-6">
       <div className="text-center max-w-md">
         <div className="mx-auto mb-6 h-px w-24 bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
         <h2 className="text-3xl font-bold text-foreground mb-3">Something went wrong</h2>

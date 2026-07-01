@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, type MouseEvent, type ElementType, type ComponentPropsWithoutRef } from 'react';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { calculateSpotlightPosition } from './spotlight-card-logic';
 
 interface SpotlightCardProps<T extends ElementType> {
@@ -33,6 +34,10 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
   // properties on the spotlight layer keeps every move at zero React re-renders.
   const spotlightRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  // Touch browsers emulate mouseenter on tap and never fire mouseleave until
+  // the next tap elsewhere — the glow would stick. Gate the hover treatment
+  // on a real hover-capable pointer.
+  const { enableHoverMotion } = useInteractionMode();
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
     // React assigns child refs before any pointer event can be dispatched.
@@ -43,7 +48,9 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
   };
 
   const handleMouseEnter = () => {
-    setIsHovering(true);
+    if (enableHoverMotion) {
+      setIsHovering(true);
+    }
   };
 
   const handleMouseLeave = () => {

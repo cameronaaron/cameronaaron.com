@@ -1,6 +1,8 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { viewport } from '@/app/layout';
 import Education from '@/components/Education';
@@ -8,6 +10,11 @@ import Navigation from '@/components/Navigation';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
+import SpotlightCard from '@/components/ui/SpotlightCard';
+
+function read(path: string): string {
+  return readFileSync(resolve(process.cwd(), path), 'utf8');
+}
 
 function setScroll(y: number) {
   Object.defineProperty(window, 'scrollY', { configurable: true, value: y });
@@ -71,12 +78,65 @@ describe('mobile regression contract', () => {
     render(<QuickActionsDock performanceTier="full" />);
 
     const dock = screen.getByRole('navigation', { name: /quick navigation dock/i });
-    expect(dock.className).toContain('bottom-5');
+    // Fixed bottom offset must add the home-indicator safe area on notched phones
+    expect(dock.className).toContain('bottom-[calc(1.25rem+env(safe-area-inset-bottom))]');
     expect(dock.className).toContain('right-5');
-    expect(dock.className).toContain('sm:bottom-6');
+    expect(dock.className).toContain('sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]');
 
     fireEvent.click(screen.getByRole('button', { name: /explore quick actions/i }));
     expect(screen.getByRole('link', { name: /credentials/i })).toBeTruthy();
+  });
+
+  it('keeps full-screen sections on svh units so the iOS URL bar never hides content', () => {
+    // 100vh on iOS is the LARGE viewport: with the URL bar visible, the bottom
+    // of a min-h-screen hero (scroll cue, CTA) sits below the fold. svh sizes
+    // to the small viewport, so above-the-fold content is always visible.
+    for (const path of [
+      'src/components/Hero.tsx',
+      'src/app/error.tsx',
+      'src/app/loading.tsx',
+      'src/app/not-found.tsx',
+    ]) {
+      const source = read(path);
+      expect(source, `${path} must use min-h-svh`).toContain('min-h-svh');
+      expect(source, `${path} must not size to the large viewport`).not.toContain('min-h-screen');
+    }
+  });
+
+  it('does not stick the SpotlightCard hover glow on coarse-pointer (touch) devices', () => {
+    // Touch browsers emulate mouseenter on tap and never deliver mouseleave
+    // until the next tap elsewhere — an ungated hover glow sticks on.
+    const coarseMedia = {
+      matches: true,
+      media: '(pointer: coarse)',
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: () => true,
+    };
+    const matchMediaSpy = vi
+      .spyOn(window, 'matchMedia')
+      .mockReturnValue(coarseMedia as unknown as MediaQueryList);
+
+    try {
+      const { container } = render(
+        <SpotlightCard>
+          <div>touch content</div>
+        </SpotlightCard>
+      );
+      const card = container.firstElementChild as HTMLElement;
+
+      // Emulated tap sequence on touch: mouseenter + mousemove
+      fireEvent.mouseEnter(card);
+      fireEvent.mouseMove(card, { clientX: 10, clientY: 10 });
+
+      // No layer may light up: every overlay stays at opacity 0
+      const litLayers = Array.from(card.querySelectorAll('div[aria-hidden="true"]')).filter(
+        (el) => (el as HTMLElement).style.opacity === '1' || (el as HTMLElement).style.opacity === '0.8'
+      );
+      expect(litLayers).toEqual([]);
+    } finally {
+      matchMediaSpy.mockRestore();
+    }
   });
 
   it('keeps education prerequisites mobile cards and horizontal overflow protection', () => {
