@@ -13,8 +13,8 @@
  *   7. useMemo hot paths   — render-path computations are memoized
  */
 
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 import { act, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -32,6 +32,24 @@ import { filterTestimonialsByRelationship } from '@/components/testimonials/logi
 
 // ── read helper (same pattern as modularization-contract.test.ts) ──────────
 const read = (rel: string) => readFileSync(resolve(process.cwd(), rel), 'utf8');
+
+// ── repo-wide sweep helper: every production source file under src/ ────────
+function listProductionSources(): string[] {
+  const root = resolve(process.cwd(), 'src');
+  const files: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (/\.(ts|tsx)$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) {
+        files.push(full);
+      }
+    }
+  };
+  walk(root);
+  return files;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. Spatial hash grid — BackgroundParticles connections
@@ -598,6 +616,58 @@ describe('structured-data builders — single-pass role collection', () => {
     // The old pattern called splitPeriod(exp.positions[0]?.period) three times per experience
     expect(src).not.toMatch(/\.\.\.\(splitPeriod\(/);
     expect(src).not.toMatch(/\.\.\.\(toIsoDate\(/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 17. Repo-wide sweeps — every production file, present AND future
+//     (per-file checks above pin known hot spots; these prevent new ones)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('repo-wide — high-frequency event listeners are always passive', () => {
+  it('every mousemove/scroll/touchmove/pointermove/wheel/resize listener passes { passive: true }', () => {
+    const highFrequencyEvents = /addEventListener\(\s*'(?:mousemove|scroll|touchmove|pointermove|wheel|resize|mouseout|pageshow)'/;
+    for (const file of listProductionSources()) {
+      const src = readFileSync(file, 'utf8');
+      for (const line of src.split('\n')) {
+        if (highFrequencyEvents.test(line)) {
+          expect(line, `${file} — non-passive high-frequency listener: ${line.trim()}`).toContain('passive: true');
+        }
+      }
+    }
+  });
+});
+
+describe('repo-wide — no map().filter() chains in production code', () => {
+  it('no file chains .filter( directly onto .map(...) — use a single-pass loop', () => {
+    // Matches `.map(<args with up to one nested paren level>).filter(` across lines.
+    const mapThenFilter = /\.map\(((?:[^()]|\([^()]*\))*)\)\s*\n?\s*\.filter\(/;
+    for (const file of listProductionSources()) {
+      const src = readFileSync(file, 'utf8');
+      expect(mapThenFilter.test(src), `${file} contains a map().filter() chain`).toBe(false);
+    }
+  });
+});
+
+describe('repo-wide — no setState wired to raw mousemove listeners', () => {
+  it('no window mousemove handler body calls a setXxx state setter', () => {
+    // A mousemove listener whose registered handler name also appears assigning
+    // React state is the exact pattern the motion-value rule exists to prevent.
+    for (const file of listProductionSources()) {
+      const src = readFileSync(file, 'utf8');
+      const handlerNames = Array.from(
+        src.matchAll(/addEventListener\(\s*'mousemove',\s*(\w+)/g),
+        (match) => match[1]
+      );
+      for (const name of handlerNames) {
+        const handlerDef = src.match(new RegExp(`const ${name} = \\([^)]*\\)[^{]*\\{([\\s\\S]*?)\\n    \\};`));
+        if (!handlerDef) continue;
+        expect(
+          /\bset[A-Z]\w*\(/.test(handlerDef[1]),
+          `${file} — mousemove handler '${name}' writes React state; use a motion value, ref, or CSS variable`
+        ).toBe(false);
+      }
+    }
   });
 });
 

@@ -30,6 +30,35 @@ export default defineConfig([
       'react/require-render-return': 'off'
     }
   },
+  {
+    // Algorithm & data-structure standards (see CLAUDE.md) enforced at the AST
+    // level for all production source. The contract tests verify the known hot
+    // spots behaviorally; these rules stop new violations at lint time.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.property.name='filter'][callee.object.type='CallExpression'][callee.object.callee.property.name='map']",
+          message:
+            'map().filter() allocates an intermediate array — use a single-pass for loop with conditional push (CLAUDE.md algorithm standards).'
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='filter'][callee.object.type='CallExpression'][callee.object.callee.property.name='flatMap']",
+          message:
+            'flatMap().filter() allocates an intermediate array — use a single-pass loop (CLAUDE.md algorithm standards).'
+        },
+        {
+          selector: "CallExpression[callee.property.name='reduce'] SpreadElement",
+          message:
+            'Spreading inside a reduce() callback is O(n²) — mutate the accumulator or use a loop.'
+        }
+      ]
+    }
+  },
   globalIgnores([
     '.next/**',
     'out/**',

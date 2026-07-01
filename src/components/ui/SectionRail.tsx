@@ -37,9 +37,11 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
 
-    const observed = sections
-      .map((section) => document.getElementById(section.id))
-      .filter((el): el is HTMLElement => el !== null);
+    const observed: HTMLElement[] = [];
+    for (const section of sections) {
+      const el = document.getElementById(section.id);
+      if (el) observed.push(el);
+    }
 
     if (observed.length === 0) return;
 
