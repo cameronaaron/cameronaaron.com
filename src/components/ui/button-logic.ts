@@ -4,6 +4,8 @@ export const BUTTON_SPRING_CONFIG = {
   mass: 0.7,
 } as const;
 
+export const BUTTON_MAGNETIC_STRENGTH = 0.3;
+
 export const BUTTON_BASE_STYLES =
   'font-semibold rounded-lg transition-all duration-300 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
 
@@ -25,18 +27,4 @@ export function getButtonStyles(
   className = ''
 ): string {
   return `${BUTTON_BASE_STYLES} ${BUTTON_SIZE_STYLES[size]} ${BUTTON_VARIANT_STYLES[variant]} ${className}`;
-}
-
-export function calculateButtonMagneticOffset(
-  rect: { left: number; top: number; width: number; height: number },
-  clientX: number,
-  clientY: number
-): { x: number; y: number } {
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-
-  return {
-    x: (clientX - centerX) * 0.3,
-    y: (clientY - centerY) * 0.3,
-  };
 }

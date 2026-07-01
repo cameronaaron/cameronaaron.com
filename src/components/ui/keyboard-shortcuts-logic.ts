@@ -4,12 +4,15 @@ interface JumpShortcutLike {
 }
 
 export function buildShortcutJumpMap(shortcuts: JumpShortcutLike[]): Record<string, string> {
-  return shortcuts
-    .filter((shortcut) => shortcut.targetId && shortcut.keys[0] === 'g')
-    .reduce((acc, shortcut) => {
-      acc[shortcut.keys[1]] = shortcut.targetId!;
-      return acc;
-    }, {} as Record<string, string>);
+  const jumpMap: Record<string, string> = {};
+
+  for (const shortcut of shortcuts) {
+    if (shortcut.targetId && shortcut.keys[0] === 'g') {
+      jumpMap[shortcut.keys[1]] = shortcut.targetId;
+    }
+  }
+
+  return jumpMap;
 }
 
 export function isEditableTarget(target: EventTarget | null): boolean {

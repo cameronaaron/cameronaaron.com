@@ -4,10 +4,11 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
+  BUTTON_MAGNETIC_STRENGTH,
   BUTTON_SPRING_CONFIG,
-  calculateButtonMagneticOffset,
   getButtonStyles,
 } from '@/components/ui/button-logic';
+import { calculateMagneticOffset } from '@/components/ui/magnetic-logic';
 
 interface ButtonProps {
   href?: string;
@@ -45,7 +46,7 @@ export default function Button({
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!enableHoverMotion || variant !== 'primary' || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const offset = calculateButtonMagneticOffset(rect, e.clientX, e.clientY);
+    const offset = calculateMagneticOffset(rect, e.clientX, e.clientY, BUTTON_MAGNETIC_STRENGTH);
     x.set(offset.x);
     y.set(offset.y);
   };
