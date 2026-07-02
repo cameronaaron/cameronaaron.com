@@ -1,10 +1,12 @@
 /**
  * Contract tests: public/mcp.json is a valid WebMCP manifest.
  *
- * Three invariants enforced:
+ * Four invariants enforced:
  *   1. WebMCP tools registered — all expected tools are present.
  *   2. WebMCP schemas are valid — every tool has a well-formed JSON Schema inputSchema.
  *   3. WebMCP form coverage — every contact surface on the site has a form entry.
+ *   4. WebMCP discovery — the manifest is linked from <head> so agents can find
+ *      it without first parsing llms.txt.
  *
  * Cross-check: contact email must match src/data/profile.ts so drift is caught.
  */
@@ -199,5 +201,15 @@ describe('WebMCP form coverage', () => {
       ).toBeGreaterThan(5);
       expect(form.submitVia, `Form "${formName}" is missing submitVia`).toBeTruthy();
     }
+  });
+});
+
+// ─── discovery ────────────────────────────────────────────────────────────────
+
+describe('WebMCP manifest is discoverable from <head>', () => {
+  it('layout.tsx links the manifest via <link rel="mcp">', () => {
+    const layoutSrc = readFileSync(join(ROOT, 'src', 'app', 'layout.tsx'), 'utf8');
+    expect(layoutSrc).toContain('rel="mcp"');
+    expect(layoutSrc).toContain('href="/mcp.json"');
   });
 });

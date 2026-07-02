@@ -302,4 +302,4 @@ npm run deploy:prod   # builds → runs Lighthouse CI → deploys to Cloudflare 
 
 Static site lives in `/out` after `npm run build`. Cloudflare Pages serves it directly. There is no server-side rendering after the build step.
 
-Lighthouse performance threshold: **0.85** (enforced by `lighthouserc.json` and `src/performance-regression-contract.test.ts`).
+Lighthouse performance threshold: **0.95 desktop / 1.0 mobile**, accessibility/best-practices/SEO pinned to 1.0 on both (enforced by `lighthouserc.json`, `lighthouserc.mobile.json`, and `src/performance-regression-contract.test.ts`). See `ENGINEERING-STANDARDS.md` §4.7 for why desktop isn't 1.0 and for a known local-vs-CI Lighthouse false positive (`bf-cache`) — trust CI's numbers over a local `npm run test:performance:*` run.

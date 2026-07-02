@@ -334,9 +334,32 @@ indicators (`animate-ping` dots) are fine. Anything animating `box-shadow`,
 
 ### 4.7 Lighthouse floor
 
-Performance ≥ 0.85 on both `lighthouserc.json` and `lighthouserc.mobile.json`,
-enforced by `performance-regression-contract.test.ts` and `deploy:prod`. The
-floor may only move **up**.
+Performance ≥ 0.95 on desktop (`lighthouserc.json`) and a clean 1.0 on mobile
+(`lighthouserc.mobile.json`) — accessibility, best-practices, and SEO are all
+pinned to a hard 1.0 on both. Enforced by `performance-regression-contract.test.ts`
+(which asserts the exact thresholds in both configs, not just their presence)
+and by `deploy:prod`, which runs the full Lighthouse gate before every deploy.
+Desktop is 0.95 rather than 1.0 deliberately — GitHub-hosted runners don't have
+consistent enough CPU timing to hit a literal 100 reliably (0.94–0.96 observed
+across 3 runs on unrelated commits); 0.95 still catches real regressions
+without failing the build on runner jitter. Mobile has held a clean 1.0 on
+every observed run, so it gets no tolerance. **The floor may only move up.**
+
+**CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
+`npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
+doesn't.** Those scripts invoke a floating `npx @lhci/cli@0.15.1`, which can
+resolve a newer transitive Lighthouse core than whatever `treosh/lighthouse-ci-action`
+bundles, expanding `lighthouse:recommended`'s default assertion set to include
+newer "Insight" audits (`cls-culprits-insight`, `lcp-phases-insight`, etc.)
+that don't compute a real score against a `wrangler pages dev` local preview
+and fail as `NaN`. Also expect a **false-positive `bf-cache` failure** when
+testing locally: `wrangler pages dev`'s own inspector/runtime bridge holds a
+WebSocket open, and Chrome's back/forward-cache detector attributes that to
+the page, not the dev server — `grep -rl "WebSocket" out/` on the actual build
+output returns nothing, confirming the app itself does nothing to block
+bfcache. If CI ever fails, trust CI's numbers over a local run showing this
+noise; if CI *and* a real production Lighthouse run both show `bf-cache`
+blocked, that's real and must be fixed at the source.
 
 ---
 
@@ -380,7 +403,23 @@ floor may only move **up**.
    hard-to-test component cannot merge.
 3. **Tests must pass before every commit** (`npm test`, 900+), plus
    `npm run type-check` and `npm run lint`.
-4. **The checklist for any new component or feature:**
+4. **Freshness covers every ecosystem you depend on, not just npm.**
+   `dependency-freshness-contract.test.ts` keeps the pnpm dependency tree at
+   latest-with-zero-CVEs, but that has zero visibility into
+   `.github/workflows/*.yml` — GitHub Actions pins (`uses: owner/repo@vX`) are
+   a separate ecosystem entirely. That blind spot is exactly how
+   `actions/checkout`, `actions/setup-node`, and `pnpm/action-setup` drifted
+   2–3 majors stale while `pnpm outdated` stayed green throughout, silently
+   costing a "Node.js 20 is deprecated" annotation on every CI run.
+   `github-actions-freshness-contract.test.ts` closes that hole: it parses
+   every `uses:` line in every workflow file, queries the GitHub releases/tags
+   API for each action's latest major, and fails naming the exact
+   `file:line — pinned → latest`. Both freshness contracts run together under
+   `pnpm run test:freshness`. **The lesson generalizes: any tool, action, or
+   binary your build depends on that isn't `pnpm add`-ed needs its own
+   freshness check — dependency drift hides in whichever ecosystem nothing is
+   watching.**
+5. **The checklist for any new component or feature:**
    - [ ] Pure logic extracted to `logic.ts` with unit tests
    - [ ] Collection builds/sorts in `useMemo`
    - [ ] List-item components `memo`'d if a parent selection re-renders them;
@@ -393,7 +432,7 @@ floor may only move **up**.
    - [ ] Hydration-safe: no browser APIs in initial state
    - [ ] New invariant → new contract test, same commit
    - [ ] `npm test && npm run type-check && npm run lint` green
-5. **When a contract fails, fix the source.** If the *requirement* genuinely
+6. **When a contract fails, fix the source.** If the *requirement* genuinely
    changed (e.g., a 5th education item changes the grid), update source, test,
    and the documentation together — that is a requirements change, not a
    test weakening.

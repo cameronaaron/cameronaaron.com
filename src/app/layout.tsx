@@ -229,6 +229,9 @@ export default function RootLayout({
       <head>
         <link rel="prefetch" href="/icon-192x192.png" />
 
+        {/* WebMCP discovery: lets AI agents find the tool/form manifest without parsing llms.txt */}
+        <link rel="mcp" type="application/json" href="/mcp.json" />
+
         {/* PWA Configuration */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
