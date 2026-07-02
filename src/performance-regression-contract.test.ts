@@ -85,11 +85,22 @@ describe('performance regression contract', () => {
 
     expect(lighthouseConfig.ci?.assert?.preset).toBe('lighthouse:recommended');
     // 0.95, not 1.0: GitHub-hosted runners don't have consistent enough CPU
-    // timing to hit a literal 100 reliably (observed 0.94-0.96 across 3 runs
-    // on unrelated commits) — 0.95 still catches real regressions without
-    // failing the build on runner jitter. Core Web Vitals budgets below stay
-    // the precise regression guard.
+    // timing to hit a literal 100 reliably — 0.95 still catches real
+    // regressions without failing the build on runner jitter. Core Web
+    // Vitals budgets below stay the precise regression guard.
     expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.95);
+  });
+
+  it('collects enough desktop Lighthouse runs to keep the median stable against runner jitter', () => {
+    // 2026-07: at numberOfRuns=3, desktop scored 0.93-0.96 across recent CI
+    // runs and dipped under the 0.95 threshold in 3 of 5 consecutive pushes —
+    // real runner-CPU variance, not a product regression (mobile held a
+    // clean 1.0 every single time on the same commits). Raised to 5 so the
+    // median LHCI compares against the threshold averages out more of that
+    // jitter without moving the bar itself. If flakiness returns at 5, raise
+    // again before ever lowering the threshold.
+    const lighthouseConfig = JSON.parse(read('lighthouserc.json')) as { ci?: { collect?: { numberOfRuns?: number } } };
+    expect(lighthouseConfig.ci?.collect?.numberOfRuns).toBeGreaterThanOrEqual(5);
   });
 
   it('keeps mobile lighthouse thresholds matching desktop, with mobile emulation', () => {
