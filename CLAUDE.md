@@ -1,5 +1,12 @@
 # CLAUDE.md — Cameron Aaron's Portfolio Site
 
+> **Read `ENGINEERING-STANDARDS.md` before any performance, algorithm,
+> data-structure, or mobile work.** It is the authoritative rulebook: the
+> complexity doctrine (per-event/per-render work is O(1); linear work runs
+> exactly once), the full algorithm/data-structure law, the React render-path
+> law, the mobile-first law, and the regression ratchet. Every rule there is
+> enforced by a contract test — when one fails, fix the source, not the test.
+
 ## Commands
 
 ```bash
@@ -15,7 +22,7 @@ npm run lint         # ESLint
 - **Next.js 16** App Router, `output: 'export'` (static), deployed on **Cloudflare Pages**
 - **React 19**, **TypeScript 6**, **Tailwind CSS v4**, **Framer Motion 12**
 - **Lenis** smooth scroll (desktop only — disabled on touch devices)
-- **Vitest 4** + **Testing Library** — 480+ tests, all must pass
+- **Vitest 4** + **Testing Library** — 900+ tests, all must pass
 
 ## Architecture
 
@@ -156,6 +163,18 @@ Fix: `useState(false)` always. `useEffect` syncs the real values after hydration
 ### 11. Hero mobile layout: image must come before text
 
 The image column uses `order-1 md:order-2` and the text column uses `order-2 md:order-1` so that on mobile the profile photo appears above the name/title, above the fold.
+
+### 12. backdrop-filter is disabled globally on touch devices
+
+`globals.css` zeroes `backdrop-filter` inside `@media (hover: none), (pointer: coarse)` — it's the biggest scroll-jank source on mobile GPUs. Use `backdrop-blur-*` utilities freely; the global rule handles mobile. Never remove that block; a mobile exception must be deliberate and scoped.
+
+### 13. List items driven by a parent "active" selection must be memoized
+
+`ExperienceCard` is `export default memo(ExperienceCard)` and receives a `useCallback`-stable `onActivate` (it passes its own `index` back). An inline `onActivate={() => ...}` closure defeats the memo and makes every hover/tap re-render all cards. Apply the same pattern to any new selectable list. Per-item state (hover, image error) stays inside the item component.
+
+### 14. Collection builds in client components are always memoized
+
+Every `buildXxx`/`sortXxx` call in a `'use client'` component body is wrapped in `useMemo` (Testimonials, Experience, Projects, Education, Certifications, Contact, ExperienceCard). New components follow suit from day one; the contract test greps for bare calls. Server components are exempt (they run once at build).
 
 ## Data
 

@@ -3,17 +3,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
+import { QUICK_DOCK_LINKS, getDockLinkMotion, getDockMenuMotion } from './quick-actions-dock-logic';
 
 interface QuickActionsDockProps {
   performanceTier: PerformanceTier;
 }
-
-const sectionLinks = [
-  { label: 'Credentials', href: '#certifications' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Contact', href: '#contact' },
-];
 
 export default function QuickActionsDock({ performanceTier }: QuickActionsDockProps) {
   const [open, setOpen] = useState(false);
@@ -29,22 +23,18 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
           {open ? (
             <motion.div
               id="quick-actions-menu"
-              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
+              {...getDockMenuMotion(reduced)}
               animate={{ opacity: 1, y: 0 }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="flex flex-col items-end gap-2"
             >
-              {sectionLinks.map((link, index) => (
+              {QUICK_DOCK_LINKS.map((link, index) => (
                 <motion.a
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  initial={reduced ? { opacity: 1 } : { opacity: 0, x: 6 }}
+                  {...getDockLinkMotion(reduced, index)}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={reduced ? { opacity: 0 } : { opacity: 0, x: 6 }}
-                  transition={{ duration: 0.2, delay: reduced ? 0 : index * 0.03, ease: 'easeOut' }}
-                  whileHover={reduced ? undefined : { x: -2, scale: 1.02 }}
                   className="rounded-full border border-white/15 bg-black/55 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45"
                 >
                   {link.label}

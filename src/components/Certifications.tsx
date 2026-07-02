@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { certifications, inProgressCertifications } from '@/data/certifications';
 import {
@@ -10,9 +11,9 @@ import {
 } from '@/components/certifications/logic';
 
 export default function Certifications() {
-  const { sortedCertifications, sortedInProgressCertifications } = buildCertificationCollections(
-    certifications,
-    inProgressCertifications
+  const { sortedCertifications, sortedInProgressCertifications } = useMemo(
+    () => buildCertificationCollections(certifications, inProgressCertifications),
+    []
   );
 
   return (

@@ -80,10 +80,18 @@
     outline: none;
   }
 
-  /* Mobile: avoid expensive fixed background & ensure normal scroll */
+  /* Mobile: avoid expensive fixed background & ensure normal scroll.
+     backdrop-filter resamples everything behind the element on every frame —
+     the single biggest scroll-jank source on mobile GPUs. The translucent
+     backgrounds carry the glass look on their own. */
   @media (hover: none), (pointer: coarse) {
     body {
       background-attachment: scroll;
+    }
+
+    * {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
     }
   }
 

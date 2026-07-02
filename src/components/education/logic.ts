@@ -10,10 +10,15 @@ const NON_FINALIZED_STATUS_TOKENS = [
   'not started',
 ] as const;
 
+export interface SortedPrerequisiteCourse extends PrerequisiteCourse {
+  /** Precomputed once during sorting so render paths never rescan status tokens. */
+  nonFinalized: boolean;
+}
+
 export interface EducationCollections {
   sortedEducationItems: EducationItem[];
   sortedHonorsAndAffiliations: HonorItem[];
-  sortedPrerequisiteCourses: PrerequisiteCourse[];
+  sortedPrerequisiteCourses: SortedPrerequisiteCourse[];
 }
 
 export function isNonFinalizedCourseStatus(status: string): boolean {
@@ -27,7 +32,7 @@ export function formatGradeDisplay(grade: string, gpa?: string): string {
   return `${grade} (${gpa})`;
 }
 
-export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): PrerequisiteCourse[] {
+export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): SortedPrerequisiteCourse[] {
   // Decorate-sort-undecorate: the status token scan runs once per course,
   // not once per comparison inside the sort.
   const decorated = courses.map((course) => ({
@@ -45,7 +50,9 @@ export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): Prerequi
     return left.course.course.localeCompare(right.course.course);
   });
 
-  return decorated.map((entry) => entry.course);
+  // Keep the flag on the sorted item so consumers read a boolean instead of
+  // re-running the token scan per row per render.
+  return decorated.map((entry) => ({ ...entry.course, nonFinalized: entry.nonFinalized === 1 }));
 }
 
 export function buildEducationCollections(

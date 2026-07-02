@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { experiences } from '@/data/experience';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ExperienceCard from '@/components/experience/ExperienceCard';
@@ -37,6 +37,10 @@ export default function Experience() {
     const target = document.getElementById(getExperienceItemId(index));
     target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
   };
+
+  // Stable identity so the memoized ExperienceCard never re-renders from a
+  // fresh callback prop — only from its own isActive flip.
+  const handleActivate = useCallback((index: number) => setActiveExperienceIndex(index), []);
 
   return (
     <section id="experience" className="py-20 bg-background relative overflow-hidden" aria-labelledby="experience-heading">
@@ -165,15 +169,12 @@ export default function Experience() {
                   transition={getTimelineDotTransition(isLiteMotion)}
                 />
 
-                <div
-                  className="w-full pl-20 md:w-[calc(50%-2rem)] md:pl-0"
-                  onMouseEnter={() => setActiveExperienceIndex(index)}
-                >
+                <div className="w-full pl-20 md:w-[calc(50%-2rem)] md:pl-0">
                   <ExperienceCard
                     experience={exp}
                     index={index}
                     isActive={activeExperienceIndex === index}
-                    onActivate={() => setActiveExperienceIndex(index)}
+                    onActivate={handleActivate}
                   />
                 </div>
               </motion.div>

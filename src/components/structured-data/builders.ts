@@ -32,7 +32,13 @@ export function buildStructuredDataGraph(baseUrl = 'https://cameronaaron.com') {
   const sortedProjects = sortByDateDesc(projects, (project) => project.period);
   const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
   const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
-  const researchThemes = Array.from(new Set(sortedProjects.flatMap((project) => project.tags)));
+  const researchThemeSet = new Set<string>();
+  for (const project of sortedProjects) {
+    for (const tag of project.tags) {
+      researchThemeSet.add(tag);
+    }
+  }
+  const researchThemes = Array.from(researchThemeSet);
   const roleNameSet = new Set<string>();
   for (const exp of experiences) {
     for (const position of exp.positions) {

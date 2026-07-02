@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import type { Experience } from '@/data/experience';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { use3DTilt } from '@/hooks/use3DTilt';
@@ -13,10 +13,10 @@ interface ExperienceCardProps {
   experience: Experience;
   index: number;
   isActive?: boolean;
-  onActivate?: () => void;
+  onActivate?: (index: number) => void;
 }
 
-export default function ExperienceCard({
+function ExperienceCard({
   experience,
   index,
   isActive = false,
@@ -25,7 +25,7 @@ export default function ExperienceCard({
   const [isHovering, setIsHovering] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const companyMonogram = buildCompanyMonogram(experience.company);
+  const companyMonogram = useMemo(() => buildCompanyMonogram(experience.company), [experience.company]);
 
   const { handleMouseMove: tiltMouseMove, handleMouseLeave: tiltMouseLeave, rotateX: springRotateX, rotateY: springRotateY } =
     use3DTilt({ maxRotation: 5 });
@@ -58,7 +58,7 @@ export default function ExperienceCard({
         if (enableHoverMotion) {
           setIsHovering(true);
         }
-        onActivate?.();
+        onActivate?.(index);
       }}
       onMouseLeave={handleMouseLeave}
       whileTap={prefersReducedMotion ? undefined : { scale: 0.995, y: 1 }}
@@ -168,4 +168,9 @@ export default function ExperienceCard({
     </SpotlightCard>
   );
 }
+
+// Activating one card must not re-render its siblings: with memo, an
+// activeExperienceIndex change re-renders only the card gaining and the card
+// losing isActive — O(1) instead of O(n) cards per hover/tap.
+export default memo(ExperienceCard);
 

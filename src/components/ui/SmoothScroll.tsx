@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import { shouldResetScrollPosition } from './smooth-scroll-logic';
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -28,13 +29,9 @@ export default function SmoothScroll() {
     let rafId = 0;
 
     const syncScrollState = () => {
-      if (window.location.hash) {
-        return;
-      }
-
       const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
 
-      if (navigationEntry?.type === 'reload' || navigationEntry?.type === 'back_forward') {
+      if (shouldResetScrollPosition(window.location.hash, navigationEntry?.type)) {
         window.scrollTo(0, 0);
 
         if (typeof lenis.scrollTo === 'function') {

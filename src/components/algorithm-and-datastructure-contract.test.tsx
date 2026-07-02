@@ -714,6 +714,134 @@ describe('sorting — expensive keys are precomputed, not recomputed per compari
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 19. useMemo on remaining collection builds — Education, Certifications,
+//     Contact, ExperienceCard (same rule as Testimonials/Experience/Projects)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('Education — collections memoized, status flag precomputed', () => {
+  it('buildEducationCollections is inside useMemo, not a bare component-body call', () => {
+    const src = read('src/components/Education.tsx');
+    expect(src).toContain('useMemo');
+    expect(src).toContain('buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations)');
+    expect(src).not.toMatch(/^\s*const\s+\{[^}]+\}\s*=\s*buildEducationCollections/m);
+  });
+
+  it('render reads the precomputed course.nonFinalized flag — no per-row token rescan', () => {
+    const src = read('src/components/Education.tsx');
+    expect(src).toContain('course.nonFinalized');
+    // The token scan belongs in sortPrerequisiteCourses (once per course), never in JSX.
+    expect(src).not.toContain('isNonFinalizedCourseStatus(');
+  });
+
+  it('runtime: sortPrerequisiteCourses attaches nonFinalized computed during the sort', async () => {
+    const { sortPrerequisiteCourses } = await import('@/components/education/logic');
+    const sorted = sortPrerequisiteCourses([
+      { requirement: 'A', course: 'X', units: '3', grade: 'A', status: 'Completed' },
+      { requirement: 'B', course: 'Y', units: '4', grade: '—', status: 'In Progress' },
+    ]);
+    expect(sorted[0]).toMatchObject({ status: 'Completed', nonFinalized: false });
+    expect(sorted[1]).toMatchObject({ status: 'In Progress', nonFinalized: true });
+  });
+});
+
+describe('Certifications — collection build is memoized', () => {
+  it('buildCertificationCollections is inside useMemo, not a bare component-body call', () => {
+    const src = read('src/components/Certifications.tsx');
+    expect(src).toContain('useMemo');
+    expect(src).toContain('buildCertificationCollections(certifications, inProgressCertifications)');
+    expect(src).not.toMatch(/^\s*const\s+\{[^}]+\}\s*=\s*buildCertificationCollections/m);
+  });
+});
+
+describe('Contact — social-link build is memoized', () => {
+  it('buildContactSocialLinks is inside useMemo, not a bare component-body call', () => {
+    const src = read('src/components/Contact.tsx');
+    expect(src).toContain('useMemo(() => buildContactSocialLinks(socialPlatforms, profile.social)');
+    expect(src).not.toMatch(/^\s*const socialLinks\s*=\s*buildContactSocialLinks/m);
+  });
+});
+
+describe('ExperienceCard — monogram memoized across hover re-renders', () => {
+  it('buildCompanyMonogram is inside useMemo keyed on the company name', () => {
+    const src = read('src/components/experience/ExperienceCard.tsx');
+    // This component re-renders on every hover enter/leave (isHovering state);
+    // the monogram must not be rebuilt each time.
+    expect(src).toContain('useMemo(() => buildCompanyMonogram(experience.company), [experience.company])');
+    expect(src).not.toMatch(/^\s*const companyMonogram\s*=\s*buildCompanyMonogram/m);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 20. React.memo — activating one ExperienceCard must not re-render siblings
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('ExperienceCard — memoized so activation is O(1) cards re-rendered, not O(n)', () => {
+  it('default export is wrapped in memo()', () => {
+    const src = read('src/components/experience/ExperienceCard.tsx');
+    expect(src).toMatch(/export default memo\(ExperienceCard\)/);
+  });
+
+  it('Experience passes a useCallback-stable onActivate, never an inline closure', () => {
+    const src = read('src/components/Experience.tsx');
+    expect(src).toMatch(/useCallback\(\(index: number\) => setActiveExperienceIndex\(index\), \[\]\)/);
+    expect(src).not.toContain('onActivate={() =>');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 21. Early-exit unique-tag collection + single-pass partition — projects
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('projects logic — early-exit tag scan and single-pass partition', () => {
+  it('getResearchSignals breaks out as soon as the limit is reached — no build-then-slice', () => {
+    const src = read('src/components/projects/logic.ts');
+    expect(src).toContain('break outer');
+    expect(src).not.toMatch(/new Set\([\s\S]{0,120}flatMap/);
+    expect(src).not.toContain('.slice(0, limit)');
+  });
+
+  it('buildProjectCollections partitions featured/other in one pass — no double filter', () => {
+    const src = read('src/components/projects/logic.ts');
+    expect(src).not.toContain('items.filter((project) => project.featured)');
+    expect(src).not.toContain('items.filter((project) => !project.featured)');
+    expect(src).toContain('project.featured ? featured : other');
+  });
+
+  it('runtime: getResearchSignals stops after `limit` unique tags and dedupes', async () => {
+    const { getResearchSignals } = await import('@/components/projects/logic');
+    const items = [
+      { tags: ['a', 'b', 'a'] },
+      { tags: ['c', 'b', 'd'] },
+      { tags: ['e'] },
+    ] as never[];
+    expect(getResearchSignals(items, 3)).toEqual(['a', 'b', 'c']);
+    expect(getResearchSignals(items, 10)).toEqual(['a', 'b', 'c', 'd', 'e']);
+  });
+
+  it('structured-data builders collect research themes with a single-pass Set, not flatMap', () => {
+    const src = read('src/components/structured-data/builders.ts');
+    expect(src).toContain('researchThemeSet');
+    expect(src).not.toContain('flatMap((project) => project.tags)');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 22. Mobile GPU — backdrop-filter disabled on coarse pointers
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('globals.css — backdrop-filter is disabled on touch devices', () => {
+  it('the coarse-pointer media block zeroes backdrop-filter globally', () => {
+    const css = read('src/app/globals.css');
+    const blockStart = css.indexOf('@media (hover: none), (pointer: coarse)');
+    expect(blockStart).toBeGreaterThan(-1);
+    const block = css.slice(blockStart, blockStart + 600);
+    expect(block).toContain('backdrop-filter: none !important');
+    expect(block).toContain('-webkit-backdrop-filter: none !important');
+    expect(block).toContain('background-attachment: scroll');
+  });
+});
+
 describe('usePerformanceProfile — exported named constants for hardware thresholds', () => {
   it('exports LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD, and defaults', () => {
     const src = read('src/hooks/usePerformanceProfile.ts');

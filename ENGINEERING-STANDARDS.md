@@ -13,7 +13,7 @@ that isn't executable is a suggestion.
 Enforcing test files:
 
 | Contract | File |
-|---|---|
+| --- | --- |
 | Algorithms & data structures | `src/components/algorithm-and-datastructure-contract.test.tsx` |
 | Runtime render behavior (Profiler-verified) | `src/components/render-behavior-contract.test.tsx` |
 | Animation anti-patterns | `src/components/animation-regression-contract.test.tsx` |
@@ -176,7 +176,7 @@ React state exists for values that change *what* is rendered. Values that
 change at pointer/scroll rate and only feed animation go **around** React:
 
 | Value | Channel |
-|---|---|
+| --- | --- |
 | Pointer position → animation | `useMotionValue` + `.set()` in the handler |
 | Spotlight/glow position | CSS custom property via `ref.style.setProperty` |
 | Scroll progress | `useScroll` / motion values |
@@ -268,7 +268,7 @@ deliberately different rendering profile chosen per device capability.
 Every effect decision flows through `usePerformanceProfile()`:
 
 | Tier | Trigger | Gets |
-|---|---|---|
+| --- | --- | --- |
 | `full` | fine pointer + capable hardware | everything: particles, cursor trail, Lenis, animated orbs, parallax |
 | `balanced` | coarse pointer (phones/tablets) | static orbs, basic scroll reveals — NO particles, NO Lenis, NO cursor trail |
 | `lite` | ≤4 cores / ≤4 GB / save-data | minimal motion |
@@ -370,6 +370,14 @@ floor may only move **up**.
    source (`listProductionSources()`) — they catch *future* files, not just
    known hot spots. Current sweeps: no `map().filter()`, all high-frequency
    listeners passive, no mousemove→setState, no date parsing in comparators.
+   Modularity sweeps (every `.tsx` under `src/components` + `src/app`,
+   present and future): no inline `.sort()`/`.reduce()`, no module-level data
+   catalogs, no regex parsing, no `performanceTier` ternary config derivation —
+   all of that lives in logic modules. Testability sweeps: every
+   `logic.ts`/`*-logic.ts`/`engine.ts`/`builders.ts` must have a co-located
+   companion test (`module-testability-contract.test.ts`), and the CI coverage
+   gate holds all of `src/` at 100% lines/branches/functions/statements — a
+   hard-to-test component cannot merge.
 3. **Tests must pass before every commit** (`npm test`, 900+), plus
    `npm run type-check` and `npm run lint`.
 4. **The checklist for any new component or feature:**

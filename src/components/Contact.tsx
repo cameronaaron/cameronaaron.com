@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
 import SocialLink from '@/components/contact/SocialLink';
@@ -16,7 +16,7 @@ export default function Contact() {
   });
   const revealRaw = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const revealProgress = useSpring(revealRaw, CONTACT_REVEAL_SPRING);
-  const socialLinks = buildContactSocialLinks(socialPlatforms, profile.social);
+  const socialLinks = useMemo(() => buildContactSocialLinks(socialPlatforms, profile.social), []);
 
   return (
     <section ref={sectionRef} id="contact" className="py-20 bg-background relative overflow-hidden" aria-labelledby="contact-heading">

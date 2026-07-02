@@ -8,6 +8,7 @@ const EXPECTED_ROOT_FILES = [
   '.env.example',
   '.gitignore',
   'CLAUDE.md',
+  'ENGINEERING-STANDARDS.md',
   'README.md',
   'eslint.config.mjs',
   'lighthouserc.json',

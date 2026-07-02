@@ -1,10 +1,30 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), 'utf8');
+}
+
+// Every production component/page file — present AND future. The per-file
+// checks below pin known extractions; the sweeps at the bottom stop new
+// components from inlining logic in the first place.
+function listProductionComponentFiles(): string[] {
+  const roots = [resolve(process.cwd(), 'src/components'), resolve(process.cwd(), 'src/app')];
+  const files: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.name.endsWith('.tsx') && !entry.name.includes('.test.')) {
+        files.push(full);
+      }
+    }
+  };
+  for (const root of roots) walk(root);
+  return files;
 }
 
 describe('modularization contract', () => {
@@ -361,6 +381,24 @@ describe('modularization contract', () => {
     expect(source).not.toContain('mouse.x > -900');
   });
 
+  it('keeps QuickActionsDock link catalog and motion config extracted', () => {
+    const source = read('src/components/ui/QuickActionsDock.tsx');
+
+    expect(source).toContain("from './quick-actions-dock-logic'");
+    expect(source).toContain('QUICK_DOCK_LINKS');
+    expect(source).not.toContain("{ label: 'Credentials', href: '#certifications' }");
+    expect(source).not.toContain('reduced ? { opacity: 1 } : { opacity: 0, y: 8 }');
+    expect(source).not.toContain('delay: reduced ? 0 : index * 0.03');
+  });
+
+  it('keeps SmoothScroll scroll-reset decision extracted', () => {
+    const source = read('src/components/ui/SmoothScroll.tsx');
+
+    expect(source).toContain("from './smooth-scroll-logic'");
+    expect(source).toContain('shouldResetScrollPosition(window.location.hash, navigationEntry?.type)');
+    expect(source).not.toContain("navigationEntry?.type === 'reload' || navigationEntry?.type === 'back_forward'");
+  });
+
   it('keeps internet page category grouping extracted to its logic module', () => {
     const source = read('src/app/internet/page.tsx');
 
@@ -369,5 +407,66 @@ describe('modularization contract', () => {
     // No per-category filter scan inline in the page
     expect(source).not.toContain('sortedFeatures.filter((feature) => feature.category === category)');
     expect(source).not.toContain('const categoryOrder');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Repo-wide sweeps — modularity for components that don't exist yet.
+// The per-file pins above protect known extractions; these stop any NEW .tsx
+// under src/components or src/app from inlining logic that belongs in a
+// companion logic module (which the module-testability contract then forces
+// to have a co-located test).
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('modularization sweeps — every production .tsx, present and future', () => {
+  it('no component sorts inline — sorting lives in logic modules', () => {
+    for (const file of listProductionComponentFiles()) {
+      const src = readFileSync(file, 'utf8');
+      expect(src.includes('.sort('), `${file} sorts inline — extract to a logic module`).toBe(false);
+    }
+  });
+
+  it('no component reduces inline — aggregation lives in logic modules', () => {
+    for (const file of listProductionComponentFiles()) {
+      const src = readFileSync(file, 'utf8');
+      expect(src.includes('.reduce('), `${file} reduces inline — extract to a logic module`).toBe(false);
+    }
+  });
+
+  it('no module-level data catalogs in components — catalogs live in logic modules or src/data', () => {
+    // A top-level `const xxx = [` in a component is a content/config catalog
+    // (nav links, phases, chips) that belongs in src/data or a logic module.
+    const catalogPattern = /^const \w+(?::[^=]+)? = \[/m;
+    for (const file of listProductionComponentFiles()) {
+      const src = readFileSync(file, 'utf8');
+      expect(
+        catalogPattern.test(src),
+        `${file} declares a module-level array catalog — move it to a logic module or src/data`
+      ).toBe(false);
+    }
+  });
+
+  it('no regex parsing in components — string parsing lives in logic modules', () => {
+    const regexCallPattern = /\.(?:match|replace|test|split)\(\s*\//;
+    for (const file of listProductionComponentFiles()) {
+      const src = readFileSync(file, 'utf8');
+      expect(
+        regexCallPattern.test(src),
+        `${file} parses with a regex literal inline — extract to a logic module`
+      ).toBe(false);
+    }
+  });
+
+  it('no performance-tier ternaries in components — tier mapping lives in logic modules', () => {
+    // `performanceTier === 'x' ? a : b` chains are motion-config derivation;
+    // components consume getXxxMotionConfig(performanceTier) instead.
+    const tierTernaryPattern = /performanceTier === '\w+'[^\n]*\?/;
+    for (const file of listProductionComponentFiles()) {
+      const src = readFileSync(file, 'utf8');
+      expect(
+        tierTernaryPattern.test(src),
+        `${file} derives config from performanceTier inline — extract a getXxxMotionConfig helper`
+      ).toBe(false);
+    }
   });
 });

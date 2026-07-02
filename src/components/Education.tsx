@@ -1,13 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
-import { buildEducationCollections, formatGradeDisplay, isNonFinalizedCourseStatus } from '@/components/education/logic';
+import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
 
 export default function Education() {
-  const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses } =
-    buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations);
+  const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses } = useMemo(
+    () => buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations),
+    []
+  );
 
   return (
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">
@@ -134,7 +137,7 @@ export default function Education() {
                 <p className="col-span-1 text-muted-foreground text-sm">{course.units}</p>
                 <p className="col-span-1 text-muted-foreground text-sm">{formatGradeDisplay(course.grade, course.gpa)}</p>
                 <p className="col-span-2 text-sm text-cyan-300 flex items-center gap-1.5">
-                  {isNonFinalizedCourseStatus(course.status) ? (
+                  {course.nonFinalized ? (
                     <span className="relative flex h-1.5 w-1.5 flex-shrink-0" aria-hidden="true">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400/60" />
                       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
