@@ -115,16 +115,23 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
               : undefined
           }
         >
-          <Image
-            src={src}
-            alt={alt}
-            width={800}
-            height={800}
-            className="object-cover w-full h-full"
-            priority
-            loading="eager"
-            sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
-          />
+          {/* Static export disables next/image's automatic srcset (unoptimized: true),
+              so the smaller mobile source is served by hand via <picture><source>.
+              The narrow-viewport slot is 192px (see the `sizes` hint below) — the
+              384x384 desktop asset would ship 3x the needed pixels there. */}
+          <picture>
+            <source media="(max-width: 639px)" srcSet="/profile-hero-sm.webp" />
+            <Image
+              src={src}
+              alt={alt}
+              width={800}
+              height={800}
+              className="object-cover w-full h-full"
+              priority
+              loading="eager"
+              sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
+            />
+          </picture>
           
           {/* Shine effect on hover */}
           <motion.div

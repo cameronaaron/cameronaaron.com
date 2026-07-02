@@ -105,6 +105,20 @@ async function generateIcons() {
       .toFile(join(OUTPUT_DIR, 'profile-hero.webp'));
     console.log('Generated profile-hero.webp (384x384)');
 
+    // Narrow viewports render the hero photo in a 192px slot (see the `sizes`
+    // hint on ProfileImage's <Image>) — a dedicated smaller source avoids
+    // shipping the full 384x384 desktop asset there. Static export disables
+    // next/image's automatic srcset generation (`unoptimized: true`), so this
+    // is served via a hand-written <picture><source> in ProfileImage.tsx.
+    await sharp(sourceBuffer)
+      .resize(256, 256, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .webp({ quality: 86 })
+      .toFile(join(OUTPUT_DIR, 'profile-hero-sm.webp'));
+    console.log('Generated profile-hero-sm.webp (256x256)');
+
     try {
       const bridgesBuffer = readFileSync(BRIDGES_SOURCE);
       await sharp(bridgesBuffer)
