@@ -148,15 +148,6 @@ describe('modularization contract', () => {
     expect(source).not.toContain('const formatGradeDisplay = (grade: string, gpa?: string) => {');
   });
 
-  it('keeps FAQ open-state and id generation helpers extracted', () => {
-    const source = read('src/components/FAQ.tsx');
-
-    expect(source).toContain("from '@/components/faq/logic'");
-    expect(source).not.toContain('const panelId = `faq-panel-${index}`;');
-    expect(source).not.toContain('const buttonId = `faq-trigger-${index}`;');
-    expect(source).not.toContain('onClick={() => setOpenIndex(isOpen ? null : index)}');
-  });
-
   it('keeps ExperienceCard monogram and tilt math extracted', () => {
     const source = read('src/components/experience/ExperienceCard.tsx');
 

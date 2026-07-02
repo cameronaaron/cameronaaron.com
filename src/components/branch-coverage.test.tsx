@@ -2,7 +2,6 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import FAQ from './FAQ';
 import Testimonials from './Testimonials';
 import ExperienceCard from './experience/ExperienceCard';
 import FeaturedProject from './projects/FeaturedProject';
@@ -23,7 +22,7 @@ afterEach(() => {
 });
 
 describe('branch coverage targets', () => {
-  it('toggles FAQ interactive branches and renders testimonials actions', () => {
+  it('renders testimonials cycle actions', () => {
     render(<Testimonials />);
     expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
 
@@ -34,10 +33,6 @@ describe('branch coverage targets', () => {
     // Click both cycle buttons to cover the inline onClick functions (lines 62, 72)
     if (prevBtn) fireEvent.click(prevBtn);
     if (nextBtn) fireEvent.click(nextBtn);
-
-    const { container } = render(<FAQ />);
-    fireEvent.click(screen.getByText("What's your background?"));
-    expect(container.querySelectorAll('[itemprop="acceptedAnswer"]').length).toBe(1);
   });
 
   it('exercises button and card style/interaction branches', () => {

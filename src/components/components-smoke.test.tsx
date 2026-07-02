@@ -1,12 +1,11 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import Certifications from './Certifications';
 import Contact from './Contact';
 import Education from './Education';
 import Experience from './Experience';
-import FAQ from './FAQ';
 import Hero from './Hero';
 import Navigation from './Navigation';
 import Projects from './Projects';
@@ -50,15 +49,6 @@ describe('component smoke coverage', () => {
     expect(container.querySelector('#experience')).toBeTruthy();
     expect(container.querySelector('#education')).toBeTruthy();
     expect(container.querySelector('#contact')).toBeTruthy();
-  });
-
-  it('renders FAQ and toggles answer visibility', () => {
-    const { container } = render(<FAQ />);
-
-    const firstQuestion = screen.getByText('Is this the official Cameron Aaron website?');
-    expect(container.querySelectorAll('[itemprop="acceptedAnswer"]').length).toBe(1);
-    fireEvent.click(firstQuestion);
-    expect(container.querySelectorAll('[itemprop="acceptedAnswer"]').length).toBe(0);
   });
 
   it('renders structured data script', () => {

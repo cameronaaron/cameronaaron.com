@@ -6,7 +6,6 @@ import Certifications from '@/components/Certifications';
 import Contact from '@/components/Contact';
 import Education from '@/components/Education';
 import Experience from '@/components/Experience';
-import FAQ from '@/components/FAQ';
 import Hero from '@/components/Hero';
 import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
@@ -22,7 +21,6 @@ const SECTION_FIXTURES = [
   { name: 'Skills', expectedIds: ['skills'], Component: Skills },
   { name: 'Testimonials', expectedIds: ['testimonials'], Component: Testimonials },
   { name: 'Contact', expectedIds: ['contact'], Component: Contact },
-  { name: 'FAQ', expectedIds: ['faq'], Component: FAQ },
 ] as const;
 
 describe('Section a11y contract', () => {

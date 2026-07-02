@@ -419,7 +419,36 @@ blocked, that's real and must be fixed at the source.
    binary your build depends on that isn't `pnpm add`-ed needs its own
    freshness check — dependency drift hides in whichever ecosystem nothing is
    watching.**
-5. **The checklist for any new component or feature:**
+5. **100% coverage proves a component is tested, not that it's used.** A
+   2026-07 cleanup found `FAQ.tsx` — full content, a11y tests, smoke tests,
+   100% coverage — never actually rendered on any page. Its only caller was
+   its own test suite, which the coverage gate cannot distinguish from a real
+   caller: both count as "covered." `dead-component-contract.test.ts` asks
+   the question coverage doesn't — is this component's exported name used as
+   a JSX tag in some *other* production file, not just its own test? Its
+   sibling, `public-assets-freshness-contract.test.ts`, asks the same
+   question about `public/`: is this file referenced anywhere, by any
+   production source, config, or the well-known conventions that legitimately
+   don't need one (documented per-entry in `PUBLIC_CONVENTION_EXEMPT`)? That
+   cleanup also found four unreferenced images (350KB) sitting in `public/`
+   for weeks with nothing watching. Both sweeps ship with an explicit,
+   reasoned allowlist for deliberate exceptions (`ALLOWED_UNUSED_COMPONENTS`)
+   rather than silently ignoring anything — an allowlist entry is a decision
+   on record, not a loophole. Both run in the fast `test:modularization` CI
+   job so this class of drift fails before the expensive build/Lighthouse
+   jobs even start.
+6. **Tests can't see what git doesn't track — sweep the working tree
+   yourself occasionally.** That same cleanup found a `false/` directory at
+   repo root (Lighthouse CLI debris from a local run whose output path
+   resolved to the literal string `"false"`) and an empty
+   `.github/modernize/` scaffold left by a one-off Copilot run — both
+   correctly gitignored, so no test could ever have failed on them, but both
+   sat on disk as clutter. `git status --short --ignored=matching` surfaces
+   exactly this class of thing; run it periodically (this repo's `.gitignore`
+   already anticipated the `false/` case specifically — line `false/` — so
+   when it recurs, deleting the directory is the whole fix, no gitignore
+   change needed).
+7. **The checklist for any new component or feature:**
    - [ ] Pure logic extracted to `logic.ts` with unit tests
    - [ ] Collection builds/sorts in `useMemo`
    - [ ] List-item components `memo`'d if a parent selection re-renders them;
@@ -432,7 +461,7 @@ blocked, that's real and must be fixed at the source.
    - [ ] Hydration-safe: no browser APIs in initial state
    - [ ] New invariant → new contract test, same commit
    - [ ] `npm test && npm run type-check && npm run lint` green
-6. **When a contract fails, fix the source.** If the *requirement* genuinely
+8. **When a contract fails, fix the source.** If the *requirement* genuinely
    changed (e.g., a 5th education item changes the grid), update source, test,
    and the documentation together — that is a requirements change, not a
    test weakening.
