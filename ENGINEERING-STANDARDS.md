@@ -340,10 +340,19 @@ pinned to a hard 1.0 on both. Enforced by `performance-regression-contract.test.
 (which asserts the exact thresholds in both configs, not just their presence)
 and by `deploy:prod`, which runs the full Lighthouse gate before every deploy.
 Desktop is 0.95 rather than 1.0 deliberately — GitHub-hosted runners don't have
-consistent enough CPU timing to hit a literal 100 reliably (0.94–0.96 observed
-across 3 runs on unrelated commits); 0.95 still catches real regressions
-without failing the build on runner jitter. Mobile has held a clean 1.0 on
-every observed run, so it gets no tolerance. **The floor may only move up.**
+consistent enough CPU timing to hit a literal 100 reliably; 0.95 still catches
+real regressions without failing the build on runner jitter. Mobile has held a
+clean 1.0 on every observed run, so it gets no tolerance. **The floor may only
+move up — if runs are still flaky, raise `numberOfRuns` (below) before ever
+lowering the threshold itself.**
+
+`lighthouserc.json`'s `numberOfRuns` is 5, not the LHCI default of 3 — raised
+2026-07 after desktop scored 0.93-0.96 across CI runs and dipped under 0.95 in
+3 of 5 consecutive pushes on unrelated commits (mobile held a clean 1.0 on the
+same commits the whole time, confirming it was runner-CPU variance, not a real
+regression). LHCI compares the *median* run against the threshold, so more
+samples per push absorbs more of that variance without moving the bar.
+`performance-regression-contract.test.ts` pins `numberOfRuns >= 5`.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
