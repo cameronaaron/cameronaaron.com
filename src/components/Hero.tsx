@@ -140,7 +140,7 @@ export default function Hero() {
             </motion.h1>
 
             <div className="text-lg sm:text-2xl md:text-3xl font-light mb-6 md:mb-8 text-muted-foreground leading-tight">
-              <TextReveal text={profile.title} delay={1.5} />
+              <TextReveal text={profile.title} delay={0.25} />
             </div>
 
             <motion.p
