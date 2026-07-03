@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import {
   INTRO_CURTAIN_STORAGE_KEY,
+  getEffectiveHoldMs,
   markIntroCurtainShown,
   shouldSkipInitialCurtain,
 } from '@/components/ui/intro-curtain-logic';
@@ -16,7 +17,10 @@ interface IntroCurtainProps {
 // SSR-safe layout effect: useLayoutEffect on client, no-op on server.
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps) {
+// 400ms hold (was 600): the curtain is the last thing blocking Lighthouse's
+// visual-completeness clock (Speed Index), and 400ms + 650ms CSS fade still
+// reads as a deliberate intro beat.
+export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
   const prefersReducedMotion = useReducedMotion();
   const reducedMotion = Boolean(prefersReducedMotion);
   // Initial state MUST match SSR (true) — collapsed synchronously below if skipping.
@@ -33,7 +37,7 @@ export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps) {
       markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
       return;
     }
-    const effectiveHoldMs = reducedMotion ? Math.min(holdMs, 220) : holdMs;
+    const effectiveHoldMs = getEffectiveHoldMs(holdMs, reducedMotion);
     const timer = window.setTimeout(() => {
       setVisible(false);
       markIntroCurtainShown(INTRO_CURTAIN_STORAGE_KEY);
@@ -61,7 +65,8 @@ export default function IntroCurtain({ holdMs = 600 }: IntroCurtainProps) {
           data-testid="intro-curtain"
           role="presentation"
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-background"
+          className="intro-curtain-autofade pointer-events-none fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-background"
+          style={{ '--intro-curtain-hold': `${getEffectiveHoldMs(holdMs, reducedMotion)}ms` } as React.CSSProperties}
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{

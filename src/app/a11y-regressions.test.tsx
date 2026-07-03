@@ -15,9 +15,11 @@ describe('Accessibility regression guards', () => {
     expect(layoutSource).not.toContain('httpEquiv="X-Content-Type-Options"');
     expect(layoutSource).not.toContain('httpEquiv="X-XSS-Protection"');
 
-    // Nu validator requires rel=prefetch links not to carry as= attributes.
-    expect(layoutSource).toContain('<link rel="prefetch" href="/icon-192x192.png" />');
-    expect(layoutSource).not.toContain('rel="prefetch" href="/icon-192x192.png" as=');
+    // The icon prefetch was removed on purpose (2026-07): any request that
+    // starts before first paint sits in Lighthouse's pessimistic LCP graph,
+    // and this one cost ~20ms of simulated LCP for a cache-warming nicety.
+    // If a prefetch ever returns, Nu validator requires it not to carry as=.
+    expect(layoutSource).not.toContain('rel="prefetch"');
   });
 
   it('keeps iframe title guard mounted in the root layout', () => {

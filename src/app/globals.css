@@ -200,4 +200,20 @@
   .glass-card {
     @apply bg-white/5 backdrop-blur-lg border border-white/10 hover:border-primary/50 transition-colors duration-300;
   }
+
+  /* IntroCurtain self-dismissal: pure CSS so the viewport unblocks even before
+     React hydrates (Speed Index / LCP are measured on first paint, and the
+     JS-driven unmount can lag by seconds on slow CPUs). The component's JS
+     timer still unmounts the node afterwards; this keyframe only guarantees
+     the pixels stop covering the page on schedule. */
+  @keyframes intro-curtain-exit {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .intro-curtain-autofade {
+    animation: intro-curtain-exit 650ms cubic-bezier(0.76, 0, 0.24, 1) var(--intro-curtain-hold, 600ms) forwards;
+  }
 }

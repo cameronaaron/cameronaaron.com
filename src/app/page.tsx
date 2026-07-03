@@ -5,6 +5,9 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
+// Sections are statically imported on purpose: code-splitting them was measured
+// (2026-07) to *hurt* Lighthouse — the extra chunk round-trip after hydration
+// deepens the critical request graph (mobile LCP 3.4s→3.8s, TTI 3.6s→4.0s).
 import Certifications from '@/components/Certifications';
 import Experience from '@/components/Experience';
 import Education from '@/components/Education';

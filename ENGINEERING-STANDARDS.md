@@ -334,47 +334,39 @@ indicators (`animate-ping` dots) are fine. Anything animating `box-shadow`,
 
 ### 4.7 Lighthouse floor
 
-Performance ≥ 0.90 on desktop (`lighthouserc.json`) and a clean 1.0 on mobile
-(`lighthouserc.mobile.json`) — accessibility, best-practices, and SEO are all
-pinned to a hard 1.0 on both. Enforced by `performance-regression-contract.test.ts`
-(which asserts the exact thresholds in both configs, not just their presence)
-and by `deploy:prod`, which runs the full Lighthouse gate before every deploy.
-Mobile has held a clean 1.0 on every observed run, so it gets no tolerance.
-**The floor may only move up — if runs are flaky, raise `numberOfRuns` first
-and confirm with real data before ever lowering the threshold.**
+Performance, accessibility, best-practices, and SEO are all pinned to a hard
+1.0 on **both** desktop (`lighthouserc.json`) and mobile
+(`lighthouserc.mobile.json`), with `numberOfRuns: 1` on both. Enforced by
+`performance-regression-contract.test.ts` (which asserts the exact thresholds
+and run counts in both configs, not just their presence) and by `deploy:prod`,
+which runs the full Lighthouse gate before every deploy.
+**The floor may only move down with owner sign-off backed by data — a flaky
+gate means fix the page at the source first.**
 
-Desktop's threshold and `numberOfRuns` both moved in 2026-07, each backed by
-data rather than a guess:
+History (2026-07, kept because the reasoning still applies):
 
-1. Started at 1.0 / 3 runs. Runner CPU jitter made a literal 100 unreliable,
-   so the threshold dropped to 0.95 — GitHub-hosted runners don't have
-   consistent enough CPU timing to hit it reliably, and 0.95 still caught
-   real regressions.
-2. 0.95 then failed 3 of 5 consecutive pushes at 0.93-0.96. `numberOfRuns`
-   raised 3→5, on the theory that LHCI's *median* comparison would absorb
-   more of the variance without moving the bar.
-3. It didn't: two more consecutive 5-run pushes both landed a median of
-   0.93 — including one push that shipped a real, verified app fix (hero
-   subtitle reveal timing) that measurably improved speed-index in isolation
-   (0.59→0.98 in one sample). The bottleneck metric moved between pushes
-   (speed-index one push, total-blocking-time the next) while the median
-   held at 0.93 both times — a stable median with a moving bottleneck means
-   0.93 is close to this runner environment's true central tendency, not
-   noise more samples would average away. `numberOfRuns` stabilizes *how
-   reliably you measure* the value; it doesn't move the value itself.
-   Threshold dropped to 0.90 — real margin below both observed medians,
-   while still well above what an actual regression would produce.
-4. With the threshold now sitting on real margin below the observed median,
-   the extra runs from step 2 were no longer buying anything — they made
-   the *measurement* of 0.93 more stable, but the fix that mattered was
-   recalibrating the *threshold*. Reverted `numberOfRuns` back to 3 to save
-   the ~2 extra minutes of CI time per push.
-
-`performance-regression-contract.test.ts` pins `numberOfRuns === 3` and
-`minScore: 0.9`. If the median drifts down again: raise `numberOfRuns` for
-better measurement *and* check Core Web Vitals for a real regression before
-touching the threshold — don't repeat step 3's mistake of assuming more
-samples alone will fix a stable-but-low median.
+1. Desktop started at 1.0 / 3 runs, dropped to 0.95 and then 0.90 while
+   chasing a CI-runner median of 0.93 whose bottleneck alternated between
+   speed-index and total-blocking-time. Along the way `numberOfRuns` went
+   3→5→3 — the durable lesson: **more samples stabilize how reliably you
+   measure a value; they never move the value itself.** A stable-but-low
+   median is a page problem, not a sampling problem.
+2. The speed-index side was then fixed at the source: `IntroCurtain`'s
+   dismissal used to wait on React hydration before its 600ms hold even
+   started, so on slow runner CPUs the full-screen curtain covered the
+   viewport for seconds. It now fades out via a pure CSS animation baked into
+   the server-rendered markup (`intro-curtain-exit` in `globals.css`), so
+   visual completeness no longer depends on JS at all. Local desktop runs
+   after the fix: 1.0 / 0.99 / 1.0 with SI 0.8-0.9s and TBT 0ms.
+3. With the page fixed, the owner set both form factors to `minScore: 1` and
+   `numberOfRuns: 1` (2026-07). If the gate flakes, treat it as a real
+   signal: check which metric moved, fix the source, and only revisit the
+   threshold/run-count with observed data — never as a reflex.
+4. A code-splitting experiment (below-fold sections via `next/dynamic`) was
+   measured and **rejected**: the extra chunk round-trip after hydration
+   deepened the critical request graph (mobile simulated LCP 3.4s→3.8s, TTI
+   3.6s→4.0s). The sections stay statically imported — see the comment in
+   `src/app/page.tsx`.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job

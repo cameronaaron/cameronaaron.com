@@ -1,5 +1,11 @@
 export const INTRO_CURTAIN_STORAGE_KEY = 'intro-curtain-shown';
 
+export const REDUCED_MOTION_MAX_HOLD_MS = 220;
+
+export function getEffectiveHoldMs(holdMs: number, reducedMotion: boolean): number {
+  return reducedMotion ? Math.min(holdMs, REDUCED_MOTION_MAX_HOLD_MS) : holdMs;
+}
+
 export function shouldSkipInitialCurtain(storageKey: string = INTRO_CURTAIN_STORAGE_KEY): boolean {
   if (typeof window === 'undefined') return true;
   try {
