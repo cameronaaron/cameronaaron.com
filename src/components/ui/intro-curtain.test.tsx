@@ -78,10 +78,10 @@ describe('IntroCurtain', () => {
     expect(screen.queryByTestId('intro-curtain')).toBeTruthy();
   });
 
-  it('uses the default hold of 600ms when not provided', () => {
+  it('uses the default hold of 400ms when not provided', () => {
     mockNavigationType('navigate');
     render(<IntroCurtain />);
-    act(() => vi.advanceTimersByTime(599));
+    act(() => vi.advanceTimersByTime(399));
     expect(screen.queryByTestId('intro-curtain')).toBeTruthy();
     act(() => vi.advanceTimersByTime(2));
     expect(screen.queryByTestId('intro-curtain')).toBeNull();

@@ -227,8 +227,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="prefetch" href="/icon-192x192.png" />
-
         {/* WebMCP discovery: lets AI agents find the tool/form manifest without parsing llms.txt */}
         <link rel="mcp" type="application/json" href="/mcp.json" />
 

@@ -84,33 +84,33 @@ describe('performance regression contract', () => {
     const lighthouseConfig = JSON.parse(read('lighthouserc.json')) as LighthouseConfig;
 
     expect(lighthouseConfig.ci?.assert?.preset).toBe('lighthouse:recommended');
-    // 0.90, not 1.0: GitHub-hosted runners don't have consistent enough CPU
-    // timing to hit a literal 100 reliably. This was 0.95 until 2026-07, when
-    // two consecutive numberOfRuns=5 pushes both landed a MEDIAN of 0.93
-    // despite individual samples ranging 0.89-0.98 — a real app fix (hero
-    // subtitle reveal timing, see git history) measurably improved
-    // speed-index in isolation (0.59→0.98 in one sample) but the median held
-    // at 0.93 across both pushes, on different bottleneck metrics each time
-    // (speed-index one push, total-blocking-time the next). That pattern —
-    // stable median, moving bottleneck — means 0.93 is close to this runner
-    // environment's true central tendency, not noise more samples will
-    // average away. 0.90 sits with real margin below both observed medians
-    // while still catching an actual regression. Core Web Vitals budgets
-    // below stay the precise, tight regression guard regardless.
-    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.9);
+    // 1.0 on desktop, single run — an explicit owner decision (2026-07). The
+    // prior 0.90/3-run calibration existed because the CI runner median sat
+    // at 0.93 with the bottleneck alternating between speed-index and
+    // total-blocking-time. The speed-index side was then fixed at the source:
+    // IntroCurtain's dismissal used to wait on React hydration before its
+    // 600ms hold even started, so on slow runner CPUs the viewport stayed
+    // covered for seconds; it now fades out via a pure CSS animation baked
+    // into the server-rendered markup (see globals.css intro-curtain-exit),
+    // decoupling visual completeness from JS entirely. If this gate flakes,
+    // fix the page (or revisit the decision with data) — do not silently
+    // lower the threshold.
+    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 1);
   });
 
-  it('keeps desktop Lighthouse at the standard LHCI sample count now the threshold has real margin', () => {
-    // 2026-07: numberOfRuns was raised 3->5 while chasing a flaky 0.95
-    // threshold, on the theory that more samples would stabilize the median
-    // above the bar. It didn't — the median (0.93) turned out to be this
-    // runner environment's actual central tendency, not noise, so the fix
-    // was recalibrating the threshold to 0.90 (see the assertion above), not
-    // adding samples. With the threshold now sitting with real margin below
-    // the observed 0.93 median, the extra runs bought CI time without
-    // catching anything the default 3 wouldn't — reverted back to 3.
+  it('keeps desktop Lighthouse at a single run', () => {
+    // numberOfRuns is pinned to 1 (owner decision, 2026-07): with the page
+    // fixed at the source there is no variance for extra samples to absorb,
+    // and the extra runs only bought CI minutes. History (see
+    // ENGINEERING-STANDARDS.md §4.7): raising 3->5 runs never moved a stable
+    // median — more samples improve measurement, not the value.
     const lighthouseConfig = JSON.parse(read('lighthouserc.json')) as { ci?: { collect?: { numberOfRuns?: number } } };
-    expect(lighthouseConfig.ci?.collect?.numberOfRuns).toBe(3);
+    expect(lighthouseConfig.ci?.collect?.numberOfRuns).toBe(1);
+  });
+
+  it('keeps mobile Lighthouse at a single run', () => {
+    const lighthouseConfig = JSON.parse(read('lighthouserc.mobile.json')) as { ci?: { collect?: { numberOfRuns?: number } } };
+    expect(lighthouseConfig.ci?.collect?.numberOfRuns).toBe(1);
   });
 
   it('keeps mobile lighthouse thresholds matching desktop, with mobile emulation', () => {
