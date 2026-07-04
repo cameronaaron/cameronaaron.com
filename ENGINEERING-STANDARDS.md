@@ -384,6 +384,16 @@ bfcache. If CI ever fails, trust CI's numbers over a local run showing this
 noise; if CI *and* a real production Lighthouse run both show `bf-cache`
 blocked, that's real and must be fixed at the source.
 
+`forced-reflow-insight` is pinned to `warn` in both configs (2026-07): it is a
+binary-scored diagnostic that flipped 0/1/0 across three otherwise-identical
+local runs, attributes its ~35ms of reflow to `[unattributed]` (nothing
+actionable), and does not feed the performance category — runs where it scored
+0 still scored a perfect 100. It failed both CI form factors as an
+assertion-only error from the `lighthouse:recommended` preset while every
+category held 1.0. Same treatment as the other demoted insight audits; if a
+future Lighthouse version starts attributing the reflow to a real script,
+investigate that script before touching the config.
+
 ---
 
 ## 5. Architecture invariants
