@@ -83,7 +83,7 @@ importers:
         specifier: ^1.61.1
         version: 1.61.1
       postcss:
-        specifier: ^8.5.16
+        specifier: '>=8.5.10'
         version: 8.5.16
       tailwindcss:
         specifier: ^4.3.2
