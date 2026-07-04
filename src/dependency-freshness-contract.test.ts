@@ -1,7 +1,7 @@
 /**
  * Dependency freshness contract.
  *
- * Enforces four invariants that must hold at all times:
+ * Enforces five invariants that must hold at all times:
  *   1. Every direct and transitive package is at its latest published version.
  *   2. There are zero known security vulnerabilities in the dependency tree.
  *   3. The wrangler CLI binary in node_modules/.bin matches the version declared
@@ -10,6 +10,10 @@
  *   4. pnpm-lock.yaml's recorded specifiers are in sync with package.json / the
  *      pnpm-workspace.yaml overrides — verified against a clean install, not the
  *      developer's existing node_modules (see the note on that test below).
+ *   5. pnpm-workspace.yaml's minimumReleaseAgeExclude entries name the exact
+ *      versions actually resolved in pnpm-lock.yaml — a manually-maintained
+ *      side-channel that `pnpm update --latest` never touches, so it silently
+ *      drifts every time one of the pinned tools is upgraded (see that test).
  *
  * Failure messages name the offending packages so the fix is one command away.
  *
@@ -17,10 +21,11 @@
  * To fix CVEs:        check pnpm audit output; add overrides to pnpm-workspace.yaml if needed
  * To fix wrangler:    pnpm install  (re-syncs node_modules to pnpm-lock.yaml)
  * To fix lockfile sync: pnpm install  (rewrites the stale specifier)
+ * To fix stale exclude entries: edit pnpm-workspace.yaml to match the versions
+ *   named in the failure message
  */
-import { readFileSync, mkdtempSync, rmSync, cpSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -123,33 +128,59 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
   // ─── lockfile/manifest sync, verified against a clean install ────────────────
 
   it('pnpm-lock.yaml is in sync with package.json — verified against a clean install', () => {
-    // `pnpm install --frozen-lockfile` against the *existing* node_modules is not
-    // a reliable check: pnpm short-circuits to "Already up to date" once
-    // node_modules already satisfies the lockfile, silently skipping the
-    // specifier-mismatch validation. That let a stale `postcss` specifier
-    // (left behind by a `pnpm update --latest` that didn't reconcile a
-    // pnpm-workspace.yaml override) pass every local check while still
-    // failing on CI's checkout, which always starts from zero node_modules —
-    // it broke every downstream CI job, including both Lighthouse gates,
-    // before they could even start. Reproducing the clean-install condition
-    // here, in a scratch directory seeded only with the three manifest files,
-    // catches the same class of drift locally before it ever reaches CI.
-    const scratchDir = mkdtempSync(join(tmpdir(), 'lockfile-sync-check-'));
-    try {
-      cpSync(join(ROOT, 'package.json'), join(scratchDir, 'package.json'));
-      cpSync(join(ROOT, 'pnpm-lock.yaml'), join(scratchDir, 'pnpm-lock.yaml'));
-      cpSync(join(ROOT, 'pnpm-workspace.yaml'), join(scratchDir, 'pnpm-workspace.yaml'));
+    // Delegates to scripts/verify-lockfile-sync.mjs (single source of truth —
+    // see that file for why this must run as a direct `node` invocation, never
+    // wrapped in a `pnpm run <script>` alias). Invoked here the same way,
+    // via a raw node child process rather than through pnpm, so this test
+    // can't fall into the exact trap it exists to catch.
+    const result = spawnSync('node', [join(ROOT, 'scripts/verify-lockfile-sync.mjs')], {
+      encoding: 'utf8',
+      cwd: ROOT,
+    });
 
-      const { stderr, status } = run(['install', '--frozen-lockfile', '--ignore-scripts'], scratchDir);
-
-      expect(
-        status,
-        `pnpm-lock.yaml is out of sync with package.json (this is exactly what CI's ` +
-          `"pnpm install --frozen-lockfile" step on a fresh checkout will hit). ` +
-          `Run "pnpm install" to resync, then commit the updated pnpm-lock.yaml.\n\n${stderr}`,
-      ).toBe(0);
-    } finally {
-      rmSync(scratchDir, { recursive: true, force: true });
-    }
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
   }, 60_000);
+
+  // ─── minimumReleaseAgeExclude, kept honest against the real lockfile ─────────
+
+  it('pnpm-workspace.yaml minimumReleaseAgeExclude names versions that are actually resolved', () => {
+    // This exclude list is how the Cloudflare toolchain (workerd/miniflare/
+    // wrangler) opts out of pnpm's minimum-release-age supply-chain guard, so
+    // this repo can track its bleeding-edge releases immediately. Nothing
+    // keeps it in sync automatically: `pnpm update --latest` bumps
+    // package.json/pnpm-lock.yaml but has no reason to touch this file, so
+    // every time one of these tools is upgraded, the exclude entry for it
+    // silently points at a version that no longer exists in the lockfile
+    // (found 2026-07: all eight entries were a full release behind). A stale
+    // entry doesn't error — it's simply not exempting the version that's
+    // actually installed, quietly reintroducing the age-gate delay it was
+    // meant to bypass.
+    const workspaceYaml = readFileSync(join(ROOT, 'pnpm-workspace.yaml'), 'utf8');
+    const lockfile = readFileSync(join(ROOT, 'pnpm-lock.yaml'), 'utf8');
+
+    const excludeEntries = [...workspaceYaml.matchAll(/^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm)].map((m) => m[1]);
+    expect(excludeEntries.length, 'minimumReleaseAgeExclude sweep found nothing — check the parsing regex').toBeGreaterThan(0);
+
+    const stale: string[] = [];
+    for (const entry of excludeEntries) {
+      const atIndex = entry.lastIndexOf('@');
+      const name = entry.slice(0, atIndex);
+      const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const resolvedVersions = [...lockfile.matchAll(new RegExp(`^\\s*['"]?${escapedName}@([\\w.-]+)['"]?:\\s*$`, 'gm'))].map(
+        (m) => m[1],
+      );
+
+      if (resolvedVersions.length === 0) {
+        stale.push(`  ${entry} — "${name}" not found in pnpm-lock.yaml at all (renamed or removed?)`);
+      } else if (!resolvedVersions.includes(entry.slice(atIndex + 1))) {
+        stale.push(`  ${entry} → lockfile actually has ${name}@${resolvedVersions.join(', ')}`);
+      }
+    }
+
+    expect(
+      stale,
+      `${stale.length} stale minimumReleaseAgeExclude entr(y/ies) in pnpm-workspace.yaml — ` +
+        `update them to match the versions pnpm-lock.yaml actually resolved:\n${stale.join('\n')}`,
+    ).toHaveLength(0);
+  });
 });

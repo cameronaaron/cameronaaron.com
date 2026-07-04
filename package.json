@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "browserslist": {
     "production": [
       "chrome >= 111",
@@ -17,7 +20,11 @@
       "last 1 safari version"
     ]
   },
+  "simple-git-hooks": {
+    "pre-push": "node scripts/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
+  },
   "scripts": {
+    "prepare": "simple-git-hooks",
     "dev": "next dev",
     "build": "next build",
     "preview": "wrangler dev",
@@ -79,6 +86,7 @@
     "lighthouse": "^13.4.0",
     "playwright": "^1.61.1",
     "postcss": "^8.5.16",
+    "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",

@@ -7,6 +7,7 @@ const PROJECT_ROOT = process.cwd();
 const EXPECTED_ROOT_FILES = [
   '.env.example',
   '.gitignore',
+  '.nvmrc',
   'CLAUDE.md',
   'ENGINEERING-STANDARDS.md',
   'README.md',
