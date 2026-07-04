@@ -34,6 +34,13 @@ function expectStrictAssertions(assertions: Record<string, unknown>, performance
   expect(assertions['total-blocking-time']).toBeTruthy();
   expect(assertions['speed-index']).toBeTruthy();
   expect(assertions['interactive']).toBeTruthy();
+  // forced-reflow-insight is demoted to warn deliberately (2026-07): it's a
+  // binary-scored diagnostic that flipped 0/1/0 across three otherwise-identical
+  // local runs, attributes its ~35ms of reflow to "[unattributed]" (nothing
+  // actionable), and does not feed the performance category score — runs where
+  // it scored 0 still scored a perfect 100. Same class as the other insight
+  // audits below.
+  expect(assertions['forced-reflow-insight']).toBe('warn');
   expect(assertions['image-delivery-insight']).toBe('warn');
   expect(assertions['label-content-name-mismatch']).toBe('warn');
   expect(assertions['legacy-javascript-insight']).toBe('warn');
