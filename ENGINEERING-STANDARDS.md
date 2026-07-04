@@ -442,6 +442,23 @@ blocked, that's real and must be fixed at the source.
    binary your build depends on that isn't `pnpm add`-ed needs its own
    freshness check — dependency drift hides in whichever ecosystem nothing is
    watching.**
+
+   The same file also closes a narrower but sharper hole (2026-07): `pnpm
+   install --frozen-lockfile` — the exact command every CI job runs first —
+   silently skips its own specifier-mismatch validation once the local
+   `node_modules` already looks satisfied. A `pnpm update --latest` left
+   `pnpm-lock.yaml` recording `postcss`'s specifier as `^8.5.16` instead of
+   the `pnpm-workspace.yaml` override (`>=8.5.10`); every local
+   `pnpm install --frozen-lockfile` check passed (false negative, warm
+   `node_modules`), and it still broke every CI job on push, including both
+   Lighthouse gates, before any of them could start. The test now runs that
+   same command in a scratch directory seeded only with `package.json`,
+   `pnpm-lock.yaml`, and `pnpm-workspace.yaml` — no pre-existing
+   `node_modules` to short-circuit the check — which is the only way to
+   reproduce CI's always-clean-checkout condition locally. **The lesson
+   generalizes: if a tool's fast path depends on prior local state, a
+   contract that runs it against that same state inherits the fast path's
+   blind spot — verify from a clean slate, matching what CI actually does.**
 5. **100% coverage proves a component is tested, not that it's used.** A
    2026-07 cleanup found `FAQ.tsx` — full content, a11y tests, smoke tests,
    100% coverage — never actually rendered on any page. Its only caller was

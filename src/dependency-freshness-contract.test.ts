@@ -1,29 +1,34 @@
 /**
  * Dependency freshness contract.
  *
- * Enforces three invariants that must hold at all times:
+ * Enforces four invariants that must hold at all times:
  *   1. Every direct and transitive package is at its latest published version.
  *   2. There are zero known security vulnerabilities in the dependency tree.
  *   3. The wrangler CLI binary in node_modules/.bin matches the version declared
  *      in package.json devDependencies — prevents stale global tools from silently
  *      being used instead of the project-managed one.
+ *   4. pnpm-lock.yaml's recorded specifiers are in sync with package.json / the
+ *      pnpm-workspace.yaml overrides — verified against a clean install, not the
+ *      developer's existing node_modules (see the note on that test below).
  *
  * Failure messages name the offending packages so the fix is one command away.
  *
  * To fix outdated:     pnpm update --latest
  * To fix CVEs:        check pnpm audit output; add overrides to pnpm-workspace.yaml if needed
  * To fix wrangler:    pnpm install  (re-syncs node_modules to pnpm-lock.yaml)
+ * To fix lockfile sync: pnpm install  (rewrites the stale specifier)
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, rmSync, cpSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = join(import.meta.dirname, '..');
 const PNPM = 'pnpm';
 
-function run(args: string[]): { stdout: string; stderr: string; status: number | null } {
-  const result = spawnSync(PNPM, args, { encoding: 'utf8', cwd: ROOT });
+function run(args: string[], cwd: string = ROOT): { stdout: string; stderr: string; status: number | null } {
+  const result = spawnSync(PNPM, args, { encoding: 'utf8', cwd });
   return { stdout: result.stdout ?? '', stderr: result.stderr ?? '', status: result.status };
 }
 
@@ -114,4 +119,37 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
         'Run "pnpm install" to sync, or "pnpm update --latest wrangler" to upgrade.',
     ).toBe(declared);
   });
+
+  // ─── lockfile/manifest sync, verified against a clean install ────────────────
+
+  it('pnpm-lock.yaml is in sync with package.json — verified against a clean install', () => {
+    // `pnpm install --frozen-lockfile` against the *existing* node_modules is not
+    // a reliable check: pnpm short-circuits to "Already up to date" once
+    // node_modules already satisfies the lockfile, silently skipping the
+    // specifier-mismatch validation. That let a stale `postcss` specifier
+    // (left behind by a `pnpm update --latest` that didn't reconcile a
+    // pnpm-workspace.yaml override) pass every local check while still
+    // failing on CI's checkout, which always starts from zero node_modules —
+    // it broke every downstream CI job, including both Lighthouse gates,
+    // before they could even start. Reproducing the clean-install condition
+    // here, in a scratch directory seeded only with the three manifest files,
+    // catches the same class of drift locally before it ever reaches CI.
+    const scratchDir = mkdtempSync(join(tmpdir(), 'lockfile-sync-check-'));
+    try {
+      cpSync(join(ROOT, 'package.json'), join(scratchDir, 'package.json'));
+      cpSync(join(ROOT, 'pnpm-lock.yaml'), join(scratchDir, 'pnpm-lock.yaml'));
+      cpSync(join(ROOT, 'pnpm-workspace.yaml'), join(scratchDir, 'pnpm-workspace.yaml'));
+
+      const { stderr, status } = run(['install', '--frozen-lockfile', '--ignore-scripts'], scratchDir);
+
+      expect(
+        status,
+        `pnpm-lock.yaml is out of sync with package.json (this is exactly what CI's ` +
+          `"pnpm install --frozen-lockfile" step on a fresh checkout will hit). ` +
+          `Run "pnpm install" to resync, then commit the updated pnpm-lock.yaml.\n\n${stderr}`,
+      ).toBe(0);
+    } finally {
+      rmSync(scratchDir, { recursive: true, force: true });
+    }
+  }, 60_000);
 });
