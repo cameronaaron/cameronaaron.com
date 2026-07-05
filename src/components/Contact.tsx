@@ -4,6 +4,7 @@ import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useMemo, useRef } from 'react';
 import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
+import { resumeDownloads } from '@/data/resume';
 import SocialLink from '@/components/contact/SocialLink';
 import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/logic';
 import Tilt from '@/components/ui/Tilt';
@@ -75,6 +76,47 @@ export default function Contact() {
               </motion.a>
             </Tilt>
           </div>
+
+          {/* Resume Downloads */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-center mb-12"
+          >
+            <h3 className="text-2xl font-bold text-foreground mb-6">Download My Resume</h3>
+            <div className="flex flex-wrap justify-center gap-4">
+              {resumeDownloads.map((resume) => (
+                <a
+                  key={resume.key}
+                  href={resume.href}
+                  download={resume.downloadName}
+                  className="glass-card rounded-2xl px-6 py-4 min-h-[44px] w-full max-w-md sm:w-auto group flex items-center gap-4 text-left hover:border-primary/50 transition-colors"
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 transition-all duration-300 group-hover:scale-105 group-hover:border-cyan-300/50 group-hover:bg-cyan-300/10">
+                    <svg
+                      className="h-5 w-5 text-cyan-300"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v11m0 0 4-4m-4 4-4-4" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 17v1.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V17" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="block font-bold text-foreground group-hover:text-primary transition-colors">
+                      {resume.label}
+                    </span>
+                    <span className="block text-sm text-muted-foreground">{resume.description}</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </motion.div>
 
           {/* Social Links */}
           <motion.div
