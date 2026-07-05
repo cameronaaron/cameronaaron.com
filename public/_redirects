@@ -25,3 +25,7 @@ http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 /capstone.html /capstone 301
 /credentials.html /credentials 301
 /internet.html /internet 301
+
+# Legacy resume PDF locations — redirect saved links to the current versions under /resume/
+/cameron-aaron-medical-resume.pdf /resume/cameron-aaron-medical-resume.pdf 301
+/cameron-aaron-medical-resume-one-page.pdf /resume/cameron-aaron-medical-resume-one-page.pdf 301
