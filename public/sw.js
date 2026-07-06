@@ -10,9 +10,9 @@ const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
   '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  '/profile.webp',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/images/profile.webp',
 ];
 
 // Cache strategies

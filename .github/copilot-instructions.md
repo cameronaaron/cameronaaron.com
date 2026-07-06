@@ -89,7 +89,7 @@ Use index-based delays for list items:
 
 Example:
 ```tsx
-<Image src="/profile.webp" alt="Name" width={400} height={400} priority />
+<Image src="/images/profile.webp" alt="Name" width={400} height={400} priority />
 ```
 
 ## SEO Architecture (Critical)
@@ -202,7 +202,7 @@ export default function Hero({ variant = 'primary' }: HeroProps) {
 
 1. **Missing `'use client'`** - Framer Motion components crash without it
 2. **Forgot `viewport={{ once: true }}`** - Animations retrigger on every scroll
-3. **Wrong image path** - Must start with `/` (e.g., `/profile.webp`, not `profile.webp`)
+3. **Wrong image path** - Must start with `/` (e.g., `/images/profile.webp`, not `profile.webp`)
 4. **Breaking data structure** - Match existing object shapes exactly (check interfaces)
 5. **Gradient text missing `text-transparent`** - Won't show gradient without it
 6. **Cloudflare static export** - Can't use Next.js features requiring Node.js runtime (API routes, ISR, etc.)
