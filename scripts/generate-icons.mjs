@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const SOURCE = 'public/profile.webp';
-const BRIDGES_SOURCE = 'public/ba.webp';
+const BRIDGES_SOURCE = 'public/logos/ba.webp';
 const OUTPUT_DIR = 'public';
 const BRAND = {
   name: 'Cameron Aaron',
@@ -127,7 +127,7 @@ async function generateIcons() {
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         })
         .webp({ quality: 92 })
-        .toFile(join(OUTPUT_DIR, 'ba-logo.webp'));
+        .toFile(join(OUTPUT_DIR, 'logos', 'ba-logo.webp'));
       console.log('Generated ba-logo.webp (64x64)');
     } catch {
       console.warn('Skipped ba-logo.webp generation (source not found)');
