@@ -21,7 +21,7 @@ describe('education ordering contract', () => {
 
   it('keeps non-finalized prerequisite coursework entries at the bottom', () => {
     const { container } = render(<Education />);
-    const rows = Array.from(container.querySelectorAll('[data-testid^="prereq-desktop-row-"]'));
+    const rows = Array.from(container.querySelectorAll('[data-testid^="prereq-row-"]'));
     const statuses = rows.map((row) => row.getAttribute('data-status') ?? '');
 
     expect(statuses.some((status) => isNonFinalizedStatus(status))).toBe(true);
@@ -45,9 +45,9 @@ describe('education ordering contract', () => {
     expect(values[1]).toContain('(Jun 2025)');
   });
 
-  it('renders pulse indicators only on in-progress prerequisite rows in the desktop table', () => {
+  it('renders pulse indicators only on in-progress prerequisite rows', () => {
     const { container } = render(<Education />);
-    const rows = Array.from(container.querySelectorAll('[data-testid^="prereq-desktop-row-"]'));
+    const rows = Array.from(container.querySelectorAll('[data-testid^="prereq-row-"]'));
 
     const inProgressRows = rows.filter((row) => row.getAttribute('data-status') === 'In Progress');
     const completedRows = rows.filter((row) => row.getAttribute('data-status') === 'Completed');
