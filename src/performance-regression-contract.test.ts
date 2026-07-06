@@ -57,7 +57,7 @@ describe('performance regression contract', () => {
 
     const scripts = packageJson.scripts ?? {};
 
-    expect(scripts['test:performance:contracts']).toBe('node scripts/performance-budgets.mjs');
+    expect(scripts['test:performance:contracts']).toBe('node scripts/checks/performance-budgets.mjs');
 
     expect(scripts['test:performance:desktop']).toContain('pnpm run build');
     expect(scripts['test:performance:desktop']).toContain('pnpm run test:performance:contracts');
@@ -141,7 +141,7 @@ describe('performance regression contract', () => {
   });
 
   it('keeps pre-deployment verification wired to strict performance checks', () => {
-    const verifyScript = read('scripts/verify-deployment.sh');
+    const verifyScript = read('scripts/verify/verify-deployment.sh');
 
     expect(verifyScript).toContain('pnpm run test:performance');
   });

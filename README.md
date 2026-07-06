@@ -96,7 +96,7 @@ Images go in `public/` as `.webp` files.
 **Manual (recommended):**
 
 ```bash
-./verify-deployment.sh    # Pre-flight checks
+./scripts/verify/verify-deployment.sh    # Pre-flight checks
 npm run deploy:prod       # Deploy to production
 ```
 

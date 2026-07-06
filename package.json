@@ -21,7 +21,7 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-push": "node scripts/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
+    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
   },
   "scripts": {
     "prepare": "simple-git-hooks",
@@ -36,7 +36,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:repo:hygiene": "vitest run src/repo-hygiene-contract.test.ts",
-    "test:performance:contracts": "node scripts/performance-budgets.mjs",
+    "test:performance:contracts": "node scripts/checks/performance-budgets.mjs",
     "test:performance:desktop": "pnpm run build && pnpm run test:performance:contracts && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "test:performance:mobile": "pnpm run build && pnpm run test:performance:contracts && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.mobile.json",
     "test:performance": "pnpm run test:performance:desktop && pnpm run test:performance:mobile",
@@ -44,17 +44,17 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:v8": "vitest run --coverage --coverage.provider=v8",
     "test:a11y:contracts": "vitest run src/app/wcag-contract.test.tsx src/app/a11y-regressions.test.tsx src/components/sections-a11y.test.tsx src/components/navigation-a11y.test.tsx src/components/faq-a11y.test.tsx src/components/ui/keyboard-shortcuts.test.tsx",
-    "test:a11y:scanners": "node scripts/run-a11y-scanners.mjs",
-    "test:a11y:external": "node scripts/run-pa11y-external.mjs",
+    "test:a11y:scanners": "node scripts/checks/run-a11y-scanners.mjs",
+    "test:a11y:external": "node scripts/checks/run-pa11y-external.mjs",
     "test:a11y:automated": "pnpm run test:a11y:contracts && pnpm run test:a11y:scanners",
     "test:a11y:ci": "pnpm run test:a11y:contracts && pnpm run test:a11y:scanners && pnpm run test:a11y:external",
-    "test:pages:parity": "node scripts/verify-pages-parity.mjs",
-    "seo:check": "node scripts/seo-check.mjs",
+    "test:pages:parity": "node scripts/verify/verify-pages-parity.mjs",
+    "seo:check": "node scripts/checks/seo-check.mjs",
     "seo:audit": "pnpm run build && pnpm run seo:check && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "cf-typegen": "wrangler types",
-    "generate:icons": "node scripts/generate-icons.mjs",
-    "generate:ai-discovery": "node scripts/generate-ai-discovery.mjs",
-    "prebuild": "node scripts/generate-icons.mjs && node scripts/generate-ai-discovery.mjs",
+    "generate:icons": "node scripts/generate/generate-icons.mjs",
+    "generate:ai-discovery": "node scripts/generate/generate-ai-discovery.mjs",
+    "prebuild": "node scripts/generate/generate-icons.mjs && node scripts/generate/generate-ai-discovery.mjs",
     "lighthouse": "pnpm run lighthouse:desktop",
     "lighthouse:desktop": "lighthouse http://localhost:3000 --preset=desktop --view",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --form-factor=mobile --screenEmulation.mobile --view"

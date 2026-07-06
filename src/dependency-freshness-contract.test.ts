@@ -128,12 +128,12 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
   // ─── lockfile/manifest sync, verified against a clean install ────────────────
 
   it('pnpm-lock.yaml is in sync with package.json — verified against a clean install', () => {
-    // Delegates to scripts/verify-lockfile-sync.mjs (single source of truth —
-    // see that file for why this must run as a direct `node` invocation, never
-    // wrapped in a `pnpm run <script>` alias). Invoked here the same way,
-    // via a raw node child process rather than through pnpm, so this test
-    // can't fall into the exact trap it exists to catch.
-    const result = spawnSync('node', [join(ROOT, 'scripts/verify-lockfile-sync.mjs')], {
+    // Delegates to scripts/verify/verify-lockfile-sync.mjs (single source of
+    // truth — see that file for why this must run as a direct `node`
+    // invocation, never wrapped in a `pnpm run <script>` alias). Invoked here
+    // the same way, via a raw node child process rather than through pnpm,
+    // so this test can't fall into the exact trap it exists to catch.
+    const result = spawnSync('node', [join(ROOT, 'scripts/verify/verify-lockfile-sync.mjs')], {
       encoding: 'utf8',
       cwd: ROOT,
     });
