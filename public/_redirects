@@ -1,31 +1,21 @@
 # Cloudflare Pages Redirects
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
-# Redirect www to non-www (if needed)
-https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
+# Relative-URL rules (work everywhere including local Wrangler)
+/index.html / 301
+/capstone.html /capstone 301
+/credentials.html /credentials 301
+/internet.html /internet 301
+/cameron-aaron-medical-resume.pdf /resume/cameron-aaron-medical-resume.pdf 301
+/cameron-aaron-medical-resume-one-page.pdf /resume/cameron-aaron-medical-resume-one-page.pdf 301
 
-# Legacy host redirect previously handled in Worker
+# Absolute-URL rules (Cloudflare Pages only; Wrangler warns but doesn't break)
+https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 https://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
 http://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
-
-# Legacy 2eschool host redirect
 https://2eschool.org/* https://cameronaaron.com/ 301
 http://2eschool.org/* https://cameronaaron.com/ 301
 https://www.2eschool.org/* https://cameronaaron.com/ 301
 http://www.2eschool.org/* https://cameronaaron.com/ 301
-
-# Force HTTPS (Cloudflare handles this automatically, but can be explicit)
 http://cameronaaron.com/* https://cameronaaron.com/:splat 301
 http://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
-
-# Canonicalize /index.html to /
-/index.html / 301
-
-# Legacy route compatibility
-/capstone.html /capstone 301
-/credentials.html /credentials 301
-/internet.html /internet 301
-
-# Legacy resume PDF locations — redirect saved links to the current versions under /resume/
-/cameron-aaron-medical-resume.pdf /resume/cameron-aaron-medical-resume.pdf 301
-/cameron-aaron-medical-resume-one-page.pdf /resume/cameron-aaron-medical-resume-one-page.pdf 301
