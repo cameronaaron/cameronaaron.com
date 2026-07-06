@@ -63,34 +63,31 @@ describe('repository hygiene contract', () => {
     }
   });
 
-  it('keeps public/ organized: platform files at root, logos and resumes in their folders', () => {
+  it('keeps public/ organized: platform files at root, everything else in a purpose-named folder', () => {
     // Root of public/ is reserved for files that platforms and crawlers expect
-    // at fixed root paths (icons, manifest, service worker, sitemaps, social
-    // images). Everything else lives in a purpose-named subdirectory:
+    // at fixed root paths by convention or fallback behavior (manifest,
+    // service worker, offline page, AI-discovery files, sitemaps, Cloudflare
+    // config, apple-touch-icon.png — some iOS versions fetch it from the root
+    // regardless of the <link> tag). Everything else lives in a purpose-named
+    // subdirectory:
     //   public/logos/  — company/institution logos referenced by src/data
     //   public/resume/ — downloadable resume PDFs referenced by src/data/resume.ts
+    //   public/icons/  — favicon-family PNGs referenced by src/app/layout.tsx
+    //   public/images/ — profile photo + hero crops referenced by src/data, src/components
+    //   public/social/ — OpenGraph/Twitter share card images
     const EXPECTED_PUBLIC_ROOT_FILES = [
       '_headers',
       '_redirects',
       'apple-touch-icon.png',
       'feed.xml',
-      'icon-16x16.png',
-      'icon-192x192.png',
-      'icon-32x32.png',
-      'icon-512x512.png',
       'llms.txt',
       'manifest.json',
       'mcp.json',
       'offline.html',
-      'opengraph-image.png',
-      'profile-hero-sm.webp',
-      'profile-hero.webp',
-      'profile.webp',
       'sitemap-images.xml',
       'sw.js',
-      'twitter-image.png',
     ] as const;
-    const EXPECTED_PUBLIC_DIRS = ['logos', 'resume'] as const;
+    const EXPECTED_PUBLIC_DIRS = ['icons', 'images', 'logos', 'resume', 'social'] as const;
 
     const publicPaths = getTrackedFiles()
       .filter((filePath) => filePath.startsWith('public/'))
@@ -106,8 +103,11 @@ describe('repository hygiene contract', () => {
       if (p.startsWith('resume/')) {
         expect(p, 'public/resume/ holds only PDF downloads').toMatch(/\.pdf$/);
       }
-      if (p.startsWith('logos/')) {
-        expect(p, 'public/logos/ holds only image assets').toMatch(/\.(webp|svg|png|avif)$/);
+      if (p.startsWith('logos/') || p.startsWith('images/') || p.startsWith('social/')) {
+        expect(p, `public/${p.split('/')[0]}/ holds only image assets`).toMatch(/\.(webp|svg|png|avif)$/);
+      }
+      if (p.startsWith('icons/')) {
+        expect(p, 'public/icons/ holds only PNG icons').toMatch(/\.png$/);
       }
     }
   });

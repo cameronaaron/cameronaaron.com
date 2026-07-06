@@ -26,15 +26,15 @@ function run() {
   const robotsPath = join(OUT_DIR, 'robots.txt');
   const sitemapPath = join(OUT_DIR, 'sitemap.xml');
   const imageSitemapPath = join(OUT_DIR, 'sitemap-images.xml');
-  const ogImagePath = join(OUT_DIR, 'opengraph-image.png');
-  const twitterImagePath = join(OUT_DIR, 'twitter-image.png');
+  const ogImagePath = join(OUT_DIR, 'social', 'opengraph-image.png');
+  const twitterImagePath = join(OUT_DIR, 'social', 'twitter-image.png');
 
   check(existsSync(indexPath), 'Missing out/index.html. Run npm run build first.');
   check(existsSync(robotsPath), 'Missing out/robots.txt.');
   check(existsSync(sitemapPath), 'Missing out/sitemap.xml.');
   check(existsSync(imageSitemapPath), 'Missing out/sitemap-images.xml.');
-  check(existsSync(ogImagePath), 'Missing out/opengraph-image.png.');
-  check(existsSync(twitterImagePath), 'Missing out/twitter-image.png.');
+  check(existsSync(ogImagePath), 'Missing out/social/opengraph-image.png.');
+  check(existsSync(twitterImagePath), 'Missing out/social/twitter-image.png.');
 
   if (!failures.length) {
     const html = read(indexPath);

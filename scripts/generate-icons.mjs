@@ -3,9 +3,12 @@ import sharp from 'sharp';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const SOURCE = 'public/profile.webp';
+const SOURCE = 'public/images/profile.webp';
 const BRIDGES_SOURCE = 'public/logos/ba.webp';
 const OUTPUT_DIR = 'public';
+const ICONS_DIR = 'public/icons';
+const IMAGES_DIR = 'public/images';
+const SOCIAL_DIR = 'public/social';
 const BRAND = {
   name: 'Cameron Aaron',
   title: 'EMT, CNA, Software Engineer, Security Researcher & Future NP',
@@ -22,12 +25,15 @@ function escapeXml(value) {
     .replaceAll("'", '&apos;');
 }
 
+// apple-touch-icon.png stays at the public/ root: some iOS versions fetch it
+// from the fixed root path regardless of the <link rel="apple-touch-icon">
+// tag, so moving it risks a broken "Add to Home Screen" icon.
 const sizes = [
-  { size: 16, name: 'icon-16x16.png' },
-  { size: 32, name: 'icon-32x32.png' },
-  { size: 192, name: 'icon-192x192.png' },
-  { size: 512, name: 'icon-512x512.png' },
-  { size: 180, name: 'apple-touch-icon.png' },
+  { size: 16, name: 'icon-16x16.png', dir: ICONS_DIR },
+  { size: 32, name: 'icon-32x32.png', dir: ICONS_DIR },
+  { size: 192, name: 'icon-192x192.png', dir: ICONS_DIR },
+  { size: 512, name: 'icon-512x512.png', dir: ICONS_DIR },
+  { size: 180, name: 'apple-touch-icon.png', dir: OUTPUT_DIR },
 ];
 
 console.log('Generating brand images from profile.webp...\n');
@@ -82,9 +88,9 @@ async function generateIcons() {
   try {
     const sourceBuffer = readFileSync(SOURCE);
     
-    for (const { size, name } of sizes) {
-      const outputPath = join(OUTPUT_DIR, name);
-      
+    for (const { size, name, dir } of sizes) {
+      const outputPath = join(dir, name);
+
       await sharp(sourceBuffer)
         .resize(size, size, {
           fit: 'cover',
@@ -92,7 +98,7 @@ async function generateIcons() {
         })
         .png({ quality: 100, compressionLevel: 9 })
         .toFile(outputPath);
-      
+
       console.log(`Generated ${name} (${size}x${size})`);
     }
 
@@ -102,7 +108,7 @@ async function generateIcons() {
         position: 'center'
       })
       .webp({ quality: 86 })
-      .toFile(join(OUTPUT_DIR, 'profile-hero.webp'));
+      .toFile(join(IMAGES_DIR, 'profile-hero.webp'));
     console.log('Generated profile-hero.webp (384x384)');
 
     // Narrow viewports render the hero photo in a 192px slot (see the `sizes`
@@ -116,7 +122,7 @@ async function generateIcons() {
         position: 'center'
       })
       .webp({ quality: 86 })
-      .toFile(join(OUTPUT_DIR, 'profile-hero-sm.webp'));
+      .toFile(join(IMAGES_DIR, 'profile-hero-sm.webp'));
     console.log('Generated profile-hero-sm.webp (256x256)');
 
     try {
@@ -139,7 +145,7 @@ async function generateIcons() {
     ];
 
     for (const asset of socialAssets) {
-      const outputPath = join(OUTPUT_DIR, asset.name);
+      const outputPath = join(SOCIAL_DIR, asset.name);
       const svg = createSocialSvg(asset);
 
       await sharp(Buffer.from(svg))

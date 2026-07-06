@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: `${baseUrl}/opengraph-image.png`,
+        url: `${baseUrl}/social/opengraph-image.png`,
         width: 1200,
         height: 630,
         alt: 'Bridging Transitions Capstone Defense',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     title: 'Bridging Transitions | Capstone Defense',
     description:
       'Spring 2026 capstone on thrice-exceptional Black male students, higher education transition, and institutional change.',
-    images: [`${baseUrl}/twitter-image.png`],
+    images: [`${baseUrl}/social/twitter-image.png`],
   },
 };
 
@@ -148,7 +148,7 @@ export default function CapstonePage() {
           duration: video.duration,
           inLanguage: 'en-US',
           isFamilyFriendly: true,
-          thumbnailUrl: `${baseUrl}/opengraph-image.png`,
+          thumbnailUrl: `${baseUrl}/social/opengraph-image.png`,
           url: video.url,
           contentUrl: video.url,
           ...(toYouTubeEmbedUrl(video.url) ? { embedUrl: toYouTubeEmbedUrl(video.url) } : {}),

@@ -27,7 +27,7 @@ export const profile: Profile = {
   bio: "Dedicated healthcare and technology professional with experience in aerospace medicine, clinical research, public health operations, software engineering, and security research. My next stage is Nurse Practitioner training, while continuing to build secure, high-impact technology for health and science.",
   email: "cameronthescientist@pm.me",
   location: "Los Angeles, CA",
-  image: "/profile.webp",
+  image: "/images/profile.webp",
   
   social: {
     github: "https://github.com/cameronaaron",

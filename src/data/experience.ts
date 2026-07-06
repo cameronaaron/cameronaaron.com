@@ -50,7 +50,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Connecticut College",
-    logo: "/logos/conn.svg.webp",
+    logo: "/logos/conn.webp",
     websiteUrl: "https://www.conncoll.edu/",
     positions: [
       {

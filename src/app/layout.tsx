@@ -118,10 +118,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/icon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/icon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
@@ -129,7 +129,7 @@ export const metadata: Metadata = {
     other: [
       {
         rel: "mask-icon",
-        url: "/icon-512x512.png",
+        url: "/icons/icon-512x512.png",
       }
     ]
   },
@@ -140,7 +140,7 @@ export const metadata: Metadata = {
     siteName: "Cameron Aaron",
     images: [
       {
-        url: "https://cameronaaron.com/opengraph-image.png",
+        url: "https://cameronaaron.com/social/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: "Cameron Aaron | EMT, CNA, Software Engineer, Security Researcher & Future NP",
@@ -159,7 +159,7 @@ export const metadata: Metadata = {
     title: "Cameron Aaron, M.Ed. | EMT, CNA, Software Engineer",
     description: "Official portfolio of Cameron Aaron, M.Ed. featuring healthcare credentials, technical work, and graduate arts-based research in gifted education and higher education transition.",
     images: {
-      url: "https://cameronaaron.com/twitter-image.png",
+      url: "https://cameronaaron.com/social/twitter-image.png",
       alt: "Cameron Aaron | EMT, CNA, Software Engineer, Security Researcher & Future NP",
     },
   },
