@@ -137,7 +137,7 @@ images: { unoptimized: true }  // Required for static export
 3. Live globally in ~2 min across 330+ edge locations
 
 **Manual deployment:** `npm run deploy:prod` (requires Wrangler auth)  
-**Pre-flight check:** `./scripts/verify-deployment.sh` (validates build, config files, Node version)
+**Pre-flight check:** `./scripts/verify/verify-deployment.sh` (validates build, config files, Node version)
 
 **Note:** GitHub Actions workflow file doesn't exist yet - deployment currently manual
 

@@ -14,7 +14,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = new URL('../..', import.meta.url).pathname;
 const PUBLIC = join(ROOT, 'public');
 
 // ─── mirrored from src/data/profile.ts ───────────────────────────────────────
