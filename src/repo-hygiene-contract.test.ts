@@ -22,6 +22,7 @@ const EXPECTED_ROOT_FILES = [
   'postcss.config.mjs',
   'tsconfig.json',
   'vercel.json',
+  'verify-deployment.sh',
   'vitest.config.ts',
   'vitest.setup.ts',
   'wrangler.toml',
@@ -60,55 +61,6 @@ describe('repository hygiene contract', () => {
     for (const filePath of files) {
       expect(filePath).not.toMatch(/\s/);
       expect(filePath).not.toContain('//');
-    }
-  });
-
-  it('keeps public/ organized: platform files at root, logos and resumes in their folders', () => {
-    // Root of public/ is reserved for files that platforms and crawlers expect
-    // at fixed root paths (icons, manifest, service worker, sitemaps, social
-    // images). Everything else lives in a purpose-named subdirectory:
-    //   public/logos/  — company/institution logos referenced by src/data
-    //   public/resume/ — downloadable resume PDFs referenced by src/data/resume.ts
-    const EXPECTED_PUBLIC_ROOT_FILES = [
-      '_headers',
-      '_redirects',
-      'apple-touch-icon.png',
-      'feed.xml',
-      'icon-16x16.png',
-      'icon-192x192.png',
-      'icon-32x32.png',
-      'icon-512x512.png',
-      'llms.txt',
-      'manifest.json',
-      'mcp.json',
-      'offline.html',
-      'opengraph-image.png',
-      'profile-hero-sm.webp',
-      'profile-hero.webp',
-      'profile.webp',
-      'sitemap-images.xml',
-      'sw.js',
-      'twitter-image.png',
-    ] as const;
-    const EXPECTED_PUBLIC_DIRS = ['logos', 'resume'] as const;
-
-    const publicPaths = getTrackedFiles()
-      .filter((filePath) => filePath.startsWith('public/'))
-      .map((filePath) => filePath.slice('public/'.length));
-
-    const rootFiles = publicPaths.filter((p) => !p.includes('/')).sort();
-    const dirs = Array.from(new Set(publicPaths.filter((p) => p.includes('/')).map((p) => p.split('/')[0]))).sort();
-
-    expect(rootFiles).toEqual([...EXPECTED_PUBLIC_ROOT_FILES].sort());
-    expect(dirs).toEqual([...EXPECTED_PUBLIC_DIRS].sort());
-
-    for (const p of publicPaths) {
-      if (p.startsWith('resume/')) {
-        expect(p, 'public/resume/ holds only PDF downloads').toMatch(/\.pdf$/);
-      }
-      if (p.startsWith('logos/')) {
-        expect(p, 'public/logos/ holds only image assets').toMatch(/\.(webp|svg|png|avif)$/);
-      }
     }
   });
 

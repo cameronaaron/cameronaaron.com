@@ -6,10 +6,8 @@
 /capstone.html /capstone 301
 /credentials.html /credentials 301
 /internet.html /internet 301
-/cameron-aaron-medical-resume.pdf /resume/cameron-aaron-medical-resume.pdf 301
-/cameron-aaron-medical-resume-one-page.pdf /resume/cameron-aaron-medical-resume-one-page.pdf 301
 
-# Absolute-URL rules (Cloudflare Pages only; Wrangler warns but doesn't break)
+# Absolute-URL rules (Cloudflare Pages only)
 https://www.cameronaaron.com/* https://cameronaaron.com/:splat 301
 https://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
 http://workshop.cameronaaron.com/* https://cameronaaron.com/ 301
