@@ -139,7 +139,7 @@ describe('mobile regression contract', () => {
     }
   });
 
-  it('keeps education prerequisites mobile cards and horizontal overflow protection', () => {
+  it('keeps education prerequisites as single responsive rows with horizontal overflow protection', () => {
     const { container } = render(<Education />);
 
     const tableRegion = screen.getByRole('region', {
@@ -147,17 +147,15 @@ describe('mobile regression contract', () => {
     });
     expect(tableRegion.className).toContain('overflow-x-auto');
 
-    const mobileRows = container.querySelectorAll('[data-testid^="prereq-mobile-row-"]');
-    expect(mobileRows.length).toBeGreaterThan(0);
+    // One row per course — no separate mobile/desktop DOM trees. The row
+    // reflows between a boxed mobile card and a desktop table line via
+    // responsive (md:) utility classes and md:contents on the field-group
+    // wrappers, rather than duplicating markup per breakpoint.
+    const rows = container.querySelectorAll('[data-testid^="prereq-row-"]');
+    expect(rows.length).toBeGreaterThan(0);
 
-    const firstMobileRow = mobileRows[0] as HTMLElement;
-    expect(firstMobileRow.className).toContain('p-4');
-
-    const desktopTableWrap = Array.from(container.querySelectorAll('div')).find((el) =>
-      (el as HTMLElement).className.includes('min-w-[920px]')
-    ) as HTMLElement | undefined;
-    expect(desktopTableWrap).toBeTruthy();
-    expect(desktopTableWrap?.className).toContain('hidden');
-    expect(desktopTableWrap?.className).toContain('md:block');
+    const firstRow = rows[0] as HTMLElement;
+    expect(firstRow.className).toContain('p-4');
+    expect(firstRow.className).toContain('md:grid-cols-12');
   });
 });
