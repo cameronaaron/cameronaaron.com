@@ -14,7 +14,7 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     company: "Bridges Academy",
-    logo: "/logos/ba-logo.webp",
+    logo: "/ba-logo.webp",
     websiteUrl: "https://bridges.edu/",
     positions: [
       {
@@ -26,7 +26,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "4me (Xurrent)",
-    logo: "/logos/xurrent.webp",
+    logo: "/xurrent.webp",
     websiteUrl: "https://www.xurrent.com/",
     positions: [
       {
@@ -38,7 +38,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Dutchie",
-    logo: "/logos/dutchie.svg",
+    logo: "/dutchie.svg",
     websiteUrl: "https://dutchie.com/",
     positions: [
       {
@@ -50,7 +50,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Connecticut College",
-    logo: "/logos/conn.svg.webp",
+    logo: "/conn.svg.webp",
     websiteUrl: "https://www.conncoll.edu/",
     positions: [
       {
@@ -72,7 +72,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "SpaceX",
-    logo: "/logos/spacex.webp",
+    logo: "/spacex.webp",
     websiteUrl: "https://www.spacex.com/",
     positions: [
       {
@@ -84,7 +84,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Helping Hands Community",
-    logo: "/logos/helping-hands.webp",
+    logo: "/helping-hands.webp",
     websiteUrl: "https://www.helpinghands.community/",
     positions: [
       {
@@ -96,7 +96,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "C19 BayShield",
-    logo: "/logos/c19-bayshield.svg",
+    logo: "/c19-bayshield.svg",
     websiteUrl: "http://c19bayshield.org/",
     positions: [
       {
@@ -108,7 +108,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "BardoVR",
-    logo: "/logos/bardovr.webp",
+    logo: "/bardovr.webp",
     websiteUrl: "https://www.bardovr.com/",
     positions: [
       {
@@ -120,7 +120,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "GitHub",
-    logo: "/logos/github.webp",
+    logo: "/github.webp",
     websiteUrl: "https://github.com/",
     positions: [
       {

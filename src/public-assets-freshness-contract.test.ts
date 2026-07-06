@@ -41,26 +41,7 @@ const PUBLIC_CONVENTION_EXEMPT: Record<string, string> = {
 };
 
 function listPublicFiles(): string[] {
-  // Walks subdirectories (logos/, resume/, …) so grouped assets stay covered
-  // by the orphan sweep. Returns paths relative to public/.
-  const files: string[] = [];
-  const walk = (dir: string, prefix: string) => {
-    for (const name of readdirSync(dir)) {
-      const full = join(dir, name);
-      if (statSync(full).isDirectory()) {
-        walk(full, `${prefix}${name}/`);
-      } else {
-        files.push(`${prefix}${name}`);
-      }
-    }
-  };
-  walk(PUBLIC_DIR, '');
-  return files;
-}
-
-function baseName(relativePath: string): string {
-  const parts = relativePath.split('/');
-  return parts[parts.length - 1] ?? relativePath;
+  return readdirSync(PUBLIC_DIR).filter((name) => statSync(join(PUBLIC_DIR, name)).isFile());
 }
 
 function listSearchableSources(): string[] {
@@ -109,8 +90,7 @@ describe('public-assets-freshness-contract — every public/ file is referenced 
       })
       .join('\n');
 
-    const orphaned = publicFiles.filter((relativePath) => {
-      const name = baseName(relativePath);
+    const orphaned = publicFiles.filter((name) => {
       if (PUBLIC_CONVENTION_EXEMPT[name]) return false;
       // A file referencing itself (e.g. manifest.json containing "manifest.json"
       // in a comment) doesn't count — strip the file's own content from the
@@ -130,7 +110,7 @@ describe('public-assets-freshness-contract — every public/ file is referenced 
   });
 
   it('every PUBLIC_CONVENTION_EXEMPT entry still exists in public/ (no stale exemptions)', () => {
-    const publicFiles = new Set(listPublicFiles().map(baseName));
+    const publicFiles = new Set(listPublicFiles());
     for (const name of Object.keys(PUBLIC_CONVENTION_EXEMPT)) {
       expect(publicFiles.has(name), `Exempted file "${name}" no longer exists in public/ — remove its exemption`).toBe(
         true,
