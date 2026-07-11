@@ -34,8 +34,8 @@
  *    Broader prevention: src/ssr-hydration-contract.test.ts scans all 'use client' files.
  */
 
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 function read(path: string): string {
@@ -199,5 +199,36 @@ describe('animation regression contract', () => {
     expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Core Competencies/);
     expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Domain Expertise/);
     expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Certification Highlights/);
+  });
+
+  it('repo-wide: every file with an infinite animation references a motion gate (2026-07)', () => {
+    // An ungated `repeat: Infinity` runs forever for every visitor — including
+    // reduced-motion users and low-power mobile devices. Sweep every production
+    // source, present and future: any file declaring an infinite animation must
+    // also reference at least one gating signal (prefersReducedMotion /
+    // reducedMotion variable, performance tier, hover-motion flag, tier-derived
+    // quality prop, or a shouldAnimate* helper). The gate keyword appearing in
+    // the file is a necessary (string-level) condition; the per-component
+    // coverage tests exercise both branches at runtime.
+    const gatePattern = /prefersReducedMotion|reducedMotion|performanceTier|enableHoverMotion|shouldAnimate|quality/;
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.(ts|tsx)$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) files.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const ungated = files.filter((file) => {
+      const src = readFileSync(file, 'utf8');
+      return src.includes('repeat: Infinity') && !gatePattern.test(src);
+    });
+
+    expect(
+      ungated,
+      `ungated infinite animation(s) — gate on prefersReducedMotion (see StatCard.tsx):\n${ungated.join('\n')}`,
+    ).toEqual([]);
   });
 });

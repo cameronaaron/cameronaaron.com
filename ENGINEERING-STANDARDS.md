@@ -449,7 +449,13 @@ investigate that script before touching the config.
 2. **Sweeps over pins.** Prefer repo-wide checks that walk every production
    source (`listProductionSources()`) — they catch *future* files, not just
    known hot spots. Current sweeps: no `map().filter()`, all high-frequency
-   listeners passive, no mousemove→setState, no date parsing in comparators.
+   listeners passive, no mousemove→setState, no date parsing in comparators,
+   every `repeat: Infinity` file references a motion gate
+   (`prefersReducedMotion` / tier / `shouldAnimate*` — the 2026-07 audit found
+   four components animating forever for reduced-motion users), and every
+   `public/` asset within the weight budget
+   (`public-asset-weight-contract.test.ts`: per-image, per-file, and total
+   caps — one oversized image is a silent mobile-LCP regression).
    Modularity sweeps (every `.tsx` under `src/components` + `src/app`,
    present and future): no inline `.sort()`/`.reduce()`, no module-level data
    catalogs, no regex parsing, no `performanceTier` ternary config derivation —

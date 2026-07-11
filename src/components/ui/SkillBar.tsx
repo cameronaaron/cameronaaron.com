@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 
+import { useInteractionMode } from '@/hooks/useInteractionMode';
+
 interface SkillBarProps {
   name: string;
   level: number;
@@ -9,6 +11,8 @@ interface SkillBarProps {
 }
 
 export default function SkillBar({ name, level, index }: SkillBarProps) {
+  const { prefersReducedMotion } = useInteractionMode();
+
   return (
     <div>
       <div className="flex justify-between mb-2">
@@ -23,9 +27,9 @@ export default function SkillBar({ name, level, index }: SkillBarProps) {
           transition={{ duration: 1, delay: index * 0.1, ease: "easeOut" }}
           className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full relative overflow-hidden"
         >
-          <motion.div 
+          <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full -translate-x-full"
-            animate={{ translateX: ["0%", "200%"] }}
+            animate={prefersReducedMotion ? undefined : { translateX: ["0%", "200%"] }}
             transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "linear" }}
           />
         </motion.div>

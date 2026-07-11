@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion';
 import FloatingBadgeIcon from '@/components/ui/floating-badge-icon';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
+  getFloatingBadgeFloatAnimation,
   getFloatingBadgePositionClass,
-  getFloatingBadgeYOffset,
+  getFloatingBadgeRotateAnimation,
   type FloatingBadgeIcon as FloatingBadgeIconType,
   type FloatingBadgePosition,
 } from '@/components/ui/floating-badge-logic';
@@ -16,14 +18,17 @@ interface FloatingBadgeProps {
 }
 
 export default function FloatingBadge({ icon, position, delay = 0 }: FloatingBadgeProps) {
+  const { prefersReducedMotion } = useInteractionMode();
+  const reducedMotion = Boolean(prefersReducedMotion);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ 
-        opacity: 1, 
+      animate={{
+        opacity: 1,
         scale: 1,
-        y: getFloatingBadgeYOffset(position),
-        rotate: [0, 5, -5, 0]
+        y: getFloatingBadgeFloatAnimation(position, reducedMotion),
+        rotate: getFloatingBadgeRotateAnimation(reducedMotion)
       }}
       transition={{ 
         opacity: { duration: 0.5, delay: delay + 0.5 },
