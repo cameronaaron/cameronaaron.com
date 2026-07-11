@@ -472,7 +472,26 @@ investigate that script before touching the config.
    every `uses:` line in every workflow file, queries the GitHub releases/tags
    API for each action's latest major, and fails naming the exact
    `file:line — pinned → latest`. Both freshness contracts run together under
-   `pnpm run test:freshness`. **The lesson generalizes: any tool, action, or
+   `pnpm run test:freshness`.
+
+   When latest is genuinely unusable (2026-07: TypeScript 7.0 removed the
+   `ts.ModuleKind` API that every released typescript-eslint — alphas
+   included, all peering `typescript <6.1.0` — depends on, hard-crashing
+   `npm run lint`), the pin goes in the contract's `PINNED_WITH_REASON` map
+   with the blocking reason and revisit condition. Two mechanisms keep a pin
+   from outliving its reason: (a) if the pinned package ever stops appearing
+   in `pnpm outdated`, the test fails and demands the entry be deleted; and
+   (b) a **compatibility probe** checks the blocking condition itself against
+   the registry on every run — for the TypeScript pin it reads
+   typescript-estree's published peer range and compares it to the latest
+   TypeScript, so the pin announces its own removal the day upstream ships
+   support, not whenever someone remembers to check.
+
+   Same lesson, one more unwatched ecosystem (2026-07): `package.json`'s
+   `packageManager` field is a one-entry ecosystem `pnpm outdated` never
+   inspects — the pnpm pin sat at 11.9.0 while 11.11.0 shipped, invisible to
+   every other freshness check. The contract now reads the field and compares
+   it against the registry's latest pnpm. **The lesson generalizes: any tool, action, or
    binary your build depends on that isn't `pnpm add`-ed needs its own
    freshness check — dependency drift hides in whichever ecosystem nothing is
    watching.**
