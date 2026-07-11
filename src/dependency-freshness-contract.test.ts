@@ -102,7 +102,7 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
     if (Object.keys(PINNED_WITH_REASON).length === 0) {
       expect(status, 'pnpm outdated exited non-zero; run "pnpm update --latest"').toBe(0);
     }
-  });
+  }, 30_000);
 
   // ─── pin compatibility probes ───────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
     ).toBe(0);
 
     expect(status, 'pnpm audit exited non-zero; run "pnpm audit" to review').toBe(0);
-  });
+  }, 30_000);
 
   // ─── wrangler CLI version ──────────────────────────────────────────────────
 
