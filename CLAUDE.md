@@ -91,6 +91,8 @@ src/public-asset-weight-contract.test.ts     # weight budgets + modern image for
 src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
+src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
+src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression

@@ -452,10 +452,16 @@ investigate that script before touching the config.
    listeners passive, no mousemove→setState, no date parsing in comparators,
    every `repeat: Infinity` file references a motion gate
    (`prefersReducedMotion` / tier / `shouldAnimate*` — the 2026-07 audit found
-   four components animating forever for reduced-motion users), and every
+   four components animating forever for reduced-motion users), every
    `public/` asset within the weight budget
    (`public-asset-weight-contract.test.ts`: per-image, per-file, and total
-   caps — one oversized image is a silent mobile-LCP regression).
+   caps — one oversized image is a silent mobile-LCP regression), every
+   timer/listener/observer cleaned up (`lifecycle-hygiene-contract.test.ts` —
+   found SmoothScroll's untracked zero-delay re-sync timers, which could call
+   scrollTo on a destroyed Lenis after unmount), and the production
+   security/caching headers pinned (`headers-integrity-contract.test.ts`:
+   HSTS/COOP/nosniff on `/*`, sw.js never cached, hashed assets immutable,
+   preload Link targets must exist in `public/`).
    Modularity sweeps (every `.tsx` under `src/components` + `src/app`,
    present and future): no inline `.sort()`/`.reduce()`, no module-level data
    catalogs, no regex parsing, no `performanceTier` ternary config derivation —
