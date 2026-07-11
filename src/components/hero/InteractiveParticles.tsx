@@ -4,12 +4,16 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import {
   type BurstParticle,
+  type Connection,
+  type ParticlePulse,
   type ParticleQuality,
   type PointerState,
   CONNECTION_OPACITY_TIERS,
+  CONNECTION_TIER_STYLES,
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
   PARTICLE_COLORS,
+  appendBursts,
   buildConnections,
   createBurstParticles,
   createInitialParticles,
@@ -70,9 +74,16 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     if (!ctx) return;
 
     const config = getQualityConfig(quality);
-    let particles = createInitialParticles(config.count, quality === 'balanced' ? 2024 : 1337);
-    let bursts: BurstParticle[] = [];
+    const particles = createInitialParticles(config.count, quality === 'balanced' ? 2024 : 1337);
+    const bursts: BurstParticle[] = [];
     const pointer: PointerState = { x: 50, y: 50, active: false };
+
+    // Persistent frame buffers — allocated once per effect, reused every frame
+    // so the steady-state rAF loop performs zero allocations.
+    const connectionPool: Connection[] = [];
+    const tierScratch = new Uint8Array(config.maxConnections);
+    const pulseScratch: ParticlePulse = { scale: 1, opacityMultiplier: 1 };
+
     let burstId = 0;
     let width = 0;
     let height = 0;
@@ -115,7 +126,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
         startId: burstId,
       });
       burstId += nextBursts.length;
-      bursts = bursts.concat(nextBursts).slice(-config.maxBursts);
+      appendBursts(bursts, nextBursts, config.maxBursts);
     };
 
     const drawGlow = (colorKey: string, xPercent: number, yPercent: number, diameter: number, alpha: number) => {
@@ -141,20 +152,25 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       lastTick = time;
       const step = delta / 16;
 
-      particles = stepParticles(particles, step, pointer, quality);
-      bursts = stepBursts(bursts, step);
-      const lines = buildConnections(particles, config.connectionDistance, config.maxConnections);
+      stepParticles(particles, step, pointer, quality);
+      stepBursts(bursts, step);
+      const lines = buildConnections(particles, config.connectionDistance, config.maxConnections, connectionPool);
 
       ctx.clearRect(0, 0, width, height);
 
-      // Connections: one batched stroke per opacity tier, never per line.
+      // Connections: tier computed once per line into the persistent scratch,
+      // then one batched stroke per opacity tier — never per line.
+      for (let k = 0; k < lines.length; k += 1) {
+        tierScratch[k] = getConnectionOpacityTier(lines[k].opacity);
+      }
       ctx.lineWidth = 1;
       ctx.globalAlpha = 1;
       for (let tier = 0; tier < CONNECTION_OPACITY_TIERS.length; tier += 1) {
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(103, 232, 249, ${CONNECTION_OPACITY_TIERS[tier]})`;
-        for (const line of lines) {
-          if (getConnectionOpacityTier(line.opacity) !== tier) continue;
+        ctx.strokeStyle = CONNECTION_TIER_STYLES[tier];
+        for (let k = 0; k < lines.length; k += 1) {
+          if (tierScratch[k] !== tier) continue;
+          const line = lines[k];
           ctx.moveTo(percentToPx(line.x1, width), percentToPx(line.y1, height));
           ctx.lineTo(percentToPx(line.x2, width), percentToPx(line.y2, height));
         }
@@ -162,7 +178,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       }
 
       for (const particle of particles) {
-        const pulse = getParticlePulse(time, particle.id);
+        const pulse = getParticlePulse(time, particle.id, pulseScratch);
         drawGlow(
           particle.color,
           particle.x,

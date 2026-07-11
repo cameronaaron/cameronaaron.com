@@ -57,34 +57,39 @@ export const PARTICLE_COLORS = [
   'rgba(103, 232, 249, 0.6)',
 ];
 
+const ZERO_QUALITY_CONFIG: ParticleQualityConfig = {
+  count: 0,
+  maxConnections: 0,
+  connectionDistance: 0,
+  burstCount: 0,
+  maxBursts: 0,
+};
+
+const QUALITY_CONFIG: Record<ParticleQuality, ParticleQualityConfig> = {
+  full: { count: 42, maxConnections: 80, connectionDistance: 15, burstCount: 14, maxBursts: 60 },
+  balanced: { count: 24, maxConnections: 32, connectionDistance: 12, burstCount: 8, maxBursts: 28 },
+  lite: ZERO_QUALITY_CONFIG,
+  reduced: ZERO_QUALITY_CONFIG,
+};
+
 export function getQualityConfig(quality: ParticleQuality): ParticleQualityConfig {
-  if (quality === 'balanced') {
-    return {
-      count: 24,
-      maxConnections: 32,
-      connectionDistance: 12,
-      burstCount: 8,
-      maxBursts: 28,
-    };
-  }
+  return QUALITY_CONFIG[quality];
+}
 
-  if (quality === 'full') {
-    return {
-      count: 42,
-      maxConnections: 80,
-      connectionDistance: 15,
-      burstCount: 14,
-      maxBursts: 60,
-    };
-  }
+/** Connection lines are batched into one canvas stroke per opacity tier. */
+export const CONNECTION_MAX_OPACITY = 0.28;
+export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;
 
-  return {
-    count: 0,
-    maxConnections: 0,
-    connectionDistance: 0,
-    burstCount: 0,
-    maxBursts: 0,
-  };
+/** One precomputed strokeStyle per opacity tier — no per-frame string building. */
+export const CONNECTION_TIER_STYLES: readonly string[] = CONNECTION_OPACITY_TIERS.map(
+  (opacity) => `rgba(103, 232, 249, ${opacity})`
+);
+
+/** Map a connection opacity (0 … CONNECTION_MAX_OPACITY) to a tier index. */
+export function getConnectionOpacityTier(opacity: number): number {
+  const tierCount = CONNECTION_OPACITY_TIERS.length;
+  const tier = Math.floor((opacity / CONNECTION_MAX_OPACITY) * tierCount);
+  return Math.min(tierCount - 1, Math.max(0, tier));
 }
 
 export function createSeededRandom(seed: number): () => number {
@@ -116,14 +121,19 @@ export function createInitialParticles(count = 42, seed = 1337): Particle[] {
 export function buildConnections(
   particles: Particle[],
   connectionDistance: number,
-  maxConnections: number
+  maxConnections: number,
+  out?: Connection[]
 ): Connection[] {
-  const lines: Connection[] = [];
+  // Pool contract: a caller-owned `out` array is overwritten in place — object
+  // slots are reused across frames, so a steady-state frame allocates nothing.
+  // Callers without a pool (tests, one-shot use) get a fresh array.
+  const lines = out ?? [];
   const connectDist2 = connectionDistance * connectionDistance;
+  let count = 0;
 
   outer: for (let i = 0; i < particles.length; i += 1) {
     for (let j = i + 1; j < particles.length; j += 1) {
-      if (lines.length >= maxConnections) break outer;
+      if (count >= maxConnections) break outer;
       const a = particles[i];
       const b = particles[j];
       const dx = a.x - b.x;
@@ -131,18 +141,24 @@ export function buildConnections(
       const dist2 = dx * dx + dy * dy;
       if (dist2 < connectDist2) {
         const distance = Math.sqrt(dist2);
-        lines.push({
-          id: a.id * 1000 + b.id,
-          x1: a.x,
-          y1: a.y,
-          x2: b.x,
-          y2: b.y,
-          opacity: 0.28 * (1 - distance / connectionDistance),
-        });
+        const opacity = CONNECTION_MAX_OPACITY * (1 - distance / connectionDistance);
+        const line = lines[count];
+        if (line === undefined) {
+          lines.push({ id: a.id * 1000 + b.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y, opacity });
+        } else {
+          line.id = a.id * 1000 + b.id;
+          line.x1 = a.x;
+          line.y1 = a.y;
+          line.x2 = b.x;
+          line.y2 = b.y;
+          line.opacity = opacity;
+        }
+        count += 1;
       }
     }
   }
 
+  lines.length = count;
   return lines;
 }
 
@@ -186,13 +202,40 @@ export function createBurstParticles(args: {
   });
 }
 
+/**
+ * Append newly spawned bursts, keeping only the newest `maxBursts` overall.
+ * In-place: older bursts slide left via copyWithin and the tail is truncated —
+ * replaces the old per-click `concat(...).slice(-max)` double allocation.
+ */
+export function appendBursts(
+  bursts: BurstParticle[],
+  incoming: BurstParticle[],
+  maxBursts: number
+): BurstParticle[] {
+  const skip = Math.max(0, incoming.length - maxBursts);
+  const overflow = bursts.length + (incoming.length - skip) - maxBursts;
+  if (overflow > 0) {
+    bursts.copyWithin(0, overflow);
+    bursts.length -= overflow;
+  }
+  for (let i = skip; i < incoming.length; i += 1) {
+    bursts.push(incoming[i]);
+  }
+  return bursts;
+}
+
 export function stepParticles(
   particles: Particle[],
   step: number,
   pointer: PointerState,
   quality: ParticleQuality
 ): Particle[] {
-  return particles.map((particle) => {
+  // Quality is invariant across the loop — resolve the strength once per frame.
+  const attractionStrength = quality === 'full' ? ATTRACTION_STRENGTH_FULL : ATTRACTION_STRENGTH_BALANCED;
+
+  // Mutates in place and returns the same array (same zero-allocation frame
+  // contract as the background engine) — a steady-state frame allocates nothing.
+  for (const particle of particles) {
     const phase = particle.phase + 0.025 * step;
 
     let velocityX = particle.velocity.x + Math.sin(phase) * 0.0023;
@@ -207,7 +250,6 @@ export function stepParticles(
       if (dist2 < POINTER_ATTRACT_RADIUS_SQ && dist2 > 0.000001) {
         const distance = Math.sqrt(dist2);
         const pull = (POINTER_ATTRACT_RADIUS - distance) / POINTER_ATTRACT_RADIUS;
-        const attractionStrength = quality === 'full' ? ATTRACTION_STRENGTH_FULL : ATTRACTION_STRENGTH_BALANCED;
         velocityX += (dx / distance) * pull * attractionStrength * step;
         velocityY += (dy / distance) * pull * attractionStrength * step;
         nextX += velocityX;
@@ -225,17 +267,14 @@ export function stepParticles(
       nextY = Math.max(0, Math.min(100, nextY));
     }
 
-    return {
-      ...particle,
-      x: nextX,
-      y: nextY,
-      phase,
-      velocity: {
-        x: velocityX * 0.998,
-        y: velocityY * 0.998,
-      },
-    };
-  });
+    particle.x = nextX;
+    particle.y = nextY;
+    particle.phase = phase;
+    particle.velocity.x = velocityX * 0.998;
+    particle.velocity.y = velocityY * 0.998;
+  }
+
+  return particles;
 }
 
 // ── Canvas pulse + batching helpers (pure — the component only draws) ────────
@@ -256,14 +295,21 @@ export interface ParticlePulse {
  * Smooth 0 → 1 → 0 pulse derived from the frame timestamp. Staggering the
  * period by particle id keeps neighbours out of phase, matching the old
  * per-element Framer animation without any per-frame React work.
+ *
+ * Pass a caller-owned `out` scratch object to skip the per-call allocation —
+ * the frame loop reuses one scratch across every particle every frame.
  */
-export function getParticlePulse(timeMs: number, particleId: number): ParticlePulse {
+export function getParticlePulse(timeMs: number, particleId: number, out?: ParticlePulse): ParticlePulse {
   const duration = PULSE_BASE_DURATION_MS + (particleId % PULSE_DURATION_VARIANTS) * PULSE_DURATION_STEP_MS;
   const wave = 0.5 - 0.5 * Math.cos((Math.PI * 2 * timeMs) / duration);
-  return {
-    scale: 1 + PULSE_SCALE_AMPLITUDE * wave,
-    opacityMultiplier: 1 + PULSE_OPACITY_AMPLITUDE * wave,
-  };
+  const scale = 1 + PULSE_SCALE_AMPLITUDE * wave;
+  const opacityMultiplier = 1 + PULSE_OPACITY_AMPLITUDE * wave;
+  if (out !== undefined) {
+    out.scale = scale;
+    out.opacityMultiplier = opacityMultiplier;
+    return out;
+  }
+  return { scale, opacityMultiplier };
 }
 
 /** Sprite canvas edge in px; the glow gradient fills the full sprite. */
@@ -292,31 +338,22 @@ export function percentToPx(percent: number, extent: number): number {
   return (percent / 100) * extent;
 }
 
-/** Connection lines are batched into one canvas stroke per opacity tier. */
-export const CONNECTION_MAX_OPACITY = 0.28;
-export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;
-
-/** Map a connection opacity (0 … CONNECTION_MAX_OPACITY) to a tier index. */
-export function getConnectionOpacityTier(opacity: number): number {
-  const tierCount = CONNECTION_OPACITY_TIERS.length;
-  const tier = Math.floor((opacity / CONNECTION_MAX_OPACITY) * tierCount);
-  return Math.min(tierCount - 1, Math.max(0, tier));
-}
-
 export function stepBursts(bursts: BurstParticle[], step: number): BurstParticle[] {
-  const result: BurstParticle[] = [];
+  // Single-pass in-place compaction: surviving bursts slide left over expired
+  // ones and the tail is truncated — no per-frame array or object allocation.
+  let write = 0;
   for (const burst of bursts) {
     const newLife = burst.life - 0.03 * step;
     if (newLife > 0) {
-      result.push({
-        ...burst,
-        x: burst.x + burst.vx * step,
-        y: burst.y + burst.vy * step,
-        vx: burst.vx * 0.985,
-        vy: burst.vy * 0.985,
-        life: newLife,
-      });
+      burst.x += burst.vx * step;
+      burst.y += burst.vy * step;
+      burst.vx *= 0.985;
+      burst.vy *= 0.985;
+      burst.life = newLife;
+      bursts[write] = burst;
+      write += 1;
     }
   }
-  return result;
+  bursts.length = write;
+  return bursts;
 }

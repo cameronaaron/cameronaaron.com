@@ -50,7 +50,7 @@ minimal frequency possible.
 
 ---
 
-## 2. Algorithms & data structures (contract sections 1–22)
+## 2. Algorithms & data structures (contract sections 1–23)
 
 ### 2.1 Lookups: `Map` / `Set` / precomputed field — never a scan
 
@@ -165,6 +165,30 @@ paint state (opacity tier) and flush once per tier:
 - DPR: cap at 2 (`Math.min(dpr, 2)`), fall back with `|| 1`, size with
   `Math.round(width * dpr)`, scale with `ctx.setTransform(dpr, ...)` — never
   `ctx.scale()` (multiplies cumulatively across resizes).
+
+### 2.8 Zero-allocation frame loops (contract section 23)
+
+A steady-state animation frame mutates persistent buffers and allocates
+nothing. Both particle engines meet this contract:
+
+- **Mutate in place, return the same array** — `stepParticles`, `stepBursts`,
+  `advanceBackgroundParticle`, `applyMousePull`. Never `.map()` + object
+  spread per frame (~300 short-lived objects/frame at 60 fps is pure GC
+  pressure).
+- **Compact in place** — expired entries slide left over dead slots and the
+  tail is truncated (`bursts.length = write`), never a fresh filtered array.
+- **Pool per-frame outputs** — `buildConnections(particles, dist, max, pool)`
+  rewrites the fields of a caller-owned `Connection[]`; slots are allocated
+  the first time they're needed and reused forever after.
+- **Scratch buffers for per-frame derivations** — one `Uint8Array` for
+  connection tiers (computed once per line, not once per tier pass), one
+  reused object for `getParticlePulse(time, id, scratch)`.
+- **Precompute paint state at module level** — `CONNECTION_TIER_STYLES` holds
+  one `strokeStyle` string per tier; a template literal in the draw loop is an
+  allocation per tier per frame.
+- **Amortize event-path appends** — `appendBursts` trims via
+  `copyWithin` + length truncation, replacing the old per-click
+  `concat(...).slice(-max)` double allocation.
 
 ---
 
