@@ -14,7 +14,7 @@ npm run dev          # dev server → http://localhost:3000
 npm run build        # production static export to /out
 npm test             # Vitest (all tests must pass before committing)
 npm run type-check   # tsc --noEmit
-npm run lint         # ESLint
+npm run lint         # ESLint (--max-warnings=0) + markdownlint — warnings are failures
 ```
 
 ## Commits
@@ -46,13 +46,14 @@ lockfile sync + type-check + lint + the full suite.
 Every animation and effect decision is gated on `usePerformanceProfile()`:
 
 | Tier | Trigger | What works |
-|------|---------|------------|
+| ------ | --------- | ------------ |
 | `full` | Desktop fine-pointer, high-spec | All effects: particles, cursor trail, Lenis, ambient animation, parallax |
 | `balanced` | Touch / coarse pointer (mobile) | Static ambient orbs, basic scroll animations, NO particles, NO Lenis, NO cursor trail |
 | `lite` | Low hardware (≤4 cores / ≤4 GB) or save-data | Minimal motion only |
 | `reduced` | `prefers-reduced-motion` | Near-static |
 
 **Key properties returned by `usePerformanceProfile`:**
+
 - `shouldRenderParticles` — `true` only on `'full'`
 - `shouldRenderAmbientEffects` — `true` on `'full'` and `'balanced'`
 - `shouldRenderHeavyEffects` / `shouldRenderCursorTrail` — `true` only on `'full'`
@@ -65,7 +66,7 @@ Pattern: `Component.tsx` imports from `./logic` (or `./card-logic`, `./featured-
 
 ### Component layout
 
-```
+```text
 src/
   app/          # Next.js App Router pages + layout
   components/
@@ -81,13 +82,15 @@ src/
 
 ## Test structure
 
-```
+```text
 src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
 src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps + pre-commit gate wiring
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
-src/public-asset-weight-contract.test.ts     # per-image/per-file/total public/ weight budgets
+src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (webp/avif)
 src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
+src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
+src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression
@@ -199,7 +202,7 @@ Every `buildXxx`/`sortXxx` call in a `'use client'` component body is wrapped in
 Site content lives in `src/data/`:
 
 | File | Content |
-|------|---------|
+| ------ | --------- |
 | `profile.ts` | Name, title, tagline, stats, social links |
 | `experience.ts` | Work history (sorted newest-first per company) |
 | `projects.ts` | Portfolio projects |

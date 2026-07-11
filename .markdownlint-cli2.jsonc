@@ -1,0 +1,14 @@
+{
+  // Markdown quality gate — enforced by src/docs-quality-contract.test.ts
+  // (runs in `pnpm run lint`). Default rules on, with deliberate exceptions:
+  "config": {
+    // Long prose/reference lines are intentional in CLAUDE.md and
+    // ENGINEERING-STANDARDS.md (tables, commands, failure-message examples);
+    // wrapping them harms grep-ability. Every other rule applies.
+    "MD013": false,
+    // Inline HTML is used deliberately (badges/layout in README).
+    "MD033": false
+  },
+  "globs": ["*.md"],
+  "ignores": ["node_modules", "out", ".next"]
+}
