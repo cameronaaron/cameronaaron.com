@@ -47,6 +47,33 @@ function expectStrictAssertions(assertions: Record<string, unknown>, performance
   expect(assertions['network-dependency-tree-insight']).toBe('warn');
   expect(assertions['unused-javascript']).toBe('warn');
   expect(assertions['uses-responsive-images']).toBe('warn');
+
+  // dom-size / legacy-javascript / render-blocking-insight / render-blocking-resources
+  // — demoted to warn deliberately (2026-07, full investigation in
+  // ENGINEERING-STANDARDS §4.7): a live `npx @lhci/cli autorun` against a
+  // clean local build confirmed all four already score category weight 0
+  // (informative diagnostics — Lighthouse v10+ scores performance from only
+  // FCP/LCP/TBT/CLS/Speed-Index) and the `lighthouse:recommended` preset
+  // already treats them as non-blocking warnings, not errors (LHCI exited 0
+  // on both form factors with these as the only open items). They're pinned
+  // here explicitly so a future lighthouse/@lhci/cli upgrade can't silently
+  // flip a preset default from warn to error and break the gate unannounced.
+  // render-blocking-insight/-resources specifically WAS attempted: a
+  // beasties-based postbuild step inlined critical CSS and moved the two
+  // render-blocking stylesheets to preload+swap. Desktop improved (speed-index
+  // 0.65→0.98, category 0.96→1.0) but mobile cumulative-layout-shift dropped
+  // from a perfect 1.0 to 0.75 — the deferred-stylesheet swap shifted an
+  // absolutely-positioned decorative hero glow div that beasties' static
+  // critical-CSS extraction didn't detect as visible. CLS carries real
+  // category weight (25%); the render-blocking audits carry none. Net effect
+  // on the graded score: negative on mobile, zero additional upside on
+  // desktop's already-perfect category score. Measured and rejected — same
+  // discipline as the code-splitting experiment in §4.7. Don't reattempt
+  // without a critical-CSS approach proven not to regress CLS.
+  expect(assertions['dom-size']).toBe('warn');
+  expect(assertions['legacy-javascript']).toBe('warn');
+  expect(assertions['render-blocking-insight']).toBe('warn');
+  expect(assertions['render-blocking-resources']).toBe('warn');
 }
 
 describe('performance regression contract', () => {
