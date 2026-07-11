@@ -21,6 +21,7 @@
     ]
   },
   "simple-git-hooks": {
+    "pre-commit": "pnpm run test:complexity",
     "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
   },
   "scripts": {
@@ -35,6 +36,7 @@
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:complexity": "vitest run src/complexity-doctrine-contract.test.ts src/components/algorithm-and-datastructure-contract.test.tsx src/components/animation-regression-contract.test.ts src/modularization-contract.test.ts src/dead-logic-export-contract.test.ts src/public-asset-weight-contract.test.ts",
     "test:repo:hygiene": "vitest run src/repo-hygiene-contract.test.ts",
     "test:performance:contracts": "node scripts/checks/performance-budgets.mjs",
     "test:performance:desktop": "pnpm run build && pnpm run test:performance:contracts && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",

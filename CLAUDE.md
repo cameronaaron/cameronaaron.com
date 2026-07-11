@@ -26,6 +26,12 @@ are **one** commit (the ratchet rule); unrelated changes are separate commits.
 Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS §6.9.
 
+Two-stage hook gate (simple-git-hooks): **pre-commit** auto-runs
+`pnpm run test:complexity` — the offline structural sweeps (complexity
+doctrine, algorithms, animation gates, modularization, dead exports, asset
+weight) — so complexity regressions are un-commitable; **pre-push** runs
+lockfile sync + type-check + lint + the full suite.
+
 ## Stack
 
 - **Next.js 16** App Router, `output: 'export'` (static), deployed on **Cloudflare Pages**
@@ -77,6 +83,7 @@ src/
 
 ```
 src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
+src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps + pre-commit gate wiring
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
 src/public-asset-weight-contract.test.ts     # per-image/per-file/total public/ weight budgets
