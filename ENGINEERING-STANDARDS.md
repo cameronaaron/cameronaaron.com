@@ -465,7 +465,16 @@ investigate that script before touching the config.
    gate holds all of `src/` at 100% lines/branches/functions/statements — a
    hard-to-test component cannot merge.
 3. **Tests must pass before every commit** (`npm test`, 900+), plus
-   `npm run type-check` and `npm run lint`.
+   `npm run type-check` and `npm run lint`. Enforcement is automated as a
+   two-stage git-hooks gate (2026-07): **pre-commit** runs
+   `pnpm run test:complexity` — every structural sweep (complexity doctrine,
+   algorithm/data-structure, animation gates, modularization, dead logic
+   exports, asset weight), offline and sub-second — so a doctrine violation
+   is un-commitable, not merely un-mergeable; **pre-push** runs the heavy
+   half (lockfile sync, type-check, lint, full suite). The complexity
+   contract asserts the hook wiring itself, so the gate cannot be silently
+   unwired. Networked freshness contracts stay out of pre-commit
+   deliberately — hooks must work offline.
 4. **Freshness covers every ecosystem you depend on, not just npm.**
    `dependency-freshness-contract.test.ts` keeps the pnpm dependency tree at
    latest-with-zero-CVEs, but that has zero visibility into
