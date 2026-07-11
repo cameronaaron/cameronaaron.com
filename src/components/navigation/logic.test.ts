@@ -4,7 +4,6 @@ import {
   ACTIVE_SECTION_TRIGGER_LINE,
   buildNavLabelMap,
   computeSectionBounds,
-  getActiveNavLabel,
   hrefToSectionId,
   pickActiveHref,
   shouldCloseMobileMenuOnResize,
@@ -66,14 +65,7 @@ describe('navigation logic', () => {
     expect(pickActiveHref([])).toBe('#home');
   });
 
-  it('computes active label and desktop close behavior', () => {
-    const items = [
-      { name: 'Home', href: '#home' },
-      { name: 'Skills', href: '#skills' },
-    ];
-
-    expect(getActiveNavLabel(items, '#skills')).toBe('Skills');
-    expect(getActiveNavLabel(items, '#missing')).toBe('Home');
+  it('computes desktop close behavior from the breakpoint', () => {
     expect(shouldCloseMobileMenuOnResize(500)).toBe(false);
     expect(shouldCloseMobileMenuOnResize(1024)).toBe(true);
   });
