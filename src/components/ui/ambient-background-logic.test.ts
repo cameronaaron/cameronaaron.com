@@ -1,27 +1,37 @@
 import { describe, expect, it } from 'vitest';
-import { getAmbientOrbCount, shouldAnimateOrbs } from './ambient-background-logic';
+import {
+  AMBIENT_ORBS,
+  ORB_COUNT_BY_TIER,
+  getVisibleAmbientOrbs,
+  shouldAnimateOrbs,
+} from './ambient-background-logic';
 
-describe('getAmbientOrbCount', () => {
-  it('returns totalOrbs for full tier', () => {
-    expect(getAmbientOrbCount('full', 7)).toBe(7);
-    expect(getAmbientOrbCount('full', 0)).toBe(0);
+describe('getVisibleAmbientOrbs', () => {
+  it('returns every orb for the full tier', () => {
+    expect(getVisibleAmbientOrbs('full')).toHaveLength(AMBIENT_ORBS.length);
   });
 
-  it('returns 4 for balanced tier', () => {
-    expect(getAmbientOrbCount('balanced', 7)).toBe(4);
+  it('returns 4 orbs for balanced, 2 for lite, 1 for reduced', () => {
+    expect(getVisibleAmbientOrbs('balanced')).toHaveLength(4);
+    expect(getVisibleAmbientOrbs('lite')).toHaveLength(2);
+    expect(getVisibleAmbientOrbs('reduced')).toHaveLength(1);
   });
 
-  it('returns 2 for lite tier', () => {
-    expect(getAmbientOrbCount('lite', 7)).toBe(2);
+  it('returns stable precomputed references — no per-call allocation', () => {
+    expect(getVisibleAmbientOrbs('full')).toBe(getVisibleAmbientOrbs('full'));
+    expect(getVisibleAmbientOrbs('balanced')).toBe(getVisibleAmbientOrbs('balanced'));
+    expect(getVisibleAmbientOrbs('full')).toBe(AMBIENT_ORBS);
   });
 
-  it('returns 1 for reduced tier', () => {
-    expect(getAmbientOrbCount('reduced', 7)).toBe(1);
+  it('slices from the front so lower tiers render a prefix of the full set', () => {
+    expect(getVisibleAmbientOrbs('balanced')).toEqual(AMBIENT_ORBS.slice(0, 4));
+    expect(getVisibleAmbientOrbs('reduced')[0]).toBe(AMBIENT_ORBS[0]);
   });
 
-  it('returns 1 for any unknown tier falling through to default', () => {
-    // TypeScript won't allow this normally but the runtime default branch must be covered
-    expect(getAmbientOrbCount('reduced', 10)).toBe(1);
+  it('ORB_COUNT_BY_TIER matches the visible slice lengths for every tier', () => {
+    for (const tier of ['full', 'balanced', 'lite', 'reduced'] as const) {
+      expect(getVisibleAmbientOrbs(tier)).toHaveLength(ORB_COUNT_BY_TIER[tier]);
+    }
   });
 });
 
