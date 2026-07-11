@@ -570,3 +570,12 @@ investigate that script before touching the config.
    changed (e.g., a 5th education item changes the grid), update source, test,
    and the documentation together — that is a requirements change, not a
    test weakening.
+9. **Commits are small, single-topic, and self-explanatory.** One logical
+   change per commit — an optimization plus its ratchet contract plus its
+   docs is *one* topic (rule 1); an unrelated dependency bump is another.
+   Subject line: imperative, ≤72 chars, says *what*; body says *why* and
+   names anything non-obvious (measurements, the bug class prevented, the
+   revisit condition for a pin). Anyone reading `git log --oneline` should be
+   able to follow the work without opening a single diff. Never mix refactors
+   with behavior changes in one commit, and never commit with a red gate
+   (rule 3).

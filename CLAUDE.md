@@ -17,6 +17,15 @@ npm run type-check   # tsc --noEmit
 npm run lint         # ESLint
 ```
 
+## Commits
+
+Small, single-topic commits — one logical change each, readable from
+`git log --oneline` without opening diffs. Subject: imperative, ≤72 chars,
+says *what*; body says *why*. An optimization + its contract test + its docs
+are **one** commit (the ratchet rule); unrelated changes are separate commits.
+Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
+See ENGINEERING-STANDARDS §6.9.
+
 ## Stack
 
 - **Next.js 16** App Router, `output: 'export'` (static), deployed on **Cloudflare Pages**
@@ -70,6 +79,8 @@ src/
 src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
+src/public-asset-weight-contract.test.ts     # per-image/per-file/total public/ weight budgets
+src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression
