@@ -195,10 +195,22 @@ These patterns are enforced by `src/components/algorithm-and-datastructure-contr
 
 ### Single-pass over map+filter
 
-Never `.map(transform).filter(alive)` — it allocates a full intermediate array. Use a `for` loop with conditional `push()`:
+Never `.map(transform).filter(alive)` — it allocates a full intermediate array. Use a `for` loop with conditional `push()`; in per-frame code, go further and compact in place with zero allocation (ENGINEERING-STANDARDS §2.8):
 
 ```ts
-// ✅ single-pass — stepBursts
+// ✅ single-pass, zero-allocation — stepBursts (per-frame code)
+let write = 0;
+for (const burst of bursts) {
+  // ...mutate burst in place
+  if (alive(burst)) {
+    bursts[write] = burst;
+    write += 1;
+  }
+}
+bursts.length = write; // truncate the dead tail
+return bursts;
+
+// ✅ single-pass — acceptable for run-once code
 const result: T[] = [];
 for (const item of items) {
   const next = transform(item);
@@ -212,11 +224,11 @@ return result;
 When collecting up to `maxN` items, break as soon as the limit is hit rather than building the full collection and calling `.slice()`:
 
 ```ts
-// ✅ labeled break — buildConnections
+// ✅ labeled break — buildConnections (count tracks pooled slots in use)
 outer: for (let i = 0; i < particles.length; i++) {
   for (let j = i + 1; j < particles.length; j++) {
-    if (lines.length >= maxConnections) break outer;
-    // ...push
+    if (count >= maxConnections) break outer;
+    // ...write into the pooled slot
   }
 }
 ```

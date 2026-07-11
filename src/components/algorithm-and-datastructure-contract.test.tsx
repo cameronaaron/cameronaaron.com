@@ -11,6 +11,7 @@
  *   4. Batch draw calls    — canvas stroke/fill counts per frame
  *   5. Numeric Connection.id — no per-frame string allocation
  *   7. useMemo hot paths   — render-path computations are memoized
+ *  23. Zero-alloc frame loop — interactive engine mutates persistent buffers
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -26,6 +27,10 @@ import {
 } from '@/components/hero/background-particles/engine';
 import {
   buildConnections as buildIpConnections,
+  stepBursts as stepIpBursts,
+  stepParticles as stepIpParticles,
+  type BurstParticle as IpBurstParticle,
+  type Connection as IpConnection,
   type Particle as IpParticle,
 } from '@/components/hero/interactive-particles/engine';
 import { filterTestimonialsByRelationship } from '@/components/testimonials/logic';
@@ -187,8 +192,8 @@ describe('interactive-particles engine — squared-distance guards', () => {
 
   it('buildConnections exits early when maxConnections is reached — no build-all-then-slice', () => {
     const src = read('src/components/hero/interactive-particles/engine.ts');
-    // Must cap during traversal, not after
-    expect(src).toContain('lines.length >= maxConnections');
+    // Must cap during traversal, not after (count tracks pooled slots in use)
+    expect(src).toContain('count >= maxConnections');
     expect(src).toContain('break outer');
     // The old pattern: build unlimited array then slice
     expect(src).not.toContain('lines.slice(0, maxConnections)');
@@ -852,6 +857,90 @@ describe('usePerformanceProfile — exported named constants for hardware thresh
     expect(src).not.toMatch(/cores <= 4/);
     expect(src).not.toMatch(/memory <= 4/);
     expect(src).not.toMatch(/\?\? 8\b/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 23. Interactive-particles — zero-allocation frame loop
+//     (same contract the background engine already meets: a steady-state
+//     frame mutates persistent buffers and allocates nothing)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('interactive-particles engine — zero-allocation frame loop', () => {
+  it('stepParticles mutates in place — no per-frame map() or object spread', () => {
+    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const fnStart = src.indexOf('export function stepParticles');
+    const fnEnd = src.indexOf('\nexport ', fnStart + 1);
+    const fnBody = src.slice(fnStart, fnEnd === -1 ? src.length : fnEnd);
+    expect(fnBody).not.toContain('.map(');
+    expect(fnBody).not.toContain('...particle');
+    expect(fnBody).toContain('return particles');
+  });
+
+  it('stepBursts compacts in place — no per-frame array or object allocation', () => {
+    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const fnStart = src.indexOf('export function stepBursts');
+    const fnEnd = src.indexOf('\nexport ', fnStart + 1);
+    const fnBody = src.slice(fnStart, fnEnd === -1 ? src.length : fnEnd);
+    expect(fnBody).not.toContain('...burst');
+    expect(fnBody).not.toMatch(/const result\s*:\s*BurstParticle\[\]\s*=\s*\[\]/);
+    expect(fnBody).toContain('bursts.length = write');
+    expect(fnBody).toContain('return bursts');
+  });
+
+  it('runtime: stepParticles and stepBursts return the same array reference (in-place)', () => {
+    const particles: IpParticle[] = [{
+      id: 1, x: 50, y: 50, size: 2, color: '#fff',
+      velocity: { x: 0.1, y: 0.1 }, opacity: 1, phase: 0,
+    }];
+    expect(stepIpParticles(particles, 1, { x: 50, y: 50, active: false }, 'full')).toBe(particles);
+
+    const bursts: IpBurstParticle[] = [{ id: 1, x: 0, y: 0, vx: 1, vy: 1, life: 1, size: 2, color: '#fff' }];
+    expect(stepIpBursts(bursts, 1)).toBe(bursts);
+  });
+
+  it('runtime: buildConnections rewrites a caller-provided pool in place across frames', () => {
+    const particles: IpParticle[] = Array.from({ length: 4 }, (_, i) => ({
+      id: i, x: i * 2, y: 0, size: 1, color: '#fff',
+      velocity: { x: 0, y: 0 }, opacity: 1, phase: 0,
+    }));
+    const pool: IpConnection[] = [];
+
+    const first = buildIpConnections(particles, 10, 10, pool);
+    expect(first).toBe(pool);
+    const firstSlot = first[0];
+
+    const second = buildIpConnections(particles, 10, 10, pool);
+    expect(second).toBe(pool);
+    // Same object slot reused — the second frame allocates zero connections.
+    expect(second[0]).toBe(firstSlot);
+  });
+
+  it('component owns persistent frame buffers — pool, tier scratch, pulse scratch', () => {
+    const src = read('src/components/hero/InteractiveParticles.tsx');
+    expect(src).toContain('const connectionPool: Connection[] = []');
+    expect(src).toContain('new Uint8Array(config.maxConnections)');
+    expect(src).toContain('pulseScratch');
+    // The old per-click double allocation: bursts.concat(next).slice(-max)
+    expect(src).not.toContain('.concat(');
+    expect(src).not.toContain('.slice(');
+  });
+
+  it('connection stroke styles are precomputed at module level, never built per frame', () => {
+    const engine = read('src/components/hero/interactive-particles/engine.ts');
+    expect(engine).toContain('export const CONNECTION_TIER_STYLES');
+    const component = read('src/components/hero/InteractiveParticles.tsx');
+    expect(component).toContain('CONNECTION_TIER_STYLES[tier]');
+    // The old pattern: a template-literal strokeStyle allocated 3× per frame
+    expect(component).not.toMatch(/strokeStyle = `rgba/);
+  });
+
+  it('connection tier is computed once per line per frame, not once per tier pass', () => {
+    const component = read('src/components/hero/InteractiveParticles.tsx');
+    // Tier lookup fills the persistent scratch in a single pass...
+    expect(component).toContain('tierScratch[k] = getConnectionOpacityTier(lines[k].opacity)');
+    // ...and the per-tier stroke passes compare the cached byte only.
+    expect(component).not.toMatch(/if \(getConnectionOpacityTier\(line\.opacity\) !== tier\)/);
   });
 });
 

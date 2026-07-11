@@ -5,6 +5,7 @@ import {
   ATTRACTION_STRENGTH_FULL,
   CONNECTION_MAX_OPACITY,
   CONNECTION_OPACITY_TIERS,
+  CONNECTION_TIER_STYLES,
   GLOW_CORE_STOP,
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
@@ -15,6 +16,7 @@ import {
   PULSE_DURATION_VARIANTS,
   PULSE_OPACITY_AMPLITUDE,
   PULSE_SCALE_AMPLITUDE,
+  appendBursts,
   buildConnections,
   createBurstParticles,
   createInitialParticles,
@@ -27,6 +29,8 @@ import {
   percentToPx,
   stepBursts,
   stepParticles,
+  type BurstParticle,
+  type Connection,
 } from './engine';
 
 describe('interactive particle engine', () => {
@@ -56,6 +60,12 @@ describe('interactive particle engine', () => {
   it('returns expected quality config for full and balanced', () => {
     expect(getQualityConfig('full').count).toBeGreaterThan(getQualityConfig('balanced').count);
     expect(getQualityConfig('lite').count).toBe(0);
+    expect(getQualityConfig('reduced').count).toBe(0);
+  });
+
+  it('getQualityConfig is an O(1) table lookup returning stable references', () => {
+    expect(getQualityConfig('full')).toBe(getQualityConfig('full'));
+    expect(getQualityConfig('lite')).toBe(getQualityConfig('reduced'));
   });
 
   it('builds bounded connection list', () => {
@@ -67,6 +77,54 @@ describe('interactive particle engine', () => {
 
     const lines = buildConnections(particles, 10, 2);
     expect(lines.length).toBe(2);
+  });
+
+  it('buildConnections reuses a caller-provided pool with zero steady-state allocation', () => {
+    const particles = Array.from({ length: 4 }, (_, i) => ({
+      id: i, x: i * 2, y: 0, size: 1, color: '#000', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0,
+    }));
+    const pool: Connection[] = [];
+
+    const first = buildConnections(particles, 10, 10, pool);
+    expect(first).toBe(pool);
+    const firstLength = first.length;
+    expect(firstLength).toBeGreaterThan(1);
+    const firstSlot = first[0];
+
+    // Second frame with a tighter distance: same array, same object slots
+    // rewritten in place, length shrunk to the new connection count.
+    const second = buildConnections(particles, 3, 10, pool);
+    expect(second).toBe(pool);
+    expect(second[0]).toBe(firstSlot);
+    expect(second.length).toBeLessThan(firstLength);
+    expect(second.length).toBeGreaterThan(0);
+    expect(second[0].id).toBe(1); // pair (0,1) → 0 * 1000 + 1
+  });
+
+  it('appendBursts appends within the cap without trimming', () => {
+    const makeBurst = (id: number): BurstParticle => ({ id, x: 0, y: 0, vx: 0, vy: 0, life: 1, size: 1, color: 'x' });
+    const bursts = [makeBurst(1), makeBurst(2)];
+
+    const result = appendBursts(bursts, [makeBurst(3)], 5);
+    expect(result).toBe(bursts);
+    expect(bursts.map((b) => b.id)).toEqual([1, 2, 3]);
+  });
+
+  it('appendBursts trims the oldest bursts in place when the cap is exceeded', () => {
+    const makeBurst = (id: number): BurstParticle => ({ id, x: 0, y: 0, vx: 0, vy: 0, life: 1, size: 1, color: 'x' });
+    const bursts = [makeBurst(1), makeBurst(2), makeBurst(3)];
+
+    appendBursts(bursts, [makeBurst(4), makeBurst(5)], 4);
+    // Same semantics as the old concat(...).slice(-max): keep the newest 4.
+    expect(bursts.map((b) => b.id)).toEqual([2, 3, 4, 5]);
+  });
+
+  it('appendBursts keeps only the newest maxBursts when incoming alone exceeds the cap', () => {
+    const makeBurst = (id: number): BurstParticle => ({ id, x: 0, y: 0, vx: 0, vy: 0, life: 1, size: 1, color: 'x' });
+    const bursts = [makeBurst(1)];
+
+    appendBursts(bursts, [makeBurst(2), makeBurst(3), makeBurst(4)], 2);
+    expect(bursts.map((b) => b.id)).toEqual([3, 4]);
   });
 
   it('normalizes pointer coordinates with safe division', () => {
@@ -146,6 +204,34 @@ describe('interactive particle engine', () => {
 
     const fullCycle = getParticlePulse(PULSE_BASE_DURATION_MS, 0);
     expect(fullCycle.scale).toBeCloseTo(1);
+  });
+
+  it('getParticlePulse writes into a caller-provided scratch object without allocating', () => {
+    const scratch = { scale: 0, opacityMultiplier: 0 };
+    const result = getParticlePulse(PULSE_BASE_DURATION_MS / 2, 0, scratch);
+
+    expect(result).toBe(scratch);
+    const allocated = getParticlePulse(PULSE_BASE_DURATION_MS / 2, 0);
+    expect(scratch.scale).toBeCloseTo(allocated.scale);
+    expect(scratch.opacityMultiplier).toBeCloseTo(allocated.opacityMultiplier);
+  });
+
+  it('stepParticles and stepBursts mutate in place and return the same array reference', () => {
+    const particles = [{
+      id: 1, x: 50, y: 50, size: 2, color: 'x',
+      velocity: { x: 0.1, y: 0.1 }, opacity: 1, phase: 0,
+    }];
+    expect(stepParticles(particles, 1, { x: 50, y: 50, active: false }, 'full')).toBe(particles);
+
+    const bursts = [{ id: 1, x: 0, y: 0, vx: 1, vy: 1, life: 1, size: 2, color: 'x' }];
+    expect(stepBursts(bursts, 1)).toBe(bursts);
+  });
+
+  it('CONNECTION_TIER_STYLES precomputes one strokeStyle per opacity tier', () => {
+    expect(CONNECTION_TIER_STYLES).toHaveLength(CONNECTION_OPACITY_TIERS.length);
+    CONNECTION_OPACITY_TIERS.forEach((opacity, index) => {
+      expect(CONNECTION_TIER_STYLES[index]).toBe(`rgba(103, 232, 249, ${opacity})`);
+    });
   });
 
   it('getParticlePulse staggers periods by particle id so neighbours stay out of phase', () => {
