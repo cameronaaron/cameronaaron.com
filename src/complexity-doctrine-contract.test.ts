@@ -104,15 +104,34 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
     'simple-git-hooks'?: Record<string, string>;
   };
 
-  it('a pre-commit hook runs the complexity gate', () => {
+  it('pre-commit runs the full validation suite — every contract and test, not a fast subset', () => {
+    // Owner mandate (2026-07): ALL contracts and tests must pass before a
+    // commit can even be created, not just before push. A partial pre-commit
+    // gate (the earlier test:complexity-only version) let a commit land with
+    // a broken full suite as long as the fast structural sweeps passed —
+    // that gap is closed by running the identical full gate pre-commit runs
+    // pre-push: lockfile sync, type-check, zero-warning lint, and the entire
+    // vitest suite (which includes test:complexity's files as a strict
+    // subset, plus every other contract and unit test).
     const preCommit = pkg['simple-git-hooks']?.['pre-commit'] ?? '';
-    expect(
-      preCommit,
-      'package.json simple-git-hooks.pre-commit must run "pnpm run test:complexity" — the doctrine is assured before every commit',
-    ).toContain('test:complexity');
+    expect(preCommit, 'pre-commit must verify the lockfile is in sync').toContain('verify-lockfile-sync');
+    expect(preCommit, 'pre-commit must type-check').toContain('type-check');
+    expect(preCommit, 'pre-commit must lint with zero warnings').toContain('lint');
+    expect(preCommit, 'pre-commit must run the full test suite, not a subset').toMatch(/pnpm test(?!:)/);
   });
 
-  it('test:complexity covers every structural sweep, offline and fast', () => {
+  it('pre-commit and pre-push run the identical full gate (redundant safety net)', () => {
+    // Pre-push re-verifies the same gate in case a commit was made with
+    // --no-verify, or a rebase/cherry-pick introduced drift after the commit
+    // hook ran. Deliberately identical, not merely equivalent — any
+    // divergence here is itself a bug.
+    expect(pkg['simple-git-hooks']?.['pre-commit']).toBe(pkg['simple-git-hooks']?.['pre-push']);
+  });
+
+  it('test:complexity stays a fast, offline, standalone subset for iterative dev use', () => {
+    // Not the pre-commit gate itself anymore (see above) — kept as a quick
+    // manual command (`pnpm run test:complexity`) a developer can run while
+    // iterating without waiting on the full suite or touching the network.
     const script = pkg.scripts?.['test:complexity'] ?? '';
     for (const requiredFile of [
       'src/complexity-doctrine-contract.test.ts',
@@ -128,12 +147,10 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
     ]) {
       expect(script, `test:complexity must include ${requiredFile}`).toContain(requiredFile);
     }
-    // Pre-commit must stay offline: the networked freshness contracts belong
-    // to pre-push/CI, not here.
     expect(script).not.toContain('freshness');
   });
 
-  it('the pre-push gate still runs the full suite (heavy half of the two-stage gate)', () => {
+  it('the shared pre-commit/pre-push gate runs the full suite', () => {
     const prePush = pkg['simple-git-hooks']?.['pre-push'] ?? '';
     expect(prePush).toContain('pnpm test');
     expect(prePush).toContain('type-check');

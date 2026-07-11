@@ -470,17 +470,21 @@ investigate that script before touching the config.
    companion test (`module-testability-contract.test.ts`), and the CI coverage
    gate holds all of `src/` at 100% lines/branches/functions/statements — a
    hard-to-test component cannot merge.
-3. **Tests must pass before every commit** (`npm test`, 900+), plus
-   `npm run type-check` and `npm run lint`. Enforcement is automated as a
-   two-stage git-hooks gate (2026-07): **pre-commit** runs
-   `pnpm run test:complexity` — every structural sweep (complexity doctrine,
-   algorithm/data-structure, animation gates, modularization, dead logic
-   exports, asset weight), offline and sub-second — so a doctrine violation
-   is un-commitable, not merely un-mergeable; **pre-push** runs the heavy
-   half (lockfile sync, type-check, lint, full suite). The complexity
-   contract asserts the hook wiring itself, so the gate cannot be silently
-   unwired. Networked freshness contracts stay out of pre-commit
-   deliberately — hooks must work offline.
+3. **Every contract and test must pass before every commit** (owner mandate,
+   2026-07) — not merely before push. `simple-git-hooks` runs the identical
+   full gate at both `pre-commit` and `pre-push`: lockfile sync, type-check,
+   zero-warning lint, and the entire `pnpm test` suite (900+ tests, all
+   contracts, including the networked freshness checks — nothing is deferred
+   to push time). A commit cannot be created with a red gate; `pre-push`
+   re-verifies identically as a redundant safety net (catches drift from a
+   `--no-verify` commit or a later rebase). `complexity-doctrine-contract.test.ts`
+   asserts the hook wiring itself — including that pre-commit and pre-push
+   stay byte-identical — so the gate cannot be silently narrowed or unwired.
+   `pnpm run test:complexity` remains available as a fast, offline,
+   manually-run subset (complexity doctrine, algorithm/data-structure,
+   animation gates, modularization, dead logic exports, asset weight,
+   config-integrity, docs-quality, lifecycle-hygiene, headers-integrity) for
+   quick iteration — it is a convenience command now, not the commit gate.
 
    **Warnings are failures.** `pnpm run lint` runs eslint with
    `--max-warnings=0` and markdownlint over every root `*.md`
