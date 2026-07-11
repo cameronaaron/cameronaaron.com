@@ -524,7 +524,13 @@ investigate that script before touching the config.
    its own test suite, which the coverage gate cannot distinguish from a real
    caller: both count as "covered." `dead-component-contract.test.ts` asks
    the question coverage doesn't — is this component's exported name used as
-   a JSX tag in some *other* production file, not just its own test? Its
+   a JSX tag in some *other* production file, not just its own test?
+   `dead-logic-export-contract.test.ts` asks it one level down (2026-07,
+   after `getActiveNavLabel` — the superseded O(n) nav lookup — sat exported
+   with passing tests months after `buildNavLabelMap` replaced it): every
+   exported logic-module *function* must be referenced by other production
+   code or called within its own module; helpers exported purely for direct
+   unit testing stay legitimate. Its
    sibling, `public-assets-freshness-contract.test.ts`, asks the same
    question about `public/`: is this file referenced anywhere, by any
    production source, config, or the well-known conventions that legitimately
