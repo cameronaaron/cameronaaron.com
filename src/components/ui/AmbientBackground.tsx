@@ -2,19 +2,20 @@
 
 import { motion } from 'framer-motion';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
-import { AMBIENT_ORBS, getAmbientOrbCount, shouldAnimateOrbs } from './ambient-background-logic';
+import { getVisibleAmbientOrbs, shouldAnimateOrbs } from './ambient-background-logic';
 
 interface AmbientBackgroundProps {
   performanceTier?: PerformanceTier;
 }
 
 export default function AmbientBackground({ performanceTier = 'full' }: AmbientBackgroundProps) {
-  const orbCount = getAmbientOrbCount(performanceTier, AMBIENT_ORBS.length);
+  // O(1) lookup into slices precomputed at module load — no per-render slice.
+  const visibleOrbs = getVisibleAmbientOrbs(performanceTier);
   const animateOrbs = shouldAnimateOrbs(performanceTier);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
-      {AMBIENT_ORBS.slice(0, orbCount).map((orb, index) => (
+      {visibleOrbs.map((orb, index) => (
         animateOrbs ? (
           <motion.div
             key={`ambient-orb-${index}`}

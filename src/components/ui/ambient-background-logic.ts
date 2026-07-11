@@ -53,11 +53,24 @@ export const AMBIENT_ORBS: OrbSpec[] = [
   },
 ];
 
-export function getAmbientOrbCount(performanceTier: PerformanceTier, totalOrbs: number): number {
-  if (performanceTier === 'full') return totalOrbs;
-  if (performanceTier === 'balanced') return 4;
-  if (performanceTier === 'lite') return 2;
-  return 1;
+export const ORB_COUNT_BY_TIER: Record<PerformanceTier, number> = {
+  full: AMBIENT_ORBS.length,
+  balanced: 4,
+  lite: 2,
+  reduced: 1,
+};
+
+// Sliced once at module load — each render is a single O(1) table lookup with
+// zero allocation, instead of re-slicing AMBIENT_ORBS on every tier change.
+const VISIBLE_ORBS_BY_TIER: Record<PerformanceTier, readonly OrbSpec[]> = {
+  full: AMBIENT_ORBS,
+  balanced: AMBIENT_ORBS.slice(0, ORB_COUNT_BY_TIER.balanced),
+  lite: AMBIENT_ORBS.slice(0, ORB_COUNT_BY_TIER.lite),
+  reduced: AMBIENT_ORBS.slice(0, ORB_COUNT_BY_TIER.reduced),
+};
+
+export function getVisibleAmbientOrbs(performanceTier: PerformanceTier): readonly OrbSpec[] {
+  return VISIBLE_ORBS_BY_TIER[performanceTier];
 }
 
 export function shouldAnimateOrbs(performanceTier: PerformanceTier): boolean {
