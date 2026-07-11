@@ -26,11 +26,14 @@ are **one** commit (the ratchet rule); unrelated changes are separate commits.
 Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS §6.9.
 
-Two-stage hook gate (simple-git-hooks): **pre-commit** auto-runs
-`pnpm run test:complexity` — the offline structural sweeps (complexity
-doctrine, algorithms, animation gates, modularization, dead exports, asset
-weight) — so complexity regressions are un-commitable; **pre-push** runs
-lockfile sync + type-check + lint + the full suite.
+Hook gate (simple-git-hooks): **pre-commit and pre-push both run the full
+gate** — lockfile sync, type-check, zero-warning lint, and the entire test
+suite (every contract, including networked freshness checks). Nothing is
+deferred to push time; a red gate blocks the commit itself. Push after
+every commit (or at least before ending a session) — commits sitting only
+local aren't backed up and aren't verified by CI.
+`pnpm run test:complexity` is a fast, offline, manually-run subset for quick
+iteration — it is not the commit gate.
 
 ## Stack
 

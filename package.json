@@ -21,7 +21,7 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm run test:complexity",
+    "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test",
     "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
   },
   "scripts": {
