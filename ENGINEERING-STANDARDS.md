@@ -475,6 +475,17 @@ investigate that script before touching the config.
    contract asserts the hook wiring itself, so the gate cannot be silently
    unwired. Networked freshness contracts stay out of pre-commit
    deliberately — hooks must work offline.
+
+   **Warnings are failures.** `pnpm run lint` runs eslint with
+   `--max-warnings=0` and markdownlint over every root `*.md`
+   (`docs-quality-contract.test.ts` — a 2026-07 audit found 138 accumulated
+   markdown violations that warnings-only tooling never surfaced). And
+   because every gate is itself just configuration,
+   `config-integrity-contract.test.ts` pins the gates' own config: tsconfig
+   strictness, the 100% coverage thresholds, `output: 'export'` +
+   `reactStrictMode`, and one Node major across `.nvmrc` / `engines` / every
+   CI workflow — a one-line config edit can no longer silently disarm a gate
+   while everything stays green.
 4. **Freshness covers every ecosystem you depend on, not just npm.**
    `dependency-freshness-contract.test.ts` keeps the pnpm dependency tree at
    latest-with-zero-CVEs, but that has zero visibility into

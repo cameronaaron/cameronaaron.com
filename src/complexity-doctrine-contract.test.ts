@@ -121,6 +121,8 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
       'src/modularization-contract.test.ts',
       'src/dead-logic-export-contract.test.ts',
       'src/public-asset-weight-contract.test.ts',
+      'src/config-integrity-contract.test.ts',
+      'src/docs-quality-contract.test.ts',
     ]) {
       expect(script, `test:complexity must include ${requiredFile}`).toContain(requiredFile);
     }

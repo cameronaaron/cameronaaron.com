@@ -144,7 +144,9 @@ describe('meoninternet coverage integration', () => {
   it('ensures every URL listed in meoninternet.md is represented in source data', () => {
     const meOnInternetPath = path.resolve(__dirname, '..', '..', 'meoninternet.md');
     const source = fs.readFileSync(meOnInternetPath, 'utf8');
-    const urlMatches = source.match(/https?:\/\/[^\s)]+/g) ?? [];
+    // URLs in meoninternet.md are markdown autolinks (<https://…>), so the
+    // closing angle bracket terminates a URL just like whitespace does.
+    const urlMatches = source.match(/https?:\/\/[^\s)>]+/g) ?? [];
     const sourceUrls = new Set(urlMatches.map(normalizeUrl));
 
     const representedUrls = new Set<string>([
