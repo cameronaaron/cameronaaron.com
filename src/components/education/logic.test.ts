@@ -34,4 +34,28 @@ describe('education logic', () => {
     expect(collections.sortedHonorsAndAffiliations[0].label).toContain('(Jun 2026)');
     expect(collections.sortedPrerequisiteCourses.length).toBe(prerequisiteCourses.length);
   });
+
+  it('precomputes pill links (verificationLinks[1..]) once per item at build', () => {
+    const withPills = {
+      institution: 'A', credential: 'B', period: 'Jan 2024', details: [],
+      verificationLinks: [
+        { label: 'Site', url: 'https://a.example' },
+        { label: 'Credential', url: 'https://b.example' },
+      ],
+    };
+    const withoutPills = {
+      institution: 'C', credential: 'D', period: 'Jan 2023', details: [],
+      verificationLinks: [{ label: 'Site', url: 'https://c.example' }],
+    };
+
+    const collections = buildEducationCollections([withPills, withoutPills], [], []);
+
+    expect(collections.sortedEducationItems[0].pillLinks).toEqual([
+      { label: 'Credential', url: 'https://b.example' },
+    ]);
+    // Items with ≤1 link share one module-level empty array — zero allocation.
+    expect(collections.sortedEducationItems[1].pillLinks).toHaveLength(0);
+    const again = buildEducationCollections([withoutPills], [], []);
+    expect(again.sortedEducationItems[0].pillLinks).toBe(collections.sortedEducationItems[1].pillLinks);
+  });
 });
