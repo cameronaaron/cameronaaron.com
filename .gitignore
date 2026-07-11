@@ -158,3 +158,6 @@ next-env.d.ts
 dns-export-*.txt
 cloudflare-dns-*.json
 unnamed-1.webp
+
+# Claude Code local tooling state (permission grants, machine-specific)
+.claude/
