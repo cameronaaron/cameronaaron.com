@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
@@ -25,6 +25,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   const reducedMotion = Boolean(prefersReducedMotion) || isCoarsePointer;
 
   // Mouse position tracking for 3D tilt effect
+  const containerRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   
@@ -44,12 +45,12 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = document.getElementById(PROFILE_CONTAINER_ID)?.getBoundingClientRect();
-      if (rect) {
-        const target = calculateProfilePointerTargets(rect, e.clientX, e.clientY);
-        mouseX.set(target.x);
-        mouseY.set(target.y);
-      }
+      // Ref read instead of a per-event document.getElementById DOM query.
+      // The listener only exists after mount, so the ref is always attached.
+      const rect = containerRef.current!.getBoundingClientRect();
+      const target = calculateProfilePointerTargets(rect, e.clientX, e.clientY);
+      mouseX.set(target.x);
+      mouseY.set(target.y);
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -59,6 +60,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   return (
     <motion.div
       id={PROFILE_CONTAINER_ID}
+      ref={containerRef}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ 
         opacity: 1, 
