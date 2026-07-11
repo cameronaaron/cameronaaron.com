@@ -2,7 +2,11 @@
 
 import { motion } from 'framer-motion';
 
+import { useInteractionMode } from '@/hooks/useInteractionMode';
+
 export default function ScrollIndicator() {
+  const { prefersReducedMotion } = useInteractionMode();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -11,7 +15,7 @@ export default function ScrollIndicator() {
       className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
     >
       <motion.div
-        animate={{ y: [0, 10, 0] }}
+        animate={prefersReducedMotion ? undefined : { y: [0, 10, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
         className="text-white/50"
       >

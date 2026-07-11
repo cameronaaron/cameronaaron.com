@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { getSectionGlowTone } from './section-transitions-logic';
 
 interface SectionRevealProps {
@@ -16,6 +17,7 @@ interface SectionHandoffProps {
 }
 
 export function SectionReveal({ index, children }: SectionRevealProps) {
+  const { prefersReducedMotion } = useInteractionMode();
   const glowTone = getSectionGlowTone(index);
 
   return (
@@ -28,7 +30,7 @@ export function SectionReveal({ index, children }: SectionRevealProps) {
     >
       <motion.div
         className={`pointer-events-none absolute inset-x-0 top-6 mx-auto h-24 w-3/4 rounded-full bg-gradient-to-r ${glowTone} blur-3xl`}
-        animate={{ opacity: [0.3, 0.55, 0.3], scale: [0.98, 1.02, 0.98] }}
+        animate={prefersReducedMotion ? undefined : { opacity: [0.3, 0.55, 0.3], scale: [0.98, 1.02, 0.98] }}
         transition={{ duration: 7 + index * 0.4, repeat: Infinity, ease: 'easeInOut' }}
         aria-hidden="true"
       />
@@ -38,6 +40,8 @@ export function SectionReveal({ index, children }: SectionRevealProps) {
 }
 
 export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffProps) {
+  const { prefersReducedMotion } = useInteractionMode();
+
   return (
     <motion.div
       className="relative z-10 px-6 py-10"
@@ -54,7 +58,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
       >
         <motion.div
           className="h-24 w-full max-w-3xl rounded-full bg-gradient-to-r from-cyan-400/10 via-primary/15 to-emerald-400/10 blur-3xl"
-          animate={{ scale: [0.96, 1.04, 0.96], opacity: [0.35, 0.55, 0.35] }}
+          animate={prefersReducedMotion ? undefined : { scale: [0.96, 1.04, 0.96], opacity: [0.35, 0.55, 0.35] }}
           transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 }}
         />
       </motion.div>
@@ -76,7 +80,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
           >
             <motion.div
               className="absolute -inset-2 rounded-full border border-cyan-300/25"
-              animate={{ rotate: [0, 360] }}
+              animate={prefersReducedMotion ? undefined : { rotate: [0, 360] }}
               transition={{ duration: 9, ease: 'linear', repeat: Infinity }}
             />
             <motion.a
@@ -110,7 +114,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
               <motion.span
                 key={pulse}
                 className="h-1.5 w-1.5 rounded-full bg-cyan-300/75"
-                animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
+                animate={prefersReducedMotion ? undefined : { y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.1, repeat: Infinity, delay: pulse * 0.13 + index * 0.05 }}
               />
             ))}
