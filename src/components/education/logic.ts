@@ -1,5 +1,5 @@
 import { sortByDateDesc } from '@/data/dateOrdering';
-import type { EducationItem, HonorItem, PrerequisiteCourse } from '@/data/education';
+import type { EducationItem, EducationVerificationLink, HonorItem, PrerequisiteCourse } from '@/data/education';
 
 const NON_FINALIZED_STATUS_TOKENS = [
   'in progress',
@@ -15,11 +15,19 @@ export interface SortedPrerequisiteCourse extends PrerequisiteCourse {
   nonFinalized: boolean;
 }
 
+export interface SortedEducationItem extends EducationItem {
+  /** Precomputed once at build — verificationLinks[1..] render as pill links,
+   *  so the render path never re-slices per render. */
+  pillLinks: EducationVerificationLink[];
+}
+
 export interface EducationCollections {
-  sortedEducationItems: EducationItem[];
+  sortedEducationItems: SortedEducationItem[];
   sortedHonorsAndAffiliations: HonorItem[];
   sortedPrerequisiteCourses: SortedPrerequisiteCourse[];
 }
+
+const EMPTY_PILL_LINKS: EducationVerificationLink[] = [];
 
 export function isNonFinalizedCourseStatus(status: string): boolean {
   const normalized = status.trim().toLowerCase();
@@ -55,13 +63,27 @@ export function sortPrerequisiteCourses(courses: PrerequisiteCourse[]): SortedPr
   return decorated.map((entry) => ({ ...entry.course, nonFinalized: entry.nonFinalized === 1 }));
 }
 
+function decorateEducationItems(items: EducationItem[]): SortedEducationItem[] {
+  const decorated: SortedEducationItem[] = [];
+  for (const item of items) {
+    decorated.push({
+      ...item,
+      pillLinks:
+        item.verificationLinks && item.verificationLinks.length > 1
+          ? item.verificationLinks.slice(1)
+          : EMPTY_PILL_LINKS,
+    });
+  }
+  return decorated;
+}
+
 export function buildEducationCollections(
   educationItems: EducationItem[],
   prerequisiteCourses: PrerequisiteCourse[],
   honorsAndAffiliations: HonorItem[]
 ): EducationCollections {
   return {
-    sortedEducationItems: sortByDateDesc(educationItems, (item) => item.period),
+    sortedEducationItems: decorateEducationItems(sortByDateDesc(educationItems, (item) => item.period)),
     sortedHonorsAndAffiliations: sortByDateDesc(honorsAndAffiliations, (item) => item.label),
     sortedPrerequisiteCourses: sortPrerequisiteCourses(prerequisiteCourses),
   };

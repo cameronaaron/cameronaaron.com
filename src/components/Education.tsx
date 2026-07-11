@@ -49,9 +49,9 @@ export default function Education() {
                 ) : (
                   <p className="text-muted-foreground">{item.institution}</p>
                 )}
-                {item.verificationLinks && item.verificationLinks.length > 1 ? (
+                {item.pillLinks.length > 0 ? (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {item.verificationLinks.slice(1).map((link) => (
+                    {item.pillLinks.map((link) => (
                       <a
                         key={link.url}
                         href={link.url}
