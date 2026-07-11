@@ -86,6 +86,25 @@ describe('public-asset-weight-contract — mobile LCP budget', () => {
     ).toBeLessThanOrEqual(TOTAL_BUDGET_BYTES);
   });
 
+  it('content images ship in modern formats (webp/avif) — no jpg/png outside icons and social cards', () => {
+    // webp/avif are 25–60% lighter than jpg/png at equal quality — directly
+    // a mobile-LCP win. PNG stays legitimate where platforms require it:
+    // PWA icons, apple-touch-icon, favicons, and Open Graph / Twitter cards
+    // (some scrapers still reject webp).
+    const MODERN_FORMAT_EXEMPT_DIRS = /^(icons|social)\//;
+    const MODERN_FORMAT_EXEMPT_FILES = /^(apple-touch-icon\.png|favicon\.ico|favicon(-\d+x\d+)?\.png)$/;
+    const legacy: string[] = [];
+    for (const file of files) {
+      if (!/\.(png|jpe?g)$/i.test(file.rel)) continue;
+      if (MODERN_FORMAT_EXEMPT_DIRS.test(file.rel) || MODERN_FORMAT_EXEMPT_FILES.test(file.rel)) continue;
+      legacy.push(`  public/${file.rel}`);
+    }
+    expect(
+      legacy,
+      `legacy-format content image(s) — convert to webp/avif (sharp is already a dependency):\n${legacy.join('\n')}`,
+    ).toEqual([]);
+  });
+
   it('every WEIGHT_EXEMPT entry names a file that still exists and still needs the exemption', () => {
     const byRel = new Map(files.map((file) => [file.rel, file.bytes]));
     for (const [rel, reason] of Object.entries(WEIGHT_EXEMPT)) {
