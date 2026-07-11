@@ -27,6 +27,7 @@ export default function SmoothScroll() {
     });
 
     let rafId = 0;
+    let syncTimeoutId = 0;
 
     const syncScrollState = () => {
       const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
@@ -47,27 +48,30 @@ export default function SmoothScroll() {
 
     rafId = requestAnimationFrame(raf);
 
-    const handlePageShow = (event: PageTransitionEvent) => {
+    // The zero-delay re-sync catches browsers that restore scroll position
+    // after the pageshow handlers run. Tracked so unmount can cancel it —
+    // a late callback would call scrollTo on a destroyed Lenis instance.
+    const queueSyncScrollState = () => {
+      window.clearTimeout(syncTimeoutId);
+      syncTimeoutId = window.setTimeout(syncScrollState, 0);
+    };
+
+    const handlePageShow = () => {
       if (typeof lenis.resize === 'function') {
         lenis.resize();
       }
 
-      if (event.persisted) {
-        syncScrollState();
-        window.setTimeout(syncScrollState, 0);
-        return;
-      }
-
       syncScrollState();
-      window.setTimeout(syncScrollState, 0);
+      queueSyncScrollState();
     };
 
     syncScrollState();
-    window.setTimeout(syncScrollState, 0);
+    queueSyncScrollState();
 
     window.addEventListener('pageshow', handlePageShow, { passive: true });
 
     return () => {
+      window.clearTimeout(syncTimeoutId);
       cancelAnimationFrame(rafId);
       window.removeEventListener('pageshow', handlePageShow);
       lenis.destroy();
