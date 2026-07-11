@@ -1,12 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Project } from '@/data/projects';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { use3DTilt } from '@/hooks/use3DTilt';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
-import { getProjectCardCta, getProjectReadingMinutes } from '@/components/projects/card-logic';
+import { getProjectCardCta, getProjectReadingMinutes, getProjectTopTags } from '@/components/projects/card-logic';
 
 interface ProjectCardProps {
   project: Project;
@@ -16,7 +16,10 @@ interface ProjectCardProps {
 export default function ProjectCard({ project, index }: ProjectCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const readingMinutes = getProjectReadingMinutes(project.description);
+  // This card re-renders on every hover enter/leave (isHovering) — derived
+  // values are memoized so hover events do zero recomputation.
+  const readingMinutes = useMemo(() => getProjectReadingMinutes(project.description), [project.description]);
+  const topTags = useMemo(() => getProjectTopTags(project.tags), [project.tags]);
 
   const { handleMouseMove: tiltMouseMove, handleMouseLeave: tiltMouseLeave, rotateX: springRotateX, rotateY: springRotateY } =
     use3DTilt({ maxRotation: 8 });
@@ -102,7 +105,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         </p>
         <p className="text-cyan-300 text-sm font-medium mb-4">{project.period}</p>
         <div className="flex flex-wrap gap-2 mb-6">
-          {project.tags.slice(0, 3).map((tag, tagIndex) => (
+          {topTags.map((tag, tagIndex) => (
             <motion.span
               key={tagIndex}
               initial={{ opacity: 0, scale: 0.8 }}
