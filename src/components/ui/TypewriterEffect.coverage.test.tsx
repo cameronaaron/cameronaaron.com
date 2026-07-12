@@ -48,7 +48,7 @@ describe('TypewriterEffect coverage', () => {
   });
 
   it('fires pageshow non-persisted event (no-op branch)', async () => {
-    render(<TypewriterEffect text="Test text 2" typingSpeed={1} />);
+    const { container } = render(<TypewriterEffect text="Test text 2" typingSpeed={1} />);
 
     await act(async () => {
       const event = new Event('pageshow') as PageTransitionEvent;
@@ -56,18 +56,18 @@ describe('TypewriterEffect coverage', () => {
       window.dispatchEvent(event);
     });
 
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders with custom className and cursorClassName', () => {
-    render(<TypewriterEffect text="Hi" className="custom" cursorClassName="cursor" typingSpeed={1} />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<TypewriterEffect text="Hi" className="custom" cursorClassName="cursor" typingSpeed={1} />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('uses default typingSpeed=100 when not provided (covers default param branch line 26)', () => {
     // Do NOT pass typingSpeed — exercises the default parameter branch
-    render(<TypewriterEffect text="X" />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<TypewriterEffect text="X" />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('marks complete and covers false branch of currentIndex < text.length (lines 58-60, 68)', async () => {

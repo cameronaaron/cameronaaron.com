@@ -126,8 +126,8 @@ describe('interactive-particles engine coverage (lines 93, 203)', () => {
 describe('BackgroundParticles coverage (line 151)', () => {
   it('renders with quality=full (shouldRenderBackgroundParticles=true)', async () => {
     const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
-    render(<BackgroundParticles quality="full" />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<BackgroundParticles quality="full" />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('returns null with quality=lite (shouldRenderBackgroundParticles=false, line 151)', async () => {
@@ -237,8 +237,8 @@ describe('BackgroundParticles — devicePixelRatio cross-browser behaviour', () 
 describe('InteractiveParticles coverage (line 125)', () => {
   it('renders with quality=full', async () => {
     const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
-    render(<InteractiveParticles quality="full" />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<InteractiveParticles quality="full" />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('returns null with quality=lite (line 125 null branch)', async () => {
@@ -255,7 +255,7 @@ describe('InteractiveParticles coverage (line 125)', () => {
 
   it('renders with quality=balanced (covers line 32 balanced seed branch)', async () => {
     const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
-    render(<InteractiveParticles quality="balanced" />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<InteractiveParticles quality="balanced" />);
+    expect(container.firstChild).not.toBeNull();
   });
 });

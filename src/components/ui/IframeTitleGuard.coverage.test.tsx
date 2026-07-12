@@ -55,23 +55,30 @@ describe('IframeTitleGuard coverage', () => {
 
   it('ignores non-HTMLElement nodes added to DOM', async () => {
     render(<IframeTitleGuard />);
+    const iframeCountBefore = document.querySelectorAll('iframe').length;
 
     await act(async () => {
       const text = document.createTextNode('hello');
       document.body.appendChild(text);
     });
 
-    expect(document.body).toBeTruthy();
+    // A text node has no tagName/querySelectorAll — the `node instanceof
+    // HTMLElement` guard must skip it without throwing, and it must not
+    // spuriously create or title any iframe.
+    expect(document.querySelectorAll('iframe').length).toBe(iframeCountBefore);
   });
 
   it('ignores HTMLElement nodes that are not iframes and have no nested iframes', async () => {
     render(<IframeTitleGuard />);
 
+    let span!: HTMLSpanElement;
     await act(async () => {
-      const span = document.createElement('span');
+      span = document.createElement('span');
       document.body.appendChild(span);
     });
 
-    expect(document.body).toBeTruthy();
+    // Proves the tag-check branch actually discriminates — a buggy version
+    // that titled every added element (not just iframes) would fail this.
+    expect(span.hasAttribute('title')).toBe(false);
   });
 });
