@@ -22,7 +22,19 @@ type LighthouseConfig = {
   };
 };
 
-function expectStrictAssertions(assertions: Record<string, unknown>, performanceMinScore: number): void {
+interface NumericCeilings {
+  domSizeMaxElements: number;
+  unusedJavascriptMaxMs: number;
+  unusedJavascriptMaxFiles: number;
+  legacyJavascriptMaxMs: number;
+  legacyJavascriptMaxFiles: number;
+}
+
+function expectStrictAssertions(
+  assertions: Record<string, unknown>,
+  performanceMinScore: number,
+  ceilings: NumericCeilings,
+): void {
   expect(assertions['categories:performance']).toBeTruthy();
   expect(assertions['categories:performance']).toEqual(['error', { minScore: performanceMinScore }]);
   expect(assertions['categories:accessibility']).toEqual(['error', { minScore: 1 }]);
@@ -34,46 +46,57 @@ function expectStrictAssertions(assertions: Record<string, unknown>, performance
   expect(assertions['total-blocking-time']).toBeTruthy();
   expect(assertions['speed-index']).toBeTruthy();
   expect(assertions['interactive']).toBeTruthy();
-  // forced-reflow-insight is demoted to warn deliberately (2026-07): it's a
-  // binary-scored diagnostic that flipped 0/1/0 across three otherwise-identical
-  // local runs, attributes its ~35ms of reflow to "[unattributed]" (nothing
-  // actionable), and does not feed the performance category score — runs where
-  // it scored 0 still scored a perfect 100. Same class as the other insight
-  // audits below.
+
+  // ── Tier 1: bare "warn" — audits with no meaningful numericValue in the LHR
+  // (confirmed 2026-07 by inspecting real collected reports), so LHCI's
+  // maxNumericValue mechanism cannot gate them. Pinned explicitly so a future
+  // lighthouse/@lhci/cli upgrade can't silently flip a preset default from
+  // warn to error and break the gate unannounced.
+  //
+  // forced-reflow-insight: a binary-scored diagnostic that flipped 0/1/0
+  // across three otherwise-identical local runs, attributes its ~35ms of
+  // reflow to "[unattributed]" (nothing actionable), zero category weight.
   expect(assertions['forced-reflow-insight']).toBe('warn');
   expect(assertions['image-delivery-insight']).toBe('warn');
   expect(assertions['label-content-name-mismatch']).toBe('warn');
-  expect(assertions['legacy-javascript-insight']).toBe('warn');
-  expect(assertions['network-dependency-tree-insight']).toBe('warn');
-  expect(assertions['unused-javascript']).toBe('warn');
   expect(assertions['uses-responsive-images']).toBe('warn');
-
-  // dom-size / legacy-javascript / render-blocking-insight / render-blocking-resources
-  // — demoted to warn deliberately (2026-07, full investigation in
-  // ENGINEERING-STANDARDS §4.7): a live `npx @lhci/cli autorun` against a
-  // clean local build confirmed all four already score category weight 0
-  // (informative diagnostics — Lighthouse v10+ scores performance from only
-  // FCP/LCP/TBT/CLS/Speed-Index) and the `lighthouse:recommended` preset
-  // already treats them as non-blocking warnings, not errors (LHCI exited 0
-  // on both form factors with these as the only open items). They're pinned
-  // here explicitly so a future lighthouse/@lhci/cli upgrade can't silently
-  // flip a preset default from warn to error and break the gate unannounced.
-  // render-blocking-insight/-resources specifically WAS attempted: a
-  // beasties-based postbuild step inlined critical CSS and moved the two
-  // render-blocking stylesheets to preload+swap. Desktop improved (speed-index
-  // 0.65→0.98, category 0.96→1.0) but mobile cumulative-layout-shift dropped
-  // from a perfect 1.0 to 0.75 — the deferred-stylesheet swap shifted an
-  // absolutely-positioned decorative hero glow div that beasties' static
-  // critical-CSS extraction didn't detect as visible. CLS carries real
-  // category weight (25%); the render-blocking audits carry none. Net effect
-  // on the graded score: negative on mobile, zero additional upside on
-  // desktop's already-perfect category score. Measured and rejected — same
-  // discipline as the code-splitting experiment in §4.7. Don't reattempt
-  // without a critical-CSS approach proven not to regress CLS.
-  expect(assertions['dom-size']).toBe('warn');
-  expect(assertions['legacy-javascript']).toBe('warn');
+  //
+  // legacy-javascript-insight: root-caused (2026-07) to Next.js's own
+  // next/dist/build/polyfills/polyfill-module.js — conditional guards like
+  // `Array.prototype.at||(Array.prototype.at=function(){...})` for
+  // Array.at/flat/flatMap/Object.fromEntries/Object.hasOwn/String.trimEnd,
+  // shipped by Next's build pipeline itself (confirmed by grepping the exact
+  // polyfill source into the built chunk), not application code and not
+  // exposed via any next.config.mjs opt-out.
+  expect(assertions['legacy-javascript-insight']).toBe('warn');
+  //
+  // network-dependency-tree-insight / render-blocking-insight /
+  // render-blocking-resources: three distinct fixes were attempted and
+  // measured (ENGINEERING-STANDARDS §4.7 history item 5) — critical-CSS
+  // extraction via beasties (regressed mobile CLS 1.0→0.75), full-file
+  // inlining (blows the HTML weight budget: 550KB raw / 70KB gzip vs the
+  // 470KB/62KB homepage budget), and preload-without-inlining (reintroduces
+  // FOUC, since font-display:swap alone doesn't cover the ~110KB Tailwind
+  // utility stylesheet). All three real, measured, rejected.
+  expect(assertions['network-dependency-tree-insight']).toBe('warn');
   expect(assertions['render-blocking-insight']).toBe('warn');
   expect(assertions['render-blocking-resources']).toBe('warn');
+
+  // ── Tier 2: warn + numeric regression ceiling. These DO expose a stable
+  // numericValue (confirmed via 3 authoritative LHCI runs per form factor,
+  // 2026-07) — a future regression that meaningfully worsens them now fails
+  // the gate even though today's baseline stays non-blocking. Ceilings carry
+  // real headroom over the observed baseline, not a tight pin, so normal
+  // content growth doesn't false-positive.
+  expect(assertions['dom-size']).toEqual(['warn', { maxNumericValue: ceilings.domSizeMaxElements }]);
+  expect(assertions['unused-javascript']).toEqual([
+    'warn',
+    { maxNumericValue: ceilings.unusedJavascriptMaxMs, maxLength: ceilings.unusedJavascriptMaxFiles },
+  ]);
+  expect(assertions['legacy-javascript']).toEqual([
+    'warn',
+    { maxNumericValue: ceilings.legacyJavascriptMaxMs, maxLength: ceilings.legacyJavascriptMaxFiles },
+  ]);
 }
 
 describe('performance regression contract', () => {
@@ -132,7 +155,17 @@ describe('performance regression contract', () => {
     // three otherwise-identical CI runs. 0.85 sits below the worst observed
     // floor (0.90) with margin for a bad-runner day, while numberOfRuns=3
     // (below) has LHCI take the median run instead of a single sample.
-    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.85);
+    //
+    // Numeric ceilings (2026-07): desktop's 3 authoritative LHCI runs measured
+    // dom-size 2689 elements, unused-javascript 70-80ms/2 files, legacy-
+    // javascript 40ms/1 file. Ceilings below carry real headroom.
+    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.85, {
+      domSizeMaxElements: 3200,
+      unusedJavascriptMaxMs: 150,
+      unusedJavascriptMaxFiles: 4,
+      legacyJavascriptMaxMs: 100,
+      legacyJavascriptMaxFiles: 3,
+    });
   });
 
   it('keeps desktop Lighthouse at three runs (median absorbs CI rendering-speed variance)', () => {
@@ -160,7 +193,18 @@ describe('performance regression contract', () => {
     // scores 0.99 under mobile's curve) — observed mobile category scores
     // have held at 0.99 across every CI run in this investigation. 0.95
     // keeps a strict bar with a small margin, well above desktop's 0.85.
-    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.95);
+    //
+    // Numeric ceilings (2026-07): mobile's 3 authoritative LHCI runs measured
+    // dom-size 2672 elements, unused-javascript 50ms/2 files, legacy-
+    // javascript 10ms/1 file — lower than desktop, so mobile's ceilings are
+    // tighter (real headroom, not copy-pasted from desktop).
+    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.95, {
+      domSizeMaxElements: 3200,
+      unusedJavascriptMaxMs: 120,
+      unusedJavascriptMaxFiles: 4,
+      legacyJavascriptMaxMs: 60,
+      legacyJavascriptMaxFiles: 3,
+    });
 
     // Must actually emulate a mobile device — otherwise this is just desktop scoring twice.
     expect(lighthouseConfig.ci?.collect?.settings?.formFactor).toBe('mobile');
