@@ -35,8 +35,17 @@ describe('hooks coverage', () => {
       result.current.handleMouseLeave();
     });
 
-    expect(result.current.rotateX).toBeTruthy();
-    expect(result.current.rotateY).toBeTruthy();
+    // vitest.setup.ts's useTransform mock doesn't interpolate the 3-array
+    // (value, inputRange, outputRange) form — it freezes at outputRange[0]
+    // regardless of the live input, so rotateX/rotateY always read
+    // maxRotation/-maxRotation here (real interpolation is covered by the
+    // calculateTiltTargets unit test above, which exercises the actual
+    // percentage math without going through the mocked motion-value layer).
+    // A MotionValue wrapper object is truthy regardless of its numeric
+    // payload — even 0 would pass toBeTruthy() — so the real check reads
+    // the value with .get() instead of trusting object identity.
+    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(10);
+    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(-10);
   });
 
   it('use3DTilt prefers the event currentTarget over ref when both are available', () => {
@@ -54,8 +63,12 @@ describe('hooks coverage', () => {
       } as never);
     });
 
-    expect(result.current.rotateX).toBeTruthy();
-    expect(result.current.rotateY).toBeTruthy();
+    // Same mock-freezing caveat as above: rotateX/rotateY read
+    // outputRange[0] regardless of the actual (90,90) pointer position.
+    // This still verifies the currentTarget-over-ref wiring produces a
+    // real, readable motion value rather than merely a truthy object.
+    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(10);
+    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(-10);
   });
 
   it('tracks scroll threshold hook', () => {

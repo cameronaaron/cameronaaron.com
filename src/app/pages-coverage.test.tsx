@@ -74,8 +74,8 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
       }),
     }));
     const { default: Home } = await import('./page');
-    render(<Home />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Home />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders with lite tier (showFloatingOverlays=false, showSectionHandoffs=false)', async () => {
@@ -90,8 +90,8 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
       }),
     }));
     const { default: Home } = await import('./page');
-    render(<Home />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Home />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('fires interaction event to set hasInteracted=true (covers lines 52-53)', async () => {
@@ -106,12 +106,12 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
       }),
     }));
     const { default: Home } = await import('./page');
-    render(<Home />);
+    const { container } = render(<Home />);
 
     await act(async () => {
       window.dispatchEvent(new Event('pointerdown'));
     });
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders with balanced tier after interaction (covers || performanceTier === balanced branch)', async () => {
@@ -126,12 +126,12 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
       }),
     }));
     const { default: Home } = await import('./page');
-    render(<Home />);
+    const { container } = render(<Home />);
 
     await act(async () => {
       window.dispatchEvent(new Event('pointerdown'));
     });
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -170,8 +170,8 @@ describe('capstone/page.tsx coverage (line 167)', () => {
       toYouTubeEmbedUrl: () => null,
     }));
     const { default: CapstonePageComponent } = await import('./capstone/page');
-    render(<CapstonePageComponent />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<CapstonePageComponent />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -179,8 +179,8 @@ describe('capstone/page.tsx coverage (line 167)', () => {
 describe('credentials/page.tsx coverage (line 104 — credentialId null branch)', () => {
   it('renders credentials page', async () => {
     const { default: CredentialsPage } = await import('./credentials/page');
-    render(<CredentialsPage />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<CredentialsPage />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders resource without credentialId (null branch at line 104)', async () => {
@@ -200,8 +200,8 @@ describe('credentials/page.tsx coverage (line 104 — credentialId null branch)'
       };
     });
     const { default: CredentialsPage } = await import('./credentials/page');
-    render(<CredentialsPage />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<CredentialsPage />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -209,8 +209,8 @@ describe('credentials/page.tsx coverage (line 104 — credentialId null branch)'
 describe('internet/page.tsx coverage (line 104 — empty items null return)', () => {
   it('renders internet page normally', async () => {
     const { default: InternetPage } = await import('./internet/page');
-    render(<InternetPage />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<InternetPage />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders internet page with a category that has no items (null return branch)', async () => {
@@ -224,8 +224,8 @@ describe('internet/page.tsx coverage (line 104 — empty items null return)', ()
       };
     });
     const { default: InternetPage } = await import('./internet/page');
-    render(<InternetPage />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<InternetPage />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
 

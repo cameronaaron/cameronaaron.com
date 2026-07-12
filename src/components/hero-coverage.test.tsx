@@ -98,8 +98,8 @@ describe('Hero coverage (lines 70-221, 242)', () => {
     }));
 
     const { default: Hero } = await import('@/components/Hero');
-    render(<Hero />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Hero />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders Hero in balanced tier (no parallax, no heavy effects)', async () => {
@@ -115,8 +115,8 @@ describe('Hero coverage (lines 70-221, 242)', () => {
     }));
 
     const { default: Hero } = await import('@/components/Hero');
-    render(<Hero />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Hero />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('writes pointer coordinates into motion values on mousemove, not React state', async () => {

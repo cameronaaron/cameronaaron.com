@@ -47,9 +47,9 @@ afterEach(() => {
 describe('TextReveal coverage', () => {
   it('becomes forced-visible via effect when sessionStorage already set (deferred readInitialReveal branch)', () => {
     window.sessionStorage.setItem('text-reveal-complete:Hello', '1');
-    render(<TextReveal text="Hello" />);
+    const { container } = render(<TextReveal text="Hello" />);
     // render() flushes effects; readInitialReveal finds '1' → setForceVisible(true)
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('fires pageshow persisted event to set forceVisible (25-54 branch)', async () => {
@@ -65,7 +65,7 @@ describe('TextReveal coverage', () => {
   });
 
   it('fires pageshow non-persisted (no-op)', async () => {
-    render(<TextReveal text="Noop" />);
+    const { container } = render(<TextReveal text="Noop" />);
 
     await act(async () => {
       const event = new Event('pageshow') as PageTransitionEvent;
@@ -73,12 +73,12 @@ describe('TextReveal coverage', () => {
       window.dispatchEvent(event);
     });
 
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders with delay prop', () => {
-    render(<TextReveal text="Delayed" delay={0.3} />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<TextReveal text="Delayed" delay={0.3} />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('saves to sessionStorage when shouldReveal becomes true', async () => {

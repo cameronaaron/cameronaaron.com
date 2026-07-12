@@ -68,13 +68,13 @@ describe('Navigation coverage (branches 18, 64)', () => {
   it('renders navigation and exercises activeHref fallback', async () => {
     vi.doMock('@/data/navigation', () => ({ navItems: [] }));
     const { default: Navigation } = await import('@/components/Navigation');
-    render(<Navigation />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Navigation />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('opens mobile menu and fires resize to close it at desktop width', async () => {
     const { default: Navigation } = await import('@/components/Navigation');
-    render(<Navigation />);
+    const { container } = render(<Navigation />);
 
     const menuButton = document.querySelector('[aria-label*="menu"], [aria-label*="Menu"], button[aria-expanded]');
     if (menuButton) {
@@ -84,12 +84,12 @@ describe('Navigation coverage (branches 18, 64)', () => {
         window.dispatchEvent(new Event('resize'));
       });
     }
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('opens mobile menu and fires resize at mobile width (menu stays open)', async () => {
     const { default: Navigation } = await import('@/components/Navigation');
-    render(<Navigation />);
+    const { container } = render(<Navigation />);
 
     const menuButton = document.querySelector('[aria-label*="menu"], [aria-label*="Menu"], button[aria-expanded]');
     if (menuButton) {
@@ -99,15 +99,15 @@ describe('Navigation coverage (branches 18, 64)', () => {
         window.dispatchEvent(new Event('resize'));
       });
     }
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('updates active section on scroll', async () => {
     const { default: Navigation } = await import('@/components/Navigation');
-    render(<Navigation />);
+    const { container } = render(<Navigation />);
 
     await act(async () => { window.dispatchEvent(new Event('scroll')); });
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -127,7 +127,7 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
       }),
     }));
     const { default: Experience } = await import('@/components/Experience');
-    render(<Experience />);
+    const { container } = render(<Experience />);
 
     const navButtons = document.querySelectorAll('[data-testid^="experience-nav-"]');
     if (navButtons.length > 0) {
@@ -135,7 +135,7 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
       await act(async () => { fireEvent.mouseEnter(navButtons[0]); });
       await act(async () => { fireEvent.focus(navButtons[0]); });
     }
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders in lite tier (isLiteMotion=true)', async () => {
@@ -150,8 +150,8 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
       }),
     }));
     const { default: Experience } = await import('@/components/Experience');
-    render(<Experience />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Experience />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('fires mouseEnter on experience item div and card (lines 167-173)', async () => {
@@ -164,7 +164,7 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
       }),
     }));
     const { default: Experience } = await import('@/components/Experience');
-    render(<Experience />);
+    const { container } = render(<Experience />);
 
     // Fire mouseEnter on the wrapper div (line 167 arrow function)
     const items = document.querySelectorAll('[data-testid^="experience-item-"]');
@@ -178,7 +178,7 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
     for (const card of cards) {
       await act(async () => { fireEvent.mouseEnter(card); });
     }
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -188,24 +188,24 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
 describe('Testimonials coverage (branches 30-32, 62-72, 121)', () => {
   it('renders testimonials and cycles spotlight prev/next', async () => {
     const { default: Testimonials } = await import('@/components/Testimonials');
-    render(<Testimonials />);
+    const { container } = render(<Testimonials />);
 
     const prevBtn = screen.queryByLabelText('Show previous testimonial');
     const nextBtn = screen.queryByLabelText('Show next testimonial');
     if (nextBtn) await act(async () => { fireEvent.click(nextBtn); });
     if (prevBtn) await act(async () => { fireEvent.click(prevBtn); });
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('filters testimonials by relationship', async () => {
     const { default: Testimonials } = await import('@/components/Testimonials');
-    render(<Testimonials />);
+    const { container } = render(<Testimonials />);
 
     const filterButtons = document.querySelectorAll('button[aria-pressed]');
     for (const btn of filterButtons) {
       await act(async () => { fireEvent.click(btn); });
     }
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('cycleSpotlight returns early when no featured testimonials', async () => {
@@ -219,11 +219,11 @@ describe('Testimonials coverage (branches 30-32, 62-72, 121)', () => {
       RELATIONSHIP_OPTIONS: [{ key: 'all', label: 'All' }],
     }));
     const { default: Testimonials } = await import('@/components/Testimonials');
-    render(<Testimonials />);
+    const { container } = render(<Testimonials />);
 
     const nextBtn = screen.queryByLabelText('Show next testimonial');
     if (nextBtn) await act(async () => { fireEvent.click(nextBtn); });
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('shows empty state when all testimonials are filtered out (line 140 true branch)', async () => {
@@ -262,7 +262,7 @@ describe('Skills coverage (branches 98-112, 75% funcs)', () => {
     );
     if (priorityBtn) await act(async () => { fireEvent.click(priorityBtn as HTMLElement); });
 
-    expect(document.body).toBeTruthy();
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders in lite tier (isLiteMotion=true)', async () => {
@@ -275,8 +275,8 @@ describe('Skills coverage (branches 98-112, 75% funcs)', () => {
       }),
     }));
     const { default: Skills } = await import('@/components/Skills');
-    render(<Skills />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Skills />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders null branch of strongestSkill ternary (line 141) when technical skills list is empty', async () => {
@@ -288,8 +288,8 @@ describe('Skills coverage (branches 98-112, 75% funcs)', () => {
       },
     }));
     const { default: Skills } = await import('@/components/Skills');
-    render(<Skills />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Skills />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -331,8 +331,8 @@ describe('Education coverage (branches 37-49)', () => {
       honorsAndAffiliations: [],
     }));
     const { default: Education } = await import('@/components/Education');
-    render(<Education />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Education />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
 
@@ -352,8 +352,8 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
       }),
     }));
     const { default: Projects } = await import('@/components/Projects');
-    render(<Projects />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Projects />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders in balanced tier (shouldRenderAmbientEffects = true, no particles)', async () => {
@@ -368,8 +368,8 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
       }),
     }));
     const { default: Projects } = await import('@/components/Projects');
-    render(<Projects />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Projects />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders in lite tier (no ambient effects, prefersReducedMotion true)', async () => {
@@ -384,8 +384,8 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
       }),
     }));
     const { default: Projects } = await import('@/components/Projects');
-    render(<Projects />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Projects />);
+    expect(container.firstChild).not.toBeNull();
   });
 
   it('renders with useReducedMotion=true (covers prefersReducedMotion ? undefined : animate branches)', async () => {
@@ -404,7 +404,7 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
       useMotionValueEvent: vi.fn(),
     }));
     const { default: Projects } = await import('@/components/Projects');
-    render(<Projects />);
-    expect(document.body).toBeTruthy();
+    const { container } = render(<Projects />);
+    expect(container.firstChild).not.toBeNull();
   });
 });
