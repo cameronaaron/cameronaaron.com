@@ -35,17 +35,20 @@ function expectStrictAssertions(
   performanceMinScore: number,
   ceilings: NumericCeilings,
 ): void {
-  expect(assertions['categories:performance']).toBeTruthy();
   expect(assertions['categories:performance']).toEqual(['error', { minScore: performanceMinScore }]);
   expect(assertions['categories:accessibility']).toEqual(['error', { minScore: 1 }]);
   expect(assertions['categories:best-practices']).toEqual(['error', { minScore: 1 }]);
   expect(assertions['categories:seo']).toEqual(['error', { minScore: 1 }]);
-  expect(assertions['first-contentful-paint']).toBeTruthy();
-  expect(assertions['largest-contentful-paint']).toBeTruthy();
-  expect(assertions['cumulative-layout-shift']).toBeTruthy();
-  expect(assertions['total-blocking-time']).toBeTruthy();
-  expect(assertions['speed-index']).toBeTruthy();
-  expect(assertions['interactive']).toBeTruthy();
+  // Core Web Vitals — exact thresholds, not just "the key exists" (a
+  // toBeTruthy() check here would pass even if maxNumericValue were silently
+  // loosened to something meaningless). Values match Google's "good" CWV
+  // bar: FCP/LCP in ms, CLS unitless, TBT/interactive in ms.
+  expect(assertions['first-contentful-paint']).toEqual(['error', { maxNumericValue: 1500 }]);
+  expect(assertions['largest-contentful-paint']).toEqual(['error', { maxNumericValue: 2500 }]);
+  expect(assertions['cumulative-layout-shift']).toEqual(['error', { maxNumericValue: 0.1 }]);
+  expect(assertions['total-blocking-time']).toEqual(['error', { maxNumericValue: 300 }]);
+  expect(assertions['speed-index']).toEqual(['error', { maxNumericValue: 3000 }]);
+  expect(assertions['interactive']).toEqual(['error', { maxNumericValue: 3500 }]);
 
   // ── Tier 1: bare "warn" — audits with no meaningful numericValue in the LHR
   // (confirmed 2026-07 by inspecting real collected reports), so LHCI's
