@@ -6,27 +6,9 @@ import {
   buildShortcutJumpMap,
   processKeySequence,
   shouldIgnoreShortcutEvent,
+  SHORTCUTS,
   type KeySequenceState,
 } from '@/components/ui/keyboard-shortcuts-logic';
-
-interface Shortcut {
-  keys: string[];
-  label: string;
-  targetId?: string;
-}
-
-export const SHORTCUTS: Shortcut[] = [
-  { keys: ['?'], label: 'Open or close this shortcut overlay' },
-  { keys: ['Esc'], label: 'Close any open overlay or menu' },
-  { keys: ['g', 'h'], label: 'Jump to Home', targetId: 'home' },
-  { keys: ['g', 'c'], label: 'Jump to Credentials', targetId: 'certifications' },
-  { keys: ['g', 'e'], label: 'Jump to Experience', targetId: 'experience' },
-  { keys: ['g', 'd'], label: 'Jump to Education', targetId: 'education' },
-  { keys: ['g', 'r'], label: 'Jump to Research', targetId: 'projects' },
-  { keys: ['g', 's'], label: 'Jump to Skills', targetId: 'skills' },
-  { keys: ['g', 't'], label: 'Jump to Testimonials', targetId: 'testimonials' },
-  { keys: ['g', 'm'], label: 'Jump to Contact (message me)', targetId: 'contact' },
-];
 
 const JUMP_MAP: Record<string, string> = buildShortcutJumpMap(SHORTCUTS);
 

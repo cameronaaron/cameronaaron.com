@@ -1,3 +1,19 @@
+export interface SectionRailItem {
+  id: string;
+  label: string;
+}
+
+export const RAIL_SECTIONS: SectionRailItem[] = [
+  { id: 'home', label: 'Intro' },
+  { id: 'certifications', label: 'Credentials' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'education', label: 'Education' },
+  { id: 'projects', label: 'Research' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'testimonials', label: 'Voices' },
+  { id: 'contact', label: 'Connect' },
+];
+
 export function getMostVisibleEntry(
   entries: IntersectionObserverEntry[]
 ): IntersectionObserverEntry | undefined {

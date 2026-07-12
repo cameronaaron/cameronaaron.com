@@ -2,7 +2,8 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import SectionRail, { RAIL_SECTIONS } from './SectionRail';
+import SectionRail from './SectionRail';
+import { RAIL_SECTIONS } from './section-rail-logic';
 
 type ObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void;
 const observerInstances: Array<{ callback: ObserverCallback; observed: Element[]; disconnect: () => void }> = [];

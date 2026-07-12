@@ -1,24 +1,8 @@
 'use client';
 
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
-import { getMostVisibleEntry } from './section-rail-logic';
+import { getMostVisibleEntry, RAIL_SECTIONS, type SectionRailItem } from './section-rail-logic';
 import { useEffect, useState } from 'react';
-
-export interface SectionRailItem {
-  id: string;
-  label: string;
-}
-
-export const RAIL_SECTIONS: SectionRailItem[] = [
-  { id: 'home', label: 'Intro' },
-  { id: 'certifications', label: 'Credentials' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'education', label: 'Education' },
-  { id: 'projects', label: 'Research' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'testimonials', label: 'Voices' },
-  { id: 'contact', label: 'Connect' },
-];
 
 interface SectionRailProps {
   sections?: SectionRailItem[];
