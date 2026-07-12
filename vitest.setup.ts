@@ -20,6 +20,32 @@ function readMotionValue(value: unknown) {
   return value;
 }
 
+/** A derived motion value that recomputes from its live inputs on every
+ *  .get() — so tests can drive a source value (pointer position, scroll)
+ *  and assert the real transformed output, not a snapshot frozen at
+ *  creation time. */
+function createComputedMotionValue(compute: () => unknown) {
+  return {
+    get: compute,
+    set: vi.fn(),
+    on: vi.fn(),
+  };
+}
+
+/** Piecewise-linear interpolation matching framer-motion's range form,
+ *  clamped at both ends (framer clamps by default). */
+function interpolateRange(value: number, inputRange: number[], outputRange: number[]): number {
+  if (value <= inputRange[0]) return outputRange[0];
+  const lastIndex = inputRange.length - 1;
+  if (value >= inputRange[lastIndex]) return outputRange[lastIndex];
+
+  let segment = 1;
+  while (inputRange[segment] < value) segment += 1;
+
+  const t = (value - inputRange[segment - 1]) / (inputRange[segment] - inputRange[segment - 1]);
+  return outputRange[segment - 1] + t * (outputRange[segment] - outputRange[segment - 1]);
+}
+
 vi.mock('framer-motion', () => {
   const stripMotionProps = (props: Record<string, unknown>) => {
     const {
@@ -40,6 +66,19 @@ vi.mock('framer-motion', () => {
       dragMomentum: _dragMomentum,
       ...rest
     } = props;
+
+    // Resolve motion-value objects inside `style` to their live values, the
+    // way real framer-motion writes computed numbers to the DOM. This keeps
+    // derived-value callbacks (useTransform fn form) executing at render and
+    // lets tests assert rendered styles numerically instead of seeing
+    // "[object Object]".
+    if (rest.style && typeof rest.style === 'object') {
+      const resolved: Record<string, unknown> = {};
+      for (const [property, value] of Object.entries(rest.style as Record<string, unknown>)) {
+        resolved[property] = readMotionValue(value);
+      }
+      rest.style = resolved;
+    }
 
     return rest;
   };
@@ -80,16 +119,32 @@ vi.mock('framer-motion', () => {
       arg2?: unknown,
       arg3?: unknown
     ) => {
+      // All three forms are LAZY — they re-read the live input(s) on every
+      // .get() instead of snapshotting at creation. Tests can therefore
+      // drive a source motion value (pointer position, scroll) and assert
+      // the real transformed output end-to-end.
       if (typeof arg2 === 'function') {
-        const inputValue = Array.isArray(input) ? input.map(readMotionValue) : readMotionValue(input);
-        return createMotionValue((arg2 as (value: unknown) => unknown)(inputValue));
+        const transform = arg2 as (value: unknown) => unknown;
+        return createComputedMotionValue(() =>
+          transform(Array.isArray(input) ? input.map(readMotionValue) : readMotionValue(input))
+        );
       }
 
-      if (Array.isArray(arg3) && arg3.length > 0) {
-        return createMotionValue(arg3[0]);
+      if (Array.isArray(arg2) && Array.isArray(arg3) && arg3.length > 0) {
+        const inputRange = arg2 as number[];
+        const outputRange = arg3 as unknown[];
+        // Every production call site maps onto numeric outputs today; if a
+        // future call maps onto strings (colors, percents), fall back to the
+        // start value rather than producing NaN arithmetic.
+        if (!outputRange.every((entry) => typeof entry === 'number')) {
+          return createComputedMotionValue(() => outputRange[0]);
+        }
+        return createComputedMotionValue(() =>
+          interpolateRange(Number(readMotionValue(input)), inputRange, outputRange as number[])
+        );
       }
 
-      return createMotionValue(readMotionValue(input));
+      return createComputedMotionValue(() => readMotionValue(input));
     },
     useMotionTemplate: (strings: TemplateStringsArray, ...values: unknown[]) =>
       strings.reduce((acc, part, index) => {

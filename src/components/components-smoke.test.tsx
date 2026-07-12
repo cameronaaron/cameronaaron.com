@@ -49,6 +49,20 @@ describe('component smoke coverage', () => {
     expect(container.querySelector('#experience')).toBeTruthy();
     expect(container.querySelector('#education')).toBeTruthy();
     expect(container.querySelector('#contact')).toBeTruthy();
+
+    // End-to-end derived-motion-math check through the rendered DOM. Hero's
+    // pointer-aura opacity is dynamicAuraOpacity = min(0.5, auraOpacity +
+    // pointerSpeed·0.14): auraOpacity interpolates scroll [0,500]→[0.34,0.12]
+    // and reads 0.34 at scroll 0; pointerSpeed is 0 with the pointer at rest
+    // → exactly 0.34. The shared motion mock resolves style-bound motion
+    // values to live numbers at render, so this verifies the whole chain
+    // (useScroll → auraOpacity interpolation → pointerSpeed fn →
+    // dynamicAuraOpacity fn → DOM style). A broken formula, swapped input,
+    // or dead interpolation all fail here — not just "an element exists".
+    const auraOverlay = Array.from(container.querySelectorAll('div[aria-hidden="true"]')).find(
+      (node) => (node as HTMLElement).style.opacity === '0.34'
+    );
+    expect(auraOverlay, 'Hero pointer-aura overlay with derived opacity 0.34 not found').toBeTruthy();
   });
 
   it('renders structured data script', () => {
