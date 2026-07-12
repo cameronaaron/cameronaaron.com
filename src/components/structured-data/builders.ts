@@ -7,6 +7,7 @@ import { testimonials } from '@/data/testimonials';
 import { faqs } from '@/data/faqs';
 import { educationItems } from '@/data/education';
 import { sortByDateDesc } from '@/data/dateOrdering';
+import { SITE_URL } from '@/data/site';
 
 export function toIsoDate(monthYearText?: string): string | undefined {
   if (!monthYearText) return undefined;
@@ -28,7 +29,7 @@ export function splitPeriod(period?: string): { startDate?: string; endDate?: st
   };
 }
 
-export function buildStructuredDataGraph(baseUrl = 'https://cameronaaron.com') {
+export function buildStructuredDataGraph(baseUrl = SITE_URL) {
   const sortedProjects = sortByDateDesc(projects, (project) => project.period);
   const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);
   const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);

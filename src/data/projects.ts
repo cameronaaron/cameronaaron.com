@@ -1,3 +1,5 @@
+import { getPageUrl } from './site';
+
 export interface Project {
   title: string;
   description: string;
@@ -12,7 +14,7 @@ export const projects: Project[] = [
   {
     title: "Bridging Transitions: Video-Based Educational Content on Thrice-exceptional Black Male Students' Higher Education Journey",
     description: "Graduate capstone project producing a five-part educational video series on identification challenges, transition barriers, strength-based practices, social-emotional experiences, and institutional recommendations.",
-    link: "https://cameronaaron.com/capstone",
+    link: getPageUrl('/capstone'),
     tags: [
       "Thrice-Exceptional",
       "Gifted Education",

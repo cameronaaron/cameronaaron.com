@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next'
+import { getPageUrl, SITE_URL } from '@/data/site'
 
 export const dynamic = 'force-static'
- 
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -19,9 +20,9 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'PerplexityBot', allow: '/' },
     ],
     sitemap: [
-      'https://cameronaaron.com/sitemap.xml',
-      'https://cameronaaron.com/sitemap-images.xml',
+      getPageUrl('/sitemap.xml'),
+      getPageUrl('/sitemap-images.xml'),
     ],
-    host: 'cameronaaron.com',
+    host: SITE_URL.replace(/^https?:\/\//, ''),
   }
 }
