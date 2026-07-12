@@ -623,6 +623,26 @@ investigate that script before touching the config.
    generalizes: if a tool's fast path depends on prior local state, a
    contract that runs it against that same state inherits the fast path's
    blind spot — verify from a clean slate, matching what CI actually does.**
+
+   It recurred (2026-07) via the exact remedy the freshness contract itself
+   prints: `pnpm outdated` flagged `postcss` (8.5.16 → 8.5.17), running the
+   suggested `pnpm update --latest postcss` rewrote the lockfile's recorded
+   specifier for it to `^8.5.17` — but for an *overridden* package, pnpm's
+   own fresh resolution always writes the override string
+   (`pnpm-workspace.yaml`'s `>=8.5.10`) as the canonical specifier, never a
+   caret range from `package.json`, regardless of what `package.json` says.
+   `pnpm update --latest <pkg>` doesn't know that and writes the caret range
+   anyway, producing the identical drift with zero visible symptoms locally
+   (warm `node_modules` install still "succeeds"). Caught immediately by
+   this same clean-slate check. Fix verified by reproducing the scratch-dir
+   install by hand: regenerate from a truly clean directory and diff the
+   result against the repo's lockfile rather than trusting a local `pnpm
+   install` (which reported "Already up to date" throughout, never
+   re-touching the stale specifier on a warm checkout). **Second-order
+   lesson: `pnpm update --latest <pkg>` is not a safe blind reflex for a
+   package with a `pnpm-workspace.yaml` override — verify the lockfile's
+   recorded specifier still matches the override afterward, the same way
+   this contract already does.**
 5. **100% coverage proves a component is tested, not that it's used.** A
    2026-07 cleanup found `FAQ.tsx` — full content, a11y tests, smoke tests,
    100% coverage — never actually rendered on any page. Its only caller was
