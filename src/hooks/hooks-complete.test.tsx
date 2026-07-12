@@ -35,17 +35,15 @@ describe('hooks coverage', () => {
       result.current.handleMouseLeave();
     });
 
-    // vitest.setup.ts's useTransform mock doesn't interpolate the 3-array
-    // (value, inputRange, outputRange) form — it freezes at outputRange[0]
-    // regardless of the live input, so rotateX/rotateY always read
-    // maxRotation/-maxRotation here (real interpolation is covered by the
-    // calculateTiltTargets unit test above, which exercises the actual
-    // percentage math without going through the mocked motion-value layer).
-    // A MotionValue wrapper object is truthy regardless of its numeric
-    // payload — even 0 would pass toBeTruthy() — so the real check reads
-    // the value with .get() instead of trusting object identity.
-    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(10);
-    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(-10);
+    // handleMouseLeave recenters x/y to 0.5 — the exact midpoint of the
+    // [0,1]→[max,-max] transform, so both rotations must read exactly 0
+    // (no residual tilt). This goes through the real interpolating mock,
+    // not a frozen snapshot: a leave handler that forgot to recenter, or
+    // recentered to the wrong value, fails here. (A MotionValue wrapper is
+    // truthy regardless of its numeric payload — even 0 passes
+    // toBeTruthy() — so the check must read .get(), never object identity.)
+    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(0);
+    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(0);
   });
 
   it('use3DTilt prefers the event currentTarget over ref when both are available', () => {
@@ -63,12 +61,38 @@ describe('hooks coverage', () => {
       } as never);
     });
 
-    // Same mock-freezing caveat as above: rotateX/rotateY read
-    // outputRange[0] regardless of the actual (90,90) pointer position.
-    // This still verifies the currentTarget-over-ref wiring produces a
-    // real, readable motion value rather than merely a truthy object.
-    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(10);
-    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(-10);
+    // Pointer at (90,90) in a 100×100 rect → x=y=0.9 (calculateTiltTargets).
+    // rotateX = useTransform(y, [0,1], [10,-10]) → 10 + 0.9·(−20) = −8.
+    // rotateY = useTransform(x, [0,1], [−10,10]) → −10 + 0.9·(20) = 8.
+    // Opposite signs on purpose: tilting toward the bottom-right corner
+    // pitches the top edge away (rotateX negative) while yawing right
+    // (rotateY positive) — a real 3D tilt-toward-cursor. End-to-end through
+    // the event handler, the shared percentage math, AND the transform
+    // layer: a sign flip or swapped axis anywhere in that chain fails here.
+    expect((result.current.rotateX as { get: () => number }).get()).toBeCloseTo(-8);
+    expect((result.current.rotateY as { get: () => number }).get()).toBeCloseTo(8);
+  });
+
+  it('use3DTilt clamps rotation at the range ends when the pointer overshoots the rect', () => {
+    const { result } = renderHook(() => use3DTilt());
+
+    act(() => {
+      result.current.handleMouseMove({
+        clientX: 200,
+        clientY: -100,
+        currentTarget: {
+          getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 } as DOMRect),
+        },
+      } as never);
+    });
+
+    // (200,−100) is far outside the 100×100 rect: calculateTiltTargets
+    // yields x=2, y=−1 — both beyond the [0,1] input range. Framer clamps
+    // by default (and the mock mirrors that), so the card pins at its
+    // maximum tilt instead of over-rotating: rotateX clamps to the y-range
+    // START (10), rotateY clamps to the x-range END (10).
+    expect((result.current.rotateX as { get: () => number }).get()).toBe(10);
+    expect((result.current.rotateY as { get: () => number }).get()).toBe(10);
   });
 
   it('tracks scroll threshold hook', () => {
