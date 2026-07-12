@@ -677,7 +677,30 @@ investigate that script before touching the config.
    already anticipated the `false/` case specifically — line `false/` — so
    when it recurs, deleting the directory is the whole fix, no gitignore
    change needed).
-7. **The checklist for any new component or feature:**
+7. **A contract sweep is only as good as its pattern — audit the pattern
+   itself occasionally, not just its results.** The `no module-level data
+   catalogs in components` sweep existed for a long time and passed
+   cleanly — but its regex only matched bare `const xxx = [` (array
+   literals, no `export`). It never had a chance at `export const metadata:
+   Metadata = {...}`, and `src/app/layout.tsx` carried a 190-line inline
+   SEO/OpenGraph/robots object — ~90 keywords, zero completeness tests —
+   for months while the sweep it should have tripped stayed green. The same
+   gap let `SectionRail.tsx` and `KeyboardShortcuts.tsx` keep their content
+   catalogs (`RAIL_SECTIONS`, `SHORTCUTS`) inline right next to a companion
+   `*-logic.ts` that held only the *functions* operating on that data — the
+   data itself never made the trip. Fixed 2026-07: the pattern now matches
+   `(?:export\s+)?const \w+... = [\[{]` (object literals and exported
+   consts too), all four page metadata blocks moved into
+   `src/data/metadata.ts` (root) and per-page `./metadata.ts` files, both
+   catalogs moved into their existing logic modules. The same audit found
+   the site's own domain hardcoded independently in 9 files (14
+   occurrences) — `src/data/site.ts` (`SITE_URL`, `getPageUrl`) is now the
+   single source of truth, enforced by a repo-wide sweep of its own.
+   **The lesson generalizes: when a sweep's *pattern* — not just its
+   coverage — has a blind spot, everything matching that blind spot
+   accumulates invisibly. Periodically ask a sweep "what would this miss?"
+   the same way you'd ask it "what does this catch?"**
+8. **The checklist for any new component or feature:**
    - [ ] Pure logic extracted to `logic.ts` with unit tests
    - [ ] Collection builds/sorts in `useMemo`
    - [ ] List-item components `memo`'d if a parent selection re-renders them;
@@ -690,11 +713,11 @@ investigate that script before touching the config.
    - [ ] Hydration-safe: no browser APIs in initial state
    - [ ] New invariant → new contract test, same commit
    - [ ] `npm test && npm run type-check && npm run lint` green
-8. **When a contract fails, fix the source.** If the *requirement* genuinely
+9. **When a contract fails, fix the source.** If the *requirement* genuinely
    changed (e.g., a 5th education item changes the grid), update source, test,
    and the documentation together — that is a requirements change, not a
    test weakening.
-9. **Commits are small, single-topic, and self-explanatory.** One logical
+10. **Commits are small, single-topic, and self-explanatory.** One logical
    change per commit — an optimization plus its ratchet contract plus its
    docs is *one* topic (rule 1); an unrelated dependency bump is another.
    Subject line: imperative, ≤72 chars, says *what*; body says *why* and

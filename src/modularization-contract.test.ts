@@ -244,12 +244,17 @@ describe('modularization contract', () => {
     expect(source).not.toContain('function shouldSkipInitialCurtain(): boolean {');
   });
 
-  it('keeps KeyboardShortcuts target/editable helpers extracted', () => {
+  it('keeps KeyboardShortcuts target/editable helpers AND the shortcut catalog extracted', () => {
     const source = read('src/components/ui/KeyboardShortcuts.tsx');
 
     expect(source).toContain("from '@/components/ui/keyboard-shortcuts-logic'");
     expect(source).not.toContain('const JUMP_MAP: Record<string, string> = SHORTCUTS.filter(');
     expect(source).not.toContain('function isEditableTarget(target: EventTarget | null): boolean {');
+    // SHORTCUTS itself (2026-07): the catalog lived in the component next to
+    // its own companion logic module for months — moved into
+    // keyboard-shortcuts-logic.ts so the component only imports it.
+    expect(source).toContain('SHORTCUTS,');
+    expect(source).not.toMatch(/^export const SHORTCUTS/m);
   });
 
   it('keeps TypewriterEffect initial-state and persistence helpers extracted', () => {
@@ -315,12 +320,16 @@ describe('modularization contract', () => {
     expect(source).not.toContain('mouseXFromCenter / width');
   });
 
-  it('keeps SectionRail most-visible entry sort extracted to section-rail-logic module', () => {
+  it('keeps SectionRail most-visible entry sort AND the rail-section catalog extracted', () => {
     const source = read('src/components/ui/SectionRail.tsx');
 
     expect(source).toContain("from './section-rail-logic'");
     expect(source).not.toContain('.filter((entry) => entry.isIntersecting)');
     expect(source).not.toContain('.sort((a, b) => b.intersectionRatio - a.intersectionRatio)');
+    // RAIL_SECTIONS itself (2026-07): same escape as KeyboardShortcuts'
+    // SHORTCUTS — moved into section-rail-logic.ts.
+    expect(source).toContain('RAIL_SECTIONS');
+    expect(source).not.toMatch(/^export const RAIL_SECTIONS/m);
   });
 
   it('keeps AmbientBackground orb-count and animate-flag extracted to logic module', () => {
@@ -399,6 +408,77 @@ describe('modularization contract', () => {
     expect(source).not.toContain('sortedFeatures.filter((feature) => feature.category === category)');
     expect(source).not.toContain('const categoryOrder');
   });
+
+  // Page/layout metadata extraction (2026-07): every `export const metadata`
+  // in src/app was a large inline object — the root layout's alone was 190
+  // lines dominated by a ~90-entry SEO keyword array, with zero completeness
+  // testing anywhere. Extracted into src/data/metadata.ts (root) and a
+  // per-page ./metadata.ts (capstone/credentials/internet), each with a
+  // companion .test.ts. This is what widening the data-catalog sweep below
+  // was for — these four object literals are exactly what it missed.
+
+  it('keeps root layout metadata and viewport built from src/data/metadata, not inline', () => {
+    const source = read('src/app/layout.tsx');
+
+    expect(source).toContain("from \"@/data/metadata\"");
+    expect(source).toContain('export const metadata = buildRootMetadata();');
+    expect(source).toContain('export const viewport = buildRootViewport();');
+    expect(source).not.toContain('metadataBase: new URL(');
+    expect(source).not.toContain("'geo.region'");
+  });
+
+  it('keeps capstone page metadata built from its own metadata module', () => {
+    const source = read('src/app/capstone/page.tsx');
+
+    expect(source).toContain("from './metadata'");
+    expect(source).toContain('export const metadata = buildCapstoneMetadata(pageUrl);');
+    expect(source).not.toContain("title: 'Bridging Transitions Capstone Defense'");
+  });
+
+  it('keeps credentials page metadata built from its own metadata module', () => {
+    const source = read('src/app/credentials/page.tsx');
+
+    expect(source).toContain("from './metadata'");
+    expect(source).toContain('export const metadata = buildCredentialsMetadata(pageUrl);');
+    expect(source).not.toContain("title: 'Credentials and Verification Links'");
+  });
+
+  it('keeps internet page metadata built from its own metadata module', () => {
+    const source = read('src/app/internet/page.tsx');
+
+    expect(source).toContain("from './metadata'");
+    expect(source).toContain('export const metadata = buildInternetMetadata(pageUrl);');
+    expect(source).not.toContain("title: 'Cameron Aaron on the Internet'");
+  });
+
+  it('every hardcoded https://cameronaaron.com literal is gone — SITE_URL is the only source of truth', () => {
+    // 2026-07: the literal was independently hardcoded in 9 files (14
+    // occurrences) — layout.tsx, sitemap.ts, robots.ts, three page.tsx
+    // files, structured-data/builders.ts, and data/projects.ts. A domain
+    // change (or a typo in just one copy) would silently diverge. Now only
+    // src/data/site.ts may contain the literal; everything else imports
+    // SITE_URL or getPageUrl from it. Repo-wide over src/ (.ts + .tsx,
+    // present and future), not just the known offenders.
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.(ts|tsx)$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) files.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const offenders = files.filter((file) => {
+      if (file.endsWith('/src/data/site.ts')) return false;
+      return readFileSync(file, 'utf8').includes('cameronaaron.com');
+    });
+
+    expect(
+      offenders,
+      `hardcoded site URL outside src/data/site.ts — import SITE_URL/getPageUrl instead:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -425,14 +505,23 @@ describe('modularization sweeps — every production .tsx, present and future', 
   });
 
   it('no module-level data catalogs in components — catalogs live in logic modules or src/data', () => {
-    // A top-level `const xxx = [` in a component is a content/config catalog
-    // (nav links, phases, chips) that belongs in src/data or a logic module.
-    const catalogPattern = /^const \w+(?::[^=]+)? = \[/m;
+    // A top-level `const xxx = [` or `= {` — bare OR exported — in a component
+    // is a content/config catalog (nav links, phases, chips, page metadata)
+    // that belongs in src/data or a logic module. Widened 2026-07: the
+    // original pattern only matched bare `const` + array literals, missing
+    // `export const metadata: Metadata = {...}` (a 190-line SEO/OpenGraph/
+    // robots object sat inline in layout.tsx for months) and two exported
+    // array catalogs (SectionRail's RAIL_SECTIONS, KeyboardShortcuts'
+    // SHORTCUTS) that had a companion *-logic.ts sitting right next to them
+    // holding only the functions, not the data. A `export const metadata =
+    // buildRootMetadata()` (function call) does NOT match — only a literal
+    // `[` or `{` immediately after `=` counts as an inline catalog.
+    const catalogPattern = /^(?:export\s+)?const \w+(?::[^=]+)? = [[{]/m;
     for (const file of listProductionComponentFiles()) {
       const src = readFileSync(file, 'utf8');
       expect(
         catalogPattern.test(src),
-        `${file} declares a module-level array catalog — move it to a logic module or src/data`
+        `${file} declares a module-level array/object catalog — move it to a logic module or src/data`
       ).toBe(false);
     }
   });

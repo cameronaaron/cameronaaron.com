@@ -215,6 +215,8 @@ Site content lives in `src/data/`:
 | `certifications.ts` | Certs with verification URLs |
 | `education.ts` | Degrees + prerequisite coursework (4 items; LACCD sorts first as most recent); `honorsAndAffiliations` is `HonorItem[]` (`{ label: string; url?: string }`) not `string[]` |
 | `testimonials.ts` | LinkedIn recommendations |
+| `site.ts` | `SITE_URL` + `getPageUrl(path)` — the **only** place `https://cameronaaron.com` may be hardcoded; every other file imports from here (enforced by a repo-wide sweep in `modularization-contract.test.ts`) |
+| `metadata.ts` | Root `<head>` metadata — `buildRootMetadata()` / `buildRootViewport()`, plus the `SEO_KEYWORDS` catalog, consumed by `src/app/layout.tsx`. Sub-pages (`capstone`, `credentials`, `internet`) each have their own co-located `./metadata.ts` with a `build*Metadata(pageUrl)` function |
 
 ## Algorithm and data-structure standards
 
