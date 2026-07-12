@@ -2,7 +2,8 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import KeyboardShortcuts, { SHORTCUTS } from './KeyboardShortcuts';
+import KeyboardShortcuts from './KeyboardShortcuts';
+import { SHORTCUTS } from './keyboard-shortcuts-logic';
 
 describe('KeyboardShortcuts', () => {
   beforeEach(() => {
