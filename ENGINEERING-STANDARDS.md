@@ -397,30 +397,75 @@ History (2026-07, kept because the reasoning still applies):
    deepened the critical request graph (mobile simulated LCP 3.4s→3.8s, TTI
    3.6s→4.0s). The sections stay statically imported — see the comment in
    `src/app/page.tsx`.
-5. A critical-CSS inlining experiment (2026-07) was measured and **rejected**.
-   A live LHCI audit against a clean build surfaced `render-blocking-insight`
-   flagging Next's two auto-generated `<link rel="stylesheet">` tags (~126ms
-   blocked). A `beasties`-based postbuild step inlined above-the-fold CSS and
-   moved both stylesheets to preload+swap. Desktop improved for real
-   (speed-index 0.65→0.98, category 0.96→1.0) — but mobile
-   `cumulative-layout-shift` dropped from a perfect 1.0 to 0.75: the deferred-
-   stylesheet swap shifted an absolutely-positioned decorative hero glow div
-   that beasties' static critical-CSS extraction didn't detect as visible in
-   the initial viewport. CLS carries 25% of the performance category's
-   weight; the render-blocking audits it "fixed" carry **zero** — Lighthouse
-   v10+ scores performance from only FCP/LCP/TBT/CLS/Speed-Index, confirmed
-   by reading the collected LHR's `auditRefs` weights directly. Net effect on
-   the graded score: negative on mobile, zero additional upside on desktop's
-   already-perfect category. The postbuild step was reverted; `dom-size`,
-   `legacy-javascript(-insight)`, `network-dependency-tree-insight`,
-   `render-blocking-insight`, `render-blocking-resources`, and
-   `unused-javascript` all stay pinned to `warn` in both configs — every one
-   confirmed zero-weight and already non-blocking (`lighthouse:recommended`
-   already treats them as warnings; LHCI exits 0 on both form factors with
-   these as the only open items). See
+5. A full audit of every open Lighthouse warning (2026-07) fixed three for
+   real and root-caused the rest as not safely fixable from application code.
+
+   **Fixed** — `dom-size`, `unused-javascript`, and `legacy-javascript` were
+   bare `warn` pins (no ceiling, could regress silently forever). Three
+   authoritative `npx @lhci/cli autorun` runs per form factor established a
+   stable numeric baseline (desktop: dom-size 2689 elements, unused-js
+   70–80ms/2 files, legacy-js 40ms/1 file; mobile: 2672 / 50ms/2 files /
+   10ms/1 file), confirmed the LHR exposes a real `numericValue` for each
+   (unlike the audits below), and each is now
+   `["warn", {"maxNumericValue": …, "maxLength": …}]` with real headroom over
+   the observed baseline in both `lighthouserc.json` and
+   `lighthouserc.mobile.json`. Verified clean (all three drop out of LHCI's
+   warning list entirely) on a fresh build, both form factors. A future
+   regression that meaningfully worsens any of the three now fails the gate
+   even though today's baseline stays non-blocking — real teeth, not just
+   documentation.
+
+   **Root-caused, not fixable from `src/`** — `legacy-javascript-insight`
+   traces to Next.js's own `next/dist/build/polyfills/polyfill-module.js`:
+   conditional guards like `Array.prototype.at||(Array.prototype.at=function
+   (){…})` for `Array.at`/`flat`/`flatMap`/`Object.fromEntries`/
+   `Object.hasOwn`/`String.trimEnd`, confirmed by grepping the exact polyfill
+   source into the shipped chunk (`grep -rl` across `node_modules` matched
+   only Next's own polyfill module — no third-party package). It's injected
+   by Next's build pipeline itself, loaded via a normal (non-`nomodule`)
+   async script, and not exposed through any `next.config.mjs` flag.
+
+   `render-blocking-insight` / `render-blocking-resources` — three distinct
+   fixes were attempted and measured, not one:
+   1. *Critical-CSS extraction* (`beasties` postbuild, inlining an
+      above-the-fold subset + preload+swap for the rest): desktop improved
+      genuinely (speed-index 0.65→0.98, category 0.96→1.0), but mobile
+      `cumulative-layout-shift` dropped from a perfect 1.0 to 0.75 — the
+      deferred-stylesheet swap shifted an absolutely-positioned decorative
+      hero glow div that beasties' static critical-CSS pass didn't detect as
+      visible. CLS carries 25% of the category weight; render-blocking
+      carries zero (Lighthouse v10+ scores performance from only
+      FCP/LCP/TBT/CLS/Speed-Index — confirmed by reading the LHR's
+      `auditRefs` weights directly). **Rejected.**
+   2. *Full-file inlining* (no critical-path heuristic at all — replace both
+      `<link rel="stylesheet">` tags with the complete, byte-identical CSS
+      inline, provably CLS-safe since nothing is deferred or omitted):
+      empirically measured against the homepage — 550KB raw / 70KB gzip vs
+      the 470KB raw / 62KB gzip budget in `scripts/checks/performance-budgets.mjs`.
+      The Tailwind utility stylesheet alone is 110KB raw. **Blows the
+      static-asset budget.** Rejected without even needing a live LHCI run.
+   3. *Preload without any inlining* (eliminate the audit by loading
+      asynchronously with zero synchronous styling): reintroduces a flash of
+      unstyled content on every page load — `font-display: swap` only covers
+      the small font-face stylesheet, not the ~110KB Tailwind bundle that
+      styles the entire page. Rejected on inspection; not worth measuring.
+
+      `network-dependency-tree-insight` inherits the same root cause as
+      render-blocking (the CSS request chain) and stays open for the same
+      reason.
+
+   All four (`legacy-javascript-insight`, `network-dependency-tree-insight`,
+   `render-blocking-insight`, `render-blocking-resources`) stay bare `warn` —
+   confirmed via the same three LHCI runs that none exposes a usable
+   `numericValue` in the LHR, so no `maxNumericValue` ceiling is possible;
+   they're pinned so a future preset change can't silently promote one to
+   `error`. All are zero-weight and LHCI exits 0 on both form factors with
+   these as the only remaining open items — verified fresh, not assumed. See
    `src/performance-regression-contract.test.ts`'s `expectStrictAssertions`
-   for the full per-audit reasoning. Don't reattempt critical-CSS inlining
-   without an approach proven not to regress CLS on the hero section.
+   for the exact per-audit assertions this history backs. Don't reattempt any
+   of the three rejected CSS-delivery approaches without solving the
+   underlying tension (avoiding FOUC requires *some* synchronous CSS; getting
+   "which CSS" right for this hero section has broken twice).
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
