@@ -139,6 +139,7 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
       'src/components/animation-regression-contract.test.ts',
       'src/modularization-contract.test.ts',
       'src/dead-logic-export-contract.test.ts',
+      'src/dead-dependency-contract.test.ts',
       'src/public-asset-weight-contract.test.ts',
       'src/config-integrity-contract.test.ts',
       'src/docs-quality-contract.test.ts',

@@ -641,12 +641,31 @@ investigate that script before touching the config.
    production source, config, or the well-known conventions that legitimately
    don't need one (documented per-entry in `PUBLIC_CONVENTION_EXEMPT`)? That
    cleanup also found four unreferenced images (350KB) sitting in `public/`
-   for weeks with nothing watching. Both sweeps ship with an explicit,
-   reasoned allowlist for deliberate exceptions (`ALLOWED_UNUSED_COMPONENTS`)
-   rather than silently ignoring anything — an allowlist entry is a decision
-   on record, not a loophole. Both run in the fast `test:modularization` CI
-   job so this class of drift fails before the expensive build/Lighthouse
-   jobs even start.
+   for weeks with nothing watching. A third sibling, `dead-dependency-
+   contract.test.ts` (2026-07), asks it one level further up the stack: does
+   every `package.json` dependency have a real consumer anywhere in the
+   repo? Found after a `beasties` postbuild experiment was reverted (critical-
+   CSS inlining that regressed mobile CLS — §4.7) but the now-unused package
+   was never removed from `devDependencies`. Auditing the full list the same
+   day found four more with zero references — `playwright`, `autoprefixer`,
+   `baseline-browser-mapping`, `@opennextjs/cloudflare` (leftover from an
+   unused Workers/OpenNext deployment path this site never adopted) —
+   verified dead by actually removing them and re-running the full build,
+   test suite, lint, and `wrangler dev`, not just by absence of an import.
+   Removing all five pruned 129 transitive packages from `pnpm-lock.yaml`.
+   The detector requires a real `import`/`require` statement in source files
+   (a code comment or test-assertion string *mentioning* a package by name
+   doesn't count — the first draft of this contract false-passed with
+   `beasties` reintroduced because its own investigation comment in
+   `performance-regression-contract.test.ts` satisfied a bare substring
+   match; fixed to require an actual import specifier). All three sweeps
+   ship with an explicit, reasoned allowlist for deliberate exceptions
+   (`ALLOWED_UNUSED_COMPONENTS`, `PUBLIC_CONVENTION_EXEMPT`,
+   `KNOWN_INDIRECT_DEPENDENCIES`) rather than silently ignoring anything — an
+   allowlist entry is a decision on record, not a loophole. All three run in
+   the fast `test:complexity`/`test:modularization` gates so this class of
+   drift fails before the expensive build/Lighthouse jobs even start — and,
+   as of the pre-commit mandate in item 3 above, before the commit itself.
 6. **Tests can't see what git doesn't track — sweep the working tree
    yourself occasionally.** That same cleanup found a `false/` directory at
    repo root (Lighthouse CLI debris from a local run whose output path

@@ -92,6 +92,7 @@ src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
 src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (webp/avif)
 src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
+src/dead-dependency-contract.test.ts         # every package.json dep has a real import/require somewhere
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
