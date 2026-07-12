@@ -1,55 +1,15 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { capstone } from '@/data/capstone';
+import { getPageUrl, SITE_URL } from '@/data/site';
 import { toYouTubeEmbedUrl } from './logic';
+import { buildCapstoneMetadata } from './metadata';
 
 export const dynamic = 'force-static';
 
-const baseUrl = 'https://cameronaaron.com';
-const pageUrl = `${baseUrl}/capstone`;
+const baseUrl = SITE_URL;
+const pageUrl = getPageUrl('/capstone');
 
-export const metadata: Metadata = {
-  title: 'Bridging Transitions Capstone Defense',
-  description:
-    'Bridging Transitions is Cameron Aaron\'s Spring 2026 M.Ed. capstone: a five-part educational video series on thrice-exceptional Black male students and higher education transition.',
-  alternates: {
-    canonical: '/capstone',
-  },
-  keywords: [
-    'Bridging Transitions capstone',
-    'capstone defense spring 2026',
-    'thrice-exceptional Black male students',
-    'arts-based research education',
-    'higher education transition support',
-    'gifted education and disability',
-    'culturally responsive education',
-    'community cultural wealth',
-    'strength-based education',
-    'educational video series',
-  ],
-  openGraph: {
-    title: 'Bridging Transitions | Capstone Defense',
-    description:
-      'A five-video arts-based capstone project translating scholarship and lived experience into practical institutional recommendations for supporting thrice-exceptional Black male students.',
-    url: pageUrl,
-    type: 'article',
-    images: [
-      {
-        url: `${baseUrl}/social/opengraph-image.png`,
-        width: 1200,
-        height: 630,
-        alt: 'Bridging Transitions Capstone Defense',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Bridging Transitions | Capstone Defense',
-    description:
-      'Spring 2026 capstone on thrice-exceptional Black male students, higher education transition, and institutional change.',
-    images: [`${baseUrl}/social/twitter-image.png`],
-  },
-};
+export const metadata = buildCapstoneMetadata(pageUrl);
 
 export default function CapstonePage() {
   const schemaGraph = {

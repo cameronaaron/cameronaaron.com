@@ -1,31 +1,17 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   academicVerificationResources,
   additionalCredentials,
 } from '@/data/additionalCredentials';
 import { sortByDateDesc } from '@/data/dateOrdering';
+import { getPageUrl } from '@/data/site';
+import { buildCredentialsMetadata } from './metadata';
 
 export const dynamic = 'force-static';
 
-const baseUrl = 'https://cameronaaron.com';
-const pageUrl = `${baseUrl}/credentials`;
+const pageUrl = getPageUrl('/credentials');
 
-export const metadata: Metadata = {
-  title: 'Credentials and Verification Links',
-  description:
-    'Full credential archive including technical specializations, accessibility training, and official academic verification links.',
-  alternates: {
-    canonical: '/credentials',
-  },
-  openGraph: {
-    title: 'Credentials and Verification | Cameron Aaron',
-    description:
-      'Direct links for verifying certifications, coursework credentials, and academic award records.',
-    url: pageUrl,
-    type: 'article',
-  },
-};
+export const metadata = buildCredentialsMetadata(pageUrl);
 
 export default function CredentialsPage() {
   const sortedCredentials = sortByDateDesc(additionalCredentials, (credential) => credential.issued);

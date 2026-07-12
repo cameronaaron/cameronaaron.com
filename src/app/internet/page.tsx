@@ -1,29 +1,15 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { internetFeatures } from '@/data/internetFeatures';
 import { sortByDateDesc } from '@/data/dateOrdering';
+import { getPageUrl } from '@/data/site';
 import { groupFeaturesByCategory } from './logic';
+import { buildInternetMetadata } from './metadata';
 
 export const dynamic = 'force-static';
 
-const baseUrl = 'https://cameronaaron.com';
-const pageUrl = `${baseUrl}/internet`;
+const pageUrl = getPageUrl('/internet');
 
-export const metadata: Metadata = {
-  title: 'Cameron Aaron on the Internet',
-  description:
-    'Curated links to speaking pages, media features, research publications, and public professional profiles.',
-  alternates: {
-    canonical: '/internet',
-  },
-  openGraph: {
-    title: 'On the Internet | Cameron Aaron',
-    description:
-      'Speaking, research, and media links gathered in one place for recruiters, collaborators, and institutions.',
-    url: pageUrl,
-    type: 'article',
-  },
-};
+export const metadata = buildInternetMetadata(pageUrl);
 
 export default function InternetPage() {
   const sortedFeatures = sortByDateDesc(internetFeatures, (item) => item.period);
