@@ -45,6 +45,7 @@ export const testimonials: Testimonial[] = [
   {
     name: "Vinicius SantAnna",
     role: "Former HubSpot and Dutchie",
+    company: "Dutchie",
     companyUrl: "https://dutchie.com/",
     profileUrl: "https://www.linkedin.com/in/vinicius-santanna-89113332/",
     relationship: "Senior Colleague",
@@ -84,8 +85,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Krystle Scott",
     role: "Voice Actor | Salesforce Administrator",
-    relationship: "Colleague at GitHub",
+    company: "GitHub",
     companyUrl: "https://github.com/",
+    relationship: "Colleague",
     date: "January 2024",
     text: "Cameron did a phenomenal job with sourcing information across several teams in preparation for onboarding new members of the community forum team at GitHub. He consistently offered novel solutions to issues arising during policy changes and new feature roll out.",
   },
@@ -107,6 +109,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Michael Gombos",
     role: "Enterprise Solutions Engineer",
+    company: "Dutchie",
+    companyUrl: "https://dutchie.com/",
     profileUrl: "https://www.linkedin.com/in/michael-gombos-3148ba17/",
     relationship: "Colleague",
     date: "July 2022",
@@ -133,6 +137,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Raymond Martinez",
     role: "Customer Experience Leader",
+    company: "Dutchie",
+    companyUrl: "https://dutchie.com/",
     profileUrl: "https://www.linkedin.com/in/raymondcmartinez/",
     relationship: "Senior Colleague",
     date: "April 2022",
@@ -225,7 +231,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Tina Taleb",
     role: "Software Engineer",
-    relationship: "Colleague at GitHub",
+    company: "GitHub",
+    companyUrl: "https://github.com/",
+    relationship: "Colleague",
     date: "February 2020",
     text: "He is undoubtedly intelligent and hard-working. His strong background in CS combined with his interest in other fields made working with him pleasurable and fun! I know he will have a bright future.",
   },
