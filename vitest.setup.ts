@@ -1,50 +1,16 @@
 import React from 'react';
 import { afterEach, beforeAll, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
-
-function createMotionValue<T>(initial: T) {
-  let current = initial;
-  return {
-    get: () => current,
-    set: (next: T) => {
-      current = next;
-    },
-    on: vi.fn(),
-  };
-}
-
-function readMotionValue(value: unknown) {
-  if (value && typeof value === 'object' && 'get' in value && typeof (value as { get: () => unknown }).get === 'function') {
-    return (value as { get: () => unknown }).get();
-  }
-  return value;
-}
-
-/** A derived motion value that recomputes from its live inputs on every
- *  .get() — so tests can drive a source value (pointer position, scroll)
- *  and assert the real transformed output, not a snapshot frozen at
- *  creation time. */
-function createComputedMotionValue(compute: () => unknown) {
-  return {
-    get: compute,
-    set: vi.fn(),
-    on: vi.fn(),
-  };
-}
-
-/** Piecewise-linear interpolation matching framer-motion's range form,
- *  clamped at both ends (framer clamps by default). */
-function interpolateRange(value: number, inputRange: number[], outputRange: number[]): number {
-  if (value <= inputRange[0]) return outputRange[0];
-  const lastIndex = inputRange.length - 1;
-  if (value >= inputRange[lastIndex]) return outputRange[lastIndex];
-
-  let segment = 1;
-  while (inputRange[segment] < value) segment += 1;
-
-  const t = (value - inputRange[segment - 1]) / (inputRange[segment] - inputRange[segment - 1]);
-  return outputRange[segment - 1] + t * (outputRange[segment] - outputRange[segment - 1]);
-}
+// The mock's pure helpers live in a first-class, unit-tested module —
+// src/test-utils/motion-mock.test.ts pins the interpolation math, and
+// src/test-quality-contract.test.ts verifies the assembled mock end-to-end.
+import {
+  createComputedMotionValue,
+  createMotionValue,
+  interpolateRange,
+  readMotionValue,
+  resolveMotionStyle,
+} from './src/test-utils/motion-mock';
 
 vi.mock('framer-motion', () => {
   const stripMotionProps = (props: Record<string, unknown>) => {
@@ -72,13 +38,7 @@ vi.mock('framer-motion', () => {
     // derived-value callbacks (useTransform fn form) executing at render and
     // lets tests assert rendered styles numerically instead of seeing
     // "[object Object]".
-    if (rest.style && typeof rest.style === 'object') {
-      const resolved: Record<string, unknown> = {};
-      for (const [property, value] of Object.entries(rest.style as Record<string, unknown>)) {
-        resolved[property] = readMotionValue(value);
-      }
-      rest.style = resolved;
-    }
+    rest.style = resolveMotionStyle(rest.style);
 
     return rest;
   };
