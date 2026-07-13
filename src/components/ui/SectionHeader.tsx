@@ -1,9 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 import TextReveal from '@/components/ui/TextReveal';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import { getMarqueeMotionConfig, sectionTitleVelocityToSkewDeg } from '@/components/ui/velocity-marquee-logic';
 
 interface SectionHeaderProps {
   title: string;
@@ -15,6 +17,17 @@ interface SectionHeaderProps {
 }
 
 export default function SectionHeader({ title, subtitle, className = '', headingId, index }: SectionHeaderProps) {
+  const { performanceTier } = usePerformanceProfile();
+  const { velocityReactive } = getMarqueeMotionConfig(performanceTier);
+
+  // Same physical-inertia treatment as the marquee bands, at reduced
+  // amplitude: the title leans with live scroll velocity. Motion values only —
+  // zero React re-renders at scroll rate (ENGINEERING-STANDARDS §3.1).
+  const { scrollY } = useScroll();
+  const rawVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(rawVelocity, { stiffness: 260, damping: 44, mass: 0.5 });
+  const skewX = useTransform(smoothVelocity, (velocity: number) => sectionTitleVelocityToSkewDeg(velocity));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,7 +56,13 @@ export default function SectionHeader({ title, subtitle, className = '', heading
         id={headingId}
         className="relative z-10 text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent overflow-hidden pb-2 font-display"
       >
-        <TextReveal text={title} />
+        <motion.span
+          data-testid="section-title-motion"
+          className="inline-block"
+          style={velocityReactive ? { skewX } : undefined}
+        >
+          <TextReveal text={title} />
+        </motion.span>
       </h2>
       {subtitle ? (
         <motion.p

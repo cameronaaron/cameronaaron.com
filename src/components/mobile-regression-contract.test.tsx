@@ -113,9 +113,15 @@ describe('mobile regression contract', () => {
       removeEventListener: vi.fn(),
       dispatchEvent: () => true,
     };
-    const matchMediaSpy = vi
-      .spyOn(window, 'matchMedia')
-      .mockReturnValue(coarseMedia as unknown as MediaQueryList);
+    // window.matchMedia is already a vi.fn (installed by vitest.setup.ts), so
+    // vi.spyOn returns that same mock — and mockRestore() on it would WIPE the
+    // setup's implementation for every later test in this file (found 2026-07
+    // when SectionHeader started consuming usePerformanceProfile and the
+    // education test below crashed on matchMedia returning undefined). Swap
+    // the implementation in and back instead of spy/restore.
+    const matchMediaMock = vi.mocked(window.matchMedia);
+    const originalImplementation = matchMediaMock.getMockImplementation();
+    matchMediaMock.mockImplementation(() => coarseMedia as unknown as MediaQueryList);
 
     try {
       const { container } = render(
@@ -135,7 +141,7 @@ describe('mobile regression contract', () => {
       );
       expect(litLayers).toEqual([]);
     } finally {
-      matchMediaSpy.mockRestore();
+      matchMediaMock.mockImplementation(originalImplementation as typeof window.matchMedia);
     }
   });
 

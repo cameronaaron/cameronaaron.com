@@ -53,9 +53,13 @@ vi.mock('framer-motion', () => ({
   useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
   useInView: () => true,
   useReducedMotion: () => false,
-  useScroll: () => ({ scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() } }),
+  useScroll: () => ({
+    scrollY: { on: vi.fn(), get: () => 0, subscribe: vi.fn() },
+    scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() },
+  }),
   useSpring: (v: unknown) => v,
   useTransform: (_v: unknown, _i: unknown, _o: unknown[]) => 0,
+  useVelocity: () => ({ on: vi.fn(), get: () => 0, subscribe: vi.fn() }),
   useMotionValue: (initial: unknown) => mockMotionValue(initial),
   useMotionTemplate: (...args: unknown[]) => args.join(''),
   useMotionValueEvent: vi.fn(),
@@ -359,6 +363,17 @@ describe('Education coverage (branches 37-49)', () => {
     expect(link.getAttribute('rel')).toBe('noopener noreferrer');
   });
 
+  it('drops the section-title velocity skew layer off the full tier', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({ performanceTier: 'balanced' }),
+    }));
+    const { default: SectionHeader } = await import('@/components/ui/SectionHeader');
+    render(<SectionHeader title="Balanced Tier" />);
+
+    const titleMotion = screen.getByTestId('section-title-motion');
+    expect(titleMotion.getAttribute('style')).toBeNull();
+  });
+
   it('renders a prerequisite course as plain text when no url is present', async () => {
     vi.doMock('@/data/education', () => ({
       educationItems: [],
@@ -441,9 +456,13 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
       useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
       useInView: () => true,
       useReducedMotion: () => true,
-      useScroll: () => ({ scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() } }),
+      useScroll: () => ({
+        scrollY: { on: vi.fn(), get: () => 0, subscribe: vi.fn() },
+        scrollYProgress: { on: vi.fn(), get: () => 0, subscribe: vi.fn() },
+      }),
       useSpring: (v: unknown) => v,
       useTransform: (_v: unknown, _i: unknown, _o: unknown[]) => 0,
+      useVelocity: () => ({ on: vi.fn(), get: () => 0, subscribe: vi.fn() }),
       useMotionValue: (initial: unknown) => mockMotionValue(initial),
       useMotionTemplate: (...args: unknown[]) => args.join(''),
       useMotionValueEvent: vi.fn(),
