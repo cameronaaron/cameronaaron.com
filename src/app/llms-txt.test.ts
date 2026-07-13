@@ -54,6 +54,11 @@ describe('llms.txt follows recommendations', () => {
     expect(LLMS_TXT).toContain(profile.social.linkedin);
   });
 
+  it('links to Spotify and Apple Music from profile data', () => {
+    expect(LLMS_TXT).toContain(profile.social.spotify);
+    expect(LLMS_TXT).toContain(profile.social.appleMusic);
+  });
+
   it('links to the MCP manifest', () => {
     expect(LLMS_TXT).toContain('mcp.json');
   });

@@ -2,11 +2,11 @@
 
 import { motion, type MotionValue, useTransform } from 'framer-motion';
 import SocialPlatformIcon from '@/components/contact/SocialPlatformIcon';
-import { getSocialRevealRange } from '@/components/contact/social-link-logic';
+import { getSocialRevealRange, type SocialPlatformKey } from '@/components/contact/social-link-logic';
 
 interface SocialLinkProps {
   name: string;
-  platformKey: 'github' | 'linkedin';
+  platformKey: SocialPlatformKey;
   url: string;
   color: string;
   index: number;
