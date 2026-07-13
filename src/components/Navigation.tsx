@@ -135,7 +135,7 @@ export default function Navigation() {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="font-mono-accent hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-200/90 lg:flex"
+              className="font-mono-accent hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-200/90 xl:flex"
               aria-live="polite"
             >
               <span className="relative flex h-2 w-2">
@@ -145,12 +145,12 @@ export default function Navigation() {
               {activeNavLabel}
             </motion.div>
 
-            <nav className="hidden md:flex items-center gap-8" aria-label="Primary navigation">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5" aria-label="Primary navigation">
               {navItems.map((item, index) => (
                 <Magnetic key={index}>
                   <motion.a
                     href={item.href}
-                    className={`relative inline-block rounded-full px-3 py-1.5 font-semibold transition-colors ${
+                    className={`relative inline-block whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors xl:px-3 xl:text-base ${
                       isScrolled
                         ? 'text-foreground hover:text-cyan-100'
                         : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
@@ -176,7 +176,7 @@ export default function Navigation() {
               ))}
             </nav>
 
-            <div className="flex items-center md:hidden">
+            <div className="flex items-center lg:hidden">
               <motion.button
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
@@ -217,7 +217,7 @@ export default function Navigation() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-t border-white/10 bg-black/85 backdrop-blur-xl md:hidden pb-[env(safe-area-inset-bottom)]"
+              className="border-t border-white/10 bg-black/85 backdrop-blur-xl lg:hidden pb-[env(safe-area-inset-bottom)]"
             >
               <div className="container mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-2">
