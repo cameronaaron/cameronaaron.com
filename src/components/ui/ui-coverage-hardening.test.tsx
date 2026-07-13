@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AmbientBackground from '@/components/ui/AmbientBackground';
@@ -69,6 +69,21 @@ describe('ui coverage hardening', () => {
 
     rerender(<SectionHeader title="Unindexed" />);
     expect(screen.queryByTestId('section-ghost-index')).toBeNull();
+  });
+
+  it('keeps the velocity-skew wrapper OUTSIDE the gradient-clipped title (CLAUDE.md constraint 15)', () => {
+    // A persistently-transformed descendant inside a bg-clip-text element gets
+    // its own compositing layer that the gradient cannot paint into — the
+    // text-transparent title renders invisible. The skew must wrap the h2.
+    render(<SectionHeader title="Paint Contract" headingId="paint-heading" />);
+
+    // TextReveal renders word-gaps as margins, so the accessible name has no space.
+    const heading = screen.getByRole('heading', { name: /paint\s*contract/i });
+    expect(heading.className).toContain('bg-clip-text');
+
+    const skewCarrier = screen.getByTestId('section-title-motion');
+    expect(skewCarrier.contains(heading)).toBe(true);
+    expect(within(heading).queryByTestId('section-title-motion')).toBeNull();
   });
 
   it('covers iframe title guard for existing, direct, and nested frames', async () => {

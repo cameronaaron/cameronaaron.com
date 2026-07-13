@@ -7,10 +7,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { viewport } from '@/app/layout';
 import Education from '@/components/Education';
 import Navigation from '@/components/Navigation';
+import { MOBILE_MENU_DESKTOP_BREAKPOINT } from '@/components/navigation/logic';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+import StatCard from '@/components/ui/StatCard';
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), 'utf8');
@@ -163,5 +165,47 @@ describe('mobile regression contract', () => {
     const firstRow = rows[0] as HTMLElement;
     expect(firstRow.className).toContain('p-4');
     expect(firstRow.className).toContain('md:grid-cols-12');
+  });
+
+  it('keeps the nav link row off screens narrower than lg — nine links never fit below 1024px', () => {
+    render(<Navigation />);
+
+    // The desktop row appears only from lg up; md widths (768–1023) showed a
+    // clipped, overflowing link row before 2026-07.
+    const primary = screen.getByRole('navigation', { name: /primary navigation/i });
+    expect(primary.className).toContain('hidden');
+    expect(primary.className).toContain('lg:flex');
+    expect(primary.className).not.toContain('md:flex');
+
+    // Every link is a no-wrap pill so the row can never soft-wrap into a second line.
+    for (const link of within(primary).getAllByRole('link')) {
+      expect(link.className).toContain('whitespace-nowrap');
+    }
+
+    // The hamburger owns everything below lg…
+    const toggle = screen.getByRole('button', { name: /open navigation menu/i });
+    expect(toggle.parentElement?.className).toContain('lg:hidden');
+
+    // …and the slide-down panel + resize-close threshold agree with it.
+    fireEvent.click(toggle);
+    const panel = document.getElementById('mobile-nav-panel');
+    expect(panel?.className).toContain('lg:hidden');
+    expect(MOBILE_MENU_DESKTOP_BREAKPOINT).toBe(1024);
+  });
+
+  it('keeps hero top clearance so centered content never slides under the fixed nav', () => {
+    // min-h-svh + items-center pushes tall content upward on short viewports;
+    // without top padding the availability pill sat underneath the nav bar.
+    const hero = read('src/components/Hero.tsx');
+    expect(hero).toContain('pt-24 pb-16 md:pt-28 md:pb-20');
+  });
+
+  it('keeps StatCard labels wrappable so long words never clip inside the card', () => {
+    render(<StatCard value="10+" label="Clinical Certifications" />);
+
+    const label = screen.getByText('Clinical Certifications');
+    expect(label.className).toContain('break-words');
+    // Wide letter-spacing is what pushed 'CERTIFICATIONS' past the card edge.
+    expect(label.className).not.toContain('tracking-[0.16em]');
   });
 });
