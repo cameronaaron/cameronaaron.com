@@ -135,7 +135,7 @@ export default function Hero() {
               <TypewriterEffect
                 text={profile.name}
                 typingSpeed={80}
-                className="bg-gradient-to-r from-cyan-300 via-emerald-300 to-indigo-300 bg-clip-text text-transparent"
+                className="bg-gradient-to-br from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent"
               />
             </motion.h1>
 
@@ -159,23 +159,17 @@ export default function Hero() {
               className="flex flex-wrap gap-3 md:gap-4"
             >
               <Magnetic strength={0.15}>
-                <Button href="#certifications" variant="primary" size="lg" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow group relative overflow-hidden">
-                  <span className="relative z-10">View Credentials</span>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-emerald-600"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
+                <Button href="#certifications" variant="primary" size="lg">
+                  View Credentials
                 </Button>
               </Magnetic>
               <Magnetic strength={0.1}>
-                <Button href="#experience" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
+                <Button href="#experience" variant="secondary" size="lg">
                   Explore Experience
                 </Button>
               </Magnetic>
               <Magnetic strength={0.1}>
-                <Button href="/internet" variant="secondary" size="lg" className="backdrop-blur-sm bg-white/5 border border-white/10 hover:bg-white/10">
+                <Button href="/internet" variant="secondary" size="lg">
                   Online Features
                 </Button>
               </Magnetic>
@@ -194,7 +188,7 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 + index * 0.08 }}
                   whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
-                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-foreground whitespace-nowrap"
+                  className="font-mono-accent rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100/90 whitespace-nowrap"
                 >
                   {chip}
                 </motion.span>
@@ -232,7 +226,7 @@ export default function Hero() {
                  {HERO_FLOATING_BADGES.map((badge, index) => (
                    <motion.span
                      key={badge.label}
-                     className={`absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md ${badge.className}`}
+                     className={`font-mono-accent absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100 backdrop-blur-md ${badge.className}`}
                      animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
                      transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
                      whileHover={{ scale: 1.06, y: -2 }}
