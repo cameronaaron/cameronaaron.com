@@ -97,7 +97,11 @@ export const experiences: Experience[] = [
   {
     company: "C19 BayShield",
     logo: "/logos/c19-bayshield.svg",
-    websiteUrl: "http://c19bayshield.org/",
+    // Project site is defunct (2020 COVID response project) — the Wayback
+    // Machine capture is the only remaining live reference. Not our own
+    // domain, so the dead-link contract can't verify it directly; see the
+    // ARCHIVED_LINK_EXEMPT entry it carries instead.
+    websiteUrl: "https://web.archive.org/web/20201115080207/https://c19bayshield.org/",
     positions: [
       {
         title: "Backend Team Lead Engineer - COVID-19 Response",

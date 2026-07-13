@@ -119,11 +119,11 @@ export const educationItems: EducationItem[] = [
       },
       {
         label: "Ammerman Center for Arts and Technology",
-        url: "https://www.conncoll.edu/ammerman/",
+        url: "https://www.conncoll.edu/",
       },
       {
         label: "Accreditation - New England Commission of Higher Education",
-        url: "https://cihe.neasc.org/",
+        url: "https://www.neche.org/",
       },
     ],
   },
@@ -338,14 +338,14 @@ export const honorsAndAffiliations: HonorItem[] = [
   },
   {
     label: "Delta Epsilon Tau International Honor Society (Jun 2025)",
-    url: "https://www.deltaepsilontau.org/",
+    url: "https://www.deac.org/discover-deac/delta-epsilon-tau-honor-society/",
   },
   {
     label: "2eASD Grant Scholarship, UCONN (May 2024)",
   },
   {
     label: "Ammerman Center Bridget Baird Award (2021)",
-    url: "https://www.conncoll.edu/ammerman/",
+    url: "https://www.conncoll.edu/",
   },
   {
     label: "Top Emerging Talent, Pangea.app Accelerator (Jun 2021)",
