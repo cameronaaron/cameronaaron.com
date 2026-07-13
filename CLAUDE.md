@@ -97,6 +97,7 @@ src/config-integrity-contract.test.ts        # pins the gates' own config (stric
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
+src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
 src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
@@ -218,6 +219,8 @@ Site content lives in `src/data/`:
 | `testimonials.ts` | LinkedIn recommendations |
 | `site.ts` | `SITE_URL` + `getPageUrl(path)` — the **only** place `https://cameronaaron.com` may be hardcoded; every other file imports from here (enforced by a repo-wide sweep in `modularization-contract.test.ts`) |
 | `metadata.ts` | Root `<head>` metadata — `buildRootMetadata()` / `buildRootViewport()`, plus the `SEO_KEYWORDS` catalog, consumed by `src/app/layout.tsx`. Sub-pages (`capstone`, `credentials`, `internet`) each have their own co-located `./metadata.ts` with a `build*Metadata(pageUrl)` function |
+
+Every external URL referenced from `src/data` is tracked in a generated ledger — `scripts/checks/external-links-ledger.json` (do not hand-edit; refresh with `pnpm run check:links` after adding or changing any external URL). `src/external-links-contract.test.ts` fails the commit if the ledger shows a dead link, is missing an entry, has an orphaned entry, or has drifted stale (45+ days unverified).
 
 ## Algorithm and data-structure standards
 
