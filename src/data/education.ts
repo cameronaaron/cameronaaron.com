@@ -119,7 +119,7 @@ export const educationItems: EducationItem[] = [
       },
       {
         label: "Ammerman Center for Arts and Technology",
-        url: "https://www.conncoll.edu/",
+        url: "https://www.conncoll.edu/academics/ammerman-center/",
       },
       {
         label: "Accreditation - New England Commission of Higher Education",
@@ -345,7 +345,7 @@ export const honorsAndAffiliations: HonorItem[] = [
   },
   {
     label: "Ammerman Center Bridget Baird Award (2021)",
-    url: "https://www.conncoll.edu/",
+    url: "https://www.conncoll.edu/academics/ammerman-center/",
   },
   {
     label: "Top Emerging Talent, Pangea.app Accelerator (Jun 2021)",
