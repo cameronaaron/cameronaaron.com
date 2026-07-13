@@ -182,7 +182,14 @@
 
   .font-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+  }
+
+  /* Monospace accent voice: eyebrow kickers, index numerals, data chips.
+     Deliberately narrow in scope — body copy stays Manrope. */
+  .font-mono-accent {
+    font-family: var(--font-mono-accent), ui-monospace, 'SF Mono', monospace;
+    font-feature-settings: 'tnum' 1;
   }
   
   /* Custom Scrollbar (dark theme aware) */
