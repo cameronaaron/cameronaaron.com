@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
 import { getMostVisibleEntry, RAIL_SECTIONS, type SectionRailItem } from './section-rail-logic';
+import { getActiveLenis } from './lenis-registry';
 import { useEffect, useState } from 'react';
 
 interface SectionRailProps {
@@ -47,10 +48,23 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
-    target.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      block: 'start',
-    });
+    // event.preventDefault() stops the browser's native jump but doesn't stop
+    // propagation, so Lenis's own anchors-driven click listener on window
+    // would also fire; stopPropagation() keeps this a single, deterministic
+    // scroll instead of two animations racing to the same target.
+    event.stopPropagation();
+
+    const lenis = getActiveLenis();
+    if (lenis) {
+      lenis.scrollTo(target, { immediate: Boolean(prefersReducedMotion) });
+    } else {
+      // Touch devices: SmoothScroll never constructs Lenis there.
+      target.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }
+
     setActiveId(id);
     if (typeof history !== 'undefined' && history.replaceState) {
       history.replaceState(null, '', `#${id}`);

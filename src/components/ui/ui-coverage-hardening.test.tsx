@@ -147,6 +147,35 @@ describe('ui coverage hardening', () => {
     windowScrollSpy.mockRestore();
   });
 
+  it('scrolls to the hash target element on a fresh load and registers/clears the active Lenis instance', async () => {
+    const { getActiveLenis } = await import('@/components/ui/lenis-registry');
+    const LenisModule = await import('lenis');
+    const LenisClass = LenisModule.default as unknown as { prototype: Record<string, unknown> };
+
+    const scrollToSpy = vi.fn();
+    LenisClass.prototype.scrollTo = scrollToSpy;
+
+    const perfSpy = vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+      { type: 'navigate' } as PerformanceNavigationTiming,
+    ]);
+
+    const target = document.createElement('section');
+    target.id = 'education';
+    document.body.appendChild(target);
+
+    window.history.pushState({}, '', '#education');
+    const { unmount } = render(<SmoothScroll />);
+
+    expect(scrollToSpy).toHaveBeenCalledWith(target, { immediate: true });
+    expect(getActiveLenis()).not.toBeNull();
+
+    unmount();
+    expect(getActiveLenis()).toBeNull();
+
+    document.body.removeChild(target);
+    perfSpy.mockRestore();
+  });
+
   it('skips Lenis RAF loop on coarse-pointer (touch) devices and still restores scrollRestoration', () => {
     const originalRestoration = window.history.scrollRestoration;
 

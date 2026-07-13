@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SectionRail from './SectionRail';
 import { RAIL_SECTIONS } from './section-rail-logic';
+import { setActiveLenis } from './lenis-registry';
 
 type ObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void;
 const observerInstances: Array<{ callback: ObserverCallback; observed: Element[]; disconnect: () => void }> = [];
@@ -60,6 +61,7 @@ describe('SectionRail', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+    setActiveLenis(null);
   });
 
   it('renders one anchor per section with accessible labels', () => {
@@ -165,6 +167,38 @@ describe('SectionRail', () => {
 
     fireEvent.click(screen.getByLabelText('Jump to Skills'));
     expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'auto', block: 'start' });
+
+    spy.mockRestore();
+  });
+
+  it('scrolls through the active Lenis instance instead of scrollIntoView when one is registered', () => {
+    const scrollToSpy = vi.fn();
+    setActiveLenis({ scrollTo: scrollToSpy } as never);
+    const replaceSpy = vi.spyOn(history, 'replaceState');
+
+    render(<SectionRail />);
+    const target = document.getElementById('projects');
+    const nativeScrollSpy = vi.fn();
+    target!.scrollIntoView = nativeScrollSpy;
+
+    fireEvent.click(screen.getByLabelText('Jump to Research'));
+
+    expect(scrollToSpy).toHaveBeenCalledWith(target, { immediate: false });
+    expect(nativeScrollSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).toHaveBeenCalledWith(null, '', '#projects');
+    replaceSpy.mockRestore();
+  });
+
+  it('passes immediate: true to Lenis when reduced motion is preferred', async () => {
+    const fm = await import('framer-motion');
+    const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
+    const scrollToSpy = vi.fn();
+    setActiveLenis({ scrollTo: scrollToSpy } as never);
+
+    render(<SectionRail />);
+    fireEvent.click(screen.getByLabelText('Jump to Skills'));
+
+    expect(scrollToSpy).toHaveBeenCalledWith(document.getElementById('skills'), { immediate: true });
 
     spy.mockRestore();
   });

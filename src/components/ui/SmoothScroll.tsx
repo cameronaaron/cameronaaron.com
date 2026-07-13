@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
-import { shouldResetScrollPosition } from './smooth-scroll-logic';
+import { resolveHashElementId, shouldResetScrollPosition } from './smooth-scroll-logic';
+import { setActiveLenis } from './lenis-registry';
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -24,7 +25,16 @@ export default function SmoothScroll() {
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 2,
+      // Intercepts clicks on same-page `a[href="#section"]` links (Navigation,
+      // Hero CTAs, QuickActionsDock) and drives the scroll through Lenis
+      // itself. Without this, the browser's native (CSS scroll-behavior:
+      // smooth) anchor jump gets fought and cancelled frame-by-frame by
+      // Lenis's own raf loop re-asserting its stale scroll position — the
+      // page never actually reaches the target section.
+      anchors: true,
     });
+
+    setActiveLenis(lenis);
 
     let rafId = 0;
     let syncTimeoutId = 0;
@@ -38,6 +48,16 @@ export default function SmoothScroll() {
         if (typeof lenis.scrollTo === 'function') {
           lenis.scrollTo(0, { immediate: true });
         }
+        return;
+      }
+
+      // A fresh load or reload landing on a hash URL: same fight as anchor
+      // clicks above, except there's no click event for `anchors` to
+      // intercept — Lenis's raf loop must be told explicitly where to land.
+      const elementId = resolveHashElementId(window.location.hash);
+      const target = elementId ? document.getElementById(elementId) : null;
+      if (target && typeof lenis.scrollTo === 'function') {
+        lenis.scrollTo(target, { immediate: true });
       }
     };
 
@@ -74,6 +94,7 @@ export default function SmoothScroll() {
       window.clearTimeout(syncTimeoutId);
       cancelAnimationFrame(rafId);
       window.removeEventListener('pageshow', handlePageShow);
+      setActiveLenis(null);
       lenis.destroy();
 
       window.history.scrollRestoration = previousScrollRestoration;

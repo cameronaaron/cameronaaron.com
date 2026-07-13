@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { shouldResetScrollPosition } from './smooth-scroll-logic';
+import { resolveHashElementId, shouldResetScrollPosition } from './smooth-scroll-logic';
 
 describe('shouldResetScrollPosition', () => {
   it('never resets when a hash anchor is present', () => {
@@ -16,5 +16,20 @@ describe('shouldResetScrollPosition', () => {
   it('keeps the browser-restored position on normal navigations', () => {
     expect(shouldResetScrollPosition('', 'navigate')).toBe(false);
     expect(shouldResetScrollPosition('', undefined)).toBe(false);
+  });
+});
+
+describe('resolveHashElementId', () => {
+  it('strips the leading # to produce the element id', () => {
+    expect(resolveHashElementId('#education')).toBe('education');
+    expect(resolveHashElementId('#contact')).toBe('contact');
+  });
+
+  it('returns null for an empty hash', () => {
+    expect(resolveHashElementId('')).toBeNull();
+  });
+
+  it('returns null for the bare # fragment', () => {
+    expect(resolveHashElementId('#')).toBeNull();
   });
 });
