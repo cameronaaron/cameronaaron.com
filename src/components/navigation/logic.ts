@@ -7,7 +7,9 @@ export interface SectionBounds {
 }
 
 export const ACTIVE_SECTION_TRIGGER_LINE = 140;
-export const MOBILE_MENU_DESKTOP_BREAKPOINT = 768;
+/* Nine section links don't fit between 768–1023px — the link row only renders
+   from lg (1024) up, so the hamburger menu owns everything below that. */
+export const MOBILE_MENU_DESKTOP_BREAKPOINT = 1024;
 
 export function hrefToSectionId(href: string): string {
   return href.startsWith('#') ? href.slice(1) : href;

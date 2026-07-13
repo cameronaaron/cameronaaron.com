@@ -99,8 +99,8 @@ export default function Hero() {
       {shouldUseParallax ? <BackgroundParticles quality={performanceTier} /> : null}
       {shouldUseParallax ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
 
-      <motion.div 
-        className="container mx-auto px-6 relative z-10"
+      <motion.div
+        className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10"
         style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
         <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
