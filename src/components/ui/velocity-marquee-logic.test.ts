@@ -7,11 +7,13 @@ import {
   MARQUEE_MAX_SKEW_DEG,
   MARQUEE_TRACK_DURATION_S,
   MARQUEE_VELOCITY_CLAMP_PX_S,
+  SECTION_TITLE_SKEW_RATIO,
   buildMarqueeItems,
   clampMarqueeVelocity,
   getMarqueeMotionConfig,
   marqueeVelocityToShiftPx,
   marqueeVelocityToSkewDeg,
+  sectionTitleVelocityToSkewDeg,
 } from './velocity-marquee-logic';
 
 describe('velocity marquee logic', () => {
@@ -66,5 +68,17 @@ describe('velocity marquee logic', () => {
   it('keeps the CSS loop period a positive finite number of seconds', () => {
     expect(MARQUEE_TRACK_DURATION_S).toBeGreaterThan(0);
     expect(Number.isFinite(MARQUEE_TRACK_DURATION_S)).toBe(true);
+  });
+
+  it('skews section titles at a fraction of the marquee amplitude', () => {
+    expect(SECTION_TITLE_SKEW_RATIO).toBeGreaterThan(0);
+    expect(SECTION_TITLE_SKEW_RATIO).toBeLessThan(1);
+    expect(sectionTitleVelocityToSkewDeg(0)).toBe(0);
+    expect(sectionTitleVelocityToSkewDeg(MARQUEE_VELOCITY_CLAMP_PX_S)).toBeCloseTo(
+      MARQUEE_MAX_SKEW_DEG * SECTION_TITLE_SKEW_RATIO
+    );
+    expect(sectionTitleVelocityToSkewDeg(-MARQUEE_VELOCITY_CLAMP_PX_S)).toBeCloseTo(
+      -MARQUEE_MAX_SKEW_DEG * SECTION_TITLE_SKEW_RATIO
+    );
   });
 });

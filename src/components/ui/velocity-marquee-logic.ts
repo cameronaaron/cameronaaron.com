@@ -82,6 +82,16 @@ export function marqueeVelocityToShiftPx(velocityPxPerS: number, direction: Marq
 }
 
 /**
+ * Section titles share the marquee's velocity graph but at a fraction of the
+ * amplitude — the page should lean with the scroll, not shear.
+ */
+export const SECTION_TITLE_SKEW_RATIO = 0.55;
+
+export function sectionTitleVelocityToSkewDeg(velocityPxPerS: number): number {
+  return marqueeVelocityToSkewDeg(velocityPxPerS) * SECTION_TITLE_SKEW_RATIO;
+}
+
+/**
  * Duplicate the phrase list so the CSS loop can translate to -50% and wrap
  * seamlessly. Runs once per phrases identity (memoized at the call site).
  */
