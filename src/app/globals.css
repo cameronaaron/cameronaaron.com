@@ -216,4 +216,24 @@
   .intro-curtain-autofade {
     animation: intro-curtain-exit 650ms cubic-bezier(0.76, 0, 0.24, 1) var(--intro-curtain-hold, 600ms) forwards;
   }
+
+  /* VelocityMarquee: the base loop is a pure CSS transform animation (GPU
+     composited, zero JS per frame — the scroll-velocity layer rides on top
+     via motion values). The track holds two copies of its content, so
+     translating to -50% wraps seamlessly. Gated to the full performance tier
+     by the component; the global prefers-reduced-motion block above also
+     freezes it for reduced-motion users as defense in depth. */
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .marquee-track {
+    animation: marquee-scroll var(--marquee-duration, 42s) linear infinite;
+  }
+
+  .marquee-track-reverse {
+    animation-direction: reverse;
+  }
 }

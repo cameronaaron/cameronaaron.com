@@ -19,6 +19,8 @@ import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import IntroCurtain from '@/components/ui/IntroCurtain';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
+import VelocityMarquee from '@/components/ui/VelocityMarquee';
+import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/velocity-marquee-logic';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -81,6 +83,7 @@ export default function Home() {
         <SectionReveal index={0}>
           <Hero />
         </SectionReveal>
+        <VelocityMarquee phrases={HERO_MARQUEE_PHRASES} performanceTier={performanceTier} />
         {showSectionHandoffs ? <SectionHandoff label="Credentials" cue="transitioning to verified credentials" index={1} targetId="certifications" /> : null}
         <SectionReveal index={1}>
           <Certifications />
@@ -105,6 +108,7 @@ export default function Home() {
         <SectionReveal index={6}>
           <Testimonials />
         </SectionReveal>
+        <VelocityMarquee phrases={CONTACT_MARQUEE_PHRASES} performanceTier={performanceTier} direction={-1} />
         {showSectionHandoffs ? <SectionHandoff label="Connect" cue="ready for your next conversation" index={7} targetId="contact" /> : null}
         <SectionReveal index={7}>
           <Contact />
