@@ -95,16 +95,16 @@ describe('meoninternet coverage integration', () => {
     expect(projectTitles).toContain('Internships: By the Dozen');
     expect(projectTitles).toContain('Toxoplasma Gondii Modifies Personality');
     expect(projectTitles).toContain('The Real Magical Girls');
-    expect(projectTitles).toContain('EAS 101 Final Paper');
+    expect(projectTitles).toContain('EAS 101 Essay');
 
     expect(projectLinks).toContain('https://doi.org/10.1167/jov.21.9.2719');
     expect(projectLinks).toContain(
-      'https://www.researchgate.net/publication/341276789_Toxoplasma_Gondii_Modifies_Personality'
+      'https://www.linkedin.com/pulse/toxoplasma-gondii-modifies-personality-cameron-aaron'
     );
     expect(projectLinks).toContain(
       'https://www.researchgate.net/publication/341276786_The_Real_Magical_Girls?_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6InByb2ZpbGUiLCJwYWdlIjoicHJvZmlsZSJ9fQ'
     );
-    expect(projectLinks).toContain('https://www.researchgate.net/publication/341276824_EAS_101_Final_paper');
+    expect(projectLinks).toContain('https://www.linkedin.com/pulse/eas-101-essay-cameron-aaron');
   });
 
   it('keeps degree data in education where it belongs', () => {
