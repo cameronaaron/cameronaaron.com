@@ -205,6 +205,10 @@ The image column uses `order-1 md:order-2` and the text column uses `order-2 md:
 
 Every `buildXxx`/`sortXxx` call in a `'use client'` component body is wrapped in `useMemo` (Testimonials, Experience, Projects, Education, Certifications, Contact, ExperienceCard). New components follow suit from day one; the contract test greps for bare calls. Server components are exempt (they run once at build).
 
+### 15. No transformed descendants inside `bg-clip-text` elements
+
+A motion element whose transform updates continuously (e.g. the section-title velocity skew) never settles at exact identity, so Chrome promotes it to its own compositing layer — and `bg-clip-text` on an ancestor cannot paint the gradient into that layer. The text is `text-transparent`, so it renders **invisible**. This shipped once as fully transparent section titles (fixed 2026-07). Rule: apply persistent transforms on an ancestor **wrapping** the gradient-clipped element, never on a descendant inside it. Transient transforms that clean up to `none` (TextReveal letters) are fine.
+
 ## Data
 
 Site content lives in `src/data/`:
