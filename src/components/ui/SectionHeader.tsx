@@ -54,18 +54,23 @@ export default function SectionHeader({ title, subtitle, className = '', heading
           transition={{ duration: 0.7, ease: 'easeOut' }}
         />
       </div>
-      <h2
-        id={headingId}
-        className="relative z-10 mb-4 overflow-hidden pb-2 font-display text-4xl font-bold tracking-tight text-transparent md:text-6xl bg-gradient-to-br from-white via-cyan-50 to-cyan-200/80 bg-clip-text"
+      {/* The velocity skew lives OUTSIDE the gradient-clipped h2: a transformed
+          (composited) descendant inside a bg-clip-text element never receives
+          the gradient paint in Chrome, so the text renders fully transparent —
+          i.e. invisible headings. Transforming the h2 from an ancestor keeps
+          the clip and the skew independent. */}
+      <motion.div
+        data-testid="section-title-motion"
+        className="inline-block"
+        style={velocityReactive ? { skewX } : undefined}
       >
-        <motion.span
-          data-testid="section-title-motion"
-          className="inline-block"
-          style={velocityReactive ? { skewX } : undefined}
+        <h2
+          id={headingId}
+          className="relative z-10 mb-4 overflow-hidden pb-2 font-display text-4xl font-bold tracking-tight text-transparent md:text-6xl bg-gradient-to-br from-white via-cyan-50 to-cyan-200/80 bg-clip-text"
         >
           <TextReveal text={title} />
-        </motion.span>
-      </h2>
+        </h2>
+      </motion.div>
       {subtitle ? (
         <motion.p
           initial={{ opacity: 0, y: 10 }}
