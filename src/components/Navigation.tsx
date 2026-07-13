@@ -106,15 +106,21 @@ export default function Navigation() {
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-background/95 border-b border-white/10 shadow-lg md:bg-background/80 md:border-white/5 md:backdrop-blur-md'
-            : 'bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50"
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="container mx-auto px-6 py-4">
+        {/* Floating capsule: at rest the nav is transparent over the hero; once
+            scrolled it lifts into an inset glass pill instead of a full-width bar. */}
+        <div className={`transition-all duration-300 ${isScrolled ? 'px-3 pt-3 sm:px-4' : ''}`}>
+        <div
+          className={`container mx-auto transition-all duration-300 ${
+            isScrolled
+              ? 'overflow-hidden rounded-2xl border border-white/10 bg-background/95 shadow-lg shadow-black/30 md:bg-background/80 md:backdrop-blur-xl'
+              : 'bg-transparent'
+          }`}
+        >
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <motion.a
               href="#home"
@@ -129,7 +135,7 @@ export default function Navigation() {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-200/90 lg:flex"
+              className="font-mono-accent hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-200/90 lg:flex"
               aria-live="polite"
             >
               <span className="relative flex h-2 w-2">
@@ -237,6 +243,8 @@ export default function Navigation() {
             </motion.div>
           ) : null}
         </AnimatePresence>
+        </div>
+        </div>
       </motion.nav>
     </>
   );

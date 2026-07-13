@@ -218,7 +218,9 @@ describe('Navigation accessibility', () => {
     render(<Navigation />);
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i });
-    expect(nav.className).toContain('bg-transparent');
+    // Before the threshold the inner capsule stays transparent — no glass pill yet.
+    expect(nav.querySelector('[class*="bg-transparent"]')).not.toBeNull();
+    expect(nav.querySelector('[class*="rounded-2xl"]')).toBeNull();
     expect(nav.className).not.toContain('bg-slate-950/55');
 
     const brand = screen.getByRole('link', { name: /cameron/i });

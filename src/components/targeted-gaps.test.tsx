@@ -53,7 +53,10 @@ describe('targeted coverage gaps', () => {
     render(<Navigation />);
 
     const nav = screen.getByRole('navigation', { name: 'Main navigation' });
-    expect(nav.className).toContain('backdrop-blur-md');
+    // Scrolled state lifts the inner capsule into blurred glass (the nav shell
+    // itself stays a transparent fixed strip so the blur only covers the pill).
+    expect(nav.querySelector('[class*="backdrop-blur-xl"]')).not.toBeNull();
+    expect(nav.querySelector('[class*="rounded-2xl"]')).not.toBeNull();
 
     const homeLink = screen.getByRole('link', { name: 'Home' });
     expect(homeLink.className).toContain('hover:text-cyan-100');
