@@ -108,8 +108,10 @@ describe('animation regression contract', () => {
 
   it('Hero title uses a responsive font scale starting from text-3xl on mobile', () => {
     const source = read('src/components/Hero.tsx');
-    // Must not start at text-4xl (too large for 390px screens)
-    expect(source).toContain('text-3xl sm:text-4xl md:text-6xl');
+    // Must not start at text-4xl (too large for 390px screens). The pin
+    // guards the mobile floor only — the desktop scale is free to grow
+    // (the 2026-07 makeover took md+ to display scale).
+    expect(source).toMatch(/className="text-3xl sm:text-4xl md:text-/);
   });
 
   it('IntroCurtain is a static import in the page shell (no ssr:false dynamic import)', () => {

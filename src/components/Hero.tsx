@@ -130,7 +130,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight font-display"
+              className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
             >
               <TypewriterEffect
                 text={profile.name}

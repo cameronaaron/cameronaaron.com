@@ -61,6 +61,7 @@ export default function Home() {
   return (
     <>
       <IntroCurtain />
+      <div className="grain-overlay" aria-hidden="true" />
       <AmbientBackground performanceTier={performanceTier} />
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <SectionRail /> : null}
