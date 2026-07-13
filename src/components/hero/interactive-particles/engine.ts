@@ -51,10 +51,10 @@ export const ATTRACTION_STRENGTH_FULL = 0.012;
 export const ATTRACTION_STRENGTH_BALANCED = 0.008;
 
 export const PARTICLE_COLORS = [
-  'rgba(34, 211, 238, 0.65)',
-  'rgba(45, 212, 191, 0.6)',
-  'rgba(16, 185, 129, 0.55)',
-  'rgba(103, 232, 249, 0.6)',
+  'rgba(56, 214, 255, 0.65)',
+  'rgba(92, 240, 205, 0.6)',
+  'rgba(16, 212, 146, 0.55)',
+  'rgba(126, 231, 255, 0.6)',
 ];
 
 const ZERO_QUALITY_CONFIG: ParticleQualityConfig = {
@@ -82,7 +82,7 @@ export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;
 
 /** One precomputed strokeStyle per opacity tier — no per-frame string building. */
 export const CONNECTION_TIER_STYLES: readonly string[] = CONNECTION_OPACITY_TIERS.map(
-  (opacity) => `rgba(103, 232, 249, ${opacity})`
+  (opacity) => `rgba(126, 231, 255, ${opacity})`
 );
 
 /** Map a connection opacity (0 … CONNECTION_MAX_OPACITY) to a tier index. */

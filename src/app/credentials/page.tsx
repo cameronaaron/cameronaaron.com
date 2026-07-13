@@ -52,7 +52,7 @@ export default function CredentialsPage() {
   return (
     <main className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-white/10 py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_52%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,214,255,0.18),transparent_52%)]" />
         <div className="container relative z-10 mx-auto px-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Verification Hub</p>
           <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-5xl">

@@ -67,7 +67,7 @@ export default function VelocityMarquee({
               <span
                 className={`whitespace-nowrap font-display text-5xl font-extrabold uppercase leading-none tracking-tight md:text-7xl lg:text-8xl ${
                   item.outlined
-                    ? 'text-transparent [-webkit-text-stroke:1.5px_rgba(148,233,255,0.30)]'
+                    ? 'text-transparent [-webkit-text-stroke:1.5px_rgba(126,231,255,0.30)]'
                     : 'bg-gradient-to-r from-cyan-200/90 via-white/90 to-emerald-200/90 bg-clip-text text-transparent'
                 }`}
               >

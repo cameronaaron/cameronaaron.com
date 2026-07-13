@@ -26,8 +26,8 @@ describe('app shell coverage', () => {
     expect(metadata.title).toBeTruthy();
     expect(metadata.openGraph?.images?.[0]?.url).toContain('opengraph-image.png');
     expect(viewport.themeColor).toEqual([
-      { media: '(prefers-color-scheme: dark)', color: '#06b6d4' },
-      { media: '(prefers-color-scheme: light)', color: '#06b6d4' },
+      { media: '(prefers-color-scheme: dark)', color: '#0cbdf2' },
+      { media: '(prefers-color-scheme: light)', color: '#0cbdf2' },
     ]);
   });
 

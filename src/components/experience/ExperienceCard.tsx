@@ -48,7 +48,7 @@ function ExperienceCard({
           ? {
               scale: 1.03,
               y: -10,
-              boxShadow: "0 25px 50px rgba(124, 58, 237, 0.3)",
+              boxShadow: "0 25px 50px rgba(99, 102, 241, 0.3)",
               transition: { duration: 0.3 }
             }
           : undefined
@@ -68,7 +68,7 @@ function ExperienceCard({
         transformStyle: 'preserve-3d',
       }}
       className={`relative h-full overflow-hidden p-8 group ${
-        isActive ? 'ring-1 ring-cyan-300/35 shadow-[0_20px_60px_rgba(34,211,238,0.16)]' : ''
+        isActive ? 'ring-1 ring-cyan-300/35 shadow-[0_20px_60px_rgba(56,214,255,0.16)]' : ''
       }`}
       animate={isActive ? { y: -4 } : { y: 0 }}
       data-testid={`experience-card-${index}`}

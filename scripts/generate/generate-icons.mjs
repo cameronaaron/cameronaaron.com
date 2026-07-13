@@ -48,36 +48,36 @@ function createSocialSvg({ width, height }) {
   <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#07131d" />
-        <stop offset="55%" stop-color="#0a1a27" />
-        <stop offset="100%" stop-color="#081017" />
+        <stop offset="0%" stop-color="#050b16" />
+        <stop offset="55%" stop-color="#081524" />
+        <stop offset="100%" stop-color="#040a12" />
       </linearGradient>
       <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#22d3ee" />
-        <stop offset="100%" stop-color="#10b981" />
+        <stop offset="0%" stop-color="#38d6ff" />
+        <stop offset="100%" stop-color="#10d492" />
       </linearGradient>
     </defs>
 
     <rect width="100%" height="100%" fill="url(#bg)" />
-    <circle cx="${width - 110}" cy="90" r="180" fill="#22d3ee" opacity="0.12" />
-    <circle cx="130" cy="${height - 70}" r="190" fill="#10b981" opacity="0.1" />
+    <circle cx="${width - 110}" cy="90" r="180" fill="#38d6ff" opacity="0.12" />
+    <circle cx="130" cy="${height - 70}" r="190" fill="#10d492" opacity="0.1" />
 
     <rect x="64" y="54" width="8" height="${height - 108}" rx="4" fill="url(#accent)" opacity="0.9" />
 
-    <text x="96" y="145" fill="#e6f6ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">
+    <text x="96" y="145" fill="#eaf4ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">
       ${brandName}
     </text>
 
-    <text x="96" y="220" fill="#9ed7ea" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" font-weight="600">
+    <text x="96" y="220" fill="#9cc8e8" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" font-weight="600">
       ${brandTitle}
     </text>
 
-    <text x="96" y="278" fill="#86c4d6" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="500">
+    <text x="96" y="278" fill="#86b6d0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="500">
       ${brandTagline}
     </text>
 
     <rect x="96" y="${height - 102}" width="360" height="48" rx="24" fill="url(#accent)" opacity="0.2" />
-    <text x="122" y="${height - 70}" fill="#dff8ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">
+    <text x="122" y="${height - 70}" fill="#dbf7ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">
       ${brandSite}
     </text>
   </svg>

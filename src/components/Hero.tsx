@@ -57,7 +57,7 @@ export default function Hero() {
   const auraCoreAlpha = useTransform(pointerSpeed, [0, 1], [0.14, 0.28]);
   const auraEdgeAlpha = useTransform(pointerSpeed, [0, 1], [0.08, 0.16]);
   const dynamicAuraOpacity = useTransform([auraOpacity, pointerSpeed], ([base, speed]: number[]) => Math.min(0.5, base + speed * 0.14));
-  const pointerAura = useMotionTemplate`radial-gradient(${auraSize}px circle at ${auraX}px ${auraY}px, rgba(34, 211, 238, ${auraCoreAlpha}), rgba(16, 185, 129, ${auraEdgeAlpha}) 34%, transparent 76%)`;
+  const pointerAura = useMotionTemplate`radial-gradient(${auraSize}px circle at ${auraX}px ${auraY}px, rgba(56, 214, 255, ${auraCoreAlpha}), rgba(16, 212, 146, ${auraEdgeAlpha}) 34%, transparent 76%)`;
 
   return (
     <section 

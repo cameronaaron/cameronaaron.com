@@ -180,7 +180,7 @@ export default function Skills() {
                   <SpotlightCard
                     className="p-4 flex items-center justify-center text-center h-full group cursor-default"
                     as={motion.div}
-                    whileHover={isCinematic ? { scale: 1.05, y: -5, boxShadow: '0 10px 30px rgba(168, 85, 247, 0.3)' } : undefined}
+                    whileHover={isCinematic ? { scale: 1.05, y: -5, boxShadow: '0 10px 30px rgba(129, 140, 248, 0.3)' } : undefined}
                     transition={getDomainCardHoverTransition(isLiteMotion)}
                   >
                     <p className="text-gray-300 font-medium group-hover:text-primary transition-colors">{domain}</p>

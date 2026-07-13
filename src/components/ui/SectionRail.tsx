@@ -105,7 +105,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                   className="relative z-10 block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/10 transition-colors group-hover:border-cyan-200 group-focus-visible:border-cyan-200"
                   animate={
                     isActive
-                      ? { scale: 1.4, backgroundColor: 'rgba(103, 232, 249, 0.95)', borderColor: 'rgba(103, 232, 249, 0.95)' }
+                      ? { scale: 1.4, backgroundColor: 'rgba(126, 231, 255, 0.95)', borderColor: 'rgba(126, 231, 255, 0.95)' }
                       : { scale: 1, backgroundColor: 'rgba(255,255,255,0.10)' }
                   }
                   transition={{ type: 'spring', stiffness: 320, damping: 22 }}
@@ -114,7 +114,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                   <motion.span
                     layoutId="section-rail-halo"
                     className="absolute -inset-2 z-0 rounded-full border"
-                    style={{ borderColor: 'rgba(103, 232, 249, 0.4)' }}
+                    style={{ borderColor: 'rgba(126, 231, 255, 0.4)' }}
                     transition={{ type: 'spring', stiffness: 320, damping: 26 }}
                     aria-hidden="true"
                   />

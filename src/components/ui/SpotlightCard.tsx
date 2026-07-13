@@ -14,7 +14,7 @@ interface SpotlightCardProps<T extends ElementType> {
 export default function SpotlightCard<T extends ElementType = 'div'>({ 
   children, 
   className = "", 
-  spotlightColor = "rgba(124, 58, 237, 0.15)",
+  spotlightColor = "rgba(99, 102, 241, 0.15)",
   as,
   ...props
 }: SpotlightCardProps<T> & ComponentPropsWithoutRef<T>) {
@@ -76,7 +76,7 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
     >
       <div
         className="pointer-events-none absolute inset-0 rounded-xl border border-cyan-300/0 transition-colors duration-300"
-        style={{ borderColor: isHovering ? 'rgba(103, 232, 249, 0.26)' : 'rgba(103, 232, 249, 0)' }}
+        style={{ borderColor: isHovering ? 'rgba(126, 231, 255, 0.26)' : 'rgba(126, 231, 255, 0)' }}
         aria-hidden="true"
       />
 
