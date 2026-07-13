@@ -15,6 +15,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Dr. Joy Lawson Davis, Ed.D.",
     role: "Author, Scholar, Professional Development Trainer",
+    company: "Elmbridge University",
+    companyUrl: "https://elmbridge.edu/",
     profileUrl: "https://www.linkedin.com/in/drjoybrighttalentedblack/",
     originalPostUrl: "https://www.facebook.com/joyld1/posts/pfbid0261cux8P1tjRCUGC9WyJpk8fxzpNnxbYQeceKUNX7T6aFMy4H89XgVPcmwdd6BHGLl",
     relationship: "Capstone Committee Member",
@@ -210,6 +212,7 @@ export const testimonials: Testimonial[] = [
     role: "Software Engineer",
     company: "Facebook",
     companyUrl: "https://www.facebook.com/",
+    profileUrl: "https://www.linkedin.com/in/shalandy-zhang/",
     relationship: "Colleague",
     date: "April 2021",
     text: "I was inspired by both Cameron's technical knowledge in helping deploy the app to Google Play/iOS as well as his dedication and passion for the mission. Cameron was also a natural in project management, setting clear steps for himself as well as the rest of the engineering team.",
@@ -256,8 +259,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Tina Taleb",
     role: "Software Engineer",
-    company: "GitHub",
-    companyUrl: "https://github.com/",
+    company: "Fortrea",
+    companyUrl: "https://www.fortrea.com/",
+    profileUrl: "https://www.linkedin.com/in/tinataleb/",
     relationship: "Colleague",
     date: "February 2020",
     text: "He is undoubtedly intelligent and hard-working. His strong background in CS combined with his interest in other fields made working with him pleasurable and fun! I know he will have a bright future.",
