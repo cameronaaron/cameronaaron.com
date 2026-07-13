@@ -54,28 +54,25 @@ describe('remaining line coverage', () => {
     expect(screen.getByText(experiences[0].company)).toBeTruthy();
   });
 
-  it('covers ProfileImage mousemove rect path', () => {
+  it('covers ProfileImage mousemove rect path (via the container ref)', () => {
     render(<ProfileImage src={profile.image} alt={profile.name} />);
 
-    const container = document.getElementById('profile-container');
-    expect(container).toBeTruthy();
+    // The component reads its container rect through a ref (not a
+    // per-mousemove getElementById query — that path was removed 2026-07);
+    // the ref attaches to the same element that carries this id. Named
+    // profileContainer (not `container`) deliberately: this one is a
+    // nullable DOM lookup, unlike RTL's always-truthy render container.
+    const profileContainer = document.getElementById('profile-container');
+    expect(profileContainer).not.toBeNull();
 
-    if (container) {
-      Object.defineProperty(container, 'getBoundingClientRect', {
+    if (profileContainer) {
+      Object.defineProperty(profileContainer, 'getBoundingClientRect', {
         configurable: true,
         value: () => ({ left: 100, top: 100, width: 240, height: 240 }),
       });
     }
 
     fireEvent.mouseMove(window, { clientX: 180, clientY: 210 });
-    expect(screen.getByAltText(profile.name)).toBeTruthy();
-  });
-
-  it('covers ProfileImage mousemove when getElementById returns null', () => {
-    render(<ProfileImage src={profile.image} alt={profile.name} />);
-    const spy = vi.spyOn(document, 'getElementById').mockReturnValue(null);
-    fireEvent.mouseMove(window, { clientX: 180, clientY: 210 });
-    spy.mockRestore();
     expect(screen.getByAltText(profile.name)).toBeTruthy();
   });
 
