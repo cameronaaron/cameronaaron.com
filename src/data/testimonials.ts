@@ -93,6 +93,7 @@ export const testimonials: Testimonial[] = [
     role: "Voice Actor | Salesforce Administrator",
     company: "GitHub",
     companyUrl: "https://github.com/",
+    profileUrl: "https://www.linkedin.com/in/kcms/",
     relationship: "Colleague",
     date: "January 2024",
     text: "Cameron did a phenomenal job with sourcing information across several teams in preparation for onboarding new members of the community forum team at GitHub. He consistently offered novel solutions to issues arising during policy changes and new feature roll out.",
