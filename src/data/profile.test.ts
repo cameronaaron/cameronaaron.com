@@ -12,6 +12,8 @@ describe('profile data', () => {
   it('includes required social links and stats', () => {
     expect(profile.social.github).toMatch(/^https:\/\/github\.com\//);
     expect(profile.social.linkedin).toMatch(/^https:\/\/www\.linkedin\.com\//);
+    expect(profile.social.spotify).toMatch(/^https:\/\/open\.spotify\.com\//);
+    expect(profile.social.appleMusic).toMatch(/^https:\/\/music\.apple\.com\//);
     expect(profile.stats.length).toBeGreaterThan(0);
 
     for (const stat of profile.stats) {

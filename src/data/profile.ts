@@ -6,6 +6,8 @@ export interface ProfileStat {
 export interface SocialLinks {
   github: string;
   linkedin: string;
+  spotify: string;
+  appleMusic: string;
 }
 
 export interface Profile {
@@ -32,6 +34,8 @@ export const profile: Profile = {
   social: {
     github: "https://github.com/cameronaaron",
     linkedin: "https://www.linkedin.com/in/kamisama",
+    spotify: "https://open.spotify.com/artist/0CpLZvas7C2hpxSKkqQL7M",
+    appleMusic: "https://music.apple.com/us/artist/cameron-aaron/1680083789",
   },
   
   stats: [

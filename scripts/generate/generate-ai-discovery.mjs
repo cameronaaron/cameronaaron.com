@@ -29,6 +29,8 @@ const PROFILE = {
   social: {
     github: 'https://github.com/cameronaaron',
     linkedin: 'https://www.linkedin.com/in/kamisama',
+    spotify: 'https://open.spotify.com/artist/0CpLZvas7C2hpxSKkqQL7M',
+    appleMusic: 'https://music.apple.com/us/artist/cameron-aaron/1680083789',
   },
 };
 
@@ -52,6 +54,8 @@ ${PROFILE.bio}
 - [Email](mailto:${PROFILE.email}): ${PROFILE.email}
 - [GitHub](${PROFILE.social.github}): Open-source projects and code repositories
 - [LinkedIn](${PROFILE.social.linkedin}): Professional profile and endorsements
+- [Spotify](${PROFILE.social.spotify}): Music as a recording artist
+- [Apple Music](${PROFILE.social.appleMusic}): Music as a recording artist
 
 ## Optional
 

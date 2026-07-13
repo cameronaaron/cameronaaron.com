@@ -71,7 +71,7 @@ export function buildStructuredDataGraph(baseUrl = SITE_URL) {
     },
     email: profile.email,
     url: baseUrl,
-    sameAs: [profile.social.github, profile.social.linkedin],
+    sameAs: Object.values(profile.social),
     alumniOf: educationItems.map((item) => ({
       '@type': 'CollegeOrUniversity',
       name: item.institution,
