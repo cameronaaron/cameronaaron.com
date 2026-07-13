@@ -14,7 +14,7 @@ export default function StatCard({ value, label }: StatCardProps) {
 
   return (
     <motion.div
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-center backdrop-blur-md"
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md"
       whileHover={enableHoverMotion ? { y: -4, scale: 1.03 } : undefined}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
     >
@@ -26,14 +26,14 @@ export default function StatCard({ value, label }: StatCardProps) {
       />
 
       <motion.div
-        className="relative text-3xl font-bold text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
+        className="relative font-display text-3xl font-bold tracking-tight text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
         animate={prefersReducedMotion ? undefined : { opacity: [0.92, 1, 0.92] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       >
         {value}
       </motion.div>
 
-      <div className="relative mt-1 text-xs font-medium uppercase tracking-[0.12em] text-foreground/90">
+      <div className="font-mono-accent relative mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-foreground/80">
         {label}
       </div>
 
