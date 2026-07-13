@@ -71,11 +71,11 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
         handleMouseLeave();
         onMouseLeaveProp?.(event);
       }}
-      className={`relative overflow-hidden rounded-xl border border-white/10 bg-white/5 ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] ${className}`}
       {...restProps}
     >
       <div
-        className="pointer-events-none absolute inset-0 rounded-xl border border-cyan-300/0 transition-colors duration-300"
+        className="pointer-events-none absolute inset-0 rounded-2xl border border-cyan-300/0 transition-colors duration-300"
         style={{ borderColor: isHovering ? 'rgba(126, 231, 255, 0.26)' : 'rgba(126, 231, 255, 0)' }}
         aria-hidden="true"
       />
