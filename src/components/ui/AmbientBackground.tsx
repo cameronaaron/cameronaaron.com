@@ -36,11 +36,11 @@ export default function AmbientBackground({ performanceTier = 'full' }: AmbientB
         }}
       />
 
-      {/* Grid pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
+      {/* Grid pattern — ice-tinted so the tech-grid reads as part of the palette */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
         style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(126,231,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(126,231,255,0.07) 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
         }}
       />

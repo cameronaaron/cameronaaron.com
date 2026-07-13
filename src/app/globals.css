@@ -6,13 +6,13 @@
      cyan-* and emerald-* scale overrides below repaint every existing
      `cyan-300`-style utility class in one place — components keep their
      class names; this block is the single source of hue truth. */
-  --color-background: #04070f;
+  --color-background: #050b1a;
   --color-foreground: #eaf4ff;
   --color-primary: #0cbdf2;
   --color-primary-foreground: #ffffff;
   --color-secondary: #10d492;
   --color-secondary-foreground: #ffffff;
-  --color-muted: #0b1626;
+  --color-muted: #0e1d36;
   --color-muted-foreground: #a6c0d9;
   --color-accent: #38d6ff;
   --color-accent-foreground: #ffffff;
@@ -42,7 +42,7 @@
 
   --gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
-  --gradient-hero-glow: radial-gradient(circle at 50% 20%, #10344f 0%, #091b31 50%, #030711 100%);
+  --gradient-hero-glow: radial-gradient(circle at 50% 20%, #14406b 0%, #0a1f42 50%, #04091a 100%);
   
   --animate-fade-in: fadeIn 0.5s ease-in-out;
   --animate-slide-up: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -94,9 +94,9 @@
     /* Aurora wash: three-hue ambient gradients (ice / mint / periwinkle) so
        the palette reads instantly instead of hiding in accents. */
     background-image:
-      radial-gradient(circle at 15% 8%, rgba(12, 189, 242, 0.17), transparent 44%),
-      radial-gradient(circle at 85% 78%, rgba(16, 212, 146, 0.12), transparent 40%),
-      radial-gradient(circle at 72% 18%, rgba(129, 140, 248, 0.11), transparent 46%);
+      radial-gradient(circle at 15% 8%, rgba(12, 189, 242, 0.24), transparent 44%),
+      radial-gradient(circle at 85% 78%, rgba(16, 212, 146, 0.17), transparent 40%),
+      radial-gradient(circle at 72% 18%, rgba(129, 140, 248, 0.16), transparent 46%);
     background-attachment: fixed;
     /* Honour iOS notch & home-indicator */
     padding-left: env(safe-area-inset-left);

@@ -135,7 +135,7 @@ export default function Hero() {
               <TypewriterEffect
                 text={profile.name}
                 typingSpeed={80}
-                className="bg-gradient-to-r from-white via-cyan-300 to-emerald-400 bg-clip-text text-transparent"
+                className="bg-gradient-to-r from-cyan-300 via-emerald-300 to-indigo-300 bg-clip-text text-transparent"
               />
             </motion.h1>
 
