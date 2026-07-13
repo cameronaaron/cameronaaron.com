@@ -96,6 +96,7 @@ src/dead-dependency-contract.test.ts         # every package.json dep has a real
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
+src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas

@@ -720,7 +720,31 @@ investigate that script before touching the config.
    coverage — has a blind spot, everything matching that blind spot
    accumulates invisibly. Periodically ask a sweep "what would this miss?"
    the same way you'd ask it "what does this catch?"**
-8. **The checklist for any new component or feature:**
+8. **A test that cannot fail is worse than no test — and test
+   *infrastructure* needs tests of its own.** A 2026-07 audit found 45+
+   assertions that could never fail: `expect(document.body).toBeTruthy()`
+   (always exists in jsdom), `expect(container).toBeTruthy()` (RTL's render
+   container is always an element), and `.toBeTruthy()` on MotionValue
+   wrappers (an object is truthy whatever its numeric payload — even 0
+   passes). Worse, the shared framer-motion mock silently froze
+   `useTransform` at creation time, which made real motion-math assertions
+   *unwritable* — and because nothing tested the mock, nothing could catch
+   it. Both fixed structurally: the mock's math now lives in
+   `src/test-utils/motion-mock.ts` (a first-class, unit-tested module —
+   lazy computed values, clamped piecewise-linear interpolation, live style
+   resolution), and `test-quality-contract.test.tsx` (a) bans always-true
+   assertion receivers repo-wide, (b) re-verifies the assembled mock's
+   fidelity end-to-end through the real `framer-motion` import on every
+   run, and (c) pins every file-local `vi.mock('framer-motion')` to a
+   reasoned registry — a local mock silently opts its file out of shared-
+   mock fidelity, so it's a decision on record, not a default. Related
+   hygiene: when production code loses a path (ProfileImage's per-mousemove
+   `getElementById` became a ref), delete or rewrite the test that mocked
+   that path — a test faithfully exercising removed behavior is another
+   test not doing what it claims. **The lesson generalizes: audit
+   assertions for "could this ever fail?", and treat shared mocks as
+   production code — modular, unit-tested, and contract-guarded.**
+9. **The checklist for any new component or feature:**
    - [ ] Pure logic extracted to `logic.ts` with unit tests
    - [ ] Collection builds/sorts in `useMemo`
    - [ ] List-item components `memo`'d if a parent selection re-renders them;
@@ -733,11 +757,11 @@ investigate that script before touching the config.
    - [ ] Hydration-safe: no browser APIs in initial state
    - [ ] New invariant → new contract test, same commit
    - [ ] `npm test && npm run type-check && npm run lint` green
-9. **When a contract fails, fix the source.** If the *requirement* genuinely
-   changed (e.g., a 5th education item changes the grid), update source, test,
-   and the documentation together — that is a requirements change, not a
-   test weakening.
-10. **Commits are small, single-topic, and self-explanatory.** One logical
+10. **When a contract fails, fix the source.** If the *requirement* genuinely
+    changed (e.g., a 5th education item changes the grid), update source, test,
+    and the documentation together — that is a requirements change, not a
+    test weakening.
+11. **Commits are small, single-topic, and self-explanatory.** One logical
    change per commit — an optimization plus its ratchet contract plus its
    docs is *one* topic (rule 1); an unrelated dependency bump is another.
    Subject line: imperative, ≤72 chars, says *what*; body says *why* and

@@ -37,7 +37,7 @@
     "lint:md": "markdownlint-cli2 \"*.md\"",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "test:complexity": "vitest run src/complexity-doctrine-contract.test.ts src/components/algorithm-and-datastructure-contract.test.tsx src/components/animation-regression-contract.test.ts src/modularization-contract.test.ts src/dead-logic-export-contract.test.ts src/dead-dependency-contract.test.ts src/public-asset-weight-contract.test.ts src/config-integrity-contract.test.ts src/docs-quality-contract.test.ts src/lifecycle-hygiene-contract.test.ts src/headers-integrity-contract.test.ts",
+    "test:complexity": "vitest run src/complexity-doctrine-contract.test.ts src/components/algorithm-and-datastructure-contract.test.tsx src/components/animation-regression-contract.test.ts src/modularization-contract.test.ts src/dead-logic-export-contract.test.ts src/dead-dependency-contract.test.ts src/public-asset-weight-contract.test.ts src/config-integrity-contract.test.ts src/docs-quality-contract.test.ts src/lifecycle-hygiene-contract.test.ts src/headers-integrity-contract.test.ts src/test-quality-contract.test.tsx",
     "test:repo:hygiene": "vitest run src/repo-hygiene-contract.test.ts",
     "test:performance:contracts": "node scripts/checks/performance-budgets.mjs",
     "test:performance:desktop": "pnpm run build && pnpm run test:performance:contracts && npx @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
