@@ -69,6 +69,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "JoeAnna McDonald",
     role: "MA Mathematics",
+    company: "Trillium Academy",
+    companyUrl: "https://www.trilliumacademy.org/",
     profileUrl: "https://www.linkedin.com/in/joeanna-mcdonald-128681154/",
     relationship: "Colleague",
     date: "March 2024",
@@ -166,6 +168,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Patricia Cebotari",
     role: "Compliance Analysis | UX/UI",
+    company: "Waystone Advisors",
+    companyUrl: "https://waystoneadvisors.com/",
     profileUrl: "https://www.linkedin.com/in/patricia-cebotari/",
     relationship: "Manager",
     date: "June 2021",
@@ -184,6 +188,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Gwendolyn D'Elia, CPTM",
     role: "Senior Trainer | Salesforce CRM",
+    company: "University of Colorado",
+    companyUrl: "https://www.cu.edu/",
+    profileUrl: "https://www.linkedin.com/in/gwendolynmhay",
     relationship: "Colleague",
     date: "April 2021",
     text: "With the utmost professionalism and creativity, Cameron has brought all of his academic and professional success into the realm of Advancement and fundraising with kindness and consideration -- truly encompassing what it means to put 'the liberal arts into action'!",
@@ -230,6 +237,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Dana Castner",
     role: "Digital Product Strategist",
+    company: "Paylocity",
+    companyUrl: "https://www.paylocity.com/",
     profileUrl: "https://www.linkedin.com/in/danacastner/",
     relationship: "Manager",
     date: "July 2020",
