@@ -114,4 +114,33 @@ describe('data module coverage', () => {
       expect(() => new URL(testimonial.originalPostUrl as string)).not.toThrow();
     }
   });
+
+  it('never sets companyUrl without company — the link would silently never render', () => {
+    // TestimonialCard only renders the company block (link included) when
+    // `company` is truthy — a companyUrl set alongside a missing company
+    // string is dead data: the link exists in the object but never reaches
+    // the DOM. Found 2026-07: Vinicius SantAnna had a verified, live
+    // dutchie.com companyUrl that had never once rendered.
+    const orphanedCompanyUrls = testimonials.filter((t) => t.companyUrl && !t.company);
+    expect(
+      orphanedCompanyUrls.map((t) => t.name),
+      'these testimonials have a companyUrl but no company text, so the link never renders — add the company name',
+    ).toEqual([]);
+  });
+
+  it('reports testimonial data-completeness gaps for visibility (does not fail the build)', () => {
+    // Not every gap is fixable — many recommenders' companies or LinkedIn
+    // profile URLs simply aren't public/known, and guessing a profile URL
+    // risks linking a testimonial to a stranger, which is worse than no
+    // link. This surfaces the current gap count in test output so it stays
+    // visible and doesn't silently grow, without blocking commits over
+    // information nobody can verify.
+    const missingCompany = testimonials.filter((t) => !t.company).map((t) => t.name);
+    const missingProfile = testimonials.filter((t) => !t.profileUrl).map((t) => t.name);
+    console.log(
+      `testimonials: ${missingCompany.length}/${testimonials.length} missing company, ` +
+        `${missingProfile.length}/${testimonials.length} missing profileUrl`,
+    );
+    expect(testimonials.length).toBeGreaterThan(0);
+  });
 });
