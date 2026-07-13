@@ -22,6 +22,9 @@ import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransition
 import VelocityMarquee from '@/components/ui/VelocityMarquee';
 import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/velocity-marquee-logic';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import { navItems } from '@/data/navigation';
+import { profile } from '@/data/profile';
+import { socialPlatforms } from '@/data/contact';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -118,7 +121,7 @@ export default function Home() {
 
       {/* Footer */}
       <motion.footer
-        className="border-t border-white/5 bg-background/80 text-white py-10 relative overflow-hidden"
+        className="border-t border-white/5 bg-background/80 text-white py-14 relative overflow-hidden"
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -130,10 +133,56 @@ export default function Home() {
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         />
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <p className="text-muted-foreground">
-            © {CURRENT_YEAR} Cameron Aaron. All rights reserved.
-          </p>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-sm">
+              <a href="#home" className="font-display text-2xl font-bold tracking-tight text-white transition-colors hover:text-cyan-100">
+                Cameron Aaron
+              </a>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Emergency care, clinical research, and secure software — building toward Nurse Practitioner practice.
+              </p>
+            </div>
+
+            <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-12 gap-y-2.5">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+                >
+                  {item.name}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex flex-col gap-2.5">
+              {socialPlatforms.map((platform) => (
+                <a
+                  key={platform.key}
+                  href={profile.social[platform.key]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+                >
+                  {platform.name}
+                </a>
+              ))}
+              <a
+                href={`mailto:${profile.email}`}
+                className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+              >
+                {profile.email}
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-sm text-muted-foreground md:flex-row">
+            <p>© {CURRENT_YEAR} Cameron Aaron. All rights reserved.</p>
+            <p className="font-mono-accent text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
+              {profile.location}
+            </p>
+          </div>
         </div>
       </motion.footer>
     </>
