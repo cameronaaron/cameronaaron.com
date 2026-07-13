@@ -230,7 +230,7 @@ describe('interactive particle engine', () => {
   it('CONNECTION_TIER_STYLES precomputes one strokeStyle per opacity tier', () => {
     expect(CONNECTION_TIER_STYLES).toHaveLength(CONNECTION_OPACITY_TIERS.length);
     CONNECTION_OPACITY_TIERS.forEach((opacity, index) => {
-      expect(CONNECTION_TIER_STYLES[index]).toBe(`rgba(103, 232, 249, ${opacity})`);
+      expect(CONNECTION_TIER_STYLES[index]).toBe(`rgba(126, 231, 255, ${opacity})`);
     });
   });
 
@@ -262,10 +262,10 @@ describe('interactive particle engine', () => {
   });
 
   it('getGlowGradientStops builds a solid-core, transparent-edge gradient', () => {
-    const stops = getGlowGradientStops('rgba(34, 211, 238, 0.65)');
+    const stops = getGlowGradientStops('rgba(56, 214, 255, 0.65)');
     expect(stops).toEqual([
-      { offset: 0, color: 'rgba(34, 211, 238, 0.65)' },
-      { offset: GLOW_CORE_STOP, color: 'rgba(34, 211, 238, 0.65)' },
+      { offset: 0, color: 'rgba(56, 214, 255, 0.65)' },
+      { offset: GLOW_CORE_STOP, color: 'rgba(56, 214, 255, 0.65)' },
       { offset: 1, color: 'rgba(0, 0, 0, 0)' },
     ]);
     // Offsets must be ascending — CanvasGradient.addColorStop requires it

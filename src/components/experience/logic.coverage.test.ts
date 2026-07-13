@@ -48,14 +48,14 @@ describe('experience logic — coverage fill for lines 31 and 57', () => {
       const result = getTimelineDotAnimation(false, false);
 
       // This hits the false branch of `isLiteMotion ?` on line 57
-      expect(result.boxShadow).toBe('0 0 10px rgba(16, 185, 129, 0.5)');
+      expect(result.boxShadow).toBe('0 0 10px rgba(16, 212, 146, 0.5)');
     });
 
     it('returns the lite boxShadow when inactive and isLiteMotion is true', () => {
       const result = getTimelineDotAnimation(true, false);
 
       // This hits the true branch of `isLiteMotion ?` on line 57
-      expect(result.boxShadow).toBe('0 0 6px rgba(16, 185, 129, 0.35)');
+      expect(result.boxShadow).toBe('0 0 6px rgba(16, 212, 146, 0.35)');
     });
   });
 });

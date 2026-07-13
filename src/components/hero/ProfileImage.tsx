@@ -112,7 +112,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
           whileHover={
             enableHoverMotion
               ? {
-                  boxShadow: '0 25px 50px -12px rgba(168, 85, 247, 0.5)',
+                  boxShadow: '0 25px 50px -12px rgba(129, 140, 248, 0.5)',
                 }
               : undefined
           }

@@ -82,7 +82,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
             className="absolute inset-0"
             style={{
               background:
-                'radial-gradient(circle at 50% 50%, rgba(6,182,212,0.18) 0%, rgba(139,92,246,0.12) 40%, transparent 70%)',
+                'radial-gradient(circle at 50% 50%, rgba(12,189,242,0.18) 0%, rgba(129,140,248,0.12) 40%, transparent 70%)',
             }}
             initial={{ opacity: 0, scale: 1.2 }}
             animate={{ opacity: 1, scale: 1 }}

@@ -51,7 +51,7 @@ export default function InternetPage() {
   return (
     <main className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-white/10 py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.2),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,212,146,0.2),transparent_55%)]" />
         <div className="container relative z-10 mx-auto px-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Public Presence</p>
           <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-5xl">

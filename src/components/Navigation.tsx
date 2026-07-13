@@ -158,8 +158,8 @@ export default function Navigation() {
                         layoutId="active-nav-pill"
                         className="absolute inset-0 -z-10 rounded-full border"
                         style={{
-                          background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.24), rgba(14, 165, 233, 0.18))',
-                          borderColor: 'rgba(103, 232, 249, 0.25)',
+                          background: 'linear-gradient(90deg, rgba(12, 189, 242, 0.24), rgba(12, 189, 242, 0.18))',
+                          borderColor: 'rgba(126, 231, 255, 0.25)',
                         }}
                         transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.35 }}
                       />

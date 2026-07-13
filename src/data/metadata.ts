@@ -200,7 +200,7 @@ export function buildRootMetadata(): Metadata {
       'geo.region': 'US-CA',
       'geo.placename': 'Los Angeles',
       ICBM: '34.0522, -118.2437',
-      'theme-color': '#06b6d4',
+      'theme-color': '#0cbdf2',
     },
   };
 }
@@ -211,8 +211,8 @@ export function buildRootMetadata(): Metadata {
 export function buildRootViewport() {
   return {
     themeColor: [
-      { media: '(prefers-color-scheme: dark)', color: '#06b6d4' },
-      { media: '(prefers-color-scheme: light)', color: '#06b6d4' },
+      { media: '(prefers-color-scheme: dark)', color: '#0cbdf2' },
+      { media: '(prefers-color-scheme: light)', color: '#0cbdf2' },
     ],
     width: 'device-width',
     initialScale: 1,

@@ -224,7 +224,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
         className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{
           background:
-            'radial-gradient(circle, rgba(34,211,238,0.12) 0%, rgba(16,185,129,0.08) 36%, rgba(6,13,20,0) 72%)',
+            'radial-gradient(circle, rgba(56,214,255,0.12) 0%, rgba(16,212,146,0.08) 36%, rgba(4,7,15,0) 72%)',
           filter: 'blur(10px)',
         }}
         animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0.9, 0.6] }}

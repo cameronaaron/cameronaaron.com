@@ -21,7 +21,7 @@ interface FeaturedProjectProps {
 export default function FeaturedProject({ project, index = 0 }: FeaturedProjectProps) {
   const hoverX = useMotionValue(50);
   const hoverY = useMotionValue(50);
-  const spotlight = useMotionTemplate`radial-gradient(460px circle at ${hoverX}% ${hoverY}%, rgba(34, 211, 238, 0.18), rgba(16, 185, 129, 0.1) 36%, transparent 72%)`;
+  const spotlight = useMotionTemplate`radial-gradient(460px circle at ${hoverX}% ${hoverY}%, rgba(56, 214, 255, 0.18), rgba(16, 212, 146, 0.1) 36%, transparent 72%)`;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -88,7 +88,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
               <Button 
                 href={project.link} 
                 variant="primary" 
-                className="w-fit group-hover:shadow-[0_0_20px_rgba(34,211,238,0.45)] transition-shadow"
+                className="w-fit group-hover:shadow-[0_0_20px_rgba(56,214,255,0.45)] transition-shadow"
               >
                 {getFeaturedProjectCta(project.cta)}
               </Button>
@@ -107,7 +107,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
               className="relative z-10 w-full max-w-xs aspect-square glass-card rounded-2xl border border-white/10 flex items-center justify-center p-8 transform group-hover:scale-105 group-hover:rotate-3 transition-transform duration-500"
             >
               <div className="text-center">
-                <div className="mb-4 flex justify-center filter drop-shadow-[0_0_15px_rgba(103,232,249,0.25)]">
+                <div className="mb-4 flex justify-center filter drop-shadow-[0_0_15px_rgba(126,231,255,0.25)]">
                   <FeaturedIcon variant={getFeaturedIconVariant(index)} />
                 </div>
                 <div className="text-2xl font-bold text-white/80 font-mono">

@@ -27,7 +27,7 @@ export default function SectionHeader({ title, subtitle, className = '', heading
         <span
           aria-hidden="true"
           data-testid="section-ghost-index"
-          className="pointer-events-none absolute inset-x-0 -top-8 z-0 flex select-none justify-center font-display text-[7rem] font-extrabold leading-none tracking-tight text-white/[0.04] [-webkit-text-stroke:1px_rgba(148,233,255,0.07)] md:-top-14 md:text-[11rem]"
+          className="pointer-events-none absolute inset-x-0 -top-8 z-0 flex select-none justify-center font-display text-[7rem] font-extrabold leading-none tracking-tight text-white/[0.04] [-webkit-text-stroke:1px_rgba(126,231,255,0.07)] md:-top-14 md:text-[11rem]"
         >
           {index}
         </span>
