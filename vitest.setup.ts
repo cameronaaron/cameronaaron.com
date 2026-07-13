@@ -30,6 +30,9 @@ vi.mock('framer-motion', () => {
       dragConstraints: _dragConstraints,
       dragElastic: _dragElastic,
       dragMomentum: _dragMomentum,
+      dragSnapToOrigin: _dragSnapToOrigin,
+      dragTransition: _dragTransition,
+      whileDrag: _whileDrag,
       ...rest
     } = props;
 
@@ -58,6 +61,17 @@ vi.mock('framer-motion', () => {
 
   return {
     motion,
+    // Deterministic imperative animate(): jump straight to the final frame so
+    // tests observe the settled DOM (count-ups land on their target).
+    animate: (
+      _from: number,
+      to: number,
+      options?: { onUpdate?: (latest: number) => void; onComplete?: () => void }
+    ) => {
+      options?.onUpdate?.(to);
+      options?.onComplete?.();
+      return { stop: () => undefined };
+    },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
     MotionConfig: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
     useMotionValue: (value = 0) => createMotionValue(value),

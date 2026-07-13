@@ -1,8 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { animate, motion } from 'framer-motion';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { STAT_COUNT_UP_DURATION_S, formatStatValue, parseStatValue } from '@/components/ui/stat-card-logic';
 
 interface StatCardProps {
   value: string;
@@ -11,6 +13,26 @@ interface StatCardProps {
 
 export default function StatCard({ value, label }: StatCardProps) {
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
+  const valueRef = useRef<HTMLDivElement>(null);
+  const parsedValue = useMemo(() => parseStatValue(value), [value]);
+
+  // Count up from 0 by writing straight into the node — the SSR HTML already
+  // holds the final value (hydration-safe, meaningful without JS) and no React
+  // re-render happens per frame.
+  useEffect(() => {
+    const node = valueRef.current;
+    if (prefersReducedMotion || parsedValue.target === null || !node) return;
+
+    const controls = animate(0, parsedValue.target, {
+      duration: STAT_COUNT_UP_DURATION_S,
+      ease: 'easeOut',
+      onUpdate: (latest) => {
+        node.textContent = formatStatValue(latest, parsedValue.suffix);
+      },
+    });
+
+    return () => controls.stop();
+  }, [prefersReducedMotion, parsedValue]);
 
   return (
     <motion.div
@@ -26,6 +48,7 @@ export default function StatCard({ value, label }: StatCardProps) {
       />
 
       <motion.div
+        ref={valueRef}
         className="relative font-display text-3xl font-bold tracking-tight text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
         animate={prefersReducedMotion ? undefined : { opacity: [0.92, 1, 0.92] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
