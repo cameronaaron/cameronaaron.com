@@ -36,6 +36,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Sean Hastings",
     role: "Information Security Leader",
+    company: "Dutchie",
+    companyUrl: "https://dutchie.com/",
     profileUrl: "https://www.linkedin.com/in/sahast/",
     relationship: "Colleague",
     date: "November 2022",
@@ -94,6 +96,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Ashley Pinales",
     role: "Latina in Tech | WFM People Leader",
+    company: "Dutchie",
+    companyUrl: "https://dutchie.com/",
     profileUrl: "https://www.linkedin.com/in/ashley-pinales-2a012770/",
     relationship: "Senior Colleague",
     date: "November 2022",
@@ -102,6 +106,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Darin Mellor CAPM, BA, MSM",
     role: "Project Manager",
+    company: "Dutchie",
+    companyUrl: "https://dutchie.com/",
+    profileUrl: "https://www.linkedin.com/in/darin-mellor-capm-ba-msm-a09441ba/",
     relationship: "Colleague",
     date: "November 2022",
     text: "Cameron is a highly motivated, passionate, and a hard working human. In my experience working with him he slayed any challenge he was given. He helped bring together three support organizations and set the foundation for our success. I consider myself lucky to have worked with and learned from Cameron.",
@@ -120,6 +127,8 @@ export const testimonials: Testimonial[] = [
     name: "KT Ellis",
     role: "Customer Onboarding Ops",
     company: "Boulevard",
+    companyUrl: "https://www.joinblvd.com/",
+    profileUrl: "https://www.linkedin.com/in/kt-ellis/",
     relationship: "Colleague",
     date: "July 2022",
     text: "When he attacks a problem, he comes at it from every angle possible, often in new and unique ways than the rest of the team. He shares ways for the company to improve even when they aren't in his natural swim lane. He's smart, dedicated, and really great guy to boot!",
@@ -180,6 +189,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Persephone L. Hall",
     role: "Career Development Leader",
+    company: "Connecticut College",
+    companyUrl: "https://www.conncoll.edu/",
     profileUrl: "https://www.linkedin.com/in/persephonelhall/",
     relationship: "Mentor",
     date: "April 2021",
@@ -207,6 +218,9 @@ export const testimonials: Testimonial[] = [
   {
     name: "Amy Peck",
     role: "CEO - EndeavorXR",
+    company: "EndeavorXR",
+    companyUrl: "https://www.endeavorxr.com/",
+    profileUrl: "https://www.linkedin.com/in/amypeckxr",
     relationship: "Industry Connection",
     date: "August 2020",
     text: "Cameron is a rock star!!",
