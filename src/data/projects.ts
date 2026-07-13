@@ -125,4 +125,20 @@ export const projects: Project[] = [
     period: "May 2020",
     cta: "View on ResearchGate",
   },
+  {
+    title: "Creating the Perfect Fit: Turning ADD Into an Asset",
+    description: "LinkedIn Pulse essay on reframing Attention Deficit Disorder as a driver of creativity, thinking, and motivation rather than a limitation.",
+    link: "https://www.linkedin.com/pulse/creating-perfect-fit-turning-add-asset-cameron-aaron",
+    tags: ["Publication", "Neurodiversity", "ADHD"],
+    period: "Feb 2021",
+    cta: "Read Article",
+  },
+  {
+    title: "My Journey in Integrating Art and Technology to Enhance the Human Experience",
+    description: "LinkedIn Pulse essay on his induction as a Scholar of the Ammerman Center for Arts and Technology and the interdisciplinary art-technology projects that followed.",
+    link: "https://www.linkedin.com/pulse/my-journey-integrating-art-technology-enhance-human-experience-aaron",
+    tags: ["Publication", "Arts-Based Research", "Ammerman Center"],
+    period: "Dec 2019",
+    cta: "Read Article",
+  },
 ];
