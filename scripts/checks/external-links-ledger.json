@@ -1,0 +1,708 @@
+{
+  "https://2esymposium.com/speaker-attendee-biographies-a-f/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://archiveprogram.github.com/arctic-vault/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://bridges.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://cvl.cdph.ca.gov/DetailPage.aspx?cert_holder_id=797902": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts",
+      "src/data/education.ts"
+    ]
+  },
+  "https://doi.org/10.1167/jov.21.9.2719": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://dutchie.com/": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts",
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=5FDD8C2A-4EEC-4AAA-A39C-A31051C0112D&langId=1": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=A1B5403C-5D5D-40CA-B89B-BB660A452AE7&langId=1": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=D2652075-56D4-4452-9F44-AF0F20FA78B0&langId=1": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://elmbridge.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts",
+      "src/data/education.ts"
+    ]
+  },
+  "https://emsregistry.emsa.ca.gov/caemsa?id=license_detail&sys_id=b94c1a2f1b6bb610f8e62138624bcb8d": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://github.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts",
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://github.com/cameronaaron": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/profile.ts"
+    ]
+  },
+  "https://jacobsinstitute.berkeley.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://nrplearningplatform.com/certificateAdmin/0.1/verify_certificate": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://pangea.app/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://petricoregames.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://phrptraining.com/login": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://search.dca.ca.gov/details/1201/G/6859700/e1facef21869287b88a72c38de0b3b3d": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://steelvalleyaccelerator.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://thehellisthis.com": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/projects.ts"
+    ]
+  },
+  "https://web.archive.org/web/20201115080207/https://c19bayshield.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://www.2enews.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.about.pangea.app/top-emerging-talent/summer-21": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.bardovr.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://www.conncoll.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts",
+      "src/data/experience.ts",
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/genetic-reflexions-a-magic-mirror-that-displays-genetic-info-about-the-person-with-their-reflection.html": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts",
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.conncoll.edu/news/news-archive/2020/a-dozen-internships/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/35GA4PT55P58": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/56UX6XK93RUE": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/AN29HKSZVTSJ": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/KE556WEY57QK": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/NNB9A5JV8WSA": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/QBP8786KGTVK": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/QU4S27ZCRDXZ": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/VW7G9Y7KVBF3": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.coursera.org/verify/specialization/YL97H6X2CJB9": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.deac.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.deac.org/discover-deac/delta-epsilon-tau-honor-society/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.facebook.com/": {
+    "status": "blocked",
+    "httpCode": 400,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.facebook.com/joyld1/posts/pfbid0261cux8P1tjRCUGC9WyJpk8fxzpNnxbYQeceKUNX7T6aFMy4H89XgVPcmwdd6BHGLl": {
+    "status": "blocked",
+    "httpCode": 400,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.helpinghands.community/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://www.impactlabs.io/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.kulturecity.org/training/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.laccd.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/acolombiadev/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/ashley-pinales-2a012770/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/chris-wiebe-a2b26778/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/christine-chung-phd/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/danacastner/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/drjoybrighttalentedblack/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/dylan-arceneaux-b8b296b6/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/h-john-schaeffer-5a66793/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/joeanna-mcdonald-128681154/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/kamisama": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/profile.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/karina-sinha/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/katelynberezo/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/michael-gombos-3148ba17/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/nate-ledbury-707507a7/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/patricia-cebotari/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/persephonelhall/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/raymondcmartinez/": {
+    "status": "blocked",
+    "httpCode": 429,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/sahast/": {
+    "status": "blocked",
+    "httpCode": 429,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/vinicius-santanna-89113332/": {
+    "status": "blocked",
+    "httpCode": 429,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/in/walterama/": {
+    "status": "blocked",
+    "httpCode": 999,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.linkedin.com/posts/cameron-aaron-21-is-currently-working-as-share-6657585783760920576-dLcj/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts"
+    ]
+  },
+  "https://www.mos.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.neche.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/education.ts"
+    ]
+  },
+  "https://www.nremt.org/verify-credentials": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/certifications.ts"
+    ]
+  },
+  "https://www.parchment.com/lp/award/5ed28264-10a0-4798-b16b-f94393e0b7da": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/additionalCredentials.ts",
+      "src/data/certifications.ts",
+      "src/data/education.ts",
+      "src/data/internetFeatures.ts"
+    ]
+  },
+  "https://www.researchgate.net/profile/Cameron-Aaron-2": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts"
+    ]
+  },
+  "https://www.researchgate.net/publication/341276786_The_Real_Magical_Girls?_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6InByb2ZpbGUiLCJwYWdlIjoicHJvZmlsZSJ9fQ": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.researchgate.net/publication/341276789_Toxoplasma_Gondii_Modifies_Personality": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.researchgate.net/publication/341276824_EAS_101_Final_paper": {
+    "status": "blocked",
+    "httpCode": 403,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.spacex.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://www.stanfordnnea.com/2023-speakers": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.westerlyschool.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/testimonials.ts"
+    ]
+  },
+  "https://www.xurrent.com/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
+  "https://www.xurrent.com/blog/4me-welcomes-cameron-aaron": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/internetFeatures.ts",
+      "src/data/projects.ts"
+    ]
+  },
+  "https://www.youtube.com/playlist?list=PLPKJAUpRXbupAzN7UaPLEewRw2up_Nyz-": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts",
+      "src/data/education.ts"
+    ]
+  },
+  "https://youtu.be/3to4vDHLO_4": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts"
+    ]
+  },
+  "https://youtu.be/i4SgPsfrms0": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts"
+    ]
+  },
+  "https://youtu.be/m21bBd5EqK0": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts"
+    ]
+  },
+  "https://youtu.be/u_hXunweL1Q": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts"
+    ]
+  },
+  "https://youtu.be/zVz1OpLugZo": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-07-13T05:57:29.297Z",
+    "files": [
+      "src/data/capstone.ts"
+    ]
+  }
+}

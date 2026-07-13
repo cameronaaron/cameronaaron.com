@@ -146,6 +146,7 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
       'src/lifecycle-hygiene-contract.test.ts',
       'src/headers-integrity-contract.test.ts',
       'src/test-quality-contract.test.tsx',
+      'src/external-links-contract.test.ts',
     ]) {
       expect(script, `test:complexity must include ${requiredFile}`).toContain(requiredFile);
     }

@@ -744,29 +744,61 @@ investigate that script before touching the config.
    test not doing what it claims. **The lesson generalizes: audit
    assertions for "could this ever fail?", and treat shared mocks as
    production code — modular, unit-tested, and contract-guarded.**
-9. **The checklist for any new component or feature:**
-   - [ ] Pure logic extracted to `logic.ts` with unit tests
-   - [ ] Collection builds/sorts in `useMemo`
-   - [ ] List-item components `memo`'d if a parent selection re-renders them;
-         callbacks `useCallback`-stable
-   - [ ] High-frequency events → motion values / CSS vars, passive listeners,
-         rAF-coalesced
-   - [ ] Effects gated on the performance tier / `enableHoverMotion`
-   - [ ] Works on coarse pointers: no stuck hover, ≥44px targets, no new
-         ungated blur/filter/infinite animation
-   - [ ] Hydration-safe: no browser APIs in initial state
-   - [ ] New invariant → new contract test, same commit
-   - [ ] `npm test && npm run type-check && npm run lint` green
-10. **When a contract fails, fix the source.** If the *requirement* genuinely
+9. **Content data needs the same freshness discipline as dependencies — a
+   dead link is drift too.** A reader reported the Delta Epsilon Tau honor
+   society link went to a dead page (its own domain had lapsed). Auditing
+   every external URL referenced from `src/data` found three more dead:
+   Connecticut College's Ammerman Center sub-page (removed in a site
+   restructure — one of its two occurrences silently survived an earlier
+   bulk edit; only re-running the checker caught it, not trusting the
+   edit's own "all occurrences replaced" claim), CIHE's old accreditor
+   domain (rebranded to NECHE), and a defunct 2020 COVID-response project's
+   site (fixed to a Wayback Machine capture). Same shape as the
+   dependency/GitHub-Actions freshness holes: an ecosystem (this site's own
+   outbound links) that nothing was watching. Fixed with the same pattern
+   used everywhere else in this file — a checked-in ledger
+   (`scripts/checks/external-links-ledger.json` — lives beside its
+   generator, not in `src/data/`, since that directory's hygiene contract
+   requires hand-written camelCase `.ts` source, not a generated JSON
+   artifact) plus a fast, offline contract
+   (`external-links-contract.test.ts`) that fails on any dead/missing/
+   orphaned/stale entry — but with one deliberate difference: unlike
+   `pnpm outdated`/`pnpm audit` (reliable, fast, high-uptime APIs), ~90
+   third-party sites (LinkedIn, ResearchGate, small institutional pages)
+   are neither reliable nor fast enough to hit on every commit, and would
+   make the gate flaky. So the network check
+   (`scripts/checks/check-external-links.mjs`, `pnpm run check:links`) runs
+   on a ledger cadence a human (or a scheduled job) triggers, not inline
+   with every commit — the pre-commit gate only ever reads the checked-in
+   result. Bot-blocking platforms get a documented `BOT_BLOCKING_HOSTS`
+   classification (`blocked`, not `dead`) so a 403 from LinkedIn doesn't
+   fail the build for a link that's actually fine. **The lesson
+   generalizes: not every freshness check belongs in the fast path — when
+   the thing being verified is inherently less reliable than your own
+   CI, verify on a cadence into a ledger, and gate fast on the ledger.**
+10. **The checklist for any new component or feature:**
+    - [ ] Pure logic extracted to `logic.ts` with unit tests
+    - [ ] Collection builds/sorts in `useMemo`
+    - [ ] List-item components `memo`'d if a parent selection re-renders them;
+          callbacks `useCallback`-stable
+    - [ ] High-frequency events → motion values / CSS vars, passive listeners,
+          rAF-coalesced
+    - [ ] Effects gated on the performance tier / `enableHoverMotion`
+    - [ ] Works on coarse pointers: no stuck hover, ≥44px targets, no new
+          ungated blur/filter/infinite animation
+    - [ ] Hydration-safe: no browser APIs in initial state
+    - [ ] New invariant → new contract test, same commit
+    - [ ] `npm test && npm run type-check && npm run lint` green
+11. **When a contract fails, fix the source.** If the *requirement* genuinely
     changed (e.g., a 5th education item changes the grid), update source, test,
     and the documentation together — that is a requirements change, not a
     test weakening.
-11. **Commits are small, single-topic, and self-explanatory.** One logical
-   change per commit — an optimization plus its ratchet contract plus its
-   docs is *one* topic (rule 1); an unrelated dependency bump is another.
-   Subject line: imperative, ≤72 chars, says *what*; body says *why* and
-   names anything non-obvious (measurements, the bug class prevented, the
-   revisit condition for a pin). Anyone reading `git log --oneline` should be
-   able to follow the work without opening a single diff. Never mix refactors
-   with behavior changes in one commit, and never commit with a red gate
-   (rule 3).
+12. **Commits are small, single-topic, and self-explanatory.** One logical
+    change per commit — an optimization plus its ratchet contract plus its
+    docs is *one* topic (rule 1); an unrelated dependency bump is another.
+    Subject line: imperative, ≤72 chars, says *what*; body says *why* and
+    names anything non-obvious (measurements, the bug class prevented, the
+    revisit condition for a pin). Anyone reading `git log --oneline` should be
+    able to follow the work without opening a single diff. Never mix refactors
+    with behavior changes in one commit, and never commit with a red gate
+    (rule 3).
