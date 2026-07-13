@@ -135,7 +135,8 @@ vi.mock('next/dynamic', () => ({
 
 vi.mock('next/font/google', () => ({
   Manrope: () => ({ className: 'mock-manrope' }),
-  Space_Grotesk: () => ({ variable: 'mock-space-grotesk' }),
+  Bricolage_Grotesque: () => ({ variable: 'mock-bricolage-grotesque' }),
+  Geist_Mono: () => ({ variable: 'mock-geist-mono' }),
 }));
 
 vi.mock('lenis', () => ({

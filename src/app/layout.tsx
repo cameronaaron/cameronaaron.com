@@ -1,4 +1,4 @@
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
@@ -12,10 +12,17 @@ const manrope = Manrope({
   preload: true,
 });
 
-const spaceGrotesk = Space_Grotesk({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   display: 'swap',
   variable: '--font-display',
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-mono-accent',
+  weight: ['400', '500'],
 });
 
 export const metadata = buildRootMetadata();
@@ -40,7 +47,7 @@ export default function RootLayout({
         
         <StructuredData />
       </head>
-      <body className={`${manrope.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <body className={`${manrope.className} ${bricolage.variable} ${geistMono.variable}`} suppressHydrationWarning>
         <SmoothScroll />
         <ServiceWorkerRegistration />
         <IframeTitleGuard />
