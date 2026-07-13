@@ -34,27 +34,29 @@ export default function SectionHeader({ title, subtitle, className = '', heading
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.55, ease: 'easeOut' }}
-      className={`relative text-center mb-16 ${className}`}
+      className={`relative mb-16 text-left ${className}`}
     >
-      {index ? (
-        <span
-          aria-hidden="true"
-          data-testid="section-ghost-index"
-          className="pointer-events-none absolute inset-x-0 -top-8 z-0 flex select-none justify-center font-display text-[7rem] font-extrabold leading-none tracking-tight text-cyan-100/[0.06] [-webkit-text-stroke:1px_rgba(126,231,255,0.14)] md:-top-14 md:text-[11rem]"
-        >
-          {index}
-        </span>
-      ) : null}
-      <motion.div
-        className="mx-auto mb-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent"
-        initial={{ scaleX: 0.35, opacity: 0 }}
-        whileInView={{ scaleX: 1, opacity: 1 }}
-        viewport={{ once: true, margin: '-80px' }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-      />
+      <div className="mb-6 flex items-center gap-4">
+        {index ? (
+          <span
+            aria-hidden="true"
+            data-testid="section-ghost-index"
+            className="font-mono-accent pointer-events-none select-none text-sm font-medium tracking-[0.35em] text-cyan-300/80"
+          >
+            {index}
+          </span>
+        ) : null}
+        <motion.div
+          className="h-px flex-1 origin-left bg-gradient-to-r from-cyan-300/50 via-white/10 to-transparent"
+          initial={{ scaleX: 0.35, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        />
+      </div>
       <h2
         id={headingId}
-        className="relative z-10 text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-300 via-emerald-200 to-indigo-300 bg-clip-text text-transparent overflow-hidden pb-2 font-display"
+        className="relative z-10 mb-4 overflow-hidden pb-2 font-display text-4xl font-bold tracking-tight text-transparent md:text-6xl bg-gradient-to-br from-white via-cyan-50 to-cyan-200/80 bg-clip-text"
       >
         <motion.span
           data-testid="section-title-motion"
@@ -70,7 +72,7 @@ export default function SectionHeader({ title, subtitle, className = '', heading
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.45, delay: 0.12, ease: 'easeOut' }}
-          className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          className="max-w-2xl text-lg text-muted-foreground"
         >
           {subtitle}
         </motion.p>
