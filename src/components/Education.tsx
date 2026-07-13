@@ -17,6 +17,7 @@ export default function Education() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           headingId="education-heading"
+          index="03"
           title="Education & Nursing Prerequisites"
           subtitle="Graduate training, interdisciplinary scholarship, and prerequisite readiness for nursing pathways"
           className="[&>h2]:font-display"

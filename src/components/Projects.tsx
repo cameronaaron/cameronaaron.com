@@ -71,6 +71,7 @@ export default function Projects() {
 
         <SectionHeader
           headingId="projects-heading"
+          index="04"
           title="Research & Publications"
           subtitle="Selected publications, conference presentations, and research projects"
           className="[&>h2]:font-display"

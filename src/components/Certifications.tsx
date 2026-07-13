@@ -26,6 +26,7 @@ export default function Certifications() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           headingId="certifications-heading"
+          index="01"
           title="Clinical Certifications & Licenses"
           subtitle="Current emergency and healthcare credentials with verifiable status"
           className="[&>h2]:font-display"

@@ -44,6 +44,7 @@ export default function Testimonials() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           headingId="testimonials-heading"
+          index="06"
           title="What People Say"
           subtitle="Recommendations from colleagues, managers, and mentors"
         />
