@@ -24,6 +24,7 @@ export interface PrerequisiteCourse {
   gpa?: string;
   qualityPoints?: string;
   status: string;
+  url?: string;
 }
 
 export const educationItems: EducationItem[] = [
@@ -137,6 +138,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=298",
   },
   {
     requirement: "Verbal Communication Skills",
@@ -145,6 +147,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B",
     gpa: "3.00",
     status: "Completed",
+    url: "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=181",
   },
   {
     requirement: "Nutrition",
@@ -153,6 +156,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=271",
   },
   {
     requirement: "Emergency & Prehospital Care (nursing-relevant elective)",
@@ -161,6 +165,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B",
     gpa: "3.00",
     status: "Completed",
+    url: "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=200",
   },
   {
     requirement: "General Psychology",
@@ -169,6 +174,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A-",
     gpa: "3.70",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/100/psy-100",
   },
   {
     requirement: "Human Growth and Development",
@@ -177,6 +183,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=313",
   },
   {
     requirement: "Human Growth and Development (additional coursework)",
@@ -186,6 +193,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     gpa: "3.30",
     qualityPoints: "13.20",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/hmd-human-development/100/hmd-111",
   },
   {
     requirement: "Human Growth and Development (additional coursework)",
@@ -194,6 +202,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lamission.edu/sites/lamc.edu/files/2024-06/LAMC-Catalog-2024-2025.pdf#page=98",
   },
   {
     requirement: "Statistics",
@@ -202,6 +211,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "C",
     gpa: "2.00",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-201",
   },
   {
     requirement: "Research Methods",
@@ -210,6 +220,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B-",
     gpa: "2.70",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-202",
   },
   {
     requirement: "Written Communication Skills",
@@ -218,6 +229,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B+",
     gpa: "3.30",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2020-2021/catalog/courses/eas-east-asian-studies/100/eas-106",
   },
   {
     requirement: "Advanced Biology (nursing-relevant elective)",
@@ -226,6 +238,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/bio-biology/200/bio-298",
   },
   {
     requirement: "Behavioral/Neuroscience Biology (nursing-relevant elective)",
@@ -234,6 +247,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B",
     gpa: "3.00",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-214",
   },
   {
     requirement: "Cognitive/Neuroscience Biology (nursing-relevant elective)",
@@ -242,6 +256,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B",
     gpa: "3.00",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-312",
   },
   {
     requirement: "Behavioral Medicine (nursing-relevant elective)",
@@ -250,6 +265,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "B",
     gpa: "3.00",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-309",
   },
   {
     requirement: "Abnormal Psychology/Psychopathology (nursing-relevant elective)",
@@ -259,6 +275,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     gpa: "3.70",
     qualityPoints: "14.80",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-210",
   },
   {
     requirement: "Developmental Psychology (nursing-relevant elective)",
@@ -267,6 +284,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A-",
     gpa: "3.70",
     status: "Completed",
+    url: "https://www.umass.edu/psychological-brain-sciences/undergraduate/undergraduate-course-offerings",
   },
   {
     requirement: "Social/Behavioral Science (nursing-relevant elective)",
@@ -275,6 +293,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://catalog.csun.edu/academics/psy/courses/psy-345/",
   },
   {
     requirement: "Social/Behavioral Science (nursing-relevant elective)",
@@ -283,6 +302,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.wlac.edu/sites/wlac.edu/files/2024-08/catalog.pdf#page=223",
   },
   {
     requirement: "Behavioral Health Promotion (nursing-relevant elective)",
@@ -292,6 +312,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     gpa: "3.30",
     qualityPoints: "13.20",
     status: "Completed",
+    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-321",
   },
   {
     requirement: "Human Anatomy and lab",
@@ -300,6 +321,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=234",
   },
   {
     requirement: "Human Physiology and lab",
@@ -308,6 +330,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     grade: "A",
     gpa: "4.00",
     status: "Completed",
+    url: "https://www.lahc.edu/sites/lahc.edu/files/2025-12/LAHC%20Master%20Catalog%20File%202025%20Final%20Draft%C2%A0(1)%20-%20Updated%2012.17.25.pdf#page=194",
   },
   {
     requirement: "Nursing Clinical Skills (nursing-relevant elective)",
@@ -315,6 +338,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     units: "1.00",
     grade: "P",
     status: "Completed",
+    url: "https://www.wlac.edu/sites/wlac.edu/files/2024-08/catalog.pdf#page=212",
   },
   {
     requirement: "Organic Chemistry and lab",
@@ -322,6 +346,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     units: "5.00",
     grade: "In Progress",
     status: "In Progress",
+    url: "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=175",
   },
   {
     requirement: "Biochemistry",
@@ -329,6 +354,7 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     units: "5.00",
     grade: "In Progress",
     status: "In Progress",
+    url: "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=175",
   },
 ];
 
