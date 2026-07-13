@@ -31,6 +31,9 @@ const CURRENT_YEAR = new Date().getFullYear();
 const AmbientBackground = dynamic(() => import('@/components/ui/AmbientBackground'), { ssr: false });
 const QuickActionsDock = dynamic(() => import('@/components/ui/QuickActionsDock'), { ssr: false });
 const SectionRail = dynamic(() => import('@/components/ui/SectionRail'), { ssr: false });
+const CursorComet = dynamic(() => import('@/components/ui/CursorComet'), { ssr: false });
+const PointerRipple = dynamic(() => import('@/components/ui/PointerRipple'), { ssr: false });
+const AuroraSurge = dynamic(() => import('@/components/ui/AuroraSurge'), { ssr: false });
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
@@ -59,6 +62,7 @@ export default function Home() {
 
   const showFloatingOverlays = hasInteracted && (performanceTier === 'full' || performanceTier === 'balanced');
   const showSectionHandoffs = performanceTier === 'full' || performanceTier === 'balanced';
+  const showCursorEffects = hasInteracted && performanceTier === 'full';
   const pageProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 32, mass: 0.45 });
 
   return (
@@ -68,6 +72,12 @@ export default function Home() {
       <AmbientBackground performanceTier={performanceTier} />
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <SectionRail /> : null}
+      {/* Interaction layer: deferred until first input (same LCP-friendly gate
+          as the other floating overlays), then tier-gated — comet + easter egg
+          are desktop full-tier; the tap ripple also runs on balanced (mobile). */}
+      {showCursorEffects ? <CursorComet /> : null}
+      {showCursorEffects ? <AuroraSurge /> : null}
+      {showFloatingOverlays ? <PointerRipple /> : null}
       <KeyboardShortcuts />
       <BackToTop />
 
