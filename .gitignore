@@ -161,3 +161,7 @@ unnamed-1.webp
 
 # Claude Code local tooling state (permission grants, machine-specific)
 .claude/
+
+# Local-only helper files with sensitive network captures (auth tokens,
+# cookies) — never meant for the repo, per its own name.
+nottobecommitedforbotonly/
