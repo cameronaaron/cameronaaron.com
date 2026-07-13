@@ -156,6 +156,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Kate Berezo",
     role: "Social Impact in Entertainment",
+    company: "Hollywood CPR",
+    companyUrl: "https://hollywoodcpr.org/",
     profileUrl: "https://www.linkedin.com/in/katelynberezo/",
     relationship: "Manager",
     date: "July 2021",
