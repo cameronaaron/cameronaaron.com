@@ -140,7 +140,13 @@ describe('capstone/page.tsx coverage (line 167)', () => {
   it('renders capstone page with videos that have toYouTubeEmbedUrl branch', async () => {
     const { default: CapstonePageComponent } = await import('./capstone/page');
     const { container } = render(<CapstonePageComponent />);
-    expect(container).toBeTruthy();
+    // The branch under test feeds the JSON-LD schema graph: every capstone
+    // video with a resolvable YouTube URL must contribute an embedUrl to its
+    // VideoObject — assert the branch's actual output, not just that render
+    // didn't throw.
+    const schemaScript = container.querySelector('script[type="application/ld+json"]');
+    expect(schemaScript?.textContent).toContain('"embedUrl"');
+    expect(schemaScript?.textContent).toContain('youtube.com/embed/');
   });
 
   it('renders capstone with a video URL that produces no embedUrl (false branch)', async () => {
