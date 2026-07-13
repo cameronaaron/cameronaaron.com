@@ -114,7 +114,18 @@ export default function Education() {
                   {course.requirement}
                 </p>
                 <p className="mt-1 text-sm text-foreground font-medium leading-relaxed md:col-span-5 md:mt-0 md:font-normal md:text-muted-foreground">
-                  {course.course}
+                  {course.url ? (
+                    <a
+                      href={course.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-sm underline decoration-cyan-400/40 underline-offset-2 transition-colors hover:text-cyan-200 hover:decoration-cyan-300/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                    >
+                      {course.course}
+                    </a>
+                  ) : (
+                    course.course
+                  )}
                 </p>
 
                 <div className="mt-3 grid grid-cols-3 gap-2 text-xs md:contents md:mt-0 md:text-sm">
