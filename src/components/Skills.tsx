@@ -53,6 +53,7 @@ export default function Skills() {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           headingId="skills-heading"
+          index="05"
           title="Clinical & Technical Skills"
           subtitle="Clinical strengths, research tools, and technical skills"
           className="[&>h2]:font-display"

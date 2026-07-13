@@ -58,6 +58,19 @@ describe('ui coverage hardening', () => {
     expect(screen.queryByText('Helpful subtitle')).toBeNull();
   });
 
+  it('renders the ghost index as decorative giant type only when provided', () => {
+    const { rerender } = render(<SectionHeader title="Indexed" index="03" />);
+
+    const ghost = screen.getByTestId('section-ghost-index');
+    expect(ghost.textContent).toBe('03');
+    expect(ghost.getAttribute('aria-hidden')).toBe('true');
+    expect(ghost.className).toContain('pointer-events-none');
+    expect(ghost.className).toContain('select-none');
+
+    rerender(<SectionHeader title="Unindexed" />);
+    expect(screen.queryByTestId('section-ghost-index')).toBeNull();
+  });
+
   it('covers iframe title guard for existing, direct, and nested frames', async () => {
     const existing = document.createElement('iframe');
     existing.setAttribute('src', 'https://example.com/embed');
