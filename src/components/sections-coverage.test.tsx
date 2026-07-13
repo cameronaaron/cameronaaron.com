@@ -334,6 +334,51 @@ describe('Education coverage (branches 37-49)', () => {
     const { container } = render(<Education />);
     expect(container.firstChild).not.toBeNull();
   });
+
+  it('renders a prerequisite course as a link when a url is present', async () => {
+    vi.doMock('@/data/education', () => ({
+      educationItems: [],
+      prerequisiteCourses: [
+        {
+          requirement: 'Test Requirement',
+          course: 'TEST 101 - Linked Course',
+          units: '3.00',
+          grade: 'A',
+          status: 'Completed',
+          url: 'https://example.edu/catalog/test-101',
+        },
+      ],
+      honorsAndAffiliations: [],
+    }));
+    const { default: Education } = await import('@/components/Education');
+    render(<Education />);
+
+    const link = screen.getByRole('link', { name: 'TEST 101 - Linked Course' });
+    expect(link.getAttribute('href')).toBe('https://example.edu/catalog/test-101');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+  });
+
+  it('renders a prerequisite course as plain text when no url is present', async () => {
+    vi.doMock('@/data/education', () => ({
+      educationItems: [],
+      prerequisiteCourses: [
+        {
+          requirement: 'Test Requirement',
+          course: 'TEST 202 - Unlinked Course',
+          units: '3.00',
+          grade: 'A',
+          status: 'Completed',
+        },
+      ],
+      honorsAndAffiliations: [],
+    }));
+    const { default: Education } = await import('@/components/Education');
+    render(<Education />);
+
+    expect(screen.getByText('TEST 202 - Unlinked Course')).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'TEST 202 - Unlinked Course' })).toBeNull();
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────
