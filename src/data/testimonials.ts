@@ -277,4 +277,22 @@ export const testimonials: Testimonial[] = [
     date: "December 2015",
     text: "His mastery of programming languages and tools, willingness to pursue outside-the-box design thinking, and ability to resolve inevitable bugs that arise are a testament to his work ethic and immense potential in this field.",
   },
+  {
+    name: "Kaileigh Doucette",
+    role: "Social Media & Marketing Manager",
+    company: "Wurrly",
+    companyUrl: "https://www.wurrly.com/",
+    relationship: "Manager",
+    date: "April 2016",
+    text: "I had the pleasure of working with Cameron Aaron at Wurrly, a social music app based in Santa Monica, CA. During his time at Wurrly, Cameron was a delight to have in the office. Not only is he extremely bright, but Cameron is a team player who goes above and beyond in his job role with a smile on his face. He is very eager to learn and always willing to help his fellow team members. Cameron earns my highest recommendation, and I know he will see lots of success in his career.",
+  },
+  {
+    name: "Theresa Torrance",
+    role: "Director, Music Clearance & Licensing",
+    company: "Wurrly",
+    companyUrl: "https://www.wurrly.com/",
+    relationship: "Colleague",
+    date: "October 2015",
+    text: "I am pleased to write this letter of recommendation for Cameron Aaron. Cameron worked at our company, Wurrly, a mobile music app, over the summer of 2015, and was a great addition to our team. He was very helpful and dedicated to Wurrly and his responsibilities. He is curious and inquisitive, very smart, and eager to learn-all great qualities to have in an employee. He will be a great addition to any company, and a committed team player.",
+  },
 ];

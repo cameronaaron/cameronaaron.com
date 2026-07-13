@@ -37,6 +37,14 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    title: "Predatory and Prey Behavior Modifying MIP Robots",
+    description: "Research project developing robotic systems that simulate predator-prey interactions using modified MIP (Magnetic Insect Platform) robots with custom Arduino controllers and IR communication.",
+    link: "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/",
+    tags: ["Robotics", "Behavioral AI", "Arduino", "Research"],
+    period: "2021",
+    cta: "View Project",
+  },
+  {
     title: "Genetic RefleXions Magic Mirror",
     description: "Award-winning interdisciplinary capstone integrating genomics, psychology, and computer science for interactive genomic data visualization.",
     link: "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/genetic-reflexions-a-magic-mirror-that-displays-genetic-info-about-the-person-with-their-reflection.html",
