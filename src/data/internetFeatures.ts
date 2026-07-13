@@ -9,6 +9,14 @@ export interface InternetFeature {
 
 export const internetFeatures: InternetFeature[] = [
   {
+    title: 'Stanford Neurodiversity Summit 2021 — K-12 Panel 1: "Neurodivergent Student Panel"',
+    organization: 'Stanford Neurodiversity Project',
+    period: '2021',
+    summary: 'Panelist alongside Ryan Neale, Cynthia Wen, and Martika Theis on the K-12 neurodivergent student panel.',
+    category: 'Speaking',
+    url: 'https://med.stanford.edu/neurodiversity/SNS2021/program.html',
+  },
+  {
     title: '2e Symposium Speaker Biography',
     organization: '2e Symposium',
     period: '2023',
@@ -78,6 +86,14 @@ export const internetFeatures: InternetFeature[] = [
     summary: 'Research profile and publications archive: Toxoplasma Gondii Modifies Personality, The Real Magical Girls, and EAS 101 Final Paper.',
     category: 'Research',
     url: 'https://www.researchgate.net/profile/Cameron-Aaron-2',
+  },
+  {
+    title: 'Medium Profile & Writing Archive',
+    organization: 'Medium',
+    period: 'Ongoing (writing since 2020)',
+    summary: 'Personal essay and coursework-writing archive, including "Creating the Perfect Fit: Turning ADD Into an Asset" and "My Journey in Integrating Art and Technology to Enhance the Human Experience."',
+    category: 'Profiles',
+    url: 'https://cameronaaron.medium.com/',
   },
   {
     title: 'CHW Credential Verification Record',

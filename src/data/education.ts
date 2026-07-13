@@ -342,6 +342,7 @@ export const honorsAndAffiliations: HonorItem[] = [
   },
   {
     label: "2eASD Grant Scholarship, UCONN (May 2024)",
+    url: "https://giftedasd.project.uconn.edu/",
   },
   {
     label: "Ammerman Center Bridget Baird Award (2021)",
