@@ -42,7 +42,7 @@
 
   --gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
-  --gradient-hero-glow: radial-gradient(circle at 50% 20%, #0c2236 0%, #071223 55%, #030711 100%);
+  --gradient-hero-glow: radial-gradient(circle at 50% 20%, #10344f 0%, #091b31 50%, #030711 100%);
   
   --animate-fade-in: fadeIn 0.5s ease-in-out;
   --animate-slide-up: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -91,9 +91,12 @@
   
   body {
     @apply bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-white;
+    /* Aurora wash: three-hue ambient gradients (ice / mint / periwinkle) so
+       the palette reads instantly instead of hiding in accents. */
     background-image:
-      radial-gradient(circle at 20% 10%, rgba(12, 189, 242, 0.12), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(16, 212, 146, 0.08), transparent 40%);
+      radial-gradient(circle at 15% 8%, rgba(12, 189, 242, 0.17), transparent 44%),
+      radial-gradient(circle at 85% 78%, rgba(16, 212, 146, 0.12), transparent 40%),
+      radial-gradient(circle at 72% 18%, rgba(129, 140, 248, 0.11), transparent 46%);
     background-attachment: fixed;
     /* Honour iOS notch & home-indicator */
     padding-left: env(safe-area-inset-left);
@@ -263,5 +266,25 @@
 
   .marquee-track-reverse {
     animation-direction: reverse;
+  }
+
+  /* Film-grain texture: a static SVG turbulence tile composited once over the
+     page. Pure CSS, no animation, no JS. Hidden on touch devices — blend
+     modes cost real GPU on mobile and the texture is a desktop nicety. */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .grain-overlay {
+      display: none;
+    }
   }
 }
