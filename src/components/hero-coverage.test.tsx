@@ -26,7 +26,7 @@ vi.mock('framer-motion', () => ({
       const El = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
         React.createElement(SAFE.includes(tag) ? tag : 'div',
           Object.fromEntries(Object.entries(props).filter(([k]) =>
-            !['initial','animate','whileHover','whileTap','whileInView','transition','viewport','variants','exit','style'].includes(k))),
+            !['initial','animate','whileHover','whileTap','whileInView','transition','viewport','variants','exit','style','drag','dragConstraints','dragElastic','dragMomentum','dragSnapToOrigin','dragTransition','whileDrag'].includes(k))),
           children);
       El.displayName = `motion.${tag}`;
       return El;
@@ -47,6 +47,11 @@ vi.mock('framer-motion', () => ({
   useMotionTemplate: (...args: unknown[]) => args.join(''),
   useMotionValueEvent: vi.fn(),
   useVelocity: (_v: unknown) => mockMotionValue(0),
+  animate: (_from: unknown, to: number, options?: { onUpdate?: (latest: number) => void; onComplete?: () => void }) => {
+    options?.onUpdate?.(to);
+    options?.onComplete?.();
+    return { stop: vi.fn() };
+  },
 }));
 
 vi.mock('next/dynamic', () => ({

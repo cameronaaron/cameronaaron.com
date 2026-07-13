@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems } from '@/data/navigation';
 import Magnetic from '@/components/ui/Magnetic';
+import ScrambleText from '@/components/ui/ScrambleText';
 import {
   ACTIVE_SECTION_TRIGGER_LINE,
   buildNavLabelMap,
@@ -127,7 +128,7 @@ export default function Navigation() {
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold text-white transition-colors hover:text-cyan-100 font-display"
             >
-              Cameron
+              <ScrambleText text="Cameron" />
             </motion.a>
 
             <motion.div

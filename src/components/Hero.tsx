@@ -11,6 +11,7 @@ import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ProfileImage from '@/components/hero/ProfileImage';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
+import ScrambleText from '@/components/ui/ScrambleText';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
 
@@ -190,7 +191,7 @@ export default function Hero() {
                   whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
                   className="font-mono-accent rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100/90 whitespace-nowrap"
                 >
-                  {chip}
+                  <ScrambleText text={chip} />
                 </motion.span>
               ))}
             </motion.div>
@@ -226,12 +227,24 @@ export default function Hero() {
                  {HERO_FLOATING_BADGES.map((badge, index) => (
                    <motion.span
                      key={badge.label}
-                     className={`font-mono-accent absolute z-20 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100 backdrop-blur-md ${badge.className}`}
-                     animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
-                     transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
-                     whileHover={{ scale: 1.06, y: -2 }}
+                     className={`absolute z-20 inline-block cursor-grab active:cursor-grabbing ${badge.className}`}
+                     drag
+                     dragSnapToOrigin
+                     dragElastic={0.32}
+                     dragMomentum={false}
+                     dragTransition={{ bounceStiffness: 380, bounceDamping: 18 }}
+                     whileDrag={{ scale: 1.15 }}
+                     whileHover={{ scale: 1.06 }}
                    >
-                     {badge.label}
+                     {/* The idle bob lives on an inner span so dragging and the
+                         infinite float never fight over the same transform. */}
+                     <motion.span
+                       className="font-mono-accent block rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100 backdrop-blur-md"
+                       animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
+                       transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
+                     >
+                       {badge.label}
+                     </motion.span>
                    </motion.span>
                  ))}
                </>
