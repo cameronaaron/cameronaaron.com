@@ -17,6 +17,7 @@ import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
+import CommandPalette from '@/components/ui/CommandPalette';
 import IntroCurtain from '@/components/ui/IntroCurtain';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
 import VelocityMarquee from '@/components/ui/VelocityMarquee';
@@ -79,6 +80,7 @@ export default function Home() {
       {showCursorEffects ? <AuroraSurge /> : null}
       {showFloatingOverlays ? <PointerRipple /> : null}
       <KeyboardShortcuts />
+      <CommandPalette />
       <BackToTop />
 
       {showFloatingOverlays ? (
