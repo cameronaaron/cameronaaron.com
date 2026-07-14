@@ -357,3 +357,121 @@ export function stepBursts(bursts: BurstParticle[], step: number): BurstParticle
   bursts.length = write;
   return bursts;
 }
+
+// ── Cursor constellation: K-nearest particles via a bounded max-heap ─────────
+//
+// Each frame we want the K particles closest to the pointer, out of N. The
+// optimal streaming structure for "K smallest from N" is a MAX-heap of capacity
+// K keyed on (squared) distance: the root is the current worst of the kept set,
+// so a new candidate is admitted in O(log K) only if it beats the root, and
+// rejected in O(1) otherwise. Total O(N log K) per frame vs O(N log N) for a
+// full sort or O(N·K) for insertion into a sorted window. Backed by two typed
+// arrays reused every frame (§2.6 / §2.8): zero allocation in steady state.
+
+/** How many nearby particles the pointer links to. */
+export const KNN_LINK_COUNT = 6;
+/** Link radius in simulation-percent units; only particles inside it qualify. */
+export const KNN_LINK_RADIUS = 26;
+export const KNN_LINK_RADIUS_SQ = KNN_LINK_RADIUS * KNN_LINK_RADIUS;
+/** Precomputed stroke for the cursor links — one string, never built per frame. */
+export const KNN_LINK_STYLE = 'rgba(126, 231, 255, 0.32)';
+
+export interface KnnHeap {
+  /** Squared distance to the pointer, max-ordered (worst kept at index 0). */
+  dist2: Float32Array;
+  /** Particle index parallel to dist2. */
+  index: Int16Array;
+  size: number;
+  capacity: number;
+}
+
+export function createKnnHeap(capacity = KNN_LINK_COUNT): KnnHeap {
+  return {
+    dist2: new Float32Array(capacity),
+    index: new Int16Array(capacity),
+    size: 0,
+    capacity,
+  };
+}
+
+export function resetKnnHeap(heap: KnnHeap): void {
+  heap.size = 0;
+}
+
+function swapHeap(heap: KnnHeap, a: number, b: number): void {
+  const d = heap.dist2[a];
+  heap.dist2[a] = heap.dist2[b];
+  heap.dist2[b] = d;
+  const i = heap.index[a];
+  heap.index[a] = heap.index[b];
+  heap.index[b] = i;
+}
+
+function siftUp(heap: KnnHeap, start: number): void {
+  let child = start;
+  while (child > 0) {
+    const parent = (child - 1) >> 1;
+    if (heap.dist2[parent] >= heap.dist2[child]) break;
+    swapHeap(heap, parent, child);
+    child = parent;
+  }
+}
+
+function siftDown(heap: KnnHeap, start: number): void {
+  const { size } = heap;
+  let parent = start;
+  for (;;) {
+    const left = parent * 2 + 1;
+    const right = left + 1;
+    let largest = parent;
+    if (left < size && heap.dist2[left] > heap.dist2[largest]) largest = left;
+    if (right < size && heap.dist2[right] > heap.dist2[largest]) largest = right;
+    if (largest === parent) break;
+    swapHeap(heap, parent, largest);
+    parent = largest;
+  }
+}
+
+/**
+ * Offer one candidate. Admits it when the heap has room, or when it is nearer
+ * than the current worst (the root) — replacing the root and sifting down.
+ * O(log K) admit, O(1) reject.
+ */
+export function knnOffer(heap: KnnHeap, dist2: number, index: number): void {
+  if (heap.size < heap.capacity) {
+    heap.dist2[heap.size] = dist2;
+    heap.index[heap.size] = index;
+    heap.size += 1;
+    siftUp(heap, heap.size - 1);
+    return;
+  }
+  if (dist2 < heap.dist2[0]) {
+    heap.dist2[0] = dist2;
+    heap.index[0] = index;
+    siftDown(heap, 0);
+  }
+}
+
+/**
+ * Fill `heap` with the up-to-K particles nearest the pointer within
+ * `radiusSq`. Single O(N) pass offering each in-range particle; the heap keeps
+ * only the K smallest. Mutates the heap in place (zero allocation). The kept
+ * particle indices are left in `heap.index[0 … heap.size)`, unordered.
+ */
+export function collectNearestParticles(
+  particles: Particle[],
+  pointerX: number,
+  pointerY: number,
+  radiusSq: number,
+  heap: KnnHeap
+): void {
+  resetKnnHeap(heap);
+  for (let i = 0; i < particles.length; i += 1) {
+    const dx = particles[i].x - pointerX;
+    const dy = particles[i].y - pointerY;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < radiusSq) {
+      knnOffer(heap, d2, i);
+    }
+  }
+}

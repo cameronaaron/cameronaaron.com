@@ -139,6 +139,19 @@ return decorated.map((entry) => entry.item);
 The contract greps every production comparator for `getDateSortKey` and
 `isNonFinalizedCourseStatus` calls — none may appear inside a `.sort()`.
 
+### 2.5b K-nearest via a bounded max-heap (contract: interactive engine)
+
+Finding the K particles nearest the cursor each frame is "K smallest of N".
+The optimal streaming structure is a **max-heap of capacity K** keyed on squared
+distance (`interactive-particles/engine.ts`: `createKnnHeap` / `knnOffer` /
+`collectNearestParticles`): the root is the worst of the kept set, so a
+candidate is admitted in O(log K) only when it beats the root and rejected in
+O(1) otherwise — O(N log K) per frame, versus O(N log N) for a full sort or
+O(N·K) for insertion into a sorted window. Backed by a `Float32Array` (squared
+distances) and `Int16Array` (indices) allocated once and reused every frame
+(§2.6/§2.8): the cursor-constellation draw pass allocates nothing. Compare
+squared distances; the ≤K survivors are the only ones that ever need a sqrt.
+
 ### 2.6 Typed arrays and numeric IDs in per-frame code
 
 Per-frame allocation is a GC pause waiting to happen.

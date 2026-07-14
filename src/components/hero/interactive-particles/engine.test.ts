@@ -9,6 +9,10 @@ import {
   GLOW_CORE_STOP,
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
+  KNN_LINK_COUNT,
+  KNN_LINK_RADIUS,
+  KNN_LINK_RADIUS_SQ,
+  KNN_LINK_STYLE,
   POINTER_ATTRACT_RADIUS,
   POINTER_ATTRACT_RADIUS_SQ,
   PULSE_BASE_DURATION_MS,
@@ -18,9 +22,13 @@ import {
   PULSE_SCALE_AMPLITUDE,
   appendBursts,
   buildConnections,
+  collectNearestParticles,
   createBurstParticles,
   createInitialParticles,
+  createKnnHeap,
   createSeededRandom,
+  knnOffer,
+  resetKnnHeap,
   getConnectionOpacityTier,
   getGlowGradientStops,
   getParticlePulse,
@@ -287,5 +295,80 @@ describe('interactive particle engine', () => {
       expect(CONNECTION_OPACITY_TIERS[i]).toBeLessThanOrEqual(CONNECTION_MAX_OPACITY);
       if (i > 0) expect(CONNECTION_OPACITY_TIERS[i]).toBeGreaterThan(CONNECTION_OPACITY_TIERS[i - 1]);
     }
+  });
+});
+
+describe('cursor constellation — bounded max-heap K-nearest', () => {
+  it('exports link constants with a precomputed stroke and squared radius', () => {
+    expect(KNN_LINK_COUNT).toBeGreaterThan(0);
+    expect(KNN_LINK_RADIUS_SQ).toBe(KNN_LINK_RADIUS * KNN_LINK_RADIUS);
+    expect(KNN_LINK_STYLE).toContain('rgba(');
+  });
+
+  it('createKnnHeap allocates typed-array backing sized to the capacity', () => {
+    const heap = createKnnHeap(4);
+    expect(heap.capacity).toBe(4);
+    expect(heap.size).toBe(0);
+    expect(heap.dist2).toBeInstanceOf(Float32Array);
+    expect(heap.index).toBeInstanceOf(Int16Array);
+    expect(heap.dist2).toHaveLength(4);
+    expect(heap.index).toHaveLength(4);
+  });
+
+  it('keeps exactly the K smallest distances out of a larger stream', () => {
+    const heap = createKnnHeap(3);
+    // Offer distances 5,1,4,2,8,3 → the three smallest are 1,2,3.
+    for (const [d, i] of [[5, 0], [1, 1], [4, 2], [2, 3], [8, 4], [3, 5]] as const) {
+      knnOffer(heap, d, i);
+    }
+    expect(heap.size).toBe(3);
+    const kept = Array.from(heap.dist2.slice(0, heap.size)).sort((a, b) => a - b);
+    expect(kept).toEqual([1, 2, 3]);
+    // The root is the max-heap's worst kept element (the largest of the K).
+    expect(heap.dist2[0]).toBe(3);
+  });
+
+  it('rejects a candidate no better than the current worst in O(1)', () => {
+    const heap = createKnnHeap(2);
+    knnOffer(heap, 1, 0);
+    knnOffer(heap, 2, 1);
+    const rootBefore = heap.dist2[0];
+    knnOffer(heap, 9, 2); // worse than the root → rejected
+    expect(heap.size).toBe(2);
+    expect(heap.dist2[0]).toBe(rootBefore);
+    expect(Array.from(heap.index.slice(0, 2)).sort()).toEqual([0, 1]);
+  });
+
+  it('resetKnnHeap empties the heap for reuse without reallocating', () => {
+    const heap = createKnnHeap(3);
+    const backing = heap.dist2;
+    knnOffer(heap, 1, 0);
+    resetKnnHeap(heap);
+    expect(heap.size).toBe(0);
+    expect(heap.dist2).toBe(backing);
+  });
+
+  it('collectNearestParticles keeps only in-radius particles, nearest first-K', () => {
+    const particles = [
+      { id: 0, x: 50, y: 50, size: 1, color: '#fff', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 52, y: 50, size: 1, color: '#fff', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 2, x: 90, y: 90, size: 1, color: '#fff', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const heap = createKnnHeap(4);
+    collectNearestParticles(particles, 50, 50, KNN_LINK_RADIUS_SQ, heap);
+
+    const kept = Array.from(heap.index.slice(0, heap.size)).sort();
+    // Particle 2 is far outside the radius; 0 and 1 are inside.
+    expect(kept).toEqual([0, 1]);
+  });
+
+  it('collectNearestParticles caps the kept set at the heap capacity', () => {
+    const particles = Array.from({ length: 10 }, (_, i) => ({
+      id: i, x: 50 + i * 0.5, y: 50, size: 1, color: '#fff',
+      velocity: { x: 0, y: 0 }, opacity: 1, phase: 0,
+    }));
+    const heap = createKnnHeap(4);
+    collectNearestParticles(particles, 50, 50, KNN_LINK_RADIUS_SQ, heap);
+    expect(heap.size).toBe(4);
   });
 });
