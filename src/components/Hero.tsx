@@ -12,6 +12,7 @@ import ProfileImage from '@/components/hero/ProfileImage';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
 import ScrambleText from '@/components/ui/ScrambleText';
+import LocalTimeStatus from '@/components/ui/LocalTimeStatus';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
 
@@ -124,7 +125,9 @@ export default function Hero() {
                 ) : null}
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              <span className="text-sm font-medium text-primary-foreground">Open to connect</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                Open to connect<LocalTimeStatus />
+              </span>
             </motion.div>
 
             <motion.h1

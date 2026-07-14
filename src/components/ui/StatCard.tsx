@@ -4,6 +4,7 @@ import { animate, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { use3DTilt } from '@/hooks/use3DTilt';
 import { STAT_COUNT_UP_DURATION_S, formatStatValue, parseStatValue } from '@/components/ui/stat-card-logic';
 
 interface StatCardProps {
@@ -15,6 +16,12 @@ export default function StatCard({ value, label }: StatCardProps) {
   const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
   const valueRef = useRef<HTMLDivElement>(null);
   const parsedValue = useMemo(() => parseStatValue(value), [value]);
+
+  // Pointer-following 3D tilt. Motion-value driven — each mousemove writes two
+  // motion values (O(1), zero React re-renders); consumers read them via
+  // useTransform/useSpring. Gated to hover-capable pointers so cards never
+  // tilt on touch.
+  const tilt = use3DTilt({ maxRotation: 9 });
 
   // Count up from 0 by writing straight into the node — the SSR HTML already
   // holds the final value (hydration-safe, meaningful without JS) and no React
@@ -36,7 +43,10 @@ export default function StatCard({ value, label }: StatCardProps) {
 
   return (
     <motion.div
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md"
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md [transform-style:preserve-3d]"
+      onMouseMove={enableHoverMotion ? tilt.handleMouseMove : undefined}
+      onMouseLeave={enableHoverMotion ? tilt.handleMouseLeave : undefined}
+      style={enableHoverMotion ? { rotateX: tilt.rotateX, rotateY: tilt.rotateY, transformPerspective: 600 } : undefined}
       whileHover={enableHoverMotion ? { y: -4, scale: 1.03 } : undefined}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
     >
