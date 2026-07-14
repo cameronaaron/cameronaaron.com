@@ -3,21 +3,19 @@
 import { useEffect, useRef } from 'react';
 
 import {
-  type BurstParticle,
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
   PARTICLE_COLORS,
-  appendBursts,
   getGlowGradientStops,
-  stepBursts,
 } from '@/components/hero/interactive-particles/engine';
 import { AURORA_SURGE_EVENT } from '@/components/ui/aurora-surge-logic';
 import {
-  MAX_TRAIL_SPARKS,
   SURGE_SPARK_COUNT,
-  createSurgeSparks,
-  createTrailSparks,
+  createSparkPool,
+  emitSurgeBurst,
+  emitTrailSparks,
   getSparkEmitCount,
+  stepSparkPool,
 } from '@/components/ui/cursor-comet-logic';
 
 function createGlowSprite(color: string): HTMLCanvasElement {
@@ -52,8 +50,9 @@ export default function CursorComet() {
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const sparks: BurstParticle[] = [];
-    let sparkId = 0;
+    // Pre-allocated ring of spark objects — every emission/step mutates these
+    // in place, so a moving-pointer frame allocates nothing (§2.8).
+    const pool = createSparkPool();
     let width = 0;
     let height = 0;
     let frameId = 0;
@@ -100,25 +99,23 @@ export default function CursorComet() {
       // capped per frame; direction comes from the last movement vector.
       const emitCount = getSparkEmitCount(pendingDistance);
       if (emitCount > 0) {
-        const next = createTrailSparks({
+        emitTrailSparks(pool, {
           baseX: pointerX,
           baseY: pointerY,
           dirX: pointerX - lastEmitX,
           dirY: pointerY - lastEmitY,
           count: emitCount,
-          startId: sparkId,
         });
-        sparkId += next.length;
-        appendBursts(sparks, next, MAX_TRAIL_SPARKS);
         lastEmitX = pointerX;
         lastEmitY = pointerY;
         pendingDistance = 0;
       }
 
-      stepBursts(sparks, step);
+      stepSparkPool(pool, step);
 
       ctx.clearRect(0, 0, width, height);
-      for (const spark of sparks) {
+      for (const spark of pool.sparks) {
+        if (spark.life <= 0) continue;
         // Colours come from PARTICLE_COLORS, so the sprite always exists.
         const sprite = sprites.get(spark.color)!;
         const diameter = spark.size * GLOW_DIAMETER_MULTIPLIER * spark.life;
@@ -128,7 +125,7 @@ export default function CursorComet() {
       ctx.globalAlpha = 1;
 
       // Sleep once the trail has burned out — wake() restarts on movement.
-      if (sparks.length === 0 && pendingDistance === 0) {
+      if (pool.liveCount === 0 && pendingDistance === 0) {
         frameId = 0;
         return;
       }
@@ -152,14 +149,7 @@ export default function CursorComet() {
     };
 
     const handleSurge = () => {
-      const storm = createSurgeSparks({
-        width,
-        height,
-        count: SURGE_SPARK_COUNT,
-        startId: sparkId,
-      });
-      sparkId += storm.length;
-      appendBursts(sparks, storm, MAX_TRAIL_SPARKS);
+      emitSurgeBurst(pool, { width, height, count: SURGE_SPARK_COUNT });
       wake();
     };
 
