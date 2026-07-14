@@ -290,6 +290,73 @@ describe('CursorComet', () => {
     expect(rafQueue).toHaveLength(0);
   });
 
+  it('no-ops when the 2D context is unavailable', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValueOnce(
+      null as unknown as CanvasRenderingContext2D
+    );
+    render(<CursorComet />);
+    fireEvent.mouseMove(window, { clientX: 10, clientY: 10 });
+    // Effect returned before wiring listeners — movement schedules nothing.
+    expect(rafQueue).toHaveLength(0);
+  });
+
+  it('tolerates a glow sprite whose own 2D context is unavailable', () => {
+    const spy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext');
+    // Main canvas gets a context; the first sprite canvas does not.
+    spy.mockReturnValueOnce(mockCtx as unknown as CanvasRenderingContext2D).mockReturnValueOnce(
+      null as unknown as CanvasRenderingContext2D
+    );
+    render(<CursorComet />);
+    fireEvent.mouseMove(window, { clientX: 60, clientY: 40 });
+    flushFrames(20);
+    expect(mockCtx.clearRect).toHaveBeenCalled();
+  });
+
+  it('honours a high-DPI device pixel ratio when sizing the canvas', () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 2 });
+    try {
+      render(<CursorComet />);
+      fireEvent.mouseMove(window, { clientX: 50, clientY: 50 });
+      flushFrames(3);
+      expect(mockCtx.setTransform).toHaveBeenCalled();
+    } finally {
+      if (original) Object.defineProperty(window, 'devicePixelRatio', original);
+    }
+  });
+
+  it('falls back to a device pixel ratio of 1 when unavailable', () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 0 });
+    try {
+      render(<CursorComet />);
+      fireEvent.mouseMove(window, { clientX: 50, clientY: 50 });
+      flushFrames(3);
+      expect(mockCtx.setTransform).toHaveBeenCalled();
+    } finally {
+      if (original) Object.defineProperty(window, 'devicePixelRatio', original);
+    }
+  });
+
+  it('coalesces rapid moves into a single scheduled frame', () => {
+    render(<CursorComet />);
+    fireEvent.mouseMove(window, { clientX: 10, clientY: 10 });
+    const scheduled = rafQueue.length;
+    fireEvent.mouseMove(window, { clientX: 40, clientY: 40 });
+    // The second wake sees a pending frame and returns — no extra schedule.
+    expect(rafQueue.length).toBe(scheduled);
+  });
+
+  it('sleeps after a sub-threshold move that emits no sparks', () => {
+    render(<CursorComet />);
+    // A 3px move is below the emit spacing — no sparks, nothing alive.
+    fireEvent.mouseMove(window, { clientX: 2, clientY: 2 });
+    fireEvent.mouseMove(window, { clientX: 4, clientY: 3 });
+    flushFrames(5);
+    // The loop must go back to sleep rather than spin forever.
+    expect(rafQueue).toHaveLength(0);
+  });
+
   it('is decorative: hidden from assistive tech and never intercepts input', () => {
     const { container } = render(<CursorComet />);
     const overlay = container.firstElementChild as HTMLElement;
