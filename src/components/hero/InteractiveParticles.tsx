@@ -12,11 +12,15 @@ import {
   CONNECTION_TIER_STYLES,
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
+  KNN_LINK_RADIUS_SQ,
+  KNN_LINK_STYLE,
   PARTICLE_COLORS,
   appendBursts,
   buildConnections,
+  collectNearestParticles,
   createBurstParticles,
   createInitialParticles,
+  createKnnHeap,
   getConnectionOpacityTier,
   getGlowGradientStops,
   getParticlePulse,
@@ -83,6 +87,8 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     const connectionPool: Connection[] = [];
     const tierScratch = new Uint8Array(config.maxConnections);
     const pulseScratch: ParticlePulse = { scale: 1, opacityMultiplier: 1 };
+    // Bounded max-heap reused every frame for the cursor's K-nearest links.
+    const knnHeap = createKnnHeap();
 
     let burstId = 0;
     let width = 0;
@@ -173,6 +179,27 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
           const line = lines[k];
           ctx.moveTo(percentToPx(line.x1, width), percentToPx(line.y1, height));
           ctx.lineTo(percentToPx(line.x2, width), percentToPx(line.y2, height));
+        }
+        ctx.stroke();
+      }
+
+      // Cursor constellation: link the pointer to its K nearest particles,
+      // selected via the bounded max-heap (O(n·log K), zero allocation). All K
+      // links draw in one batched stroke (§2.7) — bounded, never per particle.
+      if (pointer.active) {
+        collectNearestParticles(particles, pointer.x, pointer.y, KNN_LINK_RADIUS_SQ, knnHeap);
+        // The loop naturally draws nothing when the heap is empty, so no guard
+        // is needed — and the link count is bounded by the heap capacity.
+        const pointerPx = percentToPx(pointer.x, width);
+        const pointerPy = percentToPx(pointer.y, height);
+        ctx.globalAlpha = 1;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = KNN_LINK_STYLE;
+        ctx.beginPath();
+        for (let k = 0; k < knnHeap.size; k += 1) {
+          const near = particles[knnHeap.index[k]];
+          ctx.moveTo(pointerPx, pointerPy);
+          ctx.lineTo(percentToPx(near.x, width), percentToPx(near.y, height));
         }
         ctx.stroke();
       }
