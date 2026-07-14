@@ -21,12 +21,14 @@ export default function PointerRipple() {
   const poolIndexRef = useRef(0);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    // The container div always renders (no conditional), so its ref is set by
+    // the time this mount effect runs.
+    const container = containerRef.current!;
 
     const handlePointerDown = (event: PointerEvent) => {
-      const node = container.children[poolIndexRef.current] as HTMLElement | undefined;
-      if (!node) return;
+      // The pool renders exactly POINTER_RIPPLE_POOL_SIZE children and the index
+      // always wraps in-bounds, so this element is guaranteed present.
+      const node = container.children[poolIndexRef.current] as HTMLElement;
       poolIndexRef.current = getNextRippleIndex(poolIndexRef.current, POINTER_RIPPLE_POOL_SIZE);
 
       const { left, top } = getRippleOffset(event.clientX, event.clientY, RIPPLE_DIAMETER_PX);

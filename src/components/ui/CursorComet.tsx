@@ -124,8 +124,11 @@ export default function CursorComet() {
       }
       ctx.globalAlpha = 1;
 
-      // Sleep once the trail has burned out — wake() restarts on movement.
-      if (pool.liveCount === 0 && pendingDistance === 0) {
+      // Sleep once nothing is alive and nothing emitted this frame — a
+      // sub-threshold move (pendingDistance below the emit spacing) must not
+      // keep the loop spinning; wake() restarts it on the next real movement,
+      // and pendingDistance is retained so that travel still counts.
+      if (pool.liveCount === 0 && emitCount === 0) {
         frameId = 0;
         return;
       }
