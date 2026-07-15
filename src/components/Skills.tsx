@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from 'react';
 import { skills } from '@/data/skills';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SkillBar from '@/components/ui/SkillBar';
+import SkillWeb from '@/components/skills/SkillWeb';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
@@ -49,6 +50,8 @@ export default function Skills() {
         style={{ y, opacity }}
         className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-emerald-900/10 to-transparent pointer-events-none"
       />
+
+      <SkillWeb nodes={skills.domains} performanceTier={performanceTier} className="absolute inset-0 opacity-70" />
 
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
