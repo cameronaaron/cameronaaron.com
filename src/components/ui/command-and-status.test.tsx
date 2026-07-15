@@ -133,6 +133,24 @@ describe('CommandPalette', () => {
     expect(open).toHaveBeenCalledWith(expect.stringContaining('github'), '_blank', 'noopener,noreferrer');
   });
 
+  it('surfaces a just-run command as a Recent entry on reopen', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    render(<CommandPalette />);
+
+    openViaShortcut();
+    fireEvent.change(screen.getByTestId('command-palette-input'), { target: { value: 'github' } });
+    fireEvent.click(screen.getAllByTestId('command-palette-item')[0]);
+    expect(open).toHaveBeenCalled();
+
+    // Reopen with an empty query — the LRU cache leads with the recent command.
+    openViaShortcut();
+    const recentRow = screen
+      .getAllByTestId('command-palette-item')
+      .find((el) => /recent/i.test(el.textContent ?? ''));
+    expect(recentRow).toBeTruthy();
+    expect(recentRow!.textContent).toMatch(/github/i);
+  });
+
   it('wraps the active row with ArrowUp from the top', () => {
     render(<CommandPalette />);
     openViaShortcut();
