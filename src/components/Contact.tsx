@@ -8,6 +8,7 @@ import { resumeDownloads } from '@/data/resume';
 import SocialLink from '@/components/contact/SocialLink';
 import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/logic';
 import Tilt from '@/components/ui/Tilt';
+import MagneticField from '@/components/ui/MagneticField';
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -135,7 +136,8 @@ export default function Contact() {
             >
               Connect With Me
             </motion.h3>
-            <motion.div 
+            <MagneticField targetSelector="a">
+            <motion.div
               className="flex flex-wrap justify-center gap-4"
               initial="hidden"
               whileInView="visible"
@@ -169,6 +171,7 @@ export default function Contact() {
                 </motion.div>
               ))}
             </motion.div>
+            </MagneticField>
           </motion.div>
         </div>
       </div>
