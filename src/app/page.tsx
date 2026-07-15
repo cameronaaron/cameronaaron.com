@@ -21,6 +21,7 @@ import CommandPalette from '@/components/ui/CommandPalette';
 import IntroCurtain from '@/components/ui/IntroCurtain';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
 import VelocityMarquee from '@/components/ui/VelocityMarquee';
+import RibbonBand from '@/components/ui/RibbonBand';
 import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/velocity-marquee-logic';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { navItems } from '@/data/navigation';
@@ -112,6 +113,7 @@ export default function Home() {
         <SectionReveal index={3}>
           <Education />
         </SectionReveal>
+        <RibbonBand performanceTier={performanceTier} />
         {showSectionHandoffs ? <SectionHandoff label="Research" cue="opening research and publications" index={4} targetId="projects" /> : null}
         <SectionReveal index={4}>
           <Projects />
