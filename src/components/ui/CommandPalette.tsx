@@ -9,29 +9,47 @@ import { isEditableTarget } from '@/components/ui/keyboard-shortcuts-logic';
 import {
   type Command,
   buildCommandCatalog,
+  buildEmptyResults,
   clampActiveIndex,
-  filterCommands,
+  createLru,
   isPaletteOpenShortcut,
+  lruKeys,
+  lruTouch,
   moveActiveIndex,
+  rankCommands,
+  splitByMatches,
 } from '@/components/ui/command-palette-logic';
 
 /**
  * ⌘K / Ctrl+K / "/" command palette. Reuses the section jump targets and
- * social links as a searchable command catalog. Filtering runs over a fixed
- * catalog on keystroke (bounded constant work, single-pass — never per frame),
- * and the catalog itself is built exactly once. Keyboard-first, works on every
- * performance tier because it's navigation, not decorative motion.
+ * social links as a searchable command catalog. Non-empty queries are ranked
+ * by a positional fuzzy score (decorate-sort, computed once per keystroke —
+ * never per frame); the empty state leads with recently-run commands from an
+ * LRU cache (Map + doubly-linked list, O(1) per run). The catalog itself is
+ * built exactly once. Keyboard-first, works on every performance tier because
+ * it's navigation, not decorative motion.
  */
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
+  // MRU-ordered recent command ids, mirrored out of the LRU cache below so the
+  // empty state re-derives when a command runs (the ref itself is mutated only
+  // in the event handler, never read during render).
+  const [recentIds, setRecentIds] = useState<string[]>([]);
   const prefersReducedMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
+  // One LRU instance for the component's lifetime — recents persist across opens.
+  const recentsRef = useRef(createLru());
 
   const catalog = useMemo(() => buildCommandCatalog(navItems, profile.social), []);
-  const results = useMemo(() => filterCommands(catalog, query), [catalog, query]);
+  const results = useMemo(() => {
+    if (query.trim().length === 0) {
+      return buildEmptyResults(catalog, recentIds);
+    }
+    return rankCommands(catalog, query);
+  }, [catalog, query, recentIds]);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -42,6 +60,8 @@ export default function CommandPalette() {
   const runCommand = useCallback(
     (command: Command | undefined) => {
       if (!command) return;
+      lruTouch(recentsRef.current, command.id);
+      setRecentIds(lruKeys(recentsRef.current));
       if (command.action.kind === 'jump') {
         const el = document.getElementById(command.action.targetId);
         el?.scrollIntoView({
@@ -96,7 +116,7 @@ export default function CommandPalette() {
     }
     if (event.key === 'Enter') {
       event.preventDefault();
-      runCommand(results[activeRow]);
+      runCommand(results[activeRow]?.command);
     }
   };
 
@@ -163,11 +183,11 @@ export default function CommandPalette() {
                     No matches for “{query}”
                   </li>
                 ) : (
-                  results.map((command, index) => (
-                    <li key={command.id} role="option" aria-selected={index === activeRow}>
+                  results.map((match, index) => (
+                    <li key={match.command.id} role="option" aria-selected={index === activeRow}>
                       <button
                         type="button"
-                        onClick={() => runCommand(command)}
+                        onClick={() => runCommand(match.command)}
                         onMouseEnter={() => setActiveIndex(index)}
                         className={`flex w-full items-center justify-between gap-4 rounded-xl px-3 py-2.5 text-left transition-colors ${
                           index === activeRow
@@ -176,9 +196,23 @@ export default function CommandPalette() {
                         }`}
                         data-testid="command-palette-item"
                       >
-                        <span className="text-sm font-medium">{command.label}</span>
+                        <span className="text-sm font-medium">
+                          {splitByMatches(match.command.label, match.labelMatches).map((segment, segmentIndex) =>
+                            segment.matched ? (
+                              <mark
+                                key={segmentIndex}
+                                className="bg-transparent font-semibold text-cyan-300"
+                                data-testid="command-palette-match"
+                              >
+                                {segment.text}
+                              </mark>
+                            ) : (
+                              <span key={segmentIndex}>{segment.text}</span>
+                            )
+                          )}
+                        </span>
                         <span className="font-mono-accent text-[10px] uppercase tracking-[0.14em] text-muted-foreground/80">
-                          {command.hint}
+                          {match.recent ? 'Recent' : match.command.hint}
                         </span>
                       </button>
                     </li>
