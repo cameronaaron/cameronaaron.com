@@ -22,6 +22,13 @@ export function toIsoDate(monthYearText?: string): string | undefined {
 export function splitPeriod(period?: string): { startDate?: string; endDate?: string } {
   if (!period) return {};
 
+  // Stryker disable next-line MethodExpression: equivalent mutant. Removing
+  // this .trim() has no externally observable effect — toIsoDate() below
+  // re-trims its input internally (see its own `.trim()` call), so any
+  // leading/trailing whitespace left here is absorbed before the regex test
+  // or Date parse ever sees it. Verified by hand across padded, unpadded,
+  // and multi-space inputs; no test through splitPeriod's return value can
+  // distinguish the mutant from the original.
   const [startText, endText] = period.split(' - ').map((segment) => segment.trim());
   return {
     startDate: toIsoDate(startText),

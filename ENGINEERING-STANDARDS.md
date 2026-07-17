@@ -935,3 +935,37 @@ investigate that script before touching the config.
     test for one, reproduce it by hand (apply the exact mutation to a copy of
     the source, run the affected test file directly) to confirm it's real
     before trusting the count.
+
+    **2026-07 sweep across the logic-heavy files** pushed five files from
+    partial scores to at-or-near 100%, using the hand-verification protocol
+    above for every ignore: `skill-web-logic.ts` (32 real gaps closed with
+    exact-value physics tests plus 10 hand-verified equivalents — mostly
+    "out-of-bounds Float32Array access is a silent no-op in JS" and
+    "distSq/dist is clamped *to* the exact constant it's compared against, so
+    equality is a no-op" idioms) → 100%; `structured-data/builders.ts` (35
+    real gaps closed — the survivors were `'@type'`/`name`/`inLanguage`
+    Schema.org literals silently going untested at exact-string precision, a
+    real SEO risk, not cosmetic noise, plus 1 confirmed-equivalent `.trim()`
+    and 9 confirmed Stryker-harness false positives) → 0 real survivors;
+    `hero/interactive-particles/engine.ts` (35 real gaps, 6 equivalents) →
+    100%; `hero/background-particles/engine.ts` (all 47 survivors were real —
+    this file is a genuine per-frame simulation, not decorative config —
+    closed with 22 new tests and 4 equivalents; the exercise also caught a
+    real latent bug: an asymmetric bounds-check where an out-of-range spatial-
+    grid column index aliases into a *valid but wrong* neighboring cell,
+    unlike the row index's always-safe out-of-bounds case, now pinned by a
+    dedicated regression test) → 100%; and `certifications/logic.ts` (new
+    file this session — 4 gaps: the reactive-status icon color/path catalogs
+    untested at exact value, a `\s+`→`\s` regex narrowing, a dead-branch mask
+    in `buildVerificationHref`, and an in-progress sort-order check that
+    happened to pass on real data where both fixture rows tied on the same
+    date) → 100%. One file, `ambient-background-logic.ts` (49 survivors, all
+    Framer Motion keyframe/easing/duration literals in a decorative ambient-
+    orb config with zero behavioral consequence), was excluded from Stryker's
+    `mutate` scope entirely after the same hand-verification — it is a data
+    catalog like `src/data/**`, not logic. Two lessons reinforced: (1) a
+    survivor's "cosmetic-looking" string literal is only safe to ignore if it
+    truly has no observable effect — a Schema.org `@type` string is not
+    cosmetic even though it looks like one; (2) chasing survivors surfaces
+    real bugs, not just test gaps, often enough that the exercise pays for
+    itself independent of the mutation score.

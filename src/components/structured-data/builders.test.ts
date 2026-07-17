@@ -35,6 +35,13 @@ describe('structured data builders', () => {
     expect(toIsoDate('March2024')).toBeUndefined(); // no separating whitespace at all
   });
 
+  it('accepts more than one whitespace character between month and year (\\s+, not \\s)', () => {
+    // Guards the `+` quantifier on `\s+` specifically: with a single space
+    // this input would match either `\s` or `\s+` identically, so it can't
+    // distinguish the two. Two spaces only matches `\s+`.
+    expect(toIsoDate('March  2024')).toBe('2024-03-01');
+  });
+
   it('splits period into start and end dates', () => {
     expect(splitPeriod('March 2024 - April 2025')).toEqual({
       startDate: '2024-03-01',
@@ -171,6 +178,48 @@ describe('structured data builders', () => {
       });
     });
 
+    describe('ProfilePage schema', () => {
+      const profilePage = byType('ProfilePage');
+
+      it('matches the full ProfilePage shape exactly', () => {
+        expect(profilePage).toEqual({
+          '@type': 'ProfilePage',
+          '@id': `${SITE_URL}/#webpage`,
+          url: SITE_URL,
+          name: `${profile.name} | Profile`,
+          inLanguage: 'en-US',
+          isPartOf: { '@id': `${SITE_URL}/#website` },
+          mainEntity: { '@id': `${SITE_URL}/#person` },
+        });
+      });
+    });
+
+    describe('WebSite schema', () => {
+      const website = byType('WebSite');
+
+      it('matches the full WebSite shape exactly', () => {
+        expect(website).toEqual({
+          '@type': 'WebSite',
+          '@id': `${SITE_URL}/#website`,
+          url: SITE_URL,
+          name: `${profile.name} Portfolio`,
+          inLanguage: 'en-US',
+          publisher: { '@id': `${SITE_URL}/#person` },
+        });
+      });
+    });
+
+    describe('BreadcrumbList schema', () => {
+      const breadcrumb = byType('BreadcrumbList');
+
+      it('matches the full BreadcrumbList shape exactly', () => {
+        expect(breadcrumb).toEqual({
+          '@type': 'BreadcrumbList',
+          itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL }],
+        });
+      });
+    });
+
     describe('WebPage schema', () => {
       const webPage = byType('WebPage');
 
@@ -180,6 +229,19 @@ describe('structured data builders', () => {
           { '@type': 'WebPage', '@id': `${SITE_URL}/credentials#webpage`, url: `${SITE_URL}/credentials`, name: 'Credentials and Verification' },
           { '@type': 'WebPage', '@id': `${SITE_URL}/internet#webpage`, url: `${SITE_URL}/internet`, name: 'Cameron Aaron on the Internet' },
         ]);
+      });
+
+      it('matches @id/url/name/isPartOf/about/primaryImageOfPage/inLanguage exactly', () => {
+        expect(webPage['@id']).toBe(`${SITE_URL}/#home-page`);
+        expect(webPage.url).toBe(SITE_URL);
+        expect(webPage.name).toBe(`${profile.name} Portfolio`);
+        expect(webPage.isPartOf).toEqual({ '@id': `${SITE_URL}/#website` });
+        expect(webPage.about).toEqual({ '@id': `${SITE_URL}/#person` });
+        expect(webPage.primaryImageOfPage).toEqual({
+          '@type': 'ImageObject',
+          url: `${SITE_URL}${profile.image}`,
+        });
+        expect(webPage.inLanguage).toBe('en-US');
       });
 
       it('respects a custom baseUrl for every sub-page id/url', () => {
@@ -196,7 +258,14 @@ describe('structured data builders', () => {
 
     describe('Research/Publications ItemList', () => {
       const research = nodes.filter((n) => n['@type'] === 'ItemList').find((n) => n.name === 'Research and Publications')!;
-      const items = research.itemListElement as Array<{ position: number; item: SchemaNode }>;
+      const items = research.itemListElement as Array<SchemaNode & { position: number; item: SchemaNode }>;
+
+      it('sets the top-level ItemList @type and every nested ListItem @type exactly', () => {
+        expect(research['@type']).toBe('ItemList');
+        for (const entry of items) {
+          expect(entry['@type']).toBe('ListItem');
+        }
+      });
 
       it('sorts by project period, descending — not source (declaration) order', () => {
         const expectedOrder = sortByDateDesc(projects, (p) => p.period).map((p) => p.title);
@@ -245,7 +314,16 @@ describe('structured data builders', () => {
 
     describe('Work Experience ItemList', () => {
       const workExperience = nodes.filter((n) => n['@type'] === 'ItemList').find((n) => n.name === 'Professional Experience')!;
-      const items = workExperience.itemListElement as Array<{ position: number; item: SchemaNode }>;
+      const items = workExperience.itemListElement as Array<SchemaNode & { position: number; item: SchemaNode }>;
+
+      it('sets the top-level ItemList @type, nested ListItem @type, OrganizationRole @type, and worksFor exactly', () => {
+        expect(workExperience['@type']).toBe('ItemList');
+        items.forEach((entry, i) => {
+          expect(entry['@type']).toBe('ListItem');
+          expect(entry.item['@type']).toBe('OrganizationRole');
+          expect(entry.item.worksFor).toEqual({ '@type': 'Organization', name: experiences[i].company });
+        });
+      });
 
       it('preserves experience declaration order (not date-sorted) and 1-based positions', () => {
         expect(items.map((entry) => (entry.item.worksFor as { name: string }).name)).toEqual(
@@ -291,6 +369,7 @@ describe('structured data builders', () => {
       it('matches the full ItemList/ListItem/credential/Organization shape exactly', () => {
         const sortedCerts = sortByDateDesc(certifications, (c) => c.status);
         expect(credentialList['@type']).toBe('ItemList');
+        expect(credentialList.name).toBe('Certifications and Credentials');
         expect(items).toEqual(
           sortedCerts.map((cert, i) => ({
             '@type': 'ListItem',
@@ -330,6 +409,7 @@ describe('structured data builders', () => {
       it('matches the full ItemList/ListItem/CreativeWork/Person shape exactly', () => {
         const sorted = sortByDateDesc(testimonials, (t) => t.date).slice(0, 12);
         expect(testimonialList['@type']).toBe('ItemList');
+        expect(testimonialList.name).toBe('Professional Testimonials');
         expect(items).toEqual(
           sorted.map((testimonial, i) => {
             const datePublished = toIsoDate(testimonial.date);
@@ -361,10 +441,33 @@ describe('structured data builders', () => {
           expect(items[i].item.description).toBe(eduItem.details.join(' '));
         });
       });
+
+      it('matches the full ItemList/ListItem/EducationalOccupationalCredential/CollegeOrUniversity shape exactly', () => {
+        expect(educationList['@type']).toBe('ItemList');
+        expect(educationList.name).toBe('Education');
+        expect(items).toEqual(
+          educationItems.map((item, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'EducationalOccupationalCredential',
+              name: item.credential,
+              credentialCategory: item.credential.toLowerCase().includes('certificate') ? 'certificate' : 'degree',
+              recognizedBy: { '@type': 'CollegeOrUniversity', name: item.institution },
+              description: item.details.join(' '),
+            },
+          }))
+        );
+      });
     });
 
     describe('FAQPage schema', () => {
       const faqPage = byType('FAQPage');
+
+      it('sets the FAQPage @id and name exactly', () => {
+        expect(faqPage['@id']).toBe(`${SITE_URL}/#faq`);
+        expect(faqPage.name).toBe('Frequently Asked Questions');
+      });
 
       it('maps every FAQ to a Question/Answer pair, in order', () => {
         expect(faqPage.mainEntity).toEqual(

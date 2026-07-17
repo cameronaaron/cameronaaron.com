@@ -94,6 +94,11 @@ export function applyMousePull(
     const dx = mouseX - p.x;
     const dy = mouseY - p.y;
     const d2 = dx * dx + dy * dy;
+    // Stryker disable next-line EqualityOperator: '<=' only changes behavior
+    // exactly at d2 === mouseRadius2, i.e. distance === mouseRadius exactly.
+    // At that point force = (mouseRadius - distance) / mouseRadius = 0, so the
+    // position update below adds zero either way — hand-verified by mutating
+    // this line and confirming the full suite still passes bit-for-bit.
     if (d2 < mouseRadius2 && d2 > 0) {
       const distance = getDistance(dx, dy);
       const force = (mouseRadius - distance) / mouseRadius;
@@ -201,10 +206,34 @@ export function forEachConnectedPair(
     const pc = Math.min(Math.max(0, Math.floor(pi.x / cellSize)), cols - 1);
     const pr = Math.min(Math.max(0, Math.floor(pi.y / cellSize)), rows - 1);
     for (let dr = -1; dr <= 1; dr++) {
+      // Stryker disable next-line ArithmeticOperator: dr ranges symmetrically
+      // over {-1, 0, 1}, so `pr - dr` visits the exact same SET of neighbor
+      // rows as `pr + dr` (just in reverse order) — hand-verified: mutating
+      // this to a subtraction leaves the full suite passing, since the
+      // algorithm only accumulates pairs and never depends on visit order.
       const nr = pr + dr;
+      // Stryker disable next-line ConditionalExpression,LogicalOperator,EqualityOperator: an
+      // out-of-range nr can only arise from pr±1 (pr itself is clamped to
+      // [0, rows-1]), so nr is bounded to [-1, rows]. The flat index
+      // `nr * cols + nc` for any such nr, combined with nc kept properly
+      // bounded to [0, cols-1] by the untouched check below, always lands at
+      // or past `count.length` (rows*cols) for nr>=rows, or stays negative
+      // for nr<0 — both read as `undefined` from the typed arrays, making
+      // `k < undefined` false immediately (zero iterations, no side effects).
+      // Hand-verified by mutating every variant of this check (removed
+      // entirely, De Morgan's flip, each half dropped, boundary shifted by
+      // one) and confirming the full suite still passes bit-for-bit.
       if (nr < 0 || nr >= rows) continue;
       for (let dc = -1; dc <= 1; dc++) {
+        // Stryker disable next-line ArithmeticOperator: symmetric-range
+        // argument as the nr case above — `pc - dc` visits the same set of
+        // neighbor columns as `pc + dc`, just reordered.
         const nc = pc + dc;
+        // NOT equivalent (unlike the nr check above): nc is the fast-varying
+        // term in `nr * cols + nc`, so an unchecked negative nc aliases into
+        // the previous row's last column, and nc===cols aliases into the
+        // next row's first column — both real, valid, wrong cells. Covered
+        // by the "does not alias" tests in engine.test.ts.
         if (nc < 0 || nc >= cols) continue;
         const cellBase = (nr * cols + nc) * maxPerCell;
         const n = count[nr * cols + nc];
