@@ -20,12 +20,29 @@ describe('tokenizeSkill', () => {
     expect(tokenizeSkill('Care and IT')).toEqual([]);
   });
 
+  it('drops every stopword in the full list, not just the ones another test happens to cover', () => {
+    // Each stopword paired with a real token so an under-filtering bug (one
+    // token slipping through) is visible instead of an empty array either way.
+    expect(tokenizeSkill('Research and Practice')).toEqual(['research', 'practice']);
+    expect(tokenizeSkill('The Research Field')).toEqual(['research', 'field']);
+    expect(tokenizeSkill('Research for Practice')).toEqual(['research', 'practice']);
+    expect(tokenizeSkill('Research with Practice')).toEqual(['research', 'practice']);
+    expect(tokenizeSkill('Health Research')).toEqual(['research']);
+  });
+
   it('strips parenthetical detail before tokenizing', () => {
     const tokens = tokenizeSkill('Backend Engineering (Python, Flask)');
     expect(tokens).toContain('backend');
     expect(tokens).toContain('engineering');
     expect(tokens).not.toContain('python');
   });
+
+  it('replaces parenthetical content with a separator, not an empty string (guards word-boundary loss)', () => {
+    // If the paren strip used "" instead of " ", the words on either side of
+    // the parenthetical would fuse into one token instead of staying separate.
+    expect(tokenizeSkill('Neuroscience(EEG) Research')).toEqual(['neuroscience', 'research']);
+  });
+
 
   it('deduplicates a repeated word within one label', () => {
     expect(tokenizeSkill('Data Data Analysis')).toEqual(['data', 'analysis']);
@@ -149,6 +166,33 @@ describe('stepSkillLayout', () => {
     stepSkillLayout(graph, layout, bounds, idle);
     expect(layout.x[0]).toBeLessThanOrEqual(200);
     expect(layout.y[0]).toBeGreaterThanOrEqual(0);
+  });
+
+  it('computes exact forces (center gravity, repulsion, spring) and integration for one tick', () => {
+    // Two nodes, one edge, no pointer: every force term applies exactly
+    // once, so this pins center gravity + all-pairs repulsion + spring
+    // attraction + damping in a single assertion instead of five separate
+    // qualitative ones. Values re-derived independently from the physics
+    // constants, not copied from source.
+    const graph = buildSkillGraph(['Clinical Alpha', 'Clinical Beta']); // shared "clinical" -> edge [0,1]
+    const layout = createSkillLayout(2, 200, 200, 3);
+    layout.x[0] = 50;
+    layout.y[0] = 100;
+    layout.x[1] = 150;
+    layout.y[1] = 100;
+    layout.vx[0] = 0;
+    layout.vy[0] = 0;
+    layout.vx[1] = 0;
+    layout.vy[1] = 0;
+
+    stepSkillLayout(graph, layout, { width: 200, height: 200 }, idle);
+
+    expect(layout.x[0]).toBeCloseTo(50.344, 3);
+    expect(layout.y[0]).toBeCloseTo(100, 6);
+    expect(layout.x[1]).toBeCloseTo(149.656, 3);
+    expect(layout.y[1]).toBeCloseTo(100, 6);
+    expect(layout.vx[0]).toBeCloseTo(0.344, 3);
+    expect(layout.vx[1]).toBeCloseTo(-0.344, 3);
   });
 
   it('settles toward rest over many ticks', () => {
