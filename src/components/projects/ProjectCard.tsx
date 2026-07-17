@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import type { Project } from '@/data/projects';
+import ScrambleText from '@/components/ui/ScrambleText';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { use3DTilt } from '@/hooks/use3DTilt';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
@@ -98,7 +99,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           whileHover={enableHoverMotion ? { x: 5 } : undefined}
           transition={{ duration: 0.2 }}
         >
-          {project.title}
+          <ScrambleText text={project.title} />
         </motion.h3>
         <p className="text-muted-foreground mb-6 line-clamp-3 leading-relaxed flex-grow">
           {project.description}

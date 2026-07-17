@@ -64,7 +64,6 @@ describe('ui coverage hardening', () => {
     const ghost = screen.getByTestId('section-ghost-index');
     expect(ghost.textContent).toBe('03');
     expect(ghost.getAttribute('aria-hidden')).toBe('true');
-    expect(ghost.className).toContain('pointer-events-none');
     expect(ghost.className).toContain('select-none');
 
     rerender(<SectionHeader title="Unindexed" />);

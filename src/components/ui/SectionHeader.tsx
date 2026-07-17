@@ -3,6 +3,7 @@
 import { motion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import type { ReactNode } from 'react';
 
+import ScrambleText from '@/components/ui/ScrambleText';
 import TextReveal from '@/components/ui/TextReveal';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { getMarqueeMotionConfig, sectionTitleVelocityToSkewDeg } from '@/components/ui/velocity-marquee-logic';
@@ -38,12 +39,12 @@ export default function SectionHeader({ title, subtitle, className = '', heading
     >
       <div className="mb-6 flex items-center gap-4">
         {index ? (
-          <span
-            aria-hidden="true"
-            data-testid="section-ghost-index"
-            className="font-mono-accent pointer-events-none select-none text-sm font-medium tracking-[0.35em] text-cyan-300/80"
-          >
-            {index}
+          <span aria-hidden="true" data-testid="section-ghost-index" className="select-none">
+            {/* Decorative only (aria-hidden) — the hover-scramble is a mouse-only "everything reacts" flourish. */}
+            <ScrambleText
+              text={index}
+              className="font-mono-accent text-sm font-medium tracking-[0.35em] text-cyan-300/80"
+            />
           </span>
         ) : null}
         <motion.div

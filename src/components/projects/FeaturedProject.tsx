@@ -2,6 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import type { Project } from '@/data/projects';
+import ScrambleText from '@/components/ui/ScrambleText';
 import Tilt from '@/components/ui/Tilt';
 import FeaturedIcon from '@/components/projects/FeaturedIcon';
 import ProjectPattern from '@/components/projects/ProjectPattern';
@@ -65,7 +66,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
               </div>
               
               <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-emerald-300 transition-all duration-300">
-                {project.title}
+                <ScrambleText text={project.title} />
               </h3>
 
               <p className="text-cyan-300 text-sm font-medium mb-4">{project.period}</p>
