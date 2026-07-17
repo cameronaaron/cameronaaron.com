@@ -410,6 +410,22 @@ History (2026-07, kept because the reasoning still applies):
    deepened the critical request graph (mobile simulated LCP 3.4s→3.8s, TTI
    3.6s→4.0s). The sections stay statically imported — see the comment in
    `src/app/page.tsx`.
+
+   **Reconsidered (2026-07), not re-attempted:** this result is specific to
+   *whole-section* splitting on a fully static export (`output: 'export'` —
+   no server runtime, no streaming SSR, so client-side JS chunking via
+   `next/dynamic` is the only code-splitting lever available at all; there is
+   no server-rendered-shell-plus-streamed-islands option to reach for
+   instead). It doesn't necessarily rule out a *narrower* application: dynamic
+   `import()` for a single genuinely heavy, rarely-interacted-with widget deep
+   in the page (candidates: the force-directed skill web, the interactive
+   particle canvas) rather than an entire section, where the chunk is small
+   enough that a preloaded/parallel fetch might not deepen the critical path
+   the same way splitting a whole section did. That's an untested hypothesis,
+   not a finding — re-attempting it demands the same discipline as the
+   original experiment (a real `npx @lhci/cli autorun` baseline and
+   after-measurement on both form factors, not a guess), which this note
+   doesn't replace. Don't split further without doing that measurement.
 5. A full audit of every open Lighthouse warning (2026-07) fixed three for
    real and root-caused the rest as not safely fixable from application code.
 
@@ -733,6 +749,23 @@ investigate that script before touching the config.
    coverage — has a blind spot, everything matching that blind spot
    accumulates invisibly. Periodically ask a sweep "what would this miss?"
    the same way you'd ask it "what does this catch?"**
+
+   A sharper case of the same lesson (2026-07): the `no-restricted-syntax`
+   ESLint rule banning `map().filter()` is a single AST selector matching one
+   fixed expression shape (`a.map(f).filter(g)`). Splitting the identical
+   two-array allocation across statements —
+   `const mapped = items.map(f); const result = mapped.filter(g);` — passes
+   it cleanly while doing the exact same work. A regex or single-selector AST
+   rule can only ever match a fixed shape; it has no concept of "this
+   variable's value came from that other line." Closed by
+   `scripts/eslint-rules/no-split-map-filter.mjs`, a real custom ESLint rule
+   using the scope manager (not a name-string guess) to walk a `.filter()`
+   call's receiver back to its declaration and check whether *that* was a
+   `.map()`/`.flatMap()` result — the same class of fix as the coverage gap
+   above, but for evasion-by-restructuring instead of evasion-by-syntax the
+   pattern never anticipated. Tested with ESLint's own `RuleTester`
+   (`src/eslint-rules-contract.test.ts`) per rule 8 below — a lint rule is
+   test infrastructure too.
 8. **A test that cannot fail is worse than no test — and test
    *infrastructure* needs tests of its own.** A 2026-07 audit found 45+
    assertions that could never fail: `expect(document.body).toBeTruthy()`
@@ -815,3 +848,41 @@ investigate that script before touching the config.
     able to follow the work without opening a single diff. Never mix refactors
     with behavior changes in one commit, and never commit with a red gate
     (rule 3).
+13. **100% coverage proves a line executed, not that a test would fail if the
+    behavior it pins broke — mutation testing (Stryker, `pnpm run
+    test:mutation`) checks the second claim directly.** It mutates production
+    logic (flips a sign, an operator, a boundary, a string literal) and
+    re-runs the tests; a mutant that survives means some test executes that
+    line without actually asserting its effect. First real run (2026-07) on
+    `command-palette-logic.ts` found 38 of 248 mutants survived (84.68%)
+    despite 100% coverage, and every one of substance was a genuine gap, not
+    noise: `keywords: item.name.toLowerCase()` mutated to `.toUpperCase()`
+    survived because the one test exercising keyword-only matching also
+    happened to match on the label, silently masking that case-insensitive
+    keyword search was untested end-to-end; a `-Infinity` fallback (the "no
+    keyword match" sentinel in `scoreCommand`) flipped to `+Infinity` survived
+    because no test pinned an exact score, only relative comparisons that a
+    constant sign flip doesn't change; and an LRU cache's `detach()` losing its
+    tail-pointer update survived because the existing tests only ever walked
+    the list forward from `head` — never checked `cache.tail` or the `.prev`
+    chain that only a *second* eviction would expose. Also surfaced several
+    true equivalent mutants (e.g. an early-return whose fallthrough path
+    provably produces the identical result) — verify column-precise, not just
+    by line, before trusting a "Survived" verdict enough to act on it. Scope
+    excludes `src/data/**` (declarative content catalogs, not logic — mutating
+    a string literal in a company name has no meaningful signal) and every
+    `*.test.ts(x)` file (only production code is mutated). Manual-only by the
+    same pattern as `test:complexity`/`test:performance` above — a full run is
+    far slower than the ~20s test suite, so it's never wired into
+    pre-commit/pre-push or a blocking CI job.
+
+    **Known tooling caveat:** at least one mutant has been confirmed to report
+    "Survived" from Stryker's own harness while the identical mutation, applied
+    directly to the source and run through a plain `vitest run` of the
+    affected test file, actually fails — reproduced under both `perTest` and
+    `off` coverage-analysis modes, so it isn't a coverage-attribution problem,
+    more likely a Stryker↔Vitest module-caching interaction. Treat "Survived"
+    as a strong lead, not a verdict: before spending real effort writing a new
+    test for one, reproduce it by hand (apply the exact mutation to a copy of
+    the source, run the affected test file directly) to confirm it's real
+    before trusting the count.
