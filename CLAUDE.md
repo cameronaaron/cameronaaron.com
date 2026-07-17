@@ -15,6 +15,7 @@ npm run build        # production static export to /out
 npm test             # Vitest (all tests must pass before committing)
 npm run type-check   # tsc --noEmit
 npm run lint         # ESLint (--max-warnings=0) + markdownlint — warnings are failures
+npm run test:mutation  # Stryker mutation testing (manual only — see ENGINEERING-STANDARDS.md §6.13)
 ```
 
 ## Commits
@@ -24,7 +25,7 @@ Small, single-topic commits — one logical change each, readable from
 says *what*; body says *why*. An optimization + its contract test + its docs
 are **one** commit (the ratchet rule); unrelated changes are separate commits.
 Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
-See ENGINEERING-STANDARDS §6.9.
+See ENGINEERING-STANDARDS.md §6, ratchet item 12.
 
 Hook gate (simple-git-hooks): **pre-commit and pre-push both run the full
 gate** — lockfile sync, type-check, zero-warning lint, and the entire test
@@ -226,6 +227,56 @@ Site content lives in `src/data/`:
 
 Every external URL referenced from `src/data` is tracked in a generated ledger — `scripts/checks/external-links-ledger.json` (do not hand-edit; refresh with `pnpm run check:links` after adding or changing any external URL). `src/external-links-contract.test.ts` fails the commit if the ledger shows a dead link, is missing an entry, has an orphaned entry, or has drifted stale (45+ days unverified).
 
+## Quick reference patterns
+
+**Client components with Framer Motion:** every animated component needs `'use client'` and `viewport={{ once: true }}` (omitting it re-triggers the animation on every scroll into view):
+
+```tsx
+'use client';
+import { motion } from 'framer-motion';
+
+export default function Section() {
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+```
+
+**Staggered lists:** index-based delay, not a fixed duration: `transition={{ delay: i * 0.1 }}`.
+
+**Image handling:** `.webp` only, referenced with a leading slash (`/images/profile.webp`), via Next's `<Image>` with explicit `width`/`height`. Hero image gets `priority`; everything else lazy-loads by default.
+
+**Path alias:** `@/*` maps to `src/*` for all internal imports.
+
+**Adding a new section:** create `src/data/newsection.ts` → create `src/components/NewSection.tsx` (`'use client'`, imports its data, follows the client-component pattern above) → import in `src/app/page.tsx` → add a nav entry in `Navigation.tsx`'s `navItems` if it needs one.
+
+## SEO architecture
+
+`src/components/StructuredData.tsx` auto-generates Schema.org JSON-LD from data files — editing a data file updates structured data with no manual schema edits:
+
+| Schema type | Data source | Impact |
+| --- | --- | --- |
+| Person, ProfilePage | `profile.ts` | Google Knowledge Panel |
+| FAQPage | `faqs.ts` | Expandable FAQ snippets in search |
+| Review (×4) | `testimonials.ts` | 5-star rating display |
+| ItemList (Projects) | `projects.ts` | Software app carousel |
+| ItemList (WorkExperience) | `experience.ts` | Job history cards |
+
+Root `<head>` metadata (OpenGraph `type: "profile"`, the `SEO_KEYWORDS` catalog, Twitter `summary_large_image` cards) lives in `src/data/metadata.ts`, not `layout.tsx` — moved there per the module-level-data-catalog sweep (ENGINEERING-STANDARDS.md §6 item 7). `src/app/sitemap.ts` and `src/app/robots.ts` both need `export const dynamic = 'force-static'` for the static export.
+
+## Accessibility & security headers
+
+WCAG 2.1 AA: keyboard navigation, screen-reader compatibility, skip-to-content link, proper heading hierarchy, visible focus states, `prefers-reduced-motion` support — enforced by `wcag-contract.test.tsx` and `a11y-regressions.test.tsx`.
+
+All security/caching headers live in `public/_headers` (there is no `middleware.ts` — this is a static export with no server runtime), pinned by `src/headers-integrity-contract.test.ts`: HSTS with preload, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, COOP/COEP, a restrictive `Permissions-Policy`. No `Content-Security-Policy` header is currently set — don't assume one exists. Static assets cache for 1 year immutable; HTML uses `must-revalidate`.
+
+## Common pitfalls
+
+- Missing `'use client'` — Framer Motion components crash without it.
+- Forgetting `viewport={{ once: true }}` — animations re-trigger on every scroll.
+- Image path without a leading slash — must be `/images/x.webp`, not `x.webp`.
+- Gradient text missing `text-transparent` — the gradient won't show without it (and never nest a persistently-transformed element inside a `bg-clip-text` ancestor — constraint #15).
+- Static export can't use Next.js features needing a Node.js runtime (API routes, ISR, etc.).
+- Missing ARIA labels — every section needs `aria-label` or `aria-labelledby`.
+
 ## Algorithm and data-structure standards
 
 These patterns are enforced by `src/components/algorithm-and-datastructure-contract.test.tsx`. Fix the **source**, not the test, when a check fails.
@@ -352,3 +403,14 @@ npm run deploy:prod   # builds → runs Lighthouse CI → deploys to Cloudflare 
 Static site lives in `/out` after `npm run build`. Cloudflare Pages serves it directly. There is no server-side rendering after the build step.
 
 Lighthouse thresholds: accessibility/best-practices/SEO stay at **1.0** on both form factors; the performance category is **0.85 desktop / 0.95 mobile**, with `numberOfRuns: 3` in both configs (enforced by `lighthouserc.json`, `lighthouserc.mobile.json`, and `src/performance-regression-contract.test.ts`). The asymmetric performance floor is root-caused, not guessed (2026-07): local Lighthouse desktop runs score `speed-index` at 700–950ms (~1.0), but CI's shared runners render the identical build's Speed Index at 2100–2400ms — a headless-Chrome rendering-speed limit, not an app regression. Desktop's scoring curve punishes that value far harder than mobile's (the same ~2130ms scores 0.56 on desktop vs 0.99 on mobile), which is why desktop needs the lower floor. `numberOfRuns: 3` has LHCI take the median run instead of a single sample. See `ENGINEERING-STANDARDS.md` §4.7 for prior history (including a measured-and-rejected code-splitting experiment) and for a known local-vs-CI Lighthouse false positive (`bf-cache`) — trust CI's numbers over a local `npm run test:performance:*` run.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
