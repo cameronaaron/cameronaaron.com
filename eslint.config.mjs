@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTypeScript from 'eslint-config-next/typescript';
+import noSplitMapFilter from './scripts/eslint-rules/no-split-map-filter.mjs';
 
 export default defineConfig([
   ...nextVitals,
@@ -36,6 +37,9 @@ export default defineConfig([
     // spots behaviorally; these rules stop new violations at lint time.
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/**/*.test.{ts,tsx}'],
+    plugins: {
+      local: { rules: { 'no-split-map-filter': noSplitMapFilter } }
+    },
     rules: {
       'no-restricted-syntax': [
         'error',
@@ -56,13 +60,21 @@ export default defineConfig([
           message:
             'Spreading inside a reduce() callback is O(n²) — mutate the accumulator or use a loop.'
         }
-      ]
+      ],
+      // A single-selector AST rule only matches one fixed shape
+      // (`a.map(f).filter(g)`) — splitting the same allocation across two
+      // statements (`const m = a.map(f); m.filter(g)`) evades it while doing
+      // the identical work. This rule uses real scope analysis to catch that
+      // split form too (scripts/eslint-rules/no-split-map-filter.mjs).
+      'local/no-split-map-filter': 'error'
     }
   },
   globalIgnores([
     '.next/**',
     'out/**',
     'node_modules/**',
-    'coverage/**'
+    'coverage/**',
+    '.stryker-tmp/**',
+    'reports/**'
   ])
 ]);
