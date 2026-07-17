@@ -15,10 +15,20 @@ import { createSeededRandom } from '@/components/hero/interactive-particles/engi
  * vector is actually needed.
  */
 
-/** Words too generic to imply a real relationship between two skills. */
+/**
+ * Words too generic to imply a real relationship between two skills.
+ * 'and'/'the'/'for' are currently unreachable dead code from a mutation-testing
+ * standpoint — all three are shorter than SKILL_TOKEN_MIN_LENGTH (4), so the
+ * token filter already drops them before this set is ever checked. Kept (with
+ * a Stryker ignore below) as self-documenting stopwords in case that
+ * threshold ever changes, rather than deleted.
+ */
 export const SKILL_STOPWORDS = new Set([
+  // Stryker disable next-line StringLiteral: unreachable — 3-letter tokens are filtered by SKILL_TOKEN_MIN_LENGTH before this set is checked
   'and',
+  // Stryker disable next-line StringLiteral: unreachable — 3-letter tokens are filtered by SKILL_TOKEN_MIN_LENGTH before this set is checked
   'the',
+  // Stryker disable next-line StringLiteral: unreachable — 3-letter tokens are filtered by SKILL_TOKEN_MIN_LENGTH before this set is checked
   'for',
   'with',
   'care',
@@ -58,6 +68,9 @@ export function tokenizeSkill(label: string): string[] {
   const stripped = label.toLowerCase().replace(/\([^)]*\)/g, ' ');
   const seen = new Set<string>();
   const tokens: string[] = [];
+  // Stryker disable next-line Regex: dropping the '+' only inserts extra empty-string
+  // splits between consecutive delimiters, which SKILL_TOKEN_MIN_LENGTH (4) already
+  // filters out (0 < 4 always) — the surviving token list is identical either way.
   for (const raw of stripped.split(/[^a-z]+/)) {
     if (raw.length < SKILL_TOKEN_MIN_LENGTH) continue;
     if (SKILL_STOPWORDS.has(raw)) continue;
@@ -92,10 +105,17 @@ export function buildSkillGraph(labels: string[]): SkillGraph {
 
   const linked = new Set<number>();
   for (const group of tokenGroups.values()) {
+    // Stryker disable next-line EqualityOperator: '<=' adds one extra outer iteration
+    // at a===group.length, but the inner loop then starts at b=a+1>group.length and
+    // never runs — no edge is ever added, skipped, or duplicated either way.
     for (let a = 0; a < group.length; a += 1) {
       for (let b = a + 1; b < group.length; b += 1) {
         const i = Math.min(group[a], group[b]);
         const j = Math.max(group[a], group[b]);
+        // Stryker disable next-line ArithmeticOperator: any injective encoding of
+        // (i,j) into one integer works — 'i*count-j' and 'i/count+j' both stay
+        // injective for 0<=i<j<count (brute-force verified up to count=200), so the
+        // Set-based dedup below behaves identically regardless of the operator.
         const key = i * count + j;
         if (linked.has(key)) continue;
         linked.add(key);
@@ -125,6 +145,10 @@ export function createSkillLayout(count: number, width: number, height: number, 
   const random = createSeededRandom(seed);
   const x = new Float32Array(count);
   const y = new Float32Array(count);
+  // Stryker disable next-line EqualityOperator: '<=' only adds one extra iteration at
+  // i===count, reading/writing the out-of-bounds Float32Array index count. JS typed
+  // arrays make that a silent no-op (write is dropped, read is undefined), so the two
+  // extra random() calls never affect the stored values at indices 0..count-1.
   for (let i = 0; i < count; i += 1) {
     x[i] = random() * width;
     y[i] = random() * height;
@@ -155,6 +179,9 @@ export function stepSkillLayout(
   const centerX = bounds.width / 2;
   const centerY = bounds.height / 2;
 
+  // Stryker disable next-line EqualityOperator: '<=' only adds one extra iteration at
+  // i===count touching out-of-bounds Float32Array indices — a silent no-op in JS, so
+  // it never changes fx/fy/x/y at the real indices 0..count-1 (verified empirically).
   for (let i = 0; i < count; i += 1) {
     fx[i] = (centerX - x[i]) * CENTER_GRAVITY;
     fy[i] = (centerY - y[i]) * CENTER_GRAVITY;
@@ -172,11 +199,18 @@ export function stepSkillLayout(
   }
 
   // All-pairs repulsion (i<j, applied symmetrically).
+  // Stryker disable next-line EqualityOperator: '<=' adds one extra outer iteration at
+  // i===count, but the inner loop then starts at j=count+1>count-1 and never runs —
+  // same equivalence pattern as the buildSkillGraph group loop above.
   for (let i = 0; i < count; i += 1) {
     for (let j = i + 1; j < count; j += 1) {
       const dx = x[i] - x[j];
       const dy = y[i] - y[j];
       let distSq = dx * dx + dy * dy;
+      // Stryker disable next-line EqualityOperator: distSq is clamped TO the exact
+      // constant it's compared against, so at distSq===MIN_DISTANCE_SQ the '<=' branch
+      // reassigns distSq to the value it already holds — bit-identical either way
+      // (verified empirically: fx/fy unchanged by this mutation at the boundary).
       if (distSq < MIN_DISTANCE_SQ) distSq = MIN_DISTANCE_SQ;
       const dist = Math.sqrt(distSq);
       const force = REPULSION_STRENGTH / distSq;
@@ -194,6 +228,10 @@ export function stepSkillLayout(
     const dx = x[b] - x[a];
     const dy = y[b] - y[a];
     let dist = Math.sqrt(dx * dx + dy * dy);
+    // Stryker disable next-line EqualityOperator: same clamp-to-self idiom as the
+    // repulsion distSq guard above — reassigning dist to MIN_DISTANCE_SQ when it
+    // already equals MIN_DISTANCE_SQ is a no-op, so '<=' vs '<' is unobservable
+    // (verified empirically).
     if (dist < MIN_DISTANCE_SQ) dist = MIN_DISTANCE_SQ;
     const pull = (dist - SPRING_REST_LENGTH) * SPRING_STRENGTH;
     const ux = (dx / dist) * pull;
@@ -204,10 +242,17 @@ export function stepSkillLayout(
     fy[b] -= uy;
   }
 
+  // Stryker disable next-line EqualityOperator: same out-of-bounds-is-a-no-op
+  // equivalence as the loops above — the extra i===count iteration never touches a
+  // real index.
   for (let i = 0; i < count; i += 1) {
     let nvx = (vx[i] + fx[i]) * LAYOUT_DAMPING;
     let nvy = (vy[i] + fy[i]) * LAYOUT_DAMPING;
     const speed = Math.hypot(nvx, nvy);
+    // Stryker disable next-line EqualityOperator: at speed===MAX_NODE_SPEED the scale
+    // factor MAX_NODE_SPEED/speed is exactly 1, so taking the clamp branch ('>=') or
+    // skipping it ('>') both multiply nvx/nvy by 1 — bit-identical result (verified
+    // empirically with a hand-constructed exact-boundary input).
     if (speed > MAX_NODE_SPEED) {
       const scale = MAX_NODE_SPEED / speed;
       nvx *= scale;

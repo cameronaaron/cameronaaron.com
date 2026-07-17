@@ -451,6 +451,353 @@ describe('interactive particle engine', () => {
       if (i > 0) expect(CONNECTION_OPACITY_TIERS[i]).toBeGreaterThan(CONNECTION_OPACITY_TIERS[i - 1]);
     }
   });
+
+  // ── Mutation-testing hardening (Stryker) ───────────────────────────────────
+
+  it('PARTICLE_COLORS holds the exact four rgba string literals', () => {
+    // Guards each literal individually — a StringLiteral mutant that blanks any
+    // one of the four entries only surfaces if something asserts real content,
+    // not just array length via the Math.floor(random * length) usage elsewhere.
+    expect(PARTICLE_COLORS).toEqual([
+      'rgba(56, 214, 255, 0.65)',
+      'rgba(92, 240, 205, 0.6)',
+      'rgba(16, 212, 146, 0.55)',
+      'rgba(126, 231, 255, 0.6)',
+    ]);
+  });
+
+  it('buildConnections computes dx from a genuine subtraction, not a same-magnitude sign flip', () => {
+    // The existing opacity test anchors one particle at the origin, so a - -> +
+    // mutant on dx only flips a sign that gets squared away. Both particles here
+    // are nonzero on the axis under test, so + genuinely changes the magnitude.
+    const particles = [
+      { id: 0, x: 3, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 1, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const [line] = buildConnections(particles, 20, 5);
+
+    const dx = 3 - 1;
+    const distance = Math.sqrt(dx * dx);
+    expect(line.opacity).toBeCloseTo(CONNECTION_MAX_OPACITY * (1 - distance / 20), 10);
+  });
+
+  it('buildConnections computes dy from a genuine subtraction, not a same-magnitude sign flip', () => {
+    const particles = [
+      { id: 0, x: 0, y: 3, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 0, y: 1, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const [line] = buildConnections(particles, 20, 5);
+
+    const dy = 3 - 1;
+    const distance = Math.sqrt(dy * dy);
+    expect(line.opacity).toBeCloseTo(CONNECTION_MAX_OPACITY * (1 - distance / 20), 10);
+  });
+
+  it('excludes a pair sitting exactly on the connection-distance boundary (equal, not less)', () => {
+    // A 3-4-5 triangle: distance is exactly 5, so dist2 === connectDist2 exactly
+    // when connectionDistance is 5. '<' correctly excludes it; '<=' would not.
+    const particles = [
+      { id: 0, x: 0, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 3, y: 4, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const lines = buildConnections(particles, 5, 5);
+    expect(lines.length).toBe(0);
+  });
+
+  it('buildConnections updates a reused pool slot in place with the new pair’s data on the next frame', () => {
+    // A pool test that asserts CONTENT, not just object identity: the existing
+    // pool-reuse test only checks `second[0] === firstSlot`, which still passes
+    // even if the mutant's "else" branch is skipped/emptied, because the stale
+    // slot's reference never changes — only its contents would be wrong.
+    const pool: Connection[] = [];
+    const frame1 = [
+      { id: 2, x: 0, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 3, x: 1, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    buildConnections(frame1, 10, 5, pool);
+    expect(pool.length).toBe(1);
+    expect(pool[0].id).toBe(2 * 1000 + 3); // push-branch arithmetic (first population)
+
+    const frame2 = [
+      { id: 5, x: 10, y: 10, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 6, x: 11, y: 10, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const firstSlot = pool[0];
+    buildConnections(frame2, 10, 5, pool);
+
+    expect(pool[0]).toBe(firstSlot); // same object, reused in place
+    expect(pool[0].id).toBe(5 * 1000 + 6); // else-branch arithmetic, actually ran
+    expect(pool[0].x1).toBe(10);
+    expect(pool[0].y1).toBe(10);
+    expect(pool[0].x2).toBe(11);
+  });
+
+  it('uses the weaker balanced-tier attraction strength when quality is not full', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 55, y: 50, active: true },
+      'balanced'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVX = 0 + Math.sin(phase) * 0.0023;
+    const oscVY = 0 + Math.cos(phase * 0.86) * 0.002;
+    const preNextX = 50 + oscVX * 1;
+    const preNextY = 50 + oscVY * 1;
+    const dx = 55 - preNextX;
+    const dy = 50 - preNextY;
+    const dist2 = dx * dx + dy * dy;
+    const distance = Math.sqrt(dist2);
+    const pull = (22 - distance) / 22;
+    const pulledVX = oscVX + (dx / distance) * pull * ATTRACTION_STRENGTH_BALANCED * 1;
+    const pulledVY = oscVY + (dy / distance) * pull * ATTRACTION_STRENGTH_BALANCED * 1;
+    const expectedX = preNextX + pulledVX;
+    const expectedY = preNextY + pulledVY;
+
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+  });
+
+  it('does not apply pointer attraction when pointer.active is false, even though the pointer is within radius', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 55, y: 50, active: false }, // 5 units away — well within POINTER_ATTRACT_RADIUS
+      'full'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVX = 0 + Math.sin(phase) * 0.0023;
+    const oscVY = 0 + Math.cos(phase * 0.86) * 0.002;
+    const expectedX = 50 + oscVX * 1;
+    const expectedY = 50 + oscVY * 1;
+
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+    expect(p.velocity.x).toBeCloseTo(oscVX * 0.998, 10);
+    expect(p.velocity.y).toBeCloseTo(oscVY * 0.998, 10);
+  });
+
+  it('skips pointer attraction when the pointer is active but outside the attraction radius', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 0, y: 0, active: true }, // far away — outside POINTER_ATTRACT_RADIUS
+      'full'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVX = 0 + Math.sin(phase) * 0.0023;
+    const oscVY = 0 + Math.cos(phase * 0.86) * 0.002;
+    const expectedX = 50 + oscVX * 1;
+    const expectedY = 50 + oscVY * 1;
+
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+  });
+
+  it('skips pointer attraction exactly at the attraction-radius boundary (dist2 === RADIUS_SQ, not less)', () => {
+    // step=0 isolates the "did we enter the branch" question from the attraction
+    // math itself: with step=0 the earlier oscillation-driven position update is
+    // multiplied away, so nextX/nextY equal the particle's raw x/y exactly, and
+    // the attraction increment term (also *step) contributes zero even if the
+    // branch IS wrongly entered — only the unconditional `nextX += velocityX`
+    // line inside the branch can move the position, which cleanly exposes entry.
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0.01, y: -0.01 }, opacity: 1, phase: 0 }],
+      0,
+      { x: 72, y: 50, active: true }, // dx=22, dy=0 -> dist2 = 22*22 = 484 = RADIUS_SQ exactly
+      'full'
+    );
+
+    expect(p.x).toBe(50);
+    expect(p.y).toBe(50);
+  });
+
+  it('skips pointer attraction exactly at the epsilon boundary (dist2 === 0.000001, not greater)', () => {
+    // Particle x=0 (not 50) so that pointer.x - nextX subtracts from zero, which
+    // never loses precision — pointer.x=50.001 minus nextX=50 would NOT recover
+    // 0.001 exactly (50.001 itself isn't exactly representable in IEEE-754), so
+    // dist2 would land fractionally short of the boundary instead of on it.
+    const [p] = stepParticles(
+      [{ id: 1, x: 0, y: 50, size: 1, color: 'x', velocity: { x: 0.01, y: -0.01 }, opacity: 1, phase: 0 }],
+      0,
+      { x: 0.001, y: 50, active: true }, // dx=0.001, dy=0 -> dist2 = 0.001*0.001 = 0.000001 exactly
+      'full'
+    );
+
+    expect(p.x).toBe(0);
+    expect(p.y).toBe(50);
+  });
+
+  it('does not damp when arriving exactly at the bottom edge (y === 100, not beyond)', () => {
+    // Unlike the X oscillation term (Math.sin(phase)*0.0023, which is exactly 0
+    // at phase=0), the Y term is Math.cos(phase*0.86)*0.002 — cos(0) is 1, not
+    // 0, and it is added unconditionally (not scaled by step), so it still
+    // contributes even at step=0. The oracle below accounts for it explicitly.
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 100, size: 1, color: 'x', velocity: { x: 0, y: 0.01 }, opacity: 1, phase: 0 }],
+      0, // step=0 zeroes the position update's velocity term, isolating the boundary
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    const velocityY = 0.01 + Math.cos(0 * 0.86) * 0.002;
+
+    expect(p.y).toBe(100);
+    expect(p.velocity.y).toBeCloseTo(velocityY * 0.998, 10); // undamped
+  });
+
+  it('scales the pointer-attraction velocity increment by step, not the inverse of step', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      2, // a non-unit step distinguishes '* step' from '/ step' (both are '/1' at step=1)
+      { x: 55, y: 50, active: true },
+      'full'
+    );
+
+    const phase = 0 + 0.025 * 2;
+    const oscVX = 0 + Math.sin(phase) * 0.0023;
+    const oscVY = 0 + Math.cos(phase * 0.86) * 0.002;
+    const preNextX = 50 + oscVX * 2;
+    const preNextY = 50 + oscVY * 2;
+    const dx = 55 - preNextX;
+    const dy = 50 - preNextY;
+    const dist2 = dx * dx + dy * dy;
+    const distance = Math.sqrt(dist2);
+    const pull = (22 - distance) / 22;
+    const pulledVX = oscVX + (dx / distance) * pull * ATTRACTION_STRENGTH_FULL * 2;
+    const pulledVY = oscVY + (dy / distance) * pull * ATTRACTION_STRENGTH_FULL * 2;
+    const expectedX = preNextX + pulledVX;
+    const expectedY = preNextY + pulledVY;
+
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+  });
+
+  it('bounces off the left viewport edge with the exact damping factor', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 0.01, y: 50, size: 1, color: 'x', velocity: { x: -5, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVX = -5 + Math.sin(phase) * 0.0023;
+    const bouncedVX = oscVX * -0.98;
+
+    expect(p.x).toBe(0);
+    expect(p.velocity.x).toBeCloseTo(bouncedVX * 0.998, 10);
+  });
+
+  it('does not damp when arriving exactly at the left edge (x === 0, not negative)', () => {
+    // step=0 zeroes the position update's velocity term (nextX = x + velocityX*0),
+    // so nextX equals the input x exactly regardless of the oscillation contribution
+    // — with phase=0 too, that contribution is Math.sin(0)===0, so velocityX is
+    // exactly the input velocity, isolating the boundary check from float drift.
+    const [p] = stepParticles(
+      [{ id: 1, x: 0, y: 50, size: 1, color: 'x', velocity: { x: 0.01, y: 0 }, opacity: 1, phase: 0 }],
+      0,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    expect(p.x).toBe(0);
+    expect(p.velocity.x).toBeCloseTo(0.01 * 0.998, 10); // undamped
+  });
+
+  it('does not damp when arriving exactly at the right edge (x === 100, not beyond)', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 100, y: 50, size: 1, color: 'x', velocity: { x: 0.01, y: 0 }, opacity: 1, phase: 0 }],
+      0,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    expect(p.x).toBe(100);
+    expect(p.velocity.x).toBeCloseTo(0.01 * 0.998, 10); // undamped
+  });
+
+  it('bounces off the bottom viewport edge with the exact clamp and damping factor', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 99.99, size: 1, color: 'x', velocity: { x: 0, y: 5 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVY = 5 + Math.cos(phase * 0.86) * 0.002;
+    const bouncedVY = oscVY * -0.98;
+
+    expect(p.y).toBe(100);
+    expect(p.velocity.y).toBeCloseTo(bouncedVY * 0.998, 10);
+  });
+
+  it('does not damp when arriving exactly at the top edge (y === 0, not negative)', () => {
+    const phase = 0 + 0.025 * 1; // particle.phase=0, step=1
+    const velocityY = 0 + Math.cos(phase * 0.86) * 0.002; // particle.velocity.y=0
+    const startY = -velocityY; // nextY = startY + velocityY*1 === 0 exactly (a - a)
+
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: startY, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    expect(p.y).toBeCloseTo(0, 10);
+    expect(p.velocity.y).toBeCloseTo(velocityY * 0.998, 10); // undamped
+  });
+
+  it('drops a burst whose life reaches exactly zero on this step (boundary, not just negative)', () => {
+    // 0.09 - 0.03*3 === 0 exactly in IEEE-754 double precision.
+    const next = stepBursts([{ id: 1, x: 0, y: 0, vx: 0, vy: 0, life: 0.09, size: 2, color: 'x' }], 3);
+    expect(next).toHaveLength(0);
+  });
+
+  it('siftUp treats a tie with the parent as already ordered — no swap on equal distances', () => {
+    // Offering (5,0) then (3,1) then (5,2): the third offer ties the root (5).
+    // '>=' (real) breaks without swapping on a tie; '>' would swap unnecessarily,
+    // which is invisible in the dist2 array (both are [5,3,5]) but changes which
+    // original index ends up at the root — only an index-array assertion exposes it.
+    const heap = createKnnHeap(3);
+    knnOffer(heap, 5, 0);
+    knnOffer(heap, 3, 1);
+    knnOffer(heap, 5, 2);
+
+    expect(Array.from(heap.dist2)).toEqual([5, 3, 5]);
+    expect(Array.from(heap.index)).toEqual([0, 1, 2]);
+  });
+
+  it('siftDown breaks a left-child tie in favor of the parent — guards the left comparison operator', () => {
+    // Fill then replace the root with a value that ties the left child (4) while
+    // the right child (3) is smaller. Real '>' leaves the tied left child un-
+    // promoted; '>=' would promote it, then the right check re-compares against
+    // the wrong "largest" — both produce distinct final index arrangements even
+    // though the multiset of dist2 values is identical either way.
+    const heap = createKnnHeap(3);
+    knnOffer(heap, 10, 0);
+    knnOffer(heap, 4, 1);
+    knnOffer(heap, 3, 2);
+    knnOffer(heap, 4, 3); // replaces root (10); ties left child (4) exactly
+
+    expect(Array.from(heap.dist2)).toEqual([4, 4, 3]);
+    expect(Array.from(heap.index)).toEqual([3, 1, 2]);
+  });
+
+  it('siftDown breaks a right-child tie in favor of the parent — guards the right comparison operator', () => {
+    const heap = createKnnHeap(3);
+    knnOffer(heap, 10, 0);
+    knnOffer(heap, 3, 1);
+    knnOffer(heap, 4, 2);
+    knnOffer(heap, 4, 3); // replaces root (10); left child (3) loses, ties right child (4)
+
+    expect(Array.from(heap.dist2)).toEqual([4, 3, 4]);
+    expect(Array.from(heap.index)).toEqual([3, 1, 2]);
+  });
 });
 
 describe('cursor constellation — bounded max-heap K-nearest', () => {
@@ -492,6 +839,19 @@ describe('cursor constellation — bounded max-heap K-nearest', () => {
     expect(heap.size).toBe(2);
     expect(heap.dist2[0]).toBe(rootBefore);
     expect(Array.from(heap.index.slice(0, 2)).sort()).toEqual([0, 1]);
+  });
+
+  it('rejects a candidate exactly tied with the current worst (equal, not better)', () => {
+    // '<' correctly rejects a tie (not strictly nearer); '<=' would wrongly
+    // replace the root with an equally-distant candidate. After the first two
+    // offers, index 1 (dist2=5) sifts up to become the root (index array [1, 0]).
+    const heap = createKnnHeap(2);
+    knnOffer(heap, 1, 0);
+    knnOffer(heap, 5, 1); // root (worst kept) is now 5, at array index 0
+    knnOffer(heap, 5, 2); // ties the root exactly → must be rejected
+
+    expect(heap.size).toBe(2);
+    expect(Array.from(heap.index)).toEqual([1, 0]);
   });
 
   it('maintains the exact max-heap array layout through a known offer sequence (guards sift-up/down comparisons)', () => {
@@ -546,6 +906,20 @@ describe('cursor constellation — bounded max-heap K-nearest', () => {
     const kept = Array.from(heap.index.slice(0, heap.size)).sort();
     // Particle 2 is far outside the radius; 0 and 1 are inside.
     expect(kept).toEqual([0, 1]);
+  });
+
+  it('excludes a particle sitting exactly on the radius boundary (equal, not less)', () => {
+    // Particle 1 is exactly distance 5 from the pointer (dx=5, dy=0), so
+    // d2 === radiusSq === 25 exactly. '<' correctly excludes it; '<=' would not.
+    const particles = [
+      { id: 0, x: 50, y: 50, size: 1, color: '#fff', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 55, y: 50, size: 1, color: '#fff', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const heap = createKnnHeap(4);
+    collectNearestParticles(particles, 50, 50, 25, heap);
+
+    const kept = Array.from(heap.index.slice(0, heap.size)).sort();
+    expect(kept).toEqual([0]);
   });
 
   it('collectNearestParticles caps the kept set at the heap capacity', () => {

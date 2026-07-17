@@ -131,6 +131,10 @@ export function buildConnections(
   const connectDist2 = connectionDistance * connectionDistance;
   let count = 0;
 
+  // Stryker disable next-line EqualityOperator: '<=' only adds one extra outer
+  // iteration at i===particles.length. The inner loop then starts at
+  // j=i+1>particles.length, so its condition is false immediately and the body
+  // that reads particles[i] never runs — a no-op iteration, bit-identical output.
   outer: for (let i = 0; i < particles.length; i += 1) {
     for (let j = i + 1; j < particles.length; j += 1) {
       if (count >= maxConnections) break outer;
@@ -214,6 +218,9 @@ export function appendBursts(
 ): BurstParticle[] {
   const skip = Math.max(0, incoming.length - maxBursts);
   const overflow = bursts.length + (incoming.length - skip) - maxBursts;
+  // Stryker disable next-line EqualityOperator: '>=' additionally fires at
+  // overflow===0, where the body is a no-op either way — copyWithin(0, 0) is a
+  // self-copy and `bursts.length -= 0` doesn't change the length. Bit-identical.
   if (overflow > 0) {
     bursts.copyWithin(0, overflow);
     bursts.length -= overflow;
@@ -424,8 +431,19 @@ function siftDown(heap: KnnHeap, start: number): void {
     const left = parent * 2 + 1;
     const right = left + 1;
     let largest = parent;
-    if (left < size && heap.dist2[left] > heap.dist2[largest]) largest = left;
-    if (right < size && heap.dist2[right] > heap.dist2[largest]) largest = right;
+    // Stryker disable next-line ConditionalExpression,EqualityOperator: siftDown
+    // only ever runs when heap.size === heap.capacity (knnOffer only calls it from
+    // the "already full" branch), so `size` here is always `capacity`, and
+    // dist2/index are Float32Array/Int16Array of exactly that length. Forcing this
+    // gate true or loosening '<' to '<=' can only reach an index >= capacity, which
+    // reads `undefined` from the typed array — and `undefined > x` is always false,
+    // so `largest` never changes as a result. Bit-identical for every reachable input.
+    const leftInRange = left < size;
+    if (leftInRange && heap.dist2[left] > heap.dist2[largest]) largest = left;
+    // Stryker disable next-line ConditionalExpression,EqualityOperator: same
+    // reasoning as the leftInRange guard above — size is always capacity here.
+    const rightInRange = right < size;
+    if (rightInRange && heap.dist2[right] > heap.dist2[largest]) largest = right;
     if (largest === parent) break;
     swapHeap(heap, parent, largest);
     parent = largest;

@@ -136,6 +136,91 @@ describe('background particles engine', () => {
   });
 });
 
+// ── advanceBackgroundParticle — per-frame physics, exact values ─────────────
+
+describe('advanceBackgroundParticle — exact per-frame physics', () => {
+  function step(overrides: Partial<Particle>, width = 1000, height = 1000) {
+    const particle: Particle = {
+      x: 50, y: 50, size: 1, speedX: 0, speedY: 0, opacity: 0.3, fadeSpeed: 0, originalX: 50, originalY: 50,
+      ...overrides,
+    };
+    advanceBackgroundParticle(particle, width, height);
+    return particle;
+  }
+
+  it('adds speedX/speedY/fadeSpeed (not subtracts) when no boundary triggers', () => {
+    const p = step({ x: 50, y: 50, speedX: 0.3, speedY: -0.2, opacity: 0.4, fadeSpeed: 0.05 });
+    expect(p.x).toBeCloseTo(50.3, 10);
+    expect(p.y).toBeCloseTo(49.8, 10);
+    expect(p.opacity).toBeCloseTo(0.45, 10);
+  });
+
+  it('flips fadeSpeed exactly at the low opacity boundary (<=0.1), not only strictly below', () => {
+    // opacity=0, fadeSpeed=0.1 → 0 + 0.1 is bit-identical to the literal 0.1
+    // (unlike e.g. 0.15 + -0.05, which floating-point rounds to
+    // 0.09999999999999999 — just under, not AT, the boundary). Landing
+    // exactly on 0.1 is required to distinguish <= from a strict <.
+    const p = step({ opacity: 0, fadeSpeed: 0.1 });
+    expect(p.opacity).toBe(0.1);
+    expect(p.fadeSpeed).toBe(-0.1); // flipped from +0.1
+  });
+
+  it('flips fadeSpeed exactly at the high opacity boundary (>=0.6)', () => {
+    // opacity=0, fadeSpeed=0.6 → 0 + 0.6 is bit-identical to the literal 0.6.
+    const p = step({ opacity: 0, fadeSpeed: 0.6 });
+    expect(p.opacity).toBe(0.6);
+    expect(p.fadeSpeed).toBe(-0.6); // flipped from +0.6
+  });
+
+  it('does not flip fadeSpeed when opacity lands strictly inside the 0.1–0.6 range', () => {
+    const p = step({ opacity: 0.3, fadeSpeed: 0.05 });
+    expect(p.opacity).toBeCloseTo(0.35, 10);
+    expect(p.fadeSpeed).toBeCloseTo(0.05, 10); // unchanged
+  });
+
+  it('still flips on the low boundary even when nowhere near the high boundary (both clauses required)', () => {
+    // 0.15 + (-0.06) = 0.09, well under 0.6 — only the low-side clause can catch this.
+    const p = step({ opacity: 0.15, fadeSpeed: -0.06 });
+    expect(p.opacity).toBeCloseTo(0.09, 10);
+    expect(p.fadeSpeed).toBeCloseTo(0.06, 10); // flipped
+  });
+
+  it('does not wrap x at exactly 0 (only x < 0 wraps, not x <= 0)', () => {
+    const p = step({ x: 0.2, y: 50, speedX: -0.2, speedY: 0 });
+    expect(p.x).toBe(0);
+  });
+
+  it('wraps x to 0 when strictly greater than width', () => {
+    const p = step({ x: 100.5, y: 50, speedX: 0, speedY: 0 }, 100, 100);
+    expect(p.x).toBe(0);
+  });
+
+  it('leaves x untouched when clearly inside bounds', () => {
+    const p = step({ x: 50, y: 50, speedX: 0, speedY: 0 }, 100, 100);
+    expect(p.x).toBe(50);
+  });
+
+  it('wraps negative y to height (removed-check mutant must not survive)', () => {
+    const p = step({ x: 50, y: -0.3, speedX: 0, speedY: 0 }, 100, 100);
+    expect(p.y).toBe(100);
+  });
+
+  it('does not wrap y at exactly 0 (only y < 0 wraps, not y <= 0)', () => {
+    const p = step({ x: 50, y: 0.3, speedX: 0, speedY: -0.3 }, 100, 100);
+    expect(p.y).toBe(0);
+  });
+
+  it('leaves y untouched when clearly inside bounds', () => {
+    const p = step({ x: 50, y: 50, speedX: 0, speedY: 0 }, 100, 100);
+    expect(p.y).toBe(50);
+  });
+
+  it('does not wrap y at exactly height (only y > height wraps, not y >= height)', () => {
+    const p = step({ x: 50, y: 100, speedX: 0, speedY: 0 }, 100, 100);
+    expect(p.y).toBe(100);
+  });
+});
+
 // ── Spatial grid ───────────────────────────────────────────────────────────
 
 describe('getGridDimensions', () => {
@@ -252,6 +337,14 @@ describe('rebuildSpatialGrid', () => {
     // col=0, row=clamp(-1,0,2)=0 → cell 0
     expect(sg.count[0]).toBe(1);
   });
+
+  it('clamps y >= height to the last row', () => {
+    const sg = createSpatialGrid(3, 3, 8); // rows=3 → valid rows 0,1,2
+    // y=350 with cellSize=100 → floor(3.5)=3 → clamped to 2
+    rebuildSpatialGrid(sg, [makeParticle(50, 350)], 100);
+    // row=2, col=0 → cell index = 2*3+0 = 6
+    expect(sg.count[6]).toBe(1);
+  });
 });
 
 describe('forEachConnectedPair', () => {
@@ -349,6 +442,95 @@ describe('forEachConnectedPair', () => {
     const spatial = gridPairs(particles, connectDist, 200, 200);
     expect(spatial).toHaveLength(brute.length);
   });
+
+  it('excludes a pair exactly at connectDistance (strict <, not <=)', () => {
+    // Two particles precisely 100 units apart with connectDist=100: distance²
+    // equals connectDist² exactly, so the strict "<" must exclude the pair.
+    const sg = createSpatialGrid(5, 5, 8);
+    const particles = [makeParticle(0, 0), makeParticle(100, 0)];
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 100 * 100, (i, j) => pairs.push([i, j]));
+    expect(pairs).toHaveLength(0);
+  });
+
+  it('clamps its own column when searching neighbors, so a far-right particle still finds its true (nearer) cell', () => {
+    // cols=3 → valid cols 0,1,2. A's raw column (3) is one past the max valid
+    // index. The correct clamp (cols-1=2) makes its neighbor search cover
+    // cols {1,2}; an unclamped/looser bound (cols+1=4) would leave the raw
+    // column (3) untouched, making the search cover cols {2,3,4} instead —
+    // missing B's true cell (col 1) entirely.
+    const sg = createSpatialGrid(3, 3, 8);
+    const particles = [makeParticle(305, 50), makeParticle(150, 50)];
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 200 * 200, (i, j) => pairs.push([i, j]));
+    expect(pairs).toEqual([[0, 1]]);
+  });
+
+  it('clamps its own row when searching neighbors, so a far-bottom particle still finds its true (nearer) cell', () => {
+    // Mirrors the column case on the row axis (rows=3 → valid rows 0,1,2).
+    const sg = createSpatialGrid(3, 3, 8);
+    const particles = [makeParticle(50, 305), makeParticle(50, 150)];
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 200 * 200, (i, j) => pairs.push([i, j]));
+    expect(pairs).toEqual([[0, 1]]);
+  });
+
+  it('checks the +1 row offset, not just -1 and 0 (dr must range through 1 inclusive)', () => {
+    const sg = createSpatialGrid(3, 3, 8);
+    const particles = [makeParticle(150, 150), makeParticle(150, 250)]; // A row 1, B row 2
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 150 * 150, (i, j) => pairs.push([i, j]));
+    expect(pairs).toEqual([[0, 1]]);
+  });
+
+  it('does not alias an out-of-range negative nc into the previous row last column', () => {
+    // Flat-index math is `nr * cols + nc`. If the nc<0 guard were dropped,
+    // nc=-1 combined with nr=1 computes to `1*3-1=2`, which is exactly the
+    // flat index of (row=0, col=2) — the PREVIOUS row's last column — a real,
+    // valid, but entirely wrong cell (col 0 and col 2 are two cells apart,
+    // never true neighbors in a 3-column grid). An out-of-range nr can't
+    // alias this way (it multiplies by cols, always landing past the typed
+    // array's length), but nc is the fast-varying term and aliases directly.
+    const sg = createSpatialGrid(3, 3, 8);
+    const particles = [makeParticle(50, 150), makeParticle(250, 50)]; // pc=0/pr=1, pc=2/pr=0
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 60_000, (i, j) => pairs.push([i, j]));
+    expect(pairs).toHaveLength(0); // col 0 and col 2 are not adjacent cells
+  });
+
+  it('does not alias an out-of-range nc===cols into the next row first column', () => {
+    // Mirror of the above on the high side: nc=cols with nr=0 computes to
+    // `0*3+3=3`, the flat index of (row=1, col=0) — the NEXT row's first
+    // column, again two cells away from the true neighborhood.
+    const sg = createSpatialGrid(3, 3, 8);
+    const particles = [makeParticle(250, 50), makeParticle(50, 150)]; // pc=2/pr=0, pc=0/pr=1
+    rebuildSpatialGrid(sg, particles, 100);
+    const pairs: [number, number][] = [];
+    forEachConnectedPair(sg, particles, 100, 60_000, (i, j) => pairs.push([i, j]));
+    expect(pairs).toHaveLength(0);
+  });
+
+  it('does not read stale slots beyond the current per-cell count after a shrink between rebuilds', () => {
+    // Frame 1 fills a cell with 2 particles (data[cellBase+0..1] populated).
+    // Frame 2 rebuilds the SAME grid with only 1 particle mapping to that
+    // cell — count resets to 1, but the underlying `data` typed array is
+    // never zeroed, so slot 1 still holds frame 1's stale particle index.
+    // Reading past the current count (k <= n instead of k < n) would revisit
+    // that stale slot and index into an out-of-range/foreign particle.
+    const sg = createSpatialGrid(5, 5, 8);
+    const frame1 = [makeParticle(10, 10), makeParticle(20, 10), makeParticle(450, 450)];
+    rebuildSpatialGrid(sg, frame1, 100);
+    const frame2 = [makeParticle(15, 15)];
+    rebuildSpatialGrid(sg, frame2, 100);
+    expect(() => {
+      forEachConnectedPair(sg, frame2, 100, 1_000_000, () => {});
+    }).not.toThrow();
+  });
 });
 
 describe('applyMousePull — extracted pointer physics', () => {
@@ -410,6 +592,16 @@ describe('applyMousePull — extracted pointer physics', () => {
     applyMousePull([b], 100, 100, 150, 0.5);
     expect(a.x - 90).toBeCloseTo((b.x - 90) * 2);
   });
+
+  it('computes d2 via dx*dx, not dx/dx — a too-far particle must not slip past the guard', () => {
+    // dx=200 puts the particle outside mouseRadius=150 under real (dx*dx) arithmetic
+    // (d2=40000 >= mouseRadius2=22500). A dx/dx mutation collapses that term to 1,
+    // which would wrongly pass the d2 < mouseRadius2 guard and pull the particle.
+    const p = makeParticle(100, 100);
+    applyMousePull([p], 300, 100, 150);
+    expect(p.x).toBe(100);
+    expect(p.y).toBe(100);
+  });
 });
 
 describe('BACKGROUND_OPACITY_TIERS — batched draw table', () => {
@@ -435,5 +627,50 @@ describe('BACKGROUND_OPACITY_TIERS — batched draw table', () => {
       }
       expect(bucket, `opacity ${opacity} must land in a tier`).toBeGreaterThanOrEqual(0);
     }
+  });
+
+  it('has the exact rgba draw style string for every tier', () => {
+    expect(BACKGROUND_OPACITY_TIERS[0].style).toBe('rgba(129, 140, 248, 0.2)');
+    expect(BACKGROUND_OPACITY_TIERS[1].style).toBe('rgba(129, 140, 248, 0.38)');
+    expect(BACKGROUND_OPACITY_TIERS[2].style).toBe('rgba(129, 140, 248, 0.55)');
+  });
+});
+
+// ── QUALITY_CONFIG catalog — every field, every tier, exactly ───────────────
+
+describe('getBackgroundParticleConfig — exhaustive quality catalog', () => {
+  it('returns the full config object for every quality tier', () => {
+    expect(getBackgroundParticleConfig('full')).toEqual({
+      denominator: 10000,
+      maxParticles: 150,
+      connectDistance: 100,
+      mouseRadius: 150,
+      useConnections: true,
+      useMousePull: true,
+    });
+    expect(getBackgroundParticleConfig('balanced')).toEqual({
+      denominator: 17000,
+      maxParticles: 95,
+      connectDistance: 85,
+      mouseRadius: 120,
+      useConnections: true,
+      useMousePull: true,
+    });
+    expect(getBackgroundParticleConfig('lite')).toEqual({
+      denominator: 32000,
+      maxParticles: 45,
+      connectDistance: 0,
+      mouseRadius: 0,
+      useConnections: false,
+      useMousePull: false,
+    });
+    expect(getBackgroundParticleConfig('reduced')).toEqual({
+      denominator: 100000,
+      maxParticles: 0,
+      connectDistance: 0,
+      mouseRadius: 0,
+      useConnections: false,
+      useMousePull: false,
+    });
   });
 });
