@@ -508,6 +508,42 @@ History (2026-07, kept because the reasoning still applies):
    of the three rejected CSS-delivery approaches without solving the
    underlying tension (avoiding FOUC requires *some* synchronous CSS; getting
    "which CSS" right for this hero section has broken twice).
+6. **React Compiler (`reactCompiler: true`) was actually enabled, measured, and
+   reverted (2026-07) — not just discussed.** Next.js 16's Turbopack supports
+   it natively (config key moved out of `experimental` in this version; no
+   Babel fallback needed — confirmed zero warnings on build). Full test suite
+   passed unchanged (1359/1360; the one failure was the dead-dependency
+   contract needing an allowlist entry, since `babel-plugin-react-compiler`
+   is loaded by Next.js internally and never appears as a literal import).
+   Visual verification via a headless-Chromium pass (hero, skills, contact,
+   certifications, education) found zero console/page errors and no rendering
+   regressions — confirmed the compiler was genuinely active by finding
+   `useMemoCache` (its runtime helper) in 3 built chunks.
+
+   **Reverted anyway.** Three-run median Lighthouse, both form factors,
+   isolated from an unrelated pre-existing HTML-budget drift by rebuilding
+   with/without the flag back-to-back:
+
+   | Metric | Desktop before | Desktop after | Mobile before | Mobile after |
+   | --- | --- | --- | --- | --- |
+   | LCP | 759ms | 802ms | 766ms | 786ms |
+   | TTI | 763ms | 804ms | 768ms | 786ms |
+   | TBT | 0ms | 0ms | 0ms | 0ms |
+   | Total JS (gzip) | 320,593 B | 339,821 B | — | — |
+
+   LCP and TTI got measurably worse on *both* form factors (+20–43ms) and
+   total JS gzip grew 6%, crossing `performance-budgets.mjs`'s threshold.
+   TBT stayed at *zero* before and after — there was no re-render-driven
+   blocking time for auto-memoization to reclaim. This isn't a compiler bug;
+   it's architectural fit. React Compiler's value is auto-memoizing code that
+   *isn't* already hand-memoized — this repo's own §3.4/§3.5 mandates already
+   hand-memoize every collection build and every selection-driven list item,
+   enforced by a contract sweep. Layering the compiler on top of code that's
+   already fully memoized adds its runtime cache-management bytes to every
+   component with nothing left to reclaim. **Revisit only if a future
+   refactor introduces genuinely unmemoized re-render-heavy code the manual
+   discipline hasn't caught** — and re-run this same measurement, don't
+   assume the verdict transfers.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
