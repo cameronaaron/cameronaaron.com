@@ -34,6 +34,7 @@ import {
   getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
+  PARTICLE_COLORS,
   percentToPx,
   stepBursts,
   stepParticles,
@@ -65,6 +66,33 @@ describe('interactive particle engine', () => {
     expect(first).toHaveLength(3);
   });
 
+  it('computes exact particle fields from the seeded random stream (guards each generation formula)', () => {
+    // Independent oracle: the same seeded stream, consumed in the exact order
+    // createInitialParticles consumes it, with the formula re-derived here
+    // rather than copied — catches an operator swap (* vs /, + vs -) in any
+    // of the eight per-particle fields, not just "it's still deterministic".
+    const oracle = createSeededRandom(2024);
+    const rx = oracle();
+    const ry = oracle();
+    const rsize = oracle();
+    const rcolor = oracle();
+    const rvx = oracle();
+    const rvy = oracle();
+    const ropacity = oracle();
+    const rphase = oracle();
+
+    const [p] = createInitialParticles(1, 2024);
+
+    expect(p.x).toBe(rx * 100);
+    expect(p.y).toBe(ry * 100);
+    expect(p.size).toBe(rsize * 3.2 + 1.8);
+    expect(p.color).toBe(PARTICLE_COLORS[Math.floor(rcolor * PARTICLE_COLORS.length)]);
+    expect(p.velocity.x).toBe((rvx - 0.5) * 0.08);
+    expect(p.velocity.y).toBe((rvy - 0.5) * 0.08);
+    expect(p.opacity).toBe(ropacity * 0.45 + 0.25);
+    expect(p.phase).toBe(rphase * Math.PI * 2);
+  });
+
   it('returns expected quality config for full and balanced', () => {
     expect(getQualityConfig('full').count).toBeGreaterThan(getQualityConfig('balanced').count);
     expect(getQualityConfig('lite').count).toBe(0);
@@ -85,6 +113,17 @@ describe('interactive particle engine', () => {
 
     const lines = buildConnections(particles, 10, 2);
     expect(lines.length).toBe(2);
+  });
+
+  it('computes the exact connection opacity from the distance falloff, and the exact pair id', () => {
+    const particles = [
+      { id: 0, x: 0, y: 0, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+      { id: 1, x: 3, y: 4, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 },
+    ];
+    const [line] = buildConnections(particles, 10, 5);
+
+    expect(line.id).toBe(0 * 1000 + 1);
+    expect(line.opacity).toBeCloseTo(CONNECTION_MAX_OPACITY * (1 - 5 / 10), 10);
   });
 
   it('buildConnections reuses a caller-provided pool with zero steady-state allocation', () => {
@@ -154,6 +193,30 @@ describe('interactive particle engine', () => {
     expect(bursts[3].id).toBe(13);
   });
 
+  it('computes exact burst angle/speed/size/color from the random stream, per particle index', () => {
+    const sequence = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+    let call = 0;
+    const random = () => sequence[call++];
+
+    const bursts = createBurstParticles({ baseX: 5, baseY: 6, count: 2, startId: 0, random });
+
+    const angle0 = (Math.PI * 2 * 0) / 2 + 0.1 * 0.45;
+    const speed0 = 0.55 + 0.2 * 0.85;
+    expect(bursts[0].vx).toBeCloseTo(Math.cos(angle0) * speed0);
+    expect(bursts[0].vy).toBeCloseTo(Math.sin(angle0) * speed0);
+    expect(bursts[0].size).toBeCloseTo(2.2 + 0.3 * 2.1);
+    expect(bursts[0].color).toBe(PARTICLE_COLORS[Math.floor(0.4 * PARTICLE_COLORS.length)]);
+
+    // Index 1 of 2 proves the angle formula actually uses `i` (a stale copy
+    // of index 0's angle would be caught here, not just an operator swap).
+    const angle1 = (Math.PI * 2 * 1) / 2 + 0.5 * 0.45;
+    const speed1 = 0.55 + 0.6 * 0.85;
+    expect(bursts[1].vx).toBeCloseTo(Math.cos(angle1) * speed1);
+    expect(bursts[1].vy).toBeCloseTo(Math.sin(angle1) * speed1);
+    expect(bursts[1].size).toBeCloseTo(2.2 + 0.7 * 2.1);
+    expect(bursts[1].color).toBe(PARTICLE_COLORS[Math.floor(0.8 * PARTICLE_COLORS.length)]);
+  });
+
   it('steps particles while keeping them in viewport bounds', () => {
     const next = stepParticles(
       [
@@ -179,6 +242,74 @@ describe('interactive particle engine', () => {
     expect(next[0].y).toBeLessThanOrEqual(100);
   });
 
+  it('computes the exact phase/velocity/position update with the pointer inactive', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0.01, y: -0.01 }, opacity: 1, phase: 0.5 }],
+      2,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    const expectedPhase = 0.5 + 0.025 * 2;
+    const expectedVX = 0.01 + Math.sin(expectedPhase) * 0.0023;
+    const expectedVY = -0.01 + Math.cos(expectedPhase * 0.86) * 0.002;
+    const expectedX = 50 + expectedVX * 2;
+    const expectedY = 50 + expectedVY * 2;
+
+    expect(p.phase).toBeCloseTo(expectedPhase, 10);
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+    expect(p.velocity.x).toBeCloseTo(expectedVX * 0.998, 10);
+    expect(p.velocity.y).toBeCloseTo(expectedVY * 0.998, 10);
+  });
+
+  it('computes the exact pointer-attraction pull when in range, scaled by the full-tier attraction strength', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 50, y: 50, size: 1, color: 'x', velocity: { x: 0, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 55, y: 50, active: true },
+      'full'
+    );
+
+    const phase = 0 + 0.025 * 1;
+    const oscVX = 0 + Math.sin(phase) * 0.0023;
+    const oscVY = 0 + Math.cos(phase * 0.86) * 0.002;
+    const preNextX = 50 + oscVX * 1;
+    const preNextY = 50 + oscVY * 1;
+    const dx = 55 - preNextX;
+    const dy = 50 - preNextY;
+    const dist2 = dx * dx + dy * dy;
+    const distance = Math.sqrt(dist2);
+    const pull = (22 - distance) / 22; // POINTER_ATTRACT_RADIUS = 22
+    const pulledVX = oscVX + (dx / distance) * pull * 0.012 * 1; // ATTRACTION_STRENGTH_FULL
+    const pulledVY = oscVY + (dy / distance) * pull * 0.012 * 1;
+    const expectedX = preNextX + pulledVX;
+    const expectedY = preNextY + pulledVY;
+
+    expect(p.x).toBeCloseTo(expectedX, 10);
+    expect(p.y).toBeCloseTo(expectedY, 10);
+    expect(p.velocity.x).toBeCloseTo(pulledVX * 0.998, 10);
+    expect(p.velocity.y).toBeCloseTo(pulledVY * 0.998, 10);
+  });
+
+  it('bounces off the right/bottom viewport edge with the exact damping factor', () => {
+    const [p] = stepParticles(
+      [{ id: 1, x: 99.99, y: 50, size: 1, color: 'x', velocity: { x: 5, y: 0 }, opacity: 1, phase: 0 }],
+      1,
+      { x: 0, y: 0, active: false },
+      'balanced'
+    );
+
+    // Velocity overshoots past x=100, triggering the bounce branch: clamp to
+    // 100 and flip+damp velocity by exactly -0.98, then the steady 0.998 drag.
+    const phase = 0 + 0.025 * 1;
+    const oscVX = 5 + Math.sin(phase) * 0.0023;
+    const bouncedVX = oscVX * -0.98;
+
+    expect(p.x).toBe(100);
+    expect(p.velocity.x).toBeCloseTo(bouncedVX * 0.998, 10);
+  });
+
   it('steps bursts and removes expired particles', () => {
     const next = stepBursts(
       [
@@ -191,6 +322,16 @@ describe('interactive particle engine', () => {
     expect(next).toHaveLength(1);
     expect(next[0].id).toBe(2);
     expect(next[0].life).toBeLessThan(1);
+  });
+
+  it('computes the exact position/velocity/life decay for a surviving burst', () => {
+    const [b] = stepBursts([{ id: 1, x: 10, y: 20, vx: 2, vy: -1, life: 1, size: 2, color: 'x' }], 3);
+
+    expect(b.life).toBeCloseTo(1 - 0.03 * 3, 10);
+    expect(b.x).toBeCloseTo(10 + 2 * 3, 10);
+    expect(b.y).toBeCloseTo(20 + -1 * 3, 10);
+    expect(b.vx).toBeCloseTo(2 * 0.985, 10);
+    expect(b.vy).toBeCloseTo(-1 * 0.985, 10);
   });
 
   it('exports pulse constants matching the old Framer keyframe animation', () => {
@@ -212,6 +353,20 @@ describe('interactive particle engine', () => {
 
     const fullCycle = getParticlePulse(PULSE_BASE_DURATION_MS, 0);
     expect(fullCycle.scale).toBeCloseTo(1);
+  });
+
+  it('computes the exact pulse scale/opacity for a nonzero particle id (guards the per-id duration offset)', () => {
+    // particleId=0 above can't distinguish + from - in the duration formula
+    // (0 * step is 0 either way) — a nonzero id actually shifts the period.
+    const particleId = 7;
+    const timeMs = 500;
+    const duration = PULSE_BASE_DURATION_MS + (particleId % PULSE_DURATION_VARIANTS) * PULSE_DURATION_STEP_MS;
+    const wave = 0.5 - 0.5 * Math.cos((Math.PI * 2 * timeMs) / duration);
+
+    const pulse = getParticlePulse(timeMs, particleId);
+
+    expect(pulse.scale).toBeCloseTo(1 + PULSE_SCALE_AMPLITUDE * wave, 10);
+    expect(pulse.opacityMultiplier).toBeCloseTo(1 + PULSE_OPACITY_AMPLITUDE * wave, 10);
   });
 
   it('getParticlePulse writes into a caller-provided scratch object without allocating', () => {
@@ -337,6 +492,37 @@ describe('cursor constellation — bounded max-heap K-nearest', () => {
     expect(heap.size).toBe(2);
     expect(heap.dist2[0]).toBe(rootBefore);
     expect(Array.from(heap.index.slice(0, 2)).sort()).toEqual([0, 1]);
+  });
+
+  it('maintains the exact max-heap array layout through a known offer sequence (guards sift-up/down comparisons)', () => {
+    // The final kept SET is insensitive to some comparison-operator mutants
+    // as long as the overall result still happens to be correct — this pins
+    // the exact array layout after each step, which only the real sift-up/
+    // sift-down comparisons reproduce.
+    const heap = createKnnHeap(3);
+    knnOffer(heap, 5, 0);
+    knnOffer(heap, 2, 1);
+    knnOffer(heap, 8, 2);
+    knnOffer(heap, 1, 3); // replaces the root (8) — 1 < 8
+    knnOffer(heap, 9, 4); // rejected — 9 is not < the current root (5)
+
+    expect(Array.from(heap.dist2)).toEqual([5, 2, 1]);
+    expect(Array.from(heap.index)).toEqual([0, 1, 3]);
+    expect(heap.size).toBe(3);
+  });
+
+  it('sift-down recurses correctly past the root into a non-root parent (guards the child-index arithmetic)', () => {
+    // A capacity-3 heap only ever sifts down from index 0, where parent*2
+    // and parent/2 are both 0 — indistinguishable. A deeper heap forces the
+    // recursion into a parent > 0, where the two diverge.
+    const heap = createKnnHeap(7);
+    for (const [d, i] of [[10, 0], [9, 1], [8, 2], [7, 3], [6, 4], [5, 5], [4, 6]] as const) {
+      knnOffer(heap, d, i);
+    }
+    knnOffer(heap, 1, 7); // replaces the root, must sift down past level 0
+
+    expect(Array.from(heap.dist2)).toEqual([9, 7, 8, 1, 6, 5, 4]);
+    expect(Array.from(heap.index)).toEqual([1, 3, 2, 7, 4, 5, 6]);
   });
 
   it('resetKnnHeap empties the heap for reuse without reallocating', () => {

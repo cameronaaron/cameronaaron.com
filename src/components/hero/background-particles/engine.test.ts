@@ -84,6 +84,27 @@ describe('background particles engine', () => {
     expect(particle.size).toBe(2);
   });
 
+  it('computes every particle field exactly from a varying random stream (0.5 collapses +/- and */ differences)', () => {
+    // A constant 0.5 input makes `random() - 0.5` equal 0 regardless of a +/-
+    // swap, and many *0.5 / /0.5 pairs coincide at that value too — a varying
+    // sequence is required to actually distinguish the operators.
+    const sequence = [0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9, 0.15];
+    let call = 0;
+    const random = () => sequence[call++];
+
+    const p = createBackgroundParticle(200, 100, random);
+
+    expect(p.x).toBeCloseTo(0.1 * 200, 10);
+    expect(p.y).toBeCloseTo(0.2 * 100, 10);
+    expect(p.originalX).toBeCloseTo(0.3 * 200, 10);
+    expect(p.originalY).toBeCloseTo(0.4 * 100, 10);
+    expect(p.size).toBeCloseTo(0.6 * 2 + 1, 10);
+    expect(p.speedX).toBeCloseTo((0.7 - 0.5) * 0.5, 10);
+    expect(p.speedY).toBeCloseTo((0.8 - 0.5) * 0.5, 10);
+    expect(p.opacity).toBeCloseTo(0.9 * 0.5 + 0.2, 10);
+    expect(p.fadeSpeed).toBeCloseTo((0.15 - 0.5) * 0.01, 10);
+  });
+
   it('builds a particle collection for the active config', () => {
     const config = getBackgroundParticleConfig('balanced');
     const particles = createBackgroundParticles(340, 170, config, () => 0.5);
@@ -350,6 +371,21 @@ describe('applyMousePull — extracted pointer physics', () => {
     // far: outside the radius — untouched
     expect(far.x).toBe(500);
     expect(far.y).toBe(500);
+  });
+
+  it('pulls diagonally (nonzero dx AND dy) with the exact force magnitude', () => {
+    // The x-only case above can't distinguish the y-axis arithmetic (dy=0
+    // there, so any +/- or */ mutation on the y term is a no-op). A diagonal
+    // pull exercises both axes with nonzero deltas.
+    const p = makeParticle(90, 90);
+    applyMousePull([p], 100, 100, 150);
+
+    const dx = 100 - 90;
+    const dy = 100 - 90;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const force = (150 - distance) / 150;
+    expect(p.x).toBeCloseTo(90 + (dx / distance) * force * MOUSE_PULL_STRENGTH, 10);
+    expect(p.y).toBeCloseTo(90 + (dy / distance) * force * MOUSE_PULL_STRENGTH, 10);
   });
 
   it('closer particles receive a stronger pull than distant ones', () => {
