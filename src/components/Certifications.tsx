@@ -1,23 +1,50 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { certifications, inProgressCertifications } from '@/data/certifications';
 import {
   buildCertificationCollections,
   buildVerificationHref,
+  evaluateCertificationStatus,
   getInProgressAnimationOffset,
   getVerifiedCheckmarkTransition,
+  PRE_HYDRATION_STATUS_ANCHOR,
+  STATUS_ICON_PATH,
+  STATUS_ICON_STYLES,
+  type CertificationStatusInfo,
 } from '@/components/certifications/logic';
 
-/** Animated checkmark that draws itself in once, when its row scrolls into view. */
-function VerifiedCheckmark({ index }: { index: number }) {
+/** Feedback strip shown under an expiring/expired credential's status cell — the "say something" requirement. */
+function StatusFeedback({ info }: { info: CertificationStatusInfo }) {
+  if (info.kind === 'verified' || info.monthsUntilExpiry === undefined) return null;
+
+  if (info.kind === 'expired') {
+    // 'expired' only classifies monthsUntilExpiry < 0 (see evaluateCertificationStatus),
+    // so the magnitude here is always >= 1 — no "this month" (0-month) case is reachable.
+    const months = Math.abs(info.monthsUntilExpiry);
+    return (
+      <p className="text-red-300 text-xs mt-0.5" role="status">
+        Expired {months} month{months === 1 ? '' : 's'} ago — renewal needed
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-amber-300 text-xs mt-0.5" role="status">
+      Expires in {info.monthsUntilExpiry} month{info.monthsUntilExpiry === 1 ? '' : 's'} — renew soon
+    </p>
+  );
+}
+
+/** Status icon that draws itself in once, when its row scrolls into view: a check, a warning triangle, or an X — reacting to how close the credential is to expiry. */
+function StatusIcon({ index, info }: { index: number; info: CertificationStatusInfo }) {
   const transition = getVerifiedCheckmarkTransition(index);
   return (
     <motion.svg
       viewBox="0 0 24 24"
-      className="h-4 w-4 flex-shrink-0 text-emerald-400"
+      className={`h-4 w-4 flex-shrink-0 ${STATUS_ICON_STYLES[info.kind]}`}
       aria-hidden="true"
       fill="none"
       stroke="currentColor"
@@ -29,7 +56,7 @@ function VerifiedCheckmark({ index }: { index: number }) {
       viewport={{ once: true }}
       transition={transition}
     >
-      <path d="M4 12.5 9.5 18 20 6" />
+      <path d={STATUS_ICON_PATH[info.kind]} />
     </motion.svg>
   );
 }
@@ -39,6 +66,17 @@ export default function Certifications() {
     () => buildCertificationCollections(certifications, inProgressCertifications),
     []
   );
+
+  // Hydration-safe live clock (mirrors LocalTimeStatus): anchor pre-mount so
+  // server and first client render agree, then correct to the real date
+  // once mounted — see PRE_HYDRATION_STATUS_ANCHOR's doc comment.
+  const [now, setNow] = useState(PRE_HYDRATION_STATUS_ANCHOR);
+  useEffect(() => {
+    // Post-hydration half of the SSR-safe-initial-state pattern (CLAUDE.md #10):
+    // the real clock can only be read client-side, after the anchor-dated first render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNow(new Date());
+  }, []);
 
   return (
     <section id="certifications" className="py-20 bg-background relative overflow-hidden" aria-labelledby="certifications-heading">
@@ -74,11 +112,14 @@ export default function Certifications() {
               className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-cyan-500/5 hover:border-cyan-500/10 transition-colors duration-200 cursor-default"
             >
               <p className="col-span-4 flex items-center gap-2 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">
-                <VerifiedCheckmark index={index} />
+                <StatusIcon index={index} info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
               <p className="col-span-3 text-muted-foreground group-hover:text-foreground/70 transition-colors">{cert.issuer}</p>
-              <p className="col-span-3 text-cyan-300">{cert.status}</p>
+              <div className="col-span-3">
+                <p className="text-cyan-300">{cert.status}</p>
+                <StatusFeedback info={evaluateCertificationStatus(cert.status, now)} />
+              </div>
               <a
                 href={buildVerificationHref(cert)}
                 target="_blank"
@@ -104,11 +145,12 @@ export default function Certifications() {
               className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
             >
               <p className="flex items-center gap-2 text-foreground font-semibold mb-2">
-                <VerifiedCheckmark index={index} />
+                <StatusIcon index={index} info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
               <p className="text-muted-foreground text-sm mb-1">{cert.issuer}</p>
               <p className="text-cyan-300 text-sm mb-1">{cert.status}</p>
+              <StatusFeedback info={evaluateCertificationStatus(cert.status, now)} />
               <p className="text-muted-foreground text-xs">
                 Credential:{' '}
                 <a
