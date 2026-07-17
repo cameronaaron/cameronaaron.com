@@ -411,21 +411,34 @@ History (2026-07, kept because the reasoning still applies):
    3.6s→4.0s). The sections stay statically imported — see the comment in
    `src/app/page.tsx`.
 
-   **Reconsidered (2026-07), not re-attempted:** this result is specific to
-   *whole-section* splitting on a fully static export (`output: 'export'` —
-   no server runtime, no streaming SSR, so client-side JS chunking via
-   `next/dynamic` is the only code-splitting lever available at all; there is
-   no server-rendered-shell-plus-streamed-islands option to reach for
-   instead). It doesn't necessarily rule out a *narrower* application: dynamic
-   `import()` for a single genuinely heavy, rarely-interacted-with widget deep
-   in the page (candidates: the force-directed skill web, the interactive
-   particle canvas) rather than an entire section, where the chunk is small
-   enough that a preloaded/parallel fetch might not deepen the critical path
-   the same way splitting a whole section did. That's an untested hypothesis,
-   not a finding — re-attempting it demands the same discipline as the
-   original experiment (a real `npx @lhci/cli autorun` baseline and
-   after-measurement on both form factors, not a guess), which this note
-   doesn't replace. Don't split further without doing that measurement.
+   **Reconsidered and re-measured (2026-07):** a narrower hypothesis — dynamic
+   `import()` for a single decorative widget (`SkillWeb`, the force-directed
+   canvas background in `Skills.tsx`, `ssr: false`) instead of an entire
+   section — was actually tested this time, not just proposed. Three-run
+   median `npx @lhci/cli autorun` before/after on both form factors:
+
+   | Metric | Desktop before | Desktop after | Mobile before | Mobile after |
+   | --- | --- | --- | --- | --- |
+   | Performance | 0.99 | 0.99 | 1.00 | 1.00 |
+   | FCP | 370ms | 370ms | 370ms | 371ms |
+   | LCP | 759ms | 761ms | 766ms | 767ms |
+   | TBT | 0ms | 0ms | 0ms | 0ms |
+   | Speed Index | 1052ms | 1032ms | 828ms | 826ms |
+   | TTI | 763ms | 763ms | 768ms | 769ms |
+
+   No metric moved outside run-to-run noise in either direction. **Reverted**
+   (`SkillWeb` stays a static import) — not because splitting regressed
+   anything this time, but because it didn't measurably help either: the page
+   was already sub-second and 0.99-1.0 across the board before touching it,
+   so there was no headroom left for a code-split to recover. Splitting adds
+   real cost regardless of the measurement (an extra chunk boundary, a
+   loading-state to reason about, one more thing that can fail to load) —
+   that cost needs a measured benefit to justify it, and here there wasn't
+   one. The lesson isn't "narrow splits don't work"; it's "measure the
+   *headroom* before reaching for a fix — a page with nothing slow to fix has
+   nothing for code-splitting to win back." Revisit only if a future
+   regression actually creates that headroom, and measure again rather than
+   assuming this result still holds.
 5. A full audit of every open Lighthouse warning (2026-07) fixed three for
    real and root-caused the rest as not safely fixable from application code.
 
