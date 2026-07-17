@@ -4,6 +4,10 @@ import {
   buildCertificationCollections,
   buildVerificationHref,
   getInProgressAnimationOffset,
+  getVerifiedCheckmarkTransition,
+  CHECKMARK_DRAW_BASE_DELAY,
+  CHECKMARK_DRAW_STAGGER,
+  CHECKMARK_DRAW_DURATION,
 } from '@/components/certifications/logic';
 
 describe('certifications logic', () => {
@@ -35,5 +39,20 @@ describe('certifications logic', () => {
     expect(getInProgressAnimationOffset(0)).toBe(-16);
     expect(getInProgressAnimationOffset(1)).toBe(16);
     expect(getInProgressAnimationOffset(2)).toBe(-16);
+  });
+
+  it('staggers the verified checkmark draw-in after each row fades in', () => {
+    expect(getVerifiedCheckmarkTransition(0)).toEqual({
+      delay: CHECKMARK_DRAW_BASE_DELAY,
+      duration: CHECKMARK_DRAW_DURATION,
+    });
+    expect(getVerifiedCheckmarkTransition(3)).toEqual({
+      delay: CHECKMARK_DRAW_BASE_DELAY + 3 * CHECKMARK_DRAW_STAGGER,
+      duration: CHECKMARK_DRAW_DURATION,
+    });
+    // Later rows always draw later, never sooner.
+    expect(getVerifiedCheckmarkTransition(5).delay).toBeGreaterThan(
+      getVerifiedCheckmarkTransition(2).delay
+    );
   });
 });

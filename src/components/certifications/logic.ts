@@ -32,3 +32,25 @@ export function buildCertificationCollections(
 export function getInProgressAnimationOffset(index: number): number {
   return index % 2 === 0 ? -16 : 16;
 }
+
+/** Verified-row checkmark draw: starts once the row itself has faded in. */
+export const CHECKMARK_DRAW_BASE_DELAY = 0.25;
+export const CHECKMARK_DRAW_STAGGER = 0.04;
+export const CHECKMARK_DRAW_DURATION = 0.45;
+
+export interface CheckmarkDrawTransition {
+  delay: number;
+  duration: number;
+}
+
+/**
+ * Stroke-draw timing for the verified-credential checkmark icon: an
+ * `pathLength: 0 -> 1` animation that starts just after the row's own
+ * fade-in, staggered by row index like the rest of the table.
+ */
+export function getVerifiedCheckmarkTransition(index: number): CheckmarkDrawTransition {
+  return {
+    delay: CHECKMARK_DRAW_BASE_DELAY + index * CHECKMARK_DRAW_STAGGER,
+    duration: CHECKMARK_DRAW_DURATION,
+  };
+}

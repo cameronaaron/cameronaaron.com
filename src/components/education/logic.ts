@@ -21,10 +21,18 @@ export interface SortedEducationItem extends EducationItem {
   pillLinks: EducationVerificationLink[];
 }
 
+export interface PrerequisiteProgress {
+  completed: number;
+  total: number;
+  /** 0-100, rounded — the width the progress bar animates to. */
+  percent: number;
+}
+
 export interface EducationCollections {
   sortedEducationItems: SortedEducationItem[];
   sortedHonorsAndAffiliations: HonorItem[];
   sortedPrerequisiteCourses: SortedPrerequisiteCourse[];
+  prerequisiteProgress: PrerequisiteProgress;
 }
 
 const EMPTY_PILL_LINKS: EducationVerificationLink[] = [];
@@ -77,14 +85,32 @@ function decorateEducationItems(items: EducationItem[]): SortedEducationItem[] {
   return decorated;
 }
 
+/**
+ * Completed/total prerequisite counts, single pass over the already-decorated
+ * list (reuses each course's precomputed `nonFinalized` flag rather than
+ * re-scanning status text). A course with zero total courses reports 0%
+ * rather than dividing by zero.
+ */
+export function calculatePrerequisiteProgress(courses: SortedPrerequisiteCourse[]): PrerequisiteProgress {
+  let completed = 0;
+  for (const course of courses) {
+    if (!course.nonFinalized) completed += 1;
+  }
+  const total = courses.length;
+  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+  return { completed, total, percent };
+}
+
 export function buildEducationCollections(
   educationItems: EducationItem[],
   prerequisiteCourses: PrerequisiteCourse[],
   honorsAndAffiliations: HonorItem[]
 ): EducationCollections {
+  const sortedPrerequisiteCourses = sortPrerequisiteCourses(prerequisiteCourses);
   return {
     sortedEducationItems: decorateEducationItems(sortByDateDesc(educationItems, (item) => item.period)),
     sortedHonorsAndAffiliations: sortByDateDesc(honorsAndAffiliations, (item) => item.label),
-    sortedPrerequisiteCourses: sortPrerequisiteCourses(prerequisiteCourses),
+    sortedPrerequisiteCourses,
+    prerequisiteProgress: calculatePrerequisiteProgress(sortedPrerequisiteCourses),
   };
 }

@@ -8,7 +8,31 @@ import {
   buildCertificationCollections,
   buildVerificationHref,
   getInProgressAnimationOffset,
+  getVerifiedCheckmarkTransition,
 } from '@/components/certifications/logic';
+
+/** Animated checkmark that draws itself in once, when its row scrolls into view. */
+function VerifiedCheckmark({ index }: { index: number }) {
+  const transition = getVerifiedCheckmarkTransition(index);
+  return (
+    <motion.svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4 flex-shrink-0 text-emerald-400"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      initial={{ pathLength: 0, opacity: 0 }}
+      whileInView={{ pathLength: 1, opacity: 1 }}
+      viewport={{ once: true }}
+      transition={transition}
+    >
+      <path d="M4 12.5 9.5 18 20 6" />
+    </motion.svg>
+  );
+}
 
 export default function Certifications() {
   const { sortedCertifications, sortedInProgressCertifications } = useMemo(
@@ -49,7 +73,10 @@ export default function Certifications() {
               transition={{ delay: index * 0.04 }}
               className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-cyan-500/5 hover:border-cyan-500/10 transition-colors duration-200 cursor-default"
             >
-              <p className="col-span-4 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">{cert.name}</p>
+              <p className="col-span-4 flex items-center gap-2 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">
+                <VerifiedCheckmark index={index} />
+                {cert.name}
+              </p>
               <p className="col-span-3 text-muted-foreground group-hover:text-foreground/70 transition-colors">{cert.issuer}</p>
               <p className="col-span-3 text-cyan-300">{cert.status}</p>
               <a
@@ -76,7 +103,10 @@ export default function Certifications() {
               transition={{ delay: index * 0.03 }}
               className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
             >
-              <p className="text-foreground font-semibold mb-2">{cert.name}</p>
+              <p className="flex items-center gap-2 text-foreground font-semibold mb-2">
+                <VerifiedCheckmark index={index} />
+                {cert.name}
+              </p>
               <p className="text-muted-foreground text-sm mb-1">{cert.issuer}</p>
               <p className="text-cyan-300 text-sm mb-1">{cert.status}</p>
               <p className="text-muted-foreground text-xs">
