@@ -2,7 +2,7 @@
   "name": "cameron-aaron-portfolio",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.13.0",
+  "packageManager": "pnpm@11.13.1",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -48,6 +48,7 @@
     "test:modularization": "sh -c 'vitest run src/modularization-contract.test.ts src/module-testability-contract.test.ts src/dead-component-contract.test.ts src/public-assets-freshness-contract.test.ts $(find src/components -type f \\( -name logic.test.ts -o -name \\*-logic.test.ts -o -name engine.test.ts -o -name builders.test.ts \\) | sort) src/components/projects/FeaturedIcon.test.tsx src/components/contact/SocialPlatformIcon.test.tsx src/components/ui/floating-badge-icon.test.tsx src/components/ui/section-transitions.test.tsx'",
     "test:coverage": "vitest run --coverage",
     "test:coverage:v8": "vitest run --coverage --coverage.provider=v8",
+    "test:mutation": "stryker run",
     "test:a11y:contracts": "vitest run src/app/wcag-contract.test.tsx src/app/a11y-regressions.test.tsx src/components/sections-a11y.test.tsx src/components/navigation-a11y.test.tsx src/components/faq-a11y.test.tsx src/components/ui/keyboard-shortcuts.test.tsx",
     "test:a11y:scanners": "node scripts/checks/run-a11y-scanners.mjs",
     "test:a11y:external": "node scripts/checks/run-pa11y-external.mjs",
@@ -74,7 +75,9 @@
   },
   "devDependencies": {
     "@cloudflare/kv-asset-handler": "^0.5.0",
-    "@tailwindcss/postcss": "^4.3.2",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
+    "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
@@ -88,9 +91,9 @@
     "markdownlint-cli2": "^0.23.0",
     "postcss": "^8.5.19",
     "simple-git-hooks": "^2.13.1",
-    "tailwindcss": "^4.3.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.111.0"
   }
 }

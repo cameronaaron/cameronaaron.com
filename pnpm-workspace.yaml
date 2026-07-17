@@ -5,14 +5,17 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20260708.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20260708.1'
-  - '@cloudflare/workerd-linux-64@1.20260708.1'
-  - '@cloudflare/workerd-linux-arm64@1.20260708.1'
-  - '@cloudflare/workerd-windows-64@1.20260708.1'
-  - miniflare@4.20260708.1
-  - workerd@1.20260708.1
-  - wrangler@4.110.0
+  - '@cloudflare/workerd-darwin-64@1.20260710.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20260710.1'
+  - '@cloudflare/workerd-linux-64@1.20260710.1'
+  - '@cloudflare/workerd-linux-arm64@1.20260710.1'
+  - '@cloudflare/workerd-windows-64@1.20260710.1'
+  - miniflare@4.20260710.0
+  - workerd@1.20260710.1
+  - wrangler@4.111.0
 overrides:
   postcss: ">=8.5.10"
   "@opentelemetry/core": ">=2.8.0"
+  # GHSA-q8mj-m7cp-5q26 (moderate): qs.stringify DoS, fixed >=6.15.2.
+  # Pulled in transitively via @stryker-mutator/core > typed-rest-client > qs.
+  qs: ">=6.15.2"

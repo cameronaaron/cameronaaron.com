@@ -43,6 +43,7 @@ const KNOWN_INDIRECT_DEPENDENCIES: Record<string, string> = {
   '@vitest/coverage-istanbul': "selected via vitest.config.ts's coverage.provider: 'istanbul' setting, not a literal package-name reference",
   '@vitest/coverage-v8': 'selected via the --coverage.provider=v8 CLI flag in test:coverage:v8, not a literal package-name reference',
   postcss: "required peer of @tailwindcss/postcss's config-loading convention; postcss.config.mjs is postcss's own config format",
+  '@stryker-mutator/core': 'required host package of the @stryker-mutator/vitest-runner plugin (referenced by name in stryker.config.mjs); invoked via its own "stryker" CLI binary in test:mutation, never imported by its scoped package name',
 };
 
 function listCodeFiles(dir: string): string[] {
@@ -89,6 +90,7 @@ function listRootConfigFiles(): string[] {
     'lighthouserc.json',
     'lighthouserc.mobile.json',
     '.markdownlint-cli2.jsonc',
+    'stryker.config.mjs',
   ];
   return candidates.map((name) => join(ROOT, name));
 }
