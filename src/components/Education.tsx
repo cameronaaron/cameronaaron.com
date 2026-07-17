@@ -7,10 +7,8 @@ import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/da
 import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
 
 export default function Education() {
-  const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses } = useMemo(
-    () => buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations),
-    []
-  );
+  const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses, prerequisiteProgress } =
+    useMemo(() => buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations), []);
 
   return (
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">
@@ -84,7 +82,29 @@ export default function Education() {
           aria-label="Nursing program prerequisite coursework table"
           tabIndex={0}
         >
-          <h3 className="text-2xl font-bold text-foreground mb-5 font-display">Nursing Program Prerequisite Coursework</h3>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h3 className="text-2xl font-bold text-foreground font-display">Nursing Program Prerequisite Coursework</h3>
+            <p className="text-sm font-medium text-cyan-200/80 flex-shrink-0" aria-hidden="true">
+              {prerequisiteProgress.completed}/{prerequisiteProgress.total} complete
+            </p>
+          </div>
+
+          <div
+            className="mb-6 h-2 w-full overflow-hidden rounded-full bg-white/5"
+            role="progressbar"
+            aria-valuenow={prerequisiteProgress.percent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Nursing prerequisite coursework: ${prerequisiteProgress.completed} of ${prerequisiteProgress.total} courses complete`}
+          >
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
+              initial={{ width: '0%' }}
+              whileInView={{ width: `${prerequisiteProgress.percent}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+            />
+          </div>
 
           <div className="hidden md:grid md:grid-cols-12 md:gap-3 md:px-3 md:py-2 md:text-xs md:uppercase md:tracking-wider md:text-muted-foreground md:border-b md:border-white/10 md:min-w-[920px]">
             <p className="md:col-span-3">Requirement</p>
