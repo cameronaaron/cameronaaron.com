@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
+import HeartbeatMonitor from '@/components/certifications/HeartbeatMonitor';
 import { certifications, inProgressCertifications } from '@/data/certifications';
 import {
   buildCertificationCollections,
@@ -93,6 +94,10 @@ export default function Certifications() {
           subtitle="Current emergency and healthcare credentials with verifiable status"
           className="[&>h2]:font-display"
         />
+
+        <div className="-mt-8 mb-8">
+          <HeartbeatMonitor />
+        </div>
 
         <div className="hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
           <div className="grid grid-cols-12 gap-4 px-6 py-4 text-xs uppercase tracking-wider text-muted-foreground border-b border-white/10">
