@@ -19,7 +19,7 @@ describe('Certifications — reactive expiry status', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2027, 10, 15)); // Nov 2027 — EMT (LA County) expires Feb 2028, 3 months out
     render(<Certifications />);
-    expect(screen.getAllByText(/expires in 3 months.*renew soon/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Expires in 3 months — renew soon').length).toBeGreaterThan(0);
   });
 
   it('flags every dated credential as expired long past its printed expiry', () => {

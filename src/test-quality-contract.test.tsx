@@ -22,6 +22,10 @@
  *      of the shared mock's fidelity (exactly how a style assertion
  *      silently couldn't work in hero-coverage.test.tsx), so adding one is
  *      a decision on record, not a default.
+ *   4. Rendered-text queries (getByText/getAllByText/etc.) may not use a
+ *      wildcard (`.*`/`.+`) regex — a mutant that changes what's between the
+ *      anchors, or a query that matches unrelated concatenated content, can
+ *      still satisfy it. Prefer an exact string or a precise boundary regex.
  */
 import React from 'react';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -75,6 +79,41 @@ describe('test-quality-contract — no assertion that cannot fail', () => {
     }
 
     expect(offenders, `always-true assertion(s) — these can never fail:\n${offenders.join('\n')}`).toEqual([]);
+  });
+
+  it('no rendered-text query uses a wildcard regex that any content could satisfy', () => {
+    // getByText/getAllByText/etc. assert on what the USER actually sees. A
+    // regex like /expires in 3 months.*renew soon/ passes as long as SOME
+    // text sits between the two anchors — a mutant that renders the wrong
+    // number, or drops the connecting content entirely and concatenates two
+    // unrelated fragments, can still satisfy it. Found 2026-07 in this
+    // repo's own reactive-status test; fixed to an exact string. Static
+    // SOURCE-TEXT sweeps (contract tests that scan .ts/.tsx source for a
+    // coding convention, e.g. animation-regression-contract.test.ts) are a
+    // different category — not in scope here, since they're testing code
+    // shape, not rendered output, and already have their own review history.
+    const RTL_TEXT_QUERY_RE =
+      /\b(?:get|getAll|query|queryAll|find|findAll)ByText\(\s*(\/(?:[^/\\\n]|\\.)*\/[a-z]*)/g;
+    const WILDCARD_RE = /(?<!\\)\.[*+]/; // an un-escaped `.*` or `.+` inside the regex source
+
+    const offenders: string[] = [];
+    for (const file of listTestFiles()) {
+      const text = readFileSync(file, 'utf8');
+      for (const match of text.matchAll(RTL_TEXT_QUERY_RE)) {
+        const regexSource = match[1];
+        if (WILDCARD_RE.test(regexSource)) {
+          const line = text.slice(0, match.index).split('\n').length;
+          offenders.push(
+            `  ${file.replace(`${SRC}/`, 'src/')}:${line} — ${regexSource} (use an exact string, or split into two precise assertions)`,
+          );
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      `wildcard regex(es) in a rendered-text query — these pass regardless of what's between the anchors:\n${offenders.join('\n')}`,
+    ).toEqual([]);
   });
 
   it('local framer-motion mocks are a documented decision, not a default', () => {
