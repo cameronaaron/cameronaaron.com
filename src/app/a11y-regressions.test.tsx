@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 function readSource(relativePath: string): string {
@@ -88,5 +89,64 @@ describe('Accessibility regression guards', () => {
       offenders,
       `custom-widget role with no onKeyDown handler anywhere in the file — every pointer interaction needs a keyboard equivalent:\n${offenders.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('repo-wide: a component that forwards its own className prop elsewhere must also forward it to any <TypewriterEffect> it renders', () => {
+    // Found 2026-07 (GlyphDissolveName — the Hero name rendered fully
+    // invisible): TypewriterEffect's own visible-text span is `position:
+    // absolute` — its own stacking context — so a gradient/text-transparent
+    // className applied to some OTHER element in the same component (e.g. an
+    // outer wrapper span) never reaches the glyphs TypewriterEffect actually
+    // paints. TypewriterEffect.tsx documents this requirement in its own
+    // comment, but a comment isn't enforced; a future caller can make the
+    // identical mistake. This checks real JSX/prop structure: if a file
+    // forwards its own `className` prop onto some JSX element OTHER than
+    // <TypewriterEffect>, but never onto <TypewriterEffect> itself, that's
+    // exactly the shape of the bug that shipped.
+    const classNamePropRefPattern = /\bclassName\b/;
+
+    function getClassNameAttrText(attributes: ts.JsxAttributes): string | null {
+      for (const prop of attributes.properties) {
+        if (!ts.isJsxAttribute(prop) || prop.name.getText() !== 'className' || !prop.initializer) continue;
+        if (ts.isStringLiteral(prop.initializer)) return prop.initializer.text;
+        if (ts.isJsxExpression(prop.initializer) && prop.initializer.expression) {
+          return prop.initializer.expression.getText();
+        }
+      }
+      return null;
+    }
+
+    const offenders: string[] = [];
+    for (const file of listProductionSources()) {
+      const source = readFileSync(file, 'utf8');
+      const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+      let hasTypewriterUsage = false;
+      let typewriterForwardsClassName = false;
+      let someOtherElementForwardsClassName = false;
+
+      const visit = (node: ts.Node) => {
+        if (ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) {
+          const tagName = node.tagName.getText();
+          const classNameText = getClassNameAttrText(node.attributes);
+          const forwardsProp = classNameText !== null && classNamePropRefPattern.test(classNameText);
+
+          if (tagName === 'TypewriterEffect') {
+            hasTypewriterUsage = true;
+            if (forwardsProp) typewriterForwardsClassName = true;
+          } else if (forwardsProp) {
+            someOtherElementForwardsClassName = true;
+          }
+        }
+        ts.forEachChild(node, visit);
+      };
+      visit(sourceFile);
+
+      if (hasTypewriterUsage && someOtherElementForwardsClassName && !typewriterForwardsClassName) {
+        offenders.push(file);
+      }
+    }
+
+    expect(offenders, `<TypewriterEffect> gradient/styled text will render invisible or unstyled — this file forwards its className prop to a different element but never to <TypewriterEffect> itself:\n${offenders.join('\n')}`).toEqual([]);
   });
 });
