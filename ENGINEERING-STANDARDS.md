@@ -33,6 +33,16 @@ engineering quality." In practice that means:
   user who turns motion off" is the first question, not an edge case
   asked afterward** (§4 in full). A feature that only works in the happy path
   on a fast machine with a mouse is not finished.
+- **Latency is a feature, not a byproduct.** A response that lags the input
+  driving it reads as software; one that keeps up reads as a physical object.
+  This isn't aspirational framing — it's the concrete reason §1's O(1)
+  per-event rule, §3.1's "high-frequency events never touch React state,"
+  and §3.3's passive-listener sweep exist: every one of them exists
+  specifically to keep the gap between a user's input and the pixels
+  changing as close to a single frame as this stack allows. §6 item 17 is
+  the same discipline applied to *measuring* time instead of *reacting* to
+  input — a UI can be fast and still report itself wrong if the measurement
+  itself doesn't respect the render pipeline.
 
 Enforcing test files:
 
@@ -650,18 +660,31 @@ investigate that script before touching the config.
 3. **Every contract and test must pass before every commit** (owner mandate,
    2026-07) — not merely before push. `simple-git-hooks` runs the identical
    full gate at both `pre-commit` and `pre-push`: lockfile sync, type-check,
-   zero-warning lint, and the entire `pnpm test` suite (900+ tests, all
-   contracts, including the networked freshness checks — nothing is deferred
-   to push time). A commit cannot be created with a red gate; `pre-push`
-   re-verifies identically as a redundant safety net (catches drift from a
-   `--no-verify` commit or a later rebase). `complexity-doctrine-contract.test.ts`
-   asserts the hook wiring itself — including that pre-commit and pre-push
-   stay byte-identical — so the gate cannot be silently narrowed or unwired.
-   `pnpm run test:complexity` remains available as a fast, offline,
-   manually-run subset (complexity doctrine, algorithm/data-structure,
-   animation gates, modularization, dead logic exports, asset weight,
-   config-integrity, docs-quality, lifecycle-hygiene, headers-integrity) for
-   quick iteration — it is a convenience command now, not the commit gate.
+   zero-warning lint, the entire `pnpm test` suite (900+ tests, all
+   contracts, including the networked freshness checks), and mutation testing
+   scoped to whichever changed files are logic modules (see item 13) —
+   nothing is deferred to push time. A commit cannot be created with a red
+   gate; `pre-push` re-verifies identically as a redundant safety net (catches
+   drift from a `--no-verify` commit or a later rebase).
+   `complexity-doctrine-contract.test.ts` asserts the hook wiring itself —
+   including that pre-commit and pre-push stay byte-identical — so the gate
+   cannot be silently narrowed or unwired. `pnpm run test:complexity` remains
+   available as a fast, offline, manually-run subset (complexity doctrine,
+   algorithm/data-structure, animation gates, modularization, dead logic
+   exports, asset weight, config-integrity, docs-quality, lifecycle-hygiene,
+   headers-integrity) for quick iteration — it is a convenience command now,
+   not the commit gate.
+
+   **GitHub-hosted CI is disabled** (2026-07, owner request — cost, once the
+   local hooks above already ran the full gate on every commit anyway).
+   `.github/workflows/ci.yml` still exists, unmodified apart from its trigger,
+   runnable by hand via `workflow_dispatch` from the Actions tab, or fully
+   restored by reverting that trigger back to `pull_request`/`push`. Until
+   then, the pre-commit/pre-push gate above is the *only* verification a
+   change passes through — which is exactly why mutation testing moved from
+   "occasional manual sweep" to "runs on every commit" in the same change:
+   with no second, independent CI pass as a backstop, the local gate has to
+   carry the full weight by itself.
 
    **Warnings are failures.** `pnpm run lint` runs eslint with
    `--max-warnings=0` and markdownlint over every root `*.md`
@@ -944,10 +967,32 @@ investigate that script before touching the config.
     by line, before trusting a "Survived" verdict enough to act on it. Scope
     excludes `src/data/**` (declarative content catalogs, not logic — mutating
     a string literal in a company name has no meaningful signal) and every
-    `*.test.ts(x)` file (only production code is mutated). Manual-only by the
-    same pattern as `test:complexity`/`test:performance` above — a full run is
-    far slower than the ~20s test suite, so it's never wired into
-    pre-commit/pre-push or a blocking CI job.
+    `*.test.ts(x)` file (only production code is mutated). The unscoped
+    `pnpm run test:mutation` (this whole file's `mutate` glob, every
+    production source at once) stays a manual, occasional-sweep command — a
+    full run is far slower than the ~20s test suite, so it's still never run
+    unscoped in a hook. **But mutation testing itself is no longer
+    manual-only** (2026-07, see the mandate below): `pnpm run
+    test:mutation:changed` — Stryker scoped via `--mutate` to only the
+    *logic-module* files (`logic.ts`/`*-logic.ts`/`engine.ts`/`builders.ts`,
+    the exact same convention `dead-logic-export-contract.test.ts` keys off)
+    a commit/push actually touches — runs inside pre-commit AND pre-push, and
+    fails the commit if a changed logic module's mutation score drops below
+    `stryker.config.mjs`'s `break` threshold (90). Deliberately NOT every
+    changed `.ts(x)` file: an early attempt scoped to all production files
+    and run against two real components
+    (`GlyphDissolveName.tsx`/`ReactionTimeGame.tsx`, both from the same
+    2026-07 session) scored 48% and 68% — nowhere near 90% — not from being
+    undertested, but because JSX rendering code is full of low-information
+    mutations (`{' '}` → `{''}`, a className ternary's unreachable-in-practice
+    branch) that no amount of reasonable component testing chases. Every
+    100%-mutation-score file logged in this item is already a logic/engine/
+    builders file, never a component, for exactly this reason — the
+    modularization contract already keeps exhaustively-testable logic out of
+    components on purpose, so the mutation gate should be scoped to match
+    where that logic actually lives, not to every file that happens to
+    change. `pnpm run test:mutation` (the full, unscoped, manual sweep) still
+    covers component files too, for whoever wants to look at them by hand.
 
     **Known tooling caveat:** at least one mutant has been confirmed to report
     "Survived" from Stryker's own harness while the identical mutation, applied
@@ -993,6 +1038,81 @@ investigate that script before touching the config.
     cosmetic even though it looks like one; (2) chasing survivors surfaces
     real bugs, not just test gaps, often enough that the exercise pays for
     itself independent of the mutation score.
+
+    **The mandate, stated plainly (2026-07):** every new logic file ships
+    with a Stryker pass in the same session that introduces it — not as a
+    someday cleanup, as part of writing the tests in the first place — pushed
+    to 100%, or to the smallest set of hand-verified equivalent mutants the
+    file's actual logic allows. `stryker.config.mjs`'s thresholds moved from
+    90/70 to **100/90** to match what every swept file has actually achieved,
+    not what felt safely attainable when the tool was first wired in. This is
+    NOT the same as making the process itself a blocking 100%-or-fail CI
+    gate: mutation testing's own literature (and this file's own accumulating
+    equivalent-mutant log) shows that a genuine 100% raw score is usually the
+    wrong target for an entire codebase — some mutants are provably
+    equivalent (see the three below), and a gate that can never truthfully
+    reach zero survivors either stays permanently red or pressures deleting
+    real code / writing meaningless tests just to silence it. The realistic,
+    honest version of "mandate 100%" is: 100% *or a documented reason* — never
+    a silent, unexplained survivor — and that bar is enforced by review
+    discipline (this file, commit messages, the hand-verification protocol),
+    not by a CI number, because the tool is too slow to gate on (see the
+    manual-only rationale above) and equivalence is closer to code review's
+    variety of engineering judgment than the scoring gate can automate.
+
+    **2026-07 sweep, round two** (prompted directly by "mandate 100% on all
+    mutation testing" — audited, not blindly adopted as a literal blocking
+    rule, for the reasons above): three files built earlier in the same
+    session — `predator-prey-logic.ts`, `reaction-time-game-logic.ts`, and
+    `glyph-dissolve-logic.ts` — had never been run through Stryker at all.
+    First pass: 95.26% combined, 23 survivors. Every one was real:
+    `applySeek`'s existing exact-value tests all held `entity.x` at 0 and
+    `dy` at 0, which cannot distinguish `targetX - entity.x` from `targetX +
+    entity.x`, nor the dx/dy terms of the distance and desired-velocity
+    formulas, from their arithmetic-operator mutants — added a 3-4-5-triangle
+    diagonal case with a nonzero entity position to isolate exactly those
+    terms. `computeScatterTarget`'s fixed-stream test used an angle of
+    exactly π/2, where `cos(angle)` is 0 — added an angle=0 case to isolate
+    the x-term's sign. `computeGlyphParticlePosition`'s only exact hovering
+    assertion used elapsed=0 (where `/1000` and `*1000` both give 0) and its
+    only nonzero-elapsed test used a loose `not.toBeCloseTo` that a
+    differently-wrong-but-still-nonzero offset also satisfies — added an
+    exact-value case at a nonzero elapsed time, recomputing the expected
+    offset via the already-pinned `computeSwirlOffset` rather than a second
+    hand-derived formula. `nudgeTarget` only had an ArrowRight (x-axis) test,
+    missing a y-sign flip entirely — added an ArrowDown case.
+    `createInitialEntities`'s spawn-band tests used loose
+    `toBeGreaterThanOrEqual`/`toBeLessThanOrEqual` bounds, which a `*` → `/`
+    mutant can still satisfy by chance — replaced with an exact-value test
+    that independently re-derives the expected sequence from the same seeded
+    PRNG. Two `sampleGlyphPositions` loop bounds (`py < image.height`, `px <
+    image.width`) had never been tested against an out-of-bounds row/column
+    that would only be reached by a `<` → `<=` mutant — added stub images
+    with bright pixels one row/column past the declared bounds. And two
+    `PAUSED_CAPTION`/`SIMULATION_ARIA_LABEL` string literals were only ever
+    asserted by re-importing the SAME constant on both sides of the
+    comparison (`expect(...).toBe(PAUSED_CAPTION)`) — a mutant that empties
+    the constant empties both sides at once, so it can never be caught that
+    way; fixed by asserting against a hardcoded literal instead. Second pass:
+    98.76%, with exactly three survivors, all confirmed genuine equivalents
+    on re-verification (the incremental cache initially still reported the
+    fill-style string as "Survived" after it was fixed — cleared per the
+    known-caveat protocol above, confirming that caveat is not theoretical):
+    `elapsedMs <= 0` → `< 0` in `clampProgress` (once this line is reached,
+    `durationMs` is already known to be positive from the check above it, so
+    `0 / durationMs` is always exactly 0 regardless of which branch runs —
+    provably identical output for every input); `steerMagnitude > maxForce`
+    → `>=` in `applySeek` (at exact equality, `scale = maxForce /
+    steerMagnitude` is exactly 1, making the "clamp" a no-op whether or not
+    the branch executes); and `previousBestMs !== null` → `true` in
+    `isNewBestReaction` (the mutant falls through to `reactionTimeMs < null`,
+    which JS coerces to `reactionTimeMs < 0` — always false, since a
+    click-minus-go duration can never be negative — identical to the original
+    short-circuit). All three documented inline at their source, not just
+    here. Final: predator-prey-logic.ts and glyph-dissolve-logic.ts at
+    99.1-99.3% (one equivalent each), reaction-time-game-logic.ts at 99.04%
+    (one equivalent) — effectively 100% real coverage, the same standard as
+    every other swept file.
 14. **A rendered-text assertion is only as strong as its regex — a wildcard
     is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
     months.*renew soon/i))` passes as long as *something* sits between the
@@ -1073,6 +1193,64 @@ investigate that script before touching the config.
     the callback registered on that listener," "this comparator eventually
     references that function" — reach for the real parser, because a fixed
     pattern has no way to represent "any of these equivalent shapes."**
+16. **A style prop threaded through a wrapper only reaches what the wrapper
+    itself paints — not a differently-positioned descendant.** Shipped 2026-07:
+    the Hero name went fully invisible. `GlyphDissolveName` wraps
+    `TypewriterEffect` and received a `className` prop carrying the
+    `bg-clip-text text-transparent` gradient — but it applied that className
+    to its OWN outer `<span>` wrapper and never passed it to
+    `<TypewriterEffect>` at all. `TypewriterEffect`'s actual visible-text span
+    is `position: absolute` (its own stacking/positioning context, needed for
+    the zero-CLS typing effect) — a `background-clip: text` gradient set on
+    an ancestor never reaches glyphs painted by a differently-positioned
+    descendant, and the inherited `text-transparent` had no gradient to
+    replace it with. This is the SAME root cause as constraint #15's
+    persistently-transformed-descendant rule (a CLAUDE.md rule that predates
+    this bug) wearing a different disguise — descendant positioning/stacking
+    context breaking an ancestor's paint, not descendant transforms breaking
+    it — which is exactly why the same class of bug slipped through the
+    existing check. `TypewriterEffect.tsx` even carries an inline comment
+    stating this requirement, but a comment isn't enforced; a future caller
+    can make the identical mistake without ever reading it (fixed here by
+    reproducing this exact miss). **The lesson generalizes: any component
+    that forwards a caller-supplied style prop must verify that prop actually
+    lands on the element that renders the affected content — never assume a
+    wrapper's className "flows down" to a child's own differently-positioned
+    markup.** Closed two ways: the immediate fix (route `className` through
+    to `<TypewriterEffect>` directly), and a repo-wide sweep
+    (`a11y-regressions.test.tsx`) that flags any file forwarding its own
+    `className` prop onto some OTHER JSX element while never forwarding it to
+    a `<TypewriterEffect>` it also renders — the same "prove it, don't just
+    fix the one instance" pattern as every sweep above.
+17. **A user-perceived-timing measurement must be stamped from the frame that
+    actually renders the change, not the instant the code that schedules it
+    runs.** Shipped 2026-07: "Catch the Lapse" (the reaction-time game)
+    systematically over-reported every reaction time, making genuinely fast
+    players read as merely average and average players read as slow.
+    `goTimestamp` was captured with `performance.now()` inside the
+    `setTimeout` callback that ALSO flipped the round to its "go" state —
+    before React re-rendered and the browser actually painted the color
+    change the player reacts to. React's commit and the browser's paint both
+    take real time (a frame or more, worse under load from this page's other
+    animations), so every measured reaction was inflated by that render+paint
+    latency before the player could have possibly reacted at all. Fixed by
+    splitting the concerns: the timer only flips the phase; a separate effect
+    keyed on that phase change waits for the NEXT `requestAnimationFrame` and
+    uses THAT frame's own timestamp — the frame the browser is about to
+    paint — as the stimulus-onset time. **The lesson generalizes: whenever
+    code needs to know "when did the user first SEE this," schedule-time and
+    paint-time are different instants, and only paint-time is real from the
+    user's perspective — align the measurement with a
+    `requestAnimationFrame` callback (or, more strongly, one *after* the
+    triggering state update has committed), never with the moment a
+    `setTimeout`/event handler happens to run.** This is the same discipline
+    ENGINEERING-STANDARDS already applies to *drawing* (frame budgets, batch
+    draw calls) turned toward *measurement*: what the user experiences is
+    bounded by the render pipeline, not by when your JS scheduled the change.
+    Re-derived the reaction-time category thresholds at the same time from
+    named, cited constants (lab-measured mean simple reaction time plus a
+    documented browser-measurement-overhead allowance) instead of the
+    original bare numbers — see `reaction-time-game-logic.ts`.
 
 ## 7. The engagement doctrine
 
