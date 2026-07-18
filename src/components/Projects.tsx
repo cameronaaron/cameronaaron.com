@@ -6,6 +6,7 @@ import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
+import DnaSnpGame from '@/components/projects/dna-game/DnaSnpGame';
 import { buildProjectCollections } from '@/components/projects/logic';
 
 export default function Projects() {
@@ -121,6 +122,7 @@ export default function Projects() {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <FeaturedProject project={project} index={index} />
+              {project.interactiveDemo === 'dna-snp-game' && <DnaSnpGame />}
             </motion.div>
           ))}
         </motion.div>
