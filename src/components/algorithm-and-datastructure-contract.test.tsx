@@ -18,6 +18,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import { act, fireEvent, render } from '@testing-library/react';
+import * as ts from 'typescript';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -54,6 +55,101 @@ function listProductionSources(): string[] {
   };
   walk(root);
   return files;
+}
+
+// ── real-AST scan helpers (typescript compiler API) ─────────────────────────
+//
+// A regex or textual scan can only ever match one fixed shape of source code
+// — reformatting, renaming, or extracting to a helper function evades it
+// while the underlying bug ships unchanged (this is exactly how the
+// map().filter() ESLint selector was found evadable by splitting the chain
+// across two statements; see scripts/eslint-rules/no-split-map-filter.mjs).
+// These helpers parse each file with the real TypeScript compiler and walk
+// the actual AST/binding structure instead of guessing at text shape, so the
+// checks below survive the same class of trivial restructuring.
+
+function parseProductionSource(file: string, src: string): ts.SourceFile {
+  return ts.createSourceFile(
+    file,
+    src,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+}
+
+function forEachDescendant(node: ts.Node, visit: (n: ts.Node) => void): void {
+  visit(node);
+  ts.forEachChild(node, (child) => forEachDescendant(child, visit));
+}
+
+/** Resolves a bare identifier to its function body — function declaration, `const
+ * name = (...) => {}`, or `const name = useCallback((...) => {}, [...])` — so a
+ * check doesn't silently skip handlers that aren't an inline arrow literal. */
+function resolveFunctionByName(sourceFile: ts.SourceFile, name: string): ts.Node | null {
+  let found: ts.Node | null = null;
+  forEachDescendant(sourceFile, (node) => {
+    if (found) return;
+    if (ts.isFunctionDeclaration(node) && node.name?.text === name) {
+      found = node;
+      return;
+    }
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name && node.initializer) {
+      let init: ts.Node = node.initializer;
+      if (
+        ts.isCallExpression(init) &&
+        ts.isIdentifier(init.expression) &&
+        (init.expression.text === 'useCallback' || init.expression.text === 'useMemo') &&
+        init.arguments.length > 0
+      ) {
+        init = init.arguments[0];
+      }
+      if (ts.isArrowFunction(init) || ts.isFunctionExpression(init)) {
+        found = init;
+      }
+    }
+  });
+  return found;
+}
+
+/** True if `node`'s subtree contains an identifier reference anywhere — not just
+ * up to the first `;`/`{`, so a multi-statement body can't hide the reference. */
+function referencesIdentifier(node: ts.Node, identifierName: string): boolean {
+  let found = false;
+  forEachDescendant(node, (n) => {
+    if (!found && ts.isIdentifier(n) && n.text === identifierName) found = true;
+  });
+  return found;
+}
+
+/** Returns the name of the first `setXxx(...)` call inside `node`'s subtree, following
+ * one level of call-outs to other locally-resolvable functions in the same file. */
+function findStateSetterCall(node: ts.Node, sourceFile: ts.SourceFile, visited: Set<string> = new Set()): string | null {
+  let offender: string | null = null;
+  const calledNames = new Set<string>();
+
+  forEachDescendant(node, (n) => {
+    if (offender) return;
+    if (ts.isCallExpression(n) && ts.isIdentifier(n.expression)) {
+      const calleeName = n.expression.text;
+      if (/^set[A-Z]/.test(calleeName)) {
+        offender = calleeName;
+        return;
+      }
+      calledNames.add(calleeName);
+    }
+  });
+  if (offender) return offender;
+
+  for (const name of calledNames) {
+    if (visited.has(name)) continue;
+    visited.add(name);
+    const fnNode = resolveFunctionByName(sourceFile, name);
+    if (!fnNode) continue;
+    const nested = findStateSetterCall(fnNode, sourceFile, visited);
+    if (nested) return nested;
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -644,12 +740,66 @@ describe('repo-wide — high-frequency event listeners are always passive', () =
 });
 
 describe('repo-wide — no map().filter() chains in production code', () => {
-  it('no file chains .filter( directly onto .map(...) — use a single-pass loop', () => {
-    // Matches `.map(<args with up to one nested paren level>).filter(` across lines.
-    const mapThenFilter = /\.map\(((?:[^()]|\([^()]*\))*)\)\s*\n?\s*\.filter\(/;
+  it('no file chains .filter( directly onto .map(...), including split across a variable', () => {
+    // A regex/single-selector AST match can only ever catch the DIRECT chain
+    // shape (`a.map(f).filter(g)`) — splitting the identical two-array
+    // allocation across two statements (`const m = a.map(f); m.filter(g)`)
+    // evades it while doing the same work (the exact evasion no-split-map-
+    // filter.mjs closes at lint time). This walks the real AST for both shapes.
     for (const file of listProductionSources()) {
       const src = readFileSync(file, 'utf8');
-      expect(mapThenFilter.test(src), `${file} contains a map().filter() chain`).toBe(false);
+      const sourceFile = parseProductionSource(file, src);
+      const offenses: string[] = [];
+
+      // Track single-definition, never-reassigned bindings sourced from .map()/.flatMap().
+      const mapFlatMapSource = new Map<string, string>();
+      const declCount = new Map<string, number>();
+      const reassigned = new Set<string>();
+      forEachDescendant(sourceFile, (node) => {
+        if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
+          const name = node.name.text;
+          declCount.set(name, (declCount.get(name) ?? 0) + 1);
+          if (node.initializer && ts.isCallExpression(node.initializer)) {
+            const callee = node.initializer.expression;
+            if (ts.isPropertyAccessExpression(callee) && (callee.name.text === 'map' || callee.name.text === 'flatMap')) {
+              mapFlatMapSource.set(name, callee.name.text);
+            }
+          }
+        }
+        if (
+          ts.isBinaryExpression(node) &&
+          node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+          ts.isIdentifier(node.left)
+        ) {
+          reassigned.add(node.left.text);
+        }
+      });
+
+      forEachDescendant(sourceFile, (node) => {
+        if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression) || node.expression.name.text !== 'filter') {
+          return;
+        }
+        const target = node.expression.expression;
+
+        // Direct chain: `<expr>.map(...).filter(...)`.
+        if (ts.isCallExpression(target) && ts.isPropertyAccessExpression(target.expression)) {
+          const innerName = target.expression.name.text;
+          if (innerName === 'map' || innerName === 'flatMap') {
+            offenses.push(`direct ${innerName}().filter() chain`);
+            return;
+          }
+        }
+
+        // Split form: `const m = <expr>.map(...); ...; m.filter(...)`.
+        if (ts.isIdentifier(target)) {
+          const source = mapFlatMapSource.get(target.text);
+          if (source && (declCount.get(target.text) ?? 0) === 1 && !reassigned.has(target.text)) {
+            offenses.push(`split ${source}().filter() chain via '${target.text}'`);
+          }
+        }
+      });
+
+      expect(offenses, `${file} contains a map().filter() chain — allocates an intermediate array; use a single-pass loop:\n${offenses.join('\n')}`).toEqual([]);
     }
   });
 });
@@ -658,19 +808,45 @@ describe('repo-wide — no setState wired to raw mousemove listeners', () => {
   it('no window mousemove handler body calls a setXxx state setter', () => {
     // A mousemove listener whose registered handler name also appears assigning
     // React state is the exact pattern the motion-value rule exists to prevent.
+    // Resolved via the real AST (function declarations, const arrows, and
+    // useCallback/useMemo-wrapped arrows) rather than a brace-counting regex —
+    // the prior regex silently skipped (via a bare `continue`, not a failure)
+    // any handler not shaped exactly like `const name = (args) {...\n    };`,
+    // which meant this repo's own established useCallback-wrapped-handler
+    // pattern (see PredatorPreyChase's handlePointerMove) was never actually
+    // checked. Also follows one level of call-outs to locally defined helper
+    // functions, so a handler that delegates to a same-file helper is covered.
     for (const file of listProductionSources()) {
       const src = readFileSync(file, 'utf8');
-      const handlerNames = Array.from(
-        src.matchAll(/addEventListener\(\s*'mousemove',\s*(\w+)/g),
-        (match) => match[1]
-      );
+      const sourceFile = parseProductionSource(file, src);
+      const handlerNames = new Set<string>();
+
+      forEachDescendant(sourceFile, (node) => {
+        if (
+          ts.isCallExpression(node) &&
+          ts.isPropertyAccessExpression(node.expression) &&
+          node.expression.name.text === 'addEventListener' &&
+          node.arguments.length >= 2 &&
+          ts.isStringLiteral(node.arguments[0]) &&
+          node.arguments[0].text === 'mousemove' &&
+          ts.isIdentifier(node.arguments[1])
+        ) {
+          handlerNames.add(node.arguments[1].text);
+        }
+      });
+
       for (const name of handlerNames) {
-        const handlerDef = src.match(new RegExp(`const ${name} = \\([^)]*\\)[^{]*\\{([\\s\\S]*?)\\n    \\};`));
-        if (!handlerDef) continue;
+        const fnNode = resolveFunctionByName(sourceFile, name);
+        // A handler imported from another module is outside what a single-file
+        // AST walk can resolve — the same "can't safely infer" boundary
+        // no-split-map-filter.mjs draws for reassigned/destructured bindings.
+        if (!fnNode) continue;
+
+        const offender = findStateSetterCall(fnNode, sourceFile);
         expect(
-          /\bset[A-Z]\w*\(/.test(handlerDef[1]),
-          `${file} — mousemove handler '${name}' writes React state; use a motion value, ref, or CSS variable`
-        ).toBe(false);
+          offender,
+          `${file} — mousemove handler '${name}' calls '${offender}' (a React state setter); high-frequency pointer events must drive a motion value, ref, or CSS variable instead`,
+        ).toBeNull();
       }
     }
   });
@@ -690,12 +866,39 @@ describe('sorting — expensive keys are precomputed, not recomputed per compari
   });
 
   it('no comparator in production code calls getDateSortKey', () => {
+    // The prior regex (`[^{;]*getDateSortKey`) stopped scanning at the first
+    // `{` or `;` — a multi-statement arrow body, or a comparator extracted to
+    // a separate named function and passed by reference (`arr.sort(cmp)`),
+    // both evaded it while still recomputing the date key per comparison.
+    // This walks the real AST for both an inline comparator and a
+    // by-name-resolved one, over the comparator's FULL body.
     for (const file of listProductionSources()) {
       const src = readFileSync(file, 'utf8');
-      expect(
-        /\.sort\(\([^)]*\)\s*=>[^{;]*getDateSortKey/.test(src),
-        `${file} re-parses dates inside a sort comparator — decorate first`
-      ).toBe(false);
+      const sourceFile = parseProductionSource(file, src);
+      const offenses: string[] = [];
+
+      forEachDescendant(sourceFile, (node) => {
+        if (
+          !ts.isCallExpression(node) ||
+          !ts.isPropertyAccessExpression(node.expression) ||
+          node.expression.name.text !== 'sort' ||
+          node.arguments.length === 0
+        ) {
+          return;
+        }
+        const arg = node.arguments[0];
+        let fnNode: ts.Node | null = null;
+        if (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg)) {
+          fnNode = arg;
+        } else if (ts.isIdentifier(arg)) {
+          fnNode = resolveFunctionByName(sourceFile, arg.text);
+        }
+        if (fnNode && referencesIdentifier(fnNode, 'getDateSortKey')) {
+          offenses.push('sort comparator references getDateSortKey');
+        }
+      });
+
+      expect(offenses, `${file} re-parses dates inside a sort comparator (inline or by named reference) — decorate first:\n${offenses.join('\n')}`).toEqual([]);
     }
   });
 

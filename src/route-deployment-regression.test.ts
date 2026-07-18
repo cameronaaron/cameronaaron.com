@@ -1,8 +1,39 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 const repoRoot = path.resolve(__dirname, '..');
+
+/** Real source span of the `if`/`else if` block whose condition calls
+ * `isHtmlLikePath(...)`, rather than a lazy `[\s\S]*?\}` scan from the call
+ * site to the next `}`. That lazy regex happens to land on the right brace
+ * only because today's branch body has no nested block of its own — adding
+ * one (an inner `if`, a `try`, anything with its own `{...}`) would make the
+ * lazy match stop at that INNER closing brace, silently narrowing what the
+ * check inspects and potentially hiding a real `no-store` regression added
+ * after the truncation point but still inside the real branch. */
+function findHtmlBranchSource(workerSrc: string): string | undefined {
+  const sourceFile = ts.createSourceFile('index.js', workerSrc, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  let branch: ts.Node | undefined;
+
+  const visit = (node: ts.Node) => {
+    if (branch) return;
+    if (
+      ts.isIfStatement(node) &&
+      ts.isCallExpression(node.expression) &&
+      ts.isIdentifier(node.expression.expression) &&
+      node.expression.expression.text === 'isHtmlLikePath'
+    ) {
+      branch = node.thenStatement;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+
+  return branch?.getText(sourceFile);
+}
 
 describe('route deployment regression checks', () => {
   it('keeps canonical app routes and avoids conflicting .html app segments', () => {
@@ -91,9 +122,9 @@ describe('route deployment regression checks', () => {
     // `no-store` blocks back/forward cache restoration in Chrome and Firefox,
     // which manifests as the home page appearing to "break" on browser back.
     // The 404 fallback may still use no-store; only assert the HTML branch.
-    const htmlBranch = workerSrc.match(/isHtmlLikePath\(resolvedPath\)[\s\S]*?\}\s*\n/);
-    expect(htmlBranch?.[0]).toBeTruthy();
-    expect(htmlBranch?.[0]).not.toContain('no-store');
+    const htmlBranch = findHtmlBranchSource(workerSrc);
+    expect(htmlBranch).toBeTruthy();
+    expect(htmlBranch).not.toContain('no-store');
   });
 
   it('public/_headers keeps HTML cacheable for bfcache', () => {

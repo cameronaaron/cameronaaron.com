@@ -1015,6 +1015,64 @@ investigate that script before touching the config.
     assert on code shape, not rendered output the user sees, and already
     carry their own review history — so `.*` there is out of scope for this
     rule.
+15. **A structural sweep written as a regex inherits every evasion a fixed
+    text shape has — the fix is to walk the real AST, not to write a cleverer
+    regex.** A 2026-07 audit (prompted directly by "regex checks are easily
+    cheated") re-examined every text-pattern sweep in
+    `algorithm-and-datastructure-contract.test.tsx` and confirmed the concern
+    against three concrete, previously-invisible gaps, all in the fast-offline
+    `pnpm run test:complexity` subset that doesn't run lint:
+    - The repo-wide `map().filter()` sweep matched only the direct chain
+      (`a.map(f).filter(g)`) — the split-across-a-variable evasion that rule
+      7's `no-split-map-filter.mjs` already closes *at lint time* was still
+      wide open in this Vitest-native, lint-independent copy.
+    - The mousemove→setState sweep extracted a handler's body with a
+      brace-counting regex (`` const ${name} = \([^)]*\)[^{]*\{([\s\S]*?)\n    };
+      ``) keyed to one exact literal shape — a handler wrapped in
+      `useCallback`/`useMemo` (this repo's *own* established pattern, e.g.
+      `PredatorPreyChase`'s `handlePointerMove`) didn't match, and a
+      non-match silently `continue`d rather than failing. The sweep had
+      never actually checked this codebase's real handler shape.
+    - The decorate-sort-undecorate sweep's regex stopped scanning a
+      comparator's body at the first `{` or `;` and only matched an inline
+      arrow — a multi-statement comparator, or one extracted to a named
+      function and passed by reference (`arr.sort(cmp)`), both evaded it
+      while still re-parsing the date key per comparison.
+
+    The same audit found two more instances of the identical class outside
+    that file. `dead-logic-export-contract.test.ts` collected candidate
+    exports with `/^export function (\w+)/` — a logic module exporting via
+    `export const name = (...) => {}` instead of a function declaration (a
+    purely stylistic refactor) silently escaped the dead-export sweep
+    forever; confirmed by adding a synthetic dead arrow export and watching
+    the old pattern miss it entirely. And `route-deployment-regression.test.ts`
+    isolated the worker's HTML-response Cache-Control branch with
+    `/isHtmlLikePath\(resolvedPath\)[\s\S]*?\}\s*\n/` — a lazy scan for the
+    *first* `}` after the call site, which only lands on the branch's real
+    closing brace because today's branch body happens to contain no nested
+    block of its own. Proven exploitable with a synthetic branch containing
+    one inner `if`: the old regex stopped at the inner block's brace and
+    reported `no-store` absent (false pass) even though a `no-store` line
+    sat right after it, still inside the real branch.
+
+    All five were rewritten to parse each file with the real TypeScript
+    compiler (`ts.createSourceFile` + a `forEachDescendant` walk) and match
+    on actual AST shape and binding structure — including the split-variable
+    map/filter form, `useCallback`/`useMemo`-wrapped and function-declaration
+    handlers (with one level of call-outs to same-file helpers followed), and
+    by-name-resolved sort comparators — the same scope-aware rigor rule 7
+    already established for the ESLint layer, now also covering the
+    lint-independent fast path. Verified against synthetic offending files
+    for all three shapes before removal, confirming each new check actually
+    fails where its regex predecessor silently passed. **The lesson
+    generalizes: any contract that scans source *text* for a coding shape
+    (not rendered user-facing output — see rule 14's carve-out) is only as
+    strong as that shape's literal-ness. A regex is fine for a genuinely
+    fixed literal (an import path, a exact string constant); for anything
+    with dataflow — "this variable came from that call," "this handler is
+    the callback registered on that listener," "this comparator eventually
+    references that function" — reach for the real parser, because a fixed
+    pattern has no way to represent "any of these equivalent shapes."**
 
 ## 7. The engagement doctrine
 
