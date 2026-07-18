@@ -32,6 +32,17 @@
  *    performance.getEntriesByType() — mismatched on return visits in the same session.
  *    Fix (both): useState(false) for SSR-matching initial state; real detection deferred to useEffect.
  *    Broader prevention: src/ssr-hydration-contract.test.ts scans all 'use client' files.
+ *
+ * 7. Spring-animated colors serializing to oklab() (2026-07)
+ *    SectionRail's active/inactive dot and Experience's timeline dot both animated
+ *    backgroundColor/boxShadow under a `type: 'spring'` transition. A spring samples the
+ *    animation continuously (unlike a tween's start/end interpolation), and Framer Motion's
+ *    spring color sampling can produce an intermediate value that serializes as
+ *    `oklab(...)` — which some browsers reject when set via inline style with
+ *    "'oklab(...)' is not an animatable color" (motion.dev/troubleshooting/color-not-animatable).
+ *    Fix (both): keep `scale` on a spring; animate backgroundColor/borderColor/boxShadow with
+ *    a plain tween instead (per-property transition override), which only ever interpolates
+ *    within the source rgba()/rgb() space.
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -231,6 +242,38 @@ describe('animation regression contract', () => {
     expect(
       ungated,
       `ungated infinite animation(s) — gate on prefersReducedMotion (see StatCard.tsx):\n${ungated.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('repo-wide: no color-affecting property is directly sprung (2026-07)', () => {
+    // See incident 7 above. Precise, not a proximity heuristic: flags only a
+    // color-affecting property key whose OWN value object sets `type: 'spring'`
+    // (e.g. `backgroundColor: { type: 'spring', ... }`) — the shape both real fixes
+    // (SectionRail.tsx, experience/logic.ts) now deliberately avoid, always using a
+    // tween for these keys instead. A broader "spring anywhere near a color key"
+    // proximity check was tried and dropped: it false-positived on a `scale` spring
+    // legitimately sharing a per-property transition map with a *tweened* color key
+    // (exactly what the fix looks like), and on Navigation.tsx's layoutId shared-element
+    // spring, which morphs position/size next to a plain static (non-animated) style
+    // color — neither is the bug this guards against.
+    const directSpringOnColorPattern =
+      /\b(?:backgroundColor|borderColor|boxShadow)\s*:\s*\{[^{}]*type:\s*['"]spring['"]/;
+
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.(ts|tsx)$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) files.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const offenders = files.filter((file) => directSpringOnColorPattern.test(readFileSync(file, 'utf8')));
+
+    expect(
+      offenders,
+      `color-affecting property directly sprung — use a tween instead (see SectionRail.tsx or experience/logic.ts's getTimelineDotTransition):\n${offenders.join('\n')}`,
     ).toEqual([]);
   });
 });

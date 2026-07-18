@@ -1,4 +1,7 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -201,5 +204,19 @@ describe('SectionRail', () => {
     expect(scrollToSpy).toHaveBeenCalledWith(document.getElementById('skills'), { immediate: true });
 
     spy.mockRestore();
+  });
+
+  it('tweens the dot color, keeping only scale on a spring (2026-07 oklab regression)', () => {
+    // A spring-animated backgroundColor/borderColor can serialize to oklab() mid-transition,
+    // which some browsers reject for inline-style animation (see
+    // animation-regression-contract.test.ts incident 7). This file has no logic.ts to pin the
+    // transition shape with an exact-value unit test, so read the component source directly.
+    const dir = dirname(fileURLToPath(import.meta.url));
+    const source = readFileSync(resolve(dir, 'SectionRail.tsx'), 'utf8');
+
+    expect(source).toContain("backgroundColor: { type: 'tween'");
+    expect(source).toContain("borderColor: { type: 'tween'");
+    expect(source).not.toMatch(/backgroundColor:\s*\{[^{}]*type:\s*['"]spring['"]/);
+    expect(source).not.toMatch(/borderColor:\s*\{[^{}]*type:\s*['"]spring['"]/);
   });
 });

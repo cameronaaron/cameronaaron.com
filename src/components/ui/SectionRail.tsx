@@ -108,7 +108,16 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                       ? { scale: 1.4, backgroundColor: 'rgba(126, 231, 255, 0.95)', borderColor: 'rgba(126, 231, 255, 0.95)' }
                       : { scale: 1, backgroundColor: 'rgba(255,255,255,0.10)' }
                   }
-                  transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                  transition={{
+                    // A spring computes color samples through an interpolation path that can
+                    // serialize to oklab() mid-transition — some browsers reject setting that
+                    // via inline style ("not an animatable color", motion.dev/troubleshooting/
+                    // color-not-animatable). Scale keeps its springy feel; color properties use
+                    // a plain tween, which only ever interpolates within the source rgba() space.
+                    scale: { type: 'spring', stiffness: 320, damping: 22 },
+                    backgroundColor: { type: 'tween', duration: 0.2, ease: 'easeOut' },
+                    borderColor: { type: 'tween', duration: 0.2, ease: 'easeOut' },
+                  }}
                 />
                 {isActive ? (
                   <motion.span

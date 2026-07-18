@@ -108,17 +108,24 @@ describe('experience logic', () => {
   });
 
   describe('getTimelineDotTransition', () => {
-    it('returns tween transition on lite motion', () => {
-      const t = getTimelineDotTransition(true);
-      expect(t).not.toHaveProperty('type', 'spring');
-      expect(t).toHaveProperty('duration', 0.2);
+    it('never springs backgroundColor or boxShadow, on either motion tier', () => {
+      // Springing a color/shadow can serialize to oklab() mid-transition, which some
+      // browsers reject for inline-style animation — see the function's own doc comment.
+      for (const isLiteMotion of [true, false]) {
+        const t = getTimelineDotTransition(isLiteMotion);
+        expect(t.backgroundColor).toEqual({ type: 'tween', duration: 0.2, ease: 'easeOut' });
+        expect(t.boxShadow).toEqual({ type: 'tween', duration: 0.2, ease: 'easeOut' });
+      }
     });
 
-    it('returns spring transition on full motion', () => {
+    it('tweens scale on lite motion', () => {
+      const t = getTimelineDotTransition(true);
+      expect(t.scale).toEqual({ type: 'tween', duration: 0.2, ease: 'easeOut' });
+    });
+
+    it('springs scale on full motion', () => {
       const t = getTimelineDotTransition(false);
-      expect(t).toHaveProperty('type', 'spring');
-      expect(t).toHaveProperty('stiffness', 280);
-      expect(t).toHaveProperty('damping', 22);
+      expect(t.scale).toEqual({ type: 'spring', stiffness: 280, damping: 22 });
     });
   });
 
