@@ -1,5 +1,8 @@
 import { getPageUrl } from './site';
 
+/** Names an interactive mini-game to render alongside a project's featured card. */
+export type InteractiveDemo = 'dna-snp-game';
+
 export interface Project {
   title: string;
   description: string;
@@ -8,6 +11,7 @@ export interface Project {
   period: string;
   cta?: string;
   featured?: boolean;
+  interactiveDemo?: InteractiveDemo;
 }
 
 export const projects: Project[] = [
@@ -52,6 +56,7 @@ export const projects: Project[] = [
     period: "May 2021",
     cta: "Read Project",
     featured: true,
+    interactiveDemo: "dna-snp-game",
   },
   {
     title: "Stanford Neurodiversity Summit Panel",
