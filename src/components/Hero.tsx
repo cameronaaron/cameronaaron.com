@@ -127,6 +127,8 @@ export default function Hero() {
               </span>
               <span className="text-sm font-medium text-primary-foreground">
                 Open to connect<LocalTimeStatus />
+                <span> · </span>
+                <span className="text-xs align-middle">{profile.citizenshipFlag}</span> {profile.citizenshipLabel}
               </span>
             </motion.div>
 

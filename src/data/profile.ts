@@ -20,6 +20,9 @@ export interface Profile {
   image: string;
   social: SocialLinks;
   stats: ProfileStat[];
+  /** Rendered small/subdued next to citizenshipLabel — see Hero's connect pill. */
+  citizenshipFlag: string;
+  citizenshipLabel: string;
 }
 
 export const profile: Profile = {
@@ -45,4 +48,7 @@ export const profile: Profile = {
     { label: "Software & Security Projects", value: "50+" },
     { label: "Awards & Honors", value: "7+" },
   ],
+
+  citizenshipFlag: "🇺🇸",
+  citizenshipLabel: "U.S. Citizen",
 };
