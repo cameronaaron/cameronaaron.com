@@ -241,13 +241,18 @@ export default function GlyphDissolveName({ text, typingSpeed, className = '' }:
   return (
     <span
       ref={containerRef}
-      className={`relative inline-block ${className}`}
+      className="relative inline-block"
       onMouseEnter={enabled ? handleMouseEnter : undefined}
       onMouseLeave={enabled ? handleMouseLeave : undefined}
       data-testid="glyph-dissolve-name"
     >
       <span style={canvasActive ? { opacity: domOpacity } : undefined}>
-        <TypewriterEffect text={text} typingSpeed={typingSpeed} onComplete={handleTypingComplete} />
+        <TypewriterEffect
+          text={text}
+          typingSpeed={typingSpeed}
+          onComplete={handleTypingComplete}
+          className={className}
+        />
       </span>
       {canvasActive ? (
         <canvas
