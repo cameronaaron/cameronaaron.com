@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
 import type { Entity, SimulationState } from './predator-prey-logic';
 import {
   ARENA_SIZE,
@@ -8,10 +9,12 @@ import {
   INITIAL_SIM_SEED,
   INITIAL_TARGET,
   KEYBOARD_NUDGE_STEP,
+  PAUSED_CAPTION,
   PREDATOR_START_MIN,
   PREDATOR_START_RANGE,
   PREY_START_MIN,
   PREY_START_RANGE,
+  SIMULATION_ARIA_LABEL,
   VELOCITY_DAMPING,
   applyArenaBoundary,
   applySeek,
@@ -89,6 +92,24 @@ describe('createInitialEntities / getInitialSimulationState — deterministic la
     expect(isCaught(predator, prey)).toBe(false);
   });
 
+  it('computes each coordinate as exactly MIN + random() * RANGE for the seeded sequence', () => {
+    // Independently re-derives the expected sequence from the same PRNG rather
+    // than asserting loose bounds — a loose >=/<= check can't distinguish
+    // MIN + random() * RANGE from MIN + random() / RANGE when both happen to
+    // land inside the same acceptable band for a given seed.
+    const random = createSeededRandom(INITIAL_SIM_SEED);
+    const expectedPreyX = PREY_START_MIN + random() * PREY_START_RANGE;
+    const expectedPreyY = PREY_START_MIN + random() * PREY_START_RANGE;
+    const expectedPredatorX = PREDATOR_START_MIN + random() * PREDATOR_START_RANGE;
+    const expectedPredatorY = PREDATOR_START_MIN + random() * PREDATOR_START_RANGE;
+
+    const { predator, prey } = createInitialEntities(INITIAL_SIM_SEED);
+    expect(prey.x).toBe(expectedPreyX);
+    expect(prey.y).toBe(expectedPreyY);
+    expect(predator.x).toBe(expectedPredatorX);
+    expect(predator.y).toBe(expectedPredatorY);
+  });
+
   it('builds a full simulation state with zeroed counters and a centered target', () => {
     const state = getInitialSimulationState();
     expect(state.elapsedMs).toBe(0);
@@ -158,6 +179,46 @@ describe('applySeek — steering math, exact values', () => {
     // velocity delta and then integrates position over twice the step.
     expect(entityStepTwo.vx).toBeCloseTo(entityStepOne.vx * 2, 10);
   });
+
+  it('steers diagonally using a 3-4-5 triangle, exercising a nonzero dx, dy, AND a nonzero entity position', () => {
+    // Every other case in this block starts the entity at x=0 with dy=0, which
+    // cannot distinguish `targetX - entity.x` from `targetX + entity.x` (both
+    // equal targetX when entity.x is 0), nor the dy-only terms of the distance/
+    // desired-velocity formulas. entity=(7,6), target=(10,10): dx=3, dy=4,
+    // distance=5 exactly. maxSpeed=5 makes desired=(3,4) exactly; maxForce=100
+    // is large enough that the clamp branch never triggers, isolating just the
+    // seek-vector arithmetic.
+    const entity = makeEntity({ x: 7, y: 6 });
+    applySeek(entity, 10, 10, 5, 100, 1);
+
+    const expectedVx = 3 * VELOCITY_DAMPING;
+    const expectedVy = 4 * VELOCITY_DAMPING;
+    expect(entity.vx).toBe(expectedVx);
+    expect(entity.vy).toBe(expectedVy);
+    expect(entity.x).toBe(7 + expectedVx);
+    expect(entity.y).toBe(6 + expectedVy);
+  });
+
+  it('treats a distance of exactly the divide-by-zero epsilon as still "at rest" (boundary is exclusive)', () => {
+    // 0.0001 * 0.0001 -> sqrt -> 0.0001 round-trips bit-exactly in IEEE754, so
+    // this lands precisely on the `distance > 1e-4` boundary: distance must NOT
+    // be treated as "far enough to compute a direction" here, or the entity
+    // would accelerate off a target it's already effectively standing on.
+    const entity = makeEntity({ x: 0, y: 0 });
+    applySeek(entity, 0.0001, 0, 5, 1, 1);
+
+    expect(entity.vx).toBe(0);
+    expect(entity.vy).toBe(0);
+    expect(entity.x).toBe(0);
+    expect(entity.y).toBe(0);
+  });
+
+  // Not tested: `steerMagnitude > maxForce` at the exact boundary. Proven
+  // equivalent by construction — at steerMagnitude === maxForce, `scale =
+  // maxForce / steerMagnitude` is exactly 1, so `steerX *= scale` and
+  // `steerY *= scale` are no-ops whether or not the branch is entered. A
+  // Stryker `>` -> `>=` mutant here cannot produce a different result for any
+  // input (2026-07, hand-verified per ENGINEERING-STANDARDS.md §6 item 13).
 });
 
 describe('applyArenaBoundary — exact bounce values', () => {
@@ -421,6 +482,16 @@ describe('nudgeTarget', () => {
     expect(state.target.y).toBe(50);
   });
 
+  it('moves the target along the y axis for ArrowDown (the x-only ArrowRight case above cannot catch a y-sign flip)', () => {
+    const state = getInitialSimulationState();
+    setTarget(state, 50, 50);
+
+    nudgeTarget(state, 'ArrowDown');
+
+    expect(state.target.x).toBe(50);
+    expect(state.target.y).toBe(50 + KEYBOARD_NUDGE_STEP);
+  });
+
   it('clamps the nudged target to the arena bounds', () => {
     const state = getInitialSimulationState();
     setTarget(state, ARENA_SIZE, ARENA_SIZE);
@@ -438,5 +509,21 @@ describe('nudgeTarget', () => {
 
     expect(handled).toBe(false);
     expect(state.target).toEqual({ x: 33, y: 44 });
+  });
+});
+
+describe('PAUSED_CAPTION / SIMULATION_ARIA_LABEL — exact text', () => {
+  it('has the exact non-empty paused caption, asserted against a hardcoded literal (not the same imported constant)', () => {
+    // PredatorPreyChase.test.tsx compares rendered text against this SAME
+    // imported constant, which can't catch the constant itself being emptied
+    // (both sides of that comparison would mutate together). Hardcoding the
+    // literal here is what actually pins the content.
+    expect(PAUSED_CAPTION).toBe('Chase paused — reduced motion or low-power mode is active.');
+  });
+
+  it('has the exact non-empty simulation aria-label, asserted against a hardcoded literal', () => {
+    expect(SIMULATION_ARIA_LABEL).toBe(
+      'Predator-prey chase simulation. Move your cursor, drag on touch, or use the arrow keys once focused, to guide the prey away from the pursuing predator.',
+    );
   });
 });
