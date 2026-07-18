@@ -9,6 +9,11 @@ describe('profile data', () => {
     expect(profile.image.endsWith('.webp')).toBe(true);
   });
 
+  it('states citizenship with its flag', () => {
+    expect(profile.citizenshipFlag).toBe('🇺🇸');
+    expect(profile.citizenshipLabel).toBe('U.S. Citizen');
+  });
+
   it('includes required social links and stats', () => {
     expect(profile.social.github).toMatch(/^https:\/\/github\.com\//);
     expect(profile.social.linkedin).toMatch(/^https:\/\/www\.linkedin\.com\//);
