@@ -60,11 +60,24 @@ export function getTimelineDotAnimation(isLiteMotion: boolean, isActive: boolean
   };
 }
 
+/**
+ * A spring computes color/shadow samples through an interpolation path that
+ * can serialize to oklab() mid-transition — some browsers reject setting
+ * that via inline style ("not an animatable color",
+ * motion.dev/troubleshooting/color-not-animatable). Scale keeps a spring for
+ * the springy feel; backgroundColor/boxShadow always use a plain tween,
+ * which only ever interpolates within the source rgba() space.
+ */
+const TIMELINE_DOT_COLOR_TRANSITION = { type: 'tween' as const, duration: 0.2, ease: 'easeOut' as const };
+
 export function getTimelineDotTransition(isLiteMotion: boolean) {
-  if (isLiteMotion) {
-    return { duration: 0.2, ease: 'easeOut' as const };
-  }
-  return { type: 'spring' as const, stiffness: 280, damping: 22 };
+  return {
+    scale: isLiteMotion
+      ? TIMELINE_DOT_COLOR_TRANSITION
+      : { type: 'spring' as const, stiffness: 280, damping: 22 },
+    backgroundColor: TIMELINE_DOT_COLOR_TRANSITION,
+    boxShadow: TIMELINE_DOT_COLOR_TRANSITION,
+  };
 }
 
 export function getExperiencePhaseStaggerDelay(index: number, isLiteMotion: boolean): number {
