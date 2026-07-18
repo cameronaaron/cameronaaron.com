@@ -9,18 +9,32 @@ interface TypewriterEffectProps {
   className?: string;
   cursorClassName?: string;
   typingSpeed?: number;
+  /** Fires exactly once, the frame typing (or a bfcache skip-to-end) finishes. Optional — omitting it changes nothing for existing callers. */
+  onComplete?: () => void;
 }
 
 export default function TypewriterEffect({
   text,
   className = "",
   cursorClassName = "",
-  typingSpeed = 100
+  typingSpeed = 100,
+  onComplete
 }: TypewriterEffectProps) {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skipTyping, setSkipTyping] = useState(false);
   const isComplete = currentIndex >= text.length;
+
+  // Notify the caller once typing (or a bfcache skip-to-end) actually
+  // finishes. Depending on `isComplete` rather than firing inline in the
+  // typing effect means this covers both the normal last-keystroke path and
+  // the pageshow-persisted skip path with one rule. Callers that need a
+  // stable identity (to avoid re-firing) should memoize their handler.
+  useEffect(() => {
+    if (isComplete) {
+      onComplete?.();
+    }
+  }, [isComplete, onComplete]);
 
   // Only a true bfcache restore (the browser resumes a frozen page instead of
   // re-running JS) should jump straight to the finished state — every other

@@ -7,7 +7,7 @@ import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
 import StatCard from '@/components/ui/StatCard';
 import TextReveal from '@/components/ui/TextReveal';
-import TypewriterEffect from '@/components/ui/TypewriterEffect';
+import GlyphDissolveName from '@/components/hero/GlyphDissolveName';
 import ProfileImage from '@/components/hero/ProfileImage';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
 import Magnetic from '@/components/ui/Magnetic';
@@ -138,7 +138,7 @@ export default function Hero() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
             >
-              <TypewriterEffect
+              <GlyphDissolveName
                 text={profile.name}
                 typingSpeed={80}
                 className="bg-gradient-to-br from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent"
