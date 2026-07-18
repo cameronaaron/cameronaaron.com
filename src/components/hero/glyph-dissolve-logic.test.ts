@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   GLYPH_ALPHA_THRESHOLD,
   GLYPH_DISSOLVE_DURATION_MS,
+  GLYPH_PARTICLE_FILL_STYLE,
   GLYPH_PARTICLE_MAX,
   GLYPH_RESTORE_DURATION_MS,
   GLYPH_SAMPLE_STRIDE,
@@ -24,6 +25,12 @@ import {
 } from '@/components/hero/glyph-dissolve-logic';
 
 describe('glyph-dissolve-logic', () => {
+  describe('GLYPH_PARTICLE_FILL_STYLE', () => {
+    it('is the exact non-empty fill color, pinned against a hardcoded literal', () => {
+      expect(GLYPH_PARTICLE_FILL_STYLE).toBe('rgba(165, 243, 252, 0.85)');
+    });
+  });
+
   describe('shouldEnableGlyphDissolve', () => {
     it('is true only when every gate passes', () => {
       expect(shouldEnableGlyphDissolve('full', true, true)).toBe(true);
@@ -102,6 +109,30 @@ describe('glyph-dissolve-logic', () => {
       void GLYPH_SAMPLE_STRIDE;
       void GLYPH_PARTICLE_MAX;
     });
+
+    it('never scans a row at or past the declared height (row loop bound is strict <)', () => {
+      // A real getImageData buffer never has data past height*width*4, but this
+      // stub represents a row 3 that's out of the DECLARED 3-row height with a
+      // bright pixel — if the loop bound were `<=` instead of `<`, it would be
+      // (incorrectly) scanned and counted.
+      const width = 3;
+      const height = 3;
+      const data = new Uint8ClampedArray(width * 4 * 4); // room for a 4th, out-of-bounds row
+      data[(3 * width + 0) * 4 + 3] = 255;
+      const image: GlyphImageDataLike = { width, height, data };
+
+      expect(sampleGlyphPositions(image, 3, 100, 80).count).toBe(0);
+    });
+
+    it('never scans a column at or past the declared width (column loop bound is strict <)', () => {
+      const width = 3;
+      const height = 3;
+      const data = new Uint8ClampedArray((width + 1) * height * 4); // room for an out-of-bounds column
+      data[(0 * width + 3) * 4 + 3] = 255;
+      const image: GlyphImageDataLike = { width, height, data };
+
+      expect(sampleGlyphPositions(image, 3, 100, 80).count).toBe(0);
+    });
   });
 
   describe('computeScatterTarget', () => {
@@ -115,6 +146,21 @@ describe('glyph-dissolve-logic', () => {
       const expectedRadius = 10 + 0.5 * (30 - 10);
       expect(target.x).toBeCloseTo(10 + Math.cos(expectedAngle) * expectedRadius, 10);
       expect(target.y).toBeCloseTo(20 + Math.sin(expectedAngle) * expectedRadius, 10);
+    });
+
+    it('adds the cosine/sine offset to origin (not subtracts) — exact value at angle=0', () => {
+      // The fixed-stream test above uses an angle fraction of 0.25, i.e. angle =
+      // π/2, where cos(angle) is exactly 0 — that can't distinguish `origin.x +
+      // cos(angle)*radius` from `origin.x - cos(angle)*radius`, since both add
+      // zero. angle=0 (cos=1, sin=0) isolates the x-term's sign.
+      const values = [0, 0.5]; // angle fraction 0 -> angle=0; radius fraction 0.5
+      let i = 0;
+      const random = () => values[i++];
+      const target = computeScatterTarget({ x: 10, y: 20 }, random, 10, 30);
+
+      const expectedRadius = 10 + 0.5 * (30 - 10);
+      expect(target.x).toBeCloseTo(10 + expectedRadius, 10);
+      expect(target.y).toBeCloseTo(20, 10);
     });
 
     it('never lands closer than radiusMin from the origin', () => {
@@ -169,6 +215,21 @@ describe('glyph-dissolve-logic', () => {
       expect(clampProgress(5, 0)).toBe(1);
       expect(clampProgress(5, -10)).toBe(1);
     });
+
+    it('treats a duration of exactly zero as finished even with zero elapsed time', () => {
+      // Distinguishes `durationMs <= 0` from a `durationMs < 0` mutant: with
+      // elapsedMs also 0, the mutant instead falls through to the elapsedMs
+      // check and returns 0, not 1.
+      expect(clampProgress(0, 0)).toBe(1);
+    });
+
+    // Not tested: `elapsedMs <= 0` at exactly elapsedMs=0 vs a `< 0` mutant.
+    // Proven equivalent (2026-07, hand-verified per ENGINEERING-STANDARDS.md
+    // §6 item 13): whenever this line is reached, durationMs is already known
+    // to be > 0 (the durationMs<=0 check above returns first otherwise), so a
+    // mutant that falls through at elapsedMs===0 computes
+    // Math.min(1, 0 / durationMs) = Math.min(1, 0) = 0 — identical to the
+    // early return. No input reaches this branch with a different result.
   });
 
   describe('easeOutCubic / easeInCubic', () => {
@@ -234,6 +295,20 @@ describe('glyph-dissolve-logic', () => {
     it('orbits the scatter target while hovering, never sitting exactly on it once time passes', () => {
       const point = computeGlyphParticlePosition('hovering', 250, origin, scatterTarget, leaveStart, 0);
       expect(point.x).not.toBeCloseTo(scatterTarget.x, 3);
+    });
+
+    it('converts elapsedMs to swirl elapsedSeconds by dividing by 1000, not multiplying — exact value', () => {
+      // The instant-hovering test below uses elapsed=0, where both /1000 and
+      // *1000 give 0 — indistinguishable. And the "orbits, never sitting
+      // exactly on target" test above only asserts a loose not-close-to,
+      // which a wildly wrong (but still nonzero) offset would also satisfy.
+      // This recomputes the expected offset via the already-pinned
+      // computeSwirlOffset at the CORRECT elapsedSeconds (2000ms / 1000 = 2s),
+      // which also carries the correct scatterTarget.y + swirl.y sign.
+      const point = computeGlyphParticlePosition('hovering', 2000, origin, scatterTarget, leaveStart, 0);
+      const expectedSwirl = computeSwirlOffset(0, 2);
+      expect(point.x).toBeCloseTo(scatterTarget.x + expectedSwirl.x, 10);
+      expect(point.y).toBeCloseTo(scatterTarget.y + expectedSwirl.y, 10);
     });
 
     it('sits at the exact swirl-phase offset from the scatter target at the instant hovering begins', () => {
