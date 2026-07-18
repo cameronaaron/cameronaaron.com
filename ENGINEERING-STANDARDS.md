@@ -10,6 +10,30 @@ that isn't executable is a suggestion.
 > and fixing a real regression. Weakening a test to make code pass inverts the
 > entire system.
 
+**This codebase is held to the standard of safety-critical, mission-critical
+software** — not because a portfolio site is life-safety equipment, but
+because that discipline is the concrete, executable version of "obsessive
+engineering quality." In practice that means:
+
+- **A defect, once found, gets a permanent test in the same commit that fixes
+  it.** The ratchet in §6 only ever tightens; a bug that recurs after being
+  fixed once is a process failure, not bad luck.
+- **Nothing ships on "should work."** Every claim in this document is backed
+  by a measurement, a reproduction, or a contract test — see §4.7's Lighthouse
+  history and §6 item 13's mutation-testing sweep for what that looks like
+  when actually done, not just asserted.
+- **Iteration speed and verification rigor are not in tension.** The fast
+  offline subset (`test:complexity`) exists so day-to-day iteration stays
+  quick; the full pre-commit/pre-push gate exists so *nothing* ships without
+  every contract passing. Fast and rigorous are the same design goal, not a
+  tradeoff — the pattern real aerospace/mission-critical software teams use
+  is extensive automated verification paired with fast iteration loops, never
+  rigor traded for speed or speed traded for rigor.
+- **"What does this do on the worst device, on the worst network, for the
+  user who turns motion off" is the first question, not an edge case
+  asked afterward** (§4 in full). A feature that only works in the happy path
+  on a fast machine with a mouse is not finished.
+
 Enforcing test files:
 
 | Contract | File |
