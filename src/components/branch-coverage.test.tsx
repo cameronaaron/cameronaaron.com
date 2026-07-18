@@ -7,9 +7,7 @@ import ExperienceCard from './experience/ExperienceCard';
 import FeaturedProject from './projects/FeaturedProject';
 import ProjectCard from './projects/ProjectCard';
 import Button from './ui/Button';
-import Card from './ui/Card';
 import Magnetic from './ui/Magnetic';
-import ParallaxSection from './ui/ParallaxSection';
 import SmoothScroll from './ui/SmoothScroll';
 import Tilt from './ui/Tilt';
 import TypewriterEffect from './ui/TypewriterEffect';
@@ -35,17 +33,14 @@ describe('branch coverage targets', () => {
     if (nextBtn) fireEvent.click(nextBtn);
   });
 
-  it('exercises button and card style/interaction branches', () => {
+  it('exercises button style/interaction branches', () => {
     const onClick = vi.fn();
 
-    const { container } = render(
+    render(
       <>
         <Button onClick={onClick} variant="primary">Primary</Button>
         <Button href="#go" variant="secondary">Secondary Link</Button>
         <Button variant="outline">Outline</Button>
-        <Card hover={false} gradient={false}>Plain Card</Card>
-        <Card className="extra" delay={0.2}>With className and delay</Card>
-        <Card>Default gradient</Card>
       </>
     );
 
@@ -56,7 +51,6 @@ describe('branch coverage targets', () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('link', { name: 'Secondary Link' })).toBeTruthy();
-    expect(container.textContent).toContain('Plain Card');
   });
 
   it('covers experience/project hover and icon branches', () => {
@@ -97,7 +91,6 @@ describe('branch coverage targets', () => {
     render(
       <>
         <Magnetic><button type="button">Magnet</button></Magnetic>
-        <ParallaxSection direction="down"><div>Parallax Down</div></ParallaxSection>
         <Tilt><button type="button">Tilt Target</button></Tilt>
       </>
     );
@@ -110,7 +103,7 @@ describe('branch coverage targets', () => {
     fireEvent.mouseMove(tilt, { clientX: 90, clientY: 60 });
     fireEvent.mouseLeave(tilt);
 
-    expect(screen.getByText('Parallax Down')).toBeTruthy();
+    expect(tilt).toBeTruthy();
   });
 
   it('runs typewriter completion and smooth scroll RAF path', () => {

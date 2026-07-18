@@ -74,7 +74,7 @@ describe('interpolateRange', () => {
   });
 
   it('interpolates inside the correct segment of a multi-point range', () => {
-    // Skills/ScrollReveal shape: [0, 0.3, 0.7, 1] → [0, 1, 1, 0]
+    // Fade-in-plateau-fade-out shape: [0, 0.3, 0.7, 1] → [0, 1, 1, 0]
     const input = [0, 0.3, 0.7, 1];
     const output = [0, 1, 1, 0];
     expect(interpolateRange(0.15, input, output)).toBeCloseTo(0.5); // first segment, halfway up

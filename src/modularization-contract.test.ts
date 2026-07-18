@@ -274,13 +274,6 @@ describe('modularization contract', () => {
     expect(source).not.toContain('const centerX = left + width / 2;');
   });
 
-  it('keeps FadeInWhenVisible direction map extracted', () => {
-    const source = read('src/components/ui/FadeInWhenVisible.tsx');
-
-    expect(source).toContain("from '@/components/ui/fade-in-logic'");
-    expect(source).not.toContain('const directions = {');
-  });
-
   it('keeps FeaturedProject icon rendering extracted to dedicated module', () => {
     const source = read('src/components/projects/FeaturedProject.tsx');
 
