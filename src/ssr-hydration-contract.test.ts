@@ -51,7 +51,17 @@ import { describe, expect, it } from 'vitest';
 const PROJECT_ROOT = process.cwd();
 const SRC_ROOT = resolve(PROJECT_ROOT, 'src');
 
-/** Browser APIs that are undefined at SSR/build time. */
+/**
+ * Browser APIs that are undefined at SSR/build time, PLUS non-deterministic
+ * APIs that ARE defined in both environments but return a different value
+ * each time (the current date, a random number) — reading either at lazy-
+ * initializer time produces a value that can never match the statically
+ * built HTML, which is the same class of #418 mismatch as a genuinely
+ * undefined API. Found 2026-07 while building this repo's own hydration-safe
+ * live-clock pattern (LocalTimeStatus, Certifications' expiry status): this
+ * contract only checked for undefined-at-SSR APIs and would have missed a
+ * `useState(() => new Date())`-style regression entirely.
+ */
 const BROWSER_API_PATTERNS = [
   'window.',
   'navigator.',
@@ -61,6 +71,9 @@ const BROWSER_API_PATTERNS = [
   'performance.get',
   'performance.now',
   'location.',
+  'new Date(',
+  'Date.now(',
+  'Math.random(',
 ];
 
 function walkSrc(): string[] {
