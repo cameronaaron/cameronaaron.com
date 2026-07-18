@@ -1129,6 +1129,31 @@ investigate that script before touching the config.
     above are, is exactly the "whitelisted because it's hard" failure item 18
     exists to stop — mutation-testing exemptions are held to that same bar,
     not a special case of it.
+
+    **2026-07 sweep, round three:** ran the remaining ~35 never-swept logic
+    modules through Stryker in one pass. 34 of 35 landed at 100% on the first
+    try — this codebase's exact-value-testing habit generalizes, it isn't
+    specific to the handful of files chased by hand so far. The one
+    exception, `dna-snp-game-logic.ts` (never swept before — the "Spot the
+    SNP" mini-game), had 11 survivors, all real except one: `Math.floor(
+    random() * N)` mutated to `random() / N` in three places survived because
+    every existing `generateRound` test asserted loose bounds/membership a
+    division can still satisfy for many seeds — closed the same way as
+    `createInitialEntities` above, independently re-deriving the expected
+    sequence from the same seeded PRNG. `BASE_COLOR_CLASSES`'s four Tailwind
+    literals were only ever asserted by re-importing the same constant on
+    both sides of the comparison — the exact PAUSED_CAPTION/
+    SIMULATION_ARIA_LABEL mistake from round two, same fix (hardcoded
+    literals). And `getTileClassName('reveal-snp', …)` /
+    `getTileClassName('guessed-incorrect', false)` were never called at
+    all — `getTileVisualState`'s own tests only checked that the STATE NAME
+    came back, never that the class-name/animation derived from it was
+    correct, so the `'reveal-snp'` class value and two of the three
+    animated-states Set members went completely unexercised. The one true
+    equivalent — `new Array(length)` vs `new Array()`, since the following
+    loop assigns every index 0..length-1 sequentially and a plain array grows
+    to fit each write identically to a pre-sized one — documented inline at
+    its source. Final: 98.92%, one equivalent.
 14. **A rendered-text assertion is only as strong as its regex — a wildcard
     is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
     months.*renew soon/i))` passes as long as *something* sits between the
@@ -1271,10 +1296,14 @@ investigate that script before touching the config.
     — a blanket excuse, or no enforced reason at all, is the gate quietly
     turning itself off.** Every "allow-list" pattern in this codebase
     (`ALLOWED_COMPLEXITY_EXCEPTIONS`, `ALLOWED_LIFECYCLE_EXCEPTIONS`,
-    `ALLOWED_UNUSED_LOGIC_EXPORTS`, `PINNED_WITH_REASON`) is a
-    `Record<name, reason>`, with its OWN test asserting `reason.length > 10`
-    — a real sentence, not a placeholder. `ALLOWED_UNUSED_COMPONENTS`
-    (`dead-component-contract.test.ts`) was the one exception (2026-07 audit,
+    `ALLOWED_UNUSED_LOGIC_EXPORTS`, `PINNED_WITH_REASON`,
+    `PUBLIC_CONVENTION_EXEMPT`) is a `Record<name, reason>`, with its OWN
+    test asserting `reason.length > 10` — a real sentence, not a placeholder.
+    `PUBLIC_CONVENTION_EXEMPT` already had a genuinely specific reason on its
+    one entry but was missing the enforcing test itself — added the same day
+    for consistency, since a good reason with nothing checking it stays good
+    only until someone adds a bad one. `ALLOWED_UNUSED_COMPONENTS`
+    (`dead-component-contract.test.ts`) was the sharper case (2026-07 audit,
     prompted directly by "prevent us from marking sections as test-ignored or
     whitelisted just because it's hard, opposed to there being an actual
     valid reason"): a bare `Set<string>` holding four component names — Card,

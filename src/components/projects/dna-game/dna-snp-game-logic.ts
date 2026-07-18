@@ -67,6 +67,12 @@ export const BASE_COLOR_CLASSES: Record<Base, string> = {
 export function generateRound(seed: number, length: number = STRAND_LENGTH): DnaRound {
   const random = createSeededRandom(seed);
 
+  // Mutation-testing note (2026-07): a Stryker mutant that replaces
+  // `new Array(length)` with `new Array()` survives, but is a true
+  // equivalent — the loop below assigns every index from 0..length-1
+  // sequentially, and a plain array grows to fit each assignment exactly
+  // the same way a pre-sized one does. Final length and contents are
+  // identical either way, so no test can distinguish them.
   const reference: Base[] = new Array(length);
   for (let i = 0; i < length; i += 1) {
     reference[i] = BASES[Math.floor(random() * BASES.length)];

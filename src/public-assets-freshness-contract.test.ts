@@ -137,4 +137,11 @@ describe('public-assets-freshness-contract — every public/ file is referenced 
       );
     }
   });
+
+  it('every PUBLIC_CONVENTION_EXEMPT entry has a real, specific reason — not a placeholder', () => {
+    // Same bar every exemption list in this repo holds itself to (ENGINEERING-STANDARDS.md §6 item 18).
+    for (const [name, reason] of Object.entries(PUBLIC_CONVENTION_EXEMPT)) {
+      expect(reason.length, `PUBLIC_CONVENTION_EXEMPT["${name}"] needs a real reason`).toBeGreaterThan(10);
+    }
+  });
 });
