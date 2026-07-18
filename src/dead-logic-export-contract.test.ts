@@ -24,6 +24,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
+import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 const SRC = resolve(process.cwd(), 'src');
@@ -46,6 +47,47 @@ function listSources(): string[] {
   return files;
 }
 
+/** Every top-level exported function name in a module — function declarations
+ * AND `export const name = (...) => {}` / `export const name = function () {}`
+ * arrow/function-expression exports. The prior regex (`^export function
+ * (\w+)`) only matched the declaration form: converting a logic module's
+ * export style to a const arrow (a purely stylistic, entirely ordinary
+ * refactor) would silently remove it from this sweep forever. Parsed with the
+ * real TypeScript compiler rather than a broader regex, since a second regex
+ * has the exact same "only matches the shapes it was written against" limit
+ * — e.g. it still wouldn't catch a re-export (`export { name }`). */
+function listExportedFunctionNames(file: string, src: string): string[] {
+  const sourceFile = ts.createSourceFile(
+    file,
+    src,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const isExported = (modifiers: readonly ts.ModifierLike[] | undefined) =>
+    (modifiers ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
+
+  const names: string[] = [];
+  for (const statement of sourceFile.statements) {
+    if (ts.isFunctionDeclaration(statement) && isExported(statement.modifiers) && statement.name) {
+      names.push(statement.name.text);
+      continue;
+    }
+    if (ts.isVariableStatement(statement) && isExported(statement.modifiers)) {
+      for (const decl of statement.declarationList.declarations) {
+        if (
+          ts.isIdentifier(decl.name) &&
+          decl.initializer &&
+          (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer))
+        ) {
+          names.push(decl.name.text);
+        }
+      }
+    }
+  }
+  return names;
+}
+
 describe('dead-logic-export-contract — every exported logic function has a production caller', () => {
   it('no logic module exports a function used only by tests', () => {
     const sources = listSources();
@@ -55,8 +97,7 @@ describe('dead-logic-export-contract — every exported logic function has a pro
     const dead: string[] = [];
     for (const mod of logicModules) {
       const src = otherSourceText.get(mod)!;
-      for (const match of src.matchAll(/^export function ([A-Za-z0-9_]+)/gm)) {
-        const name = match[1];
+      for (const name of listExportedFunctionNames(mod, src)) {
         const key = `${basename(mod)}::${name}`;
         if (key in ALLOWED_UNUSED_LOGIC_EXPORTS) continue;
 
