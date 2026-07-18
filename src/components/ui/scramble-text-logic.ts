@@ -25,6 +25,14 @@ export function scrambleFrame(
   out: string[]
 ): string {
   const revealedCount = Math.min(target.length, Math.floor(revealed));
+  // Stryker disable next-line EqualityOperator: at i===revealedCount, either
+  // (a) revealedCount < target.length, in which case the very next loop
+  // below starts at exactly this same index and unconditionally overwrites
+  // it, or (b) revealedCount === target.length, in which case target[i] is
+  // out-of-range (undefined) and the final `out.length = target.length`
+  // truncates that extra slot away entirely. Either way, one extra iteration
+  // here is never observable. Hand-verified: mutating '<' to '<=' here
+  // leaves the full scramble-text suite (logic + interaction-layer) passing.
   for (let i = 0; i < revealedCount; i += 1) {
     out[i] = target[i];
   }

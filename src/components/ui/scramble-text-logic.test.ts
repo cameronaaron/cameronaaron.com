@@ -64,6 +64,24 @@ describe('scrambleFrame', () => {
     const frame = scrambleFrame(target, 1, firstGlyphRandom, scratch);
     expect(frame[1]).toBe(' ');
   });
+
+  it('churns exactly the SCRAMBLE_WINDOW characters past reveal, touching nothing beyond it', () => {
+    // A mutant that computes windowEnd via `revealedCount - SCRAMBLE_WINDOW`
+    // (instead of +) makes the churn loop never run — verify positions
+    // inside the window actually get overwritten, and the very next
+    // position just past the window is left untouched.
+    const target = 'HelloWorld'; // 10 chars
+    const scratch = ['S', 'E', 'N', 'T', 'I', 'N', 'E', 'L', '!', '?'];
+    const frame = scrambleFrame(target, 2, firstGlyphRandom, scratch);
+
+    expect(frame.slice(0, 2)).toBe('He'); // revealed chars come from target
+    // Window is [2, 5): these sentinel slots must be overwritten with glyphs.
+    expect(SCRAMBLE_GLYPHS).toContain(scratch[2]);
+    expect(SCRAMBLE_GLYPHS).toContain(scratch[3]);
+    expect(SCRAMBLE_GLYPHS).toContain(scratch[4]);
+    // Position 5 is past the window — must remain the untouched sentinel.
+    expect(scratch[5]).toBe('N');
+  });
 });
 
 describe('isScrambleComplete', () => {

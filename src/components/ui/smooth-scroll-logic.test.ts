@@ -32,4 +32,12 @@ describe('resolveHashElementId', () => {
   it('returns null for the bare # fragment', () => {
     expect(resolveHashElementId('#')).toBeNull();
   });
+
+  it('accepts a 2-character hash (boundary is <2, not <=2)', () => {
+    expect(resolveHashElementId('#a')).toBe('a');
+  });
+
+  it('returns null when the string does not start with #, even if long enough', () => {
+    expect(resolveHashElementId('xy')).toBeNull();
+  });
 });

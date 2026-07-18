@@ -32,6 +32,12 @@ describe('toYouTubeEmbedUrl', () => {
     );
   });
 
+  it('requires the youtu.be short-URL pattern to be anchored at the start', () => {
+    // Without the `^` anchor, this substring would still match mid-string
+    // even though the URL isn't actually a youtu.be link.
+    expect(toYouTubeEmbedUrl('not-a-url https://youtu.be/abc123')).toBeUndefined();
+  });
+
   it('returns undefined for a non-YouTube URL', () => {
     expect(toYouTubeEmbedUrl('https://example.com/not-youtube')).toBeUndefined();
   });

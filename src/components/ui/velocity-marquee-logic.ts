@@ -62,7 +62,16 @@ export function getMarqueeMotionConfig(tier: PerformanceTier): MarqueeMotionConf
 
 /** Clamp a scroll velocity into the saturation window. */
 export function clampMarqueeVelocity(velocityPxPerS: number): number {
+  // Stryker disable next-line EqualityOperator: at velocityPxPerS exactly
+  // equal to the clamp constant, '>' is false and falls through to the final
+  // `return velocityPxPerS`, which returns that same constant value anyway —
+  // identical to what '>=' would return by clamping. The two branches only
+  // ever disagree on which code path runs, never on the returned number.
+  // Hand-verified: mutating '>' to '>=' here (together with the mirrored '<'
+  // below) leaves the full velocity-marquee suite passing bit-for-bit.
   if (velocityPxPerS > MARQUEE_VELOCITY_CLAMP_PX_S) return MARQUEE_VELOCITY_CLAMP_PX_S;
+  // Stryker disable next-line EqualityOperator: same self-consistent-boundary
+  // idiom as the '>' check above, mirrored for the negative saturation edge.
   if (velocityPxPerS < -MARQUEE_VELOCITY_CLAMP_PX_S) return -MARQUEE_VELOCITY_CLAMP_PX_S;
   return velocityPxPerS;
 }
@@ -78,6 +87,12 @@ export function marqueeVelocityToSkewDeg(velocityPxPerS: number): number {
  * it for a reversed one.
  */
 export function marqueeVelocityToShiftPx(velocityPxPerS: number, direction: MarqueeDirection): number {
+  // Stryker disable next-line ArithmeticOperator: `direction` is typed as
+  // exactly `1 | -1` (MarqueeDirection), and multiplying or dividing by
+  // either of those two values produces the identical result (x*1===x/1,
+  // x*-1===x/-1) — there is no value this parameter can hold for which '*'
+  // and '/' diverge. Hand-verified: mutating the trailing '*' to '/' here
+  // leaves the full velocity-marquee suite passing bit-for-bit.
   return (clampMarqueeVelocity(velocityPxPerS) / MARQUEE_VELOCITY_CLAMP_PX_S) * MARQUEE_MAX_SHIFT_PX * -direction;
 }
 

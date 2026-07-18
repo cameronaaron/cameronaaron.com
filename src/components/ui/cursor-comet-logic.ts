@@ -122,6 +122,17 @@ export function emitSurgeBurst(
 export function stepSparkPool(pool: SparkPool, step: number): void {
   let live = 0;
   for (const spark of pool.sparks) {
+    // Stryker disable next-line ConditionalExpression,EqualityOperator:
+    // life is only ever exactly 1 (fresh), a positive fraction (decaying), or
+    // exactly 0 (clamped dead by the `nextLife <= 0` branch below — decay is
+    // strictly subtractive, so life can never go negative through normal
+    // pool lifecycle). At life===0 specifically, skipping this guard entirely
+    // (or narrowing it to '<0') doesn't change anything observable: the
+    // fallthrough computes nextLife = 0 - DECAY*step < 0, which the second
+    // guard clamps back to exactly 0 and `continue`s anyway — same end state,
+    // same `live` count (not incremented either way). Hand-verified: both
+    // replacing this condition with `false` and narrowing it to `< 0` leave
+    // the full cursor-comet + interaction-layer suites passing bit-for-bit.
     if (spark.life <= 0) continue;
     const nextLife = spark.life - SPARK_LIFE_DECAY * step;
     if (nextLife <= 0) {

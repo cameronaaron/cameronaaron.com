@@ -73,6 +73,12 @@ export function createRibbon(
   const pinned = new Uint8Array(count);
 
   const lastIndex = count - 1;
+  // Stryker disable next-line EqualityOperator: '<=' runs one extra iteration
+  // at i===count, one past every array's length. Reads (x[count], t, etc.) are
+  // undefined and writes (x[count] = nx) to a Float32Array/Uint8Array index at
+  // or beyond its length are silently ignored per spec — no buffer is resized,
+  // no exception thrown. Hand-verified: mutating '<' to '<=' here leaves the
+  // full ribbon-band suite passing bit-for-bit.
   for (let i = 0; i < count; i += 1) {
     const t = lastIndex === 0 ? 0 : i / lastIndex;
     const nx = x0 + (x1 - x0) * t;
@@ -112,6 +118,12 @@ export function integrateRibbon(
   damping = RIBBON_DAMPING
 ): void {
   const { count, x, y, px, py, pinned } = state;
+  // Stryker disable next-line EqualityOperator: same out-of-bounds-is-a-silent
+  // -no-op idiom as createRibbon's loop — at i===count, pinned[count] reads
+  // undefined (falsy, so the continue doesn't fire), but the resulting
+  // NaN arithmetic is only ever written back to x[count]/y[count]/px[count]/
+  // py[count], all out-of-range Float32Array writes that are dropped. Hand-
+  // verified: mutating '<' to '<=' here leaves the full suite passing.
   for (let i = 0; i < count; i += 1) {
     if (pinned[i]) continue;
     const vx = (x[i] - px[i]) * damping;
@@ -137,12 +149,23 @@ export function applyPointerForce(
 ): void {
   const radiusSq = radius * radius;
   const { count, x, y, pinned } = state;
+  // Stryker disable next-line EqualityOperator: same out-of-bounds-is-a-silent
+  // -no-op idiom as createRibbon/integrateRibbon's loops. Hand-verified:
+  // mutating '<' to '<=' here leaves the full suite passing.
   for (let i = 0; i < count; i += 1) {
     if (pinned[i]) continue;
     const dx = x[i] - pointerX;
     const dy = y[i] - pointerY;
     const distSq = dx * dx + dy * dy;
-    if (distSq <= 0 || distSq >= radiusSq) continue;
+    if (distSq <= 0) continue;
+    // Stryker disable next-line EqualityOperator: at the exact boundary
+    // distSq===radiusSq, dist===radius, so falloff = (1 - dist/radius) *
+    // strength evaluates to exactly 0 — this guard is a compute-avoidance
+    // short-circuit (skip the sqrt), not a behavior boundary; letting the
+    // boundary case fall through to the force calculation below produces the
+    // identical no-op result. Hand-verified: mutating '>=' to '>' here leaves
+    // the full suite passing bit-for-bit.
+    if (distSq >= radiusSq) continue;
     const dist = Math.sqrt(distSq);
     const falloff = (1 - dist / radius) * strength;
     x[i] += (dx / dist) * falloff;

@@ -25,6 +25,14 @@ describe('rectContains', () => {
     expect(rectContains(rect, 11, 5)).toBe(false);
     expect(rectContains(rect, 5, -1)).toBe(false);
   });
+
+  it('rejects a point left of the rect even though every other clause is true', () => {
+    // x=-1 fails only the `x >= rect.x` clause; y=5 and x<=10 both hold, so a
+    // mutant that replaces just that first clause with `true` would wrongly
+    // accept this point. The existing "outside" cases above happen to fail
+    // via the right/bottom clauses instead, leaving this one unexercised.
+    expect(rectContains(rect, -1, 5)).toBe(false);
+  });
 });
 
 describe('circleIntersectsRect', () => {
@@ -35,6 +43,11 @@ describe('circleIntersectsRect', () => {
   });
   it('rejects a circle that cannot reach the box', () => {
     expect(circleIntersectsRect(rect, 100, 100, 4)).toBe(false);
+  });
+  it('accepts a circle whose edge exactly touches the box (boundary is <=, not <)', () => {
+    // closest point on the rect to (12,5) is (10,5): dx=2, dy=0, distSq=4.
+    // radiusSq=4 exactly means the circle's edge just reaches the box.
+    expect(circleIntersectsRect(rect, 12, 5, 4)).toBe(true);
   });
 });
 
@@ -61,6 +74,38 @@ describe('quadInsert', () => {
     expect(node.divided).toBe(true);
     expect(node.se?.points).toHaveLength(1);
     expect(node.se?.points[0]).toEqual(point(80, 80));
+  });
+
+  it('subdivides into exactly four quadrants with the correct boundary rects', () => {
+    const node = createQuadNode({ x: 0, y: 0, w: 100, h: 100 }, 2);
+    quadInsert(node, point(10, 10));
+    quadInsert(node, point(20, 20));
+    quadInsert(node, point(80, 80)); // forces subdivide()
+    expect(node.nw?.boundary).toEqual({ x: 0, y: 0, w: 50, h: 50 });
+    expect(node.ne?.boundary).toEqual({ x: 50, y: 0, w: 50, h: 50 });
+    expect(node.sw?.boundary).toEqual({ x: 0, y: 50, w: 50, h: 50 });
+    expect(node.se?.boundary).toEqual({ x: 50, y: 50, w: 50, h: 50 });
+  });
+
+  it('returns true (not false) when a point is accepted by a non-first, non-last child quadrant', () => {
+    // The insertion chain is `quadInsert(nw) || quadInsert(ne) || ...`. A
+    // mutant that ANDs the first two terms together (`nw && ne`) makes the
+    // return value wrong for any point landing in NW alone (or NE alone):
+    // JS still evaluates the second operand since the first was truthy, that
+    // second call correctly rejects (no side effect), so `nw && ne` is
+    // false, and the point's real acceptance into `nw` gets masked by the
+    // trailing `|| sw || se` also failing. The array state ends up correct
+    // (inserted once, in the right place) even under the mutant — only the
+    // boolean return value lies — so this must be caught via the return
+    // value, not by inspecting node.points.
+    const node = createQuadNode({ x: 0, y: 0, w: 100, h: 100 }, 2);
+    quadInsert(node, point(10, 10));
+    quadInsert(node, point(20, 20));
+    quadInsert(node, point(80, 80)); // forces subdivide()
+    const accepted = quadInsert(node, point(5, 5)); // squarely inside NW only
+    expect(accepted).toBe(true);
+    expect(node.nw?.points).toHaveLength(1);
+    expect(node.ne?.points ?? []).toHaveLength(0);
   });
 
   it('stops subdividing at the depth cap even with coincident points', () => {

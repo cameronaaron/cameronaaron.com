@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { getMostVisibleEntry } from './section-rail-logic';
+import { RAIL_SECTIONS, getMostVisibleEntry } from './section-rail-logic';
+
+describe('RAIL_SECTIONS', () => {
+  it('pins the exact id/label catalog for every rail item', () => {
+    expect(RAIL_SECTIONS).toEqual([
+      { id: 'home', label: 'Intro' },
+      { id: 'certifications', label: 'Credentials' },
+      { id: 'experience', label: 'Experience' },
+      { id: 'education', label: 'Education' },
+      { id: 'projects', label: 'Research' },
+      { id: 'skills', label: 'Skills' },
+      { id: 'testimonials', label: 'Voices' },
+      { id: 'contact', label: 'Connect' },
+    ]);
+  });
+});
 
 function makeEntry(id: string, ratio: number): IntersectionObserverEntry {
   const el = document.createElement('div');
@@ -45,7 +60,11 @@ describe('getMostVisibleEntry', () => {
     // sort is stable in V8 — entries with equal ratio keep their relative order
     const entries = [makeEntry('home', 0.5), makeEntry('skills', 0.5)];
     const result = getMostVisibleEntry(entries);
-    // Both are equally visible; the first one in the filtered list wins
+    // Both are equally visible; the first one in the filtered list wins.
+    // A mutant that widens the comparison to `>=` would let the SECOND entry
+    // (skills) overwrite `best` on the tie — check the winning id, not just
+    // the ratio value (which is identical either way).
+    expect(result?.target.id).toBe('home');
     expect(result?.intersectionRatio).toBe(0.5);
   });
 

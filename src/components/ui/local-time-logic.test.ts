@@ -39,6 +39,15 @@ describe('getDaypartLabel', () => {
     // 10 PM PST → after the last band (untilHour 21).
     expect(getDaypartLabel(new Date('2026-01-16T06:00:00Z'))).toBe('tonight');
   });
+
+  it('treats the band boundary hour as NOT yet in that band (boundary is <, not <=)', () => {
+    // 20:00Z - 8h = 12:00 PST exactly, matching the 'this morning' band's
+    // untilHour (12) precisely. At the exact boundary, hour===12 should
+    // fall through to the NEXT band ('this afternoon'), not match early.
+    const noonPST = new Date('2026-01-15T20:00:00Z');
+    expect(getLocalHour(noonPST)).toBe(12);
+    expect(getDaypartLabel(noonPST)).toBe('this afternoon');
+  });
 });
 
 describe('constants', () => {

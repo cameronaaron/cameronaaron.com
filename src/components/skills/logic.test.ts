@@ -146,6 +146,15 @@ describe('skills logic', () => {
       expect(t2.delay).toBeGreaterThan(t0.delay);
     });
 
+    it('computes the exact delay (index * step, not index / step)', () => {
+      // toBeGreaterThan above can't tell multiplication from division — both
+      // grow with a larger index for step values > 1... but even for step <
+      // 1 here, division would also produce a larger (just much bigger)
+      // number than multiplication, so only an exact value pins the operator.
+      expect(getSkillBarEntryTransition(false, 2).delay).toBe(0.08); // 2 * 0.04
+      expect(getSkillBarEntryTransition(true, 2).delay).toBe(0.03); // 2 * 0.015
+    });
+
     it('lite motion does not include spring-only stiffness/damping props', () => {
       const t = getSkillBarEntryTransition(true, 0);
       expect(t).not.toHaveProperty('stiffness');
