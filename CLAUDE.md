@@ -15,8 +15,16 @@ npm run build        # production static export to /out
 npm test             # Vitest (all tests must pass before committing)
 npm run type-check   # tsc --noEmit
 npm run lint         # ESLint (--max-warnings=0) + markdownlint — warnings are failures
-npm run test:mutation  # Stryker mutation testing (manual only — see ENGINEERING-STANDARDS.md §6.13)
+npm run test:mutation  # Stryker mutation testing, full repo — manual sweep tool (see ENGINEERING-STANDARDS.md §6.13)
 ```
+
+Mutation testing itself is **no longer manual-only**: `pnpm run test:mutation:changed`
+(scoped to whichever changed files match the logic-module convention —
+`logic.ts`/`*-logic.ts`/`engine.ts`/`builders.ts`, not every changed `.ts(x)`
+file — see ENGINEERING-STANDARDS.md §6 item 13 for why) runs inside the
+pre-commit/pre-push gate below. `pnpm run test:mutation` (the unscoped,
+full-repo command above, which does cover component files too) stays a
+manual tool for periodic whole-codebase sweeps.
 
 ## Commits
 
@@ -28,11 +36,15 @@ Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS.md §6, ratchet item 12.
 
 Hook gate (simple-git-hooks): **pre-commit and pre-push both run the full
-gate** — lockfile sync, type-check, zero-warning lint, and the entire test
-suite (every contract, including networked freshness checks). Nothing is
-deferred to push time; a red gate blocks the commit itself. Push after
-every commit (or at least before ending a session) — commits sitting only
-local aren't backed up and aren't verified by CI.
+gate** — lockfile sync, type-check, zero-warning lint, the entire test suite
+(every contract, including networked freshness checks), and mutation testing
+scoped to whichever changed files are logic modules (fails the commit if a
+changed logic module's mutation score drops below the threshold in
+`stryker.config.mjs`). Nothing is deferred to push time; a red gate blocks
+the commit itself. GitHub-hosted CI is currently **disabled** (2026-07, cost —
+`.github/workflows/ci.yml` only runs on manual `workflow_dispatch` now), so
+these local hooks are the only gate a change passes through; push after every
+commit (or at least before ending a session) anyway so work is backed up.
 `pnpm run test:complexity` is a fast, offline, manually-run subset for quick
 iteration — it is not the commit gate.
 

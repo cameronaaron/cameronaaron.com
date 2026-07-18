@@ -2,15 +2,17 @@
 /**
  * Mutation testing (Stryker).
  *
- * Manual-only by design (ENGINEERING-STANDARDS.md §6 pattern for expensive
- * checks — see test:complexity, test:performance): a full run mutates every
- * production statement in the logic layer and re-runs only the tests that
- * cover it (coverageAnalysis: 'perTest'), which is still far slower than the
- * ~20s full Vitest suite. Never wired into pre-commit/pre-push or a blocking
- * CI job — run by hand with `pnpm run test:mutation` when you want to verify
- * a test suite actually fails when the behavior it claims to pin changes,
- * not just that it executes the line (100% coverage proves the latter, not
- * the former).
+ * Standard in the pre-commit/pre-push gate as of 2026-07 (owner mandate,
+ * once GitHub-hosted CI was turned off to cut cost — local hooks became the
+ * only gate, so they now carry the full weight this repo holds itself to).
+ * `pnpm run test:mutation` still runs the FULL scope defined here — that
+ * remains a manual, whole-codebase command for periodic sweeps (still far
+ * slower than the ~20s Vitest suite). The hook itself never runs this full
+ * scope: `scripts/verify/run-mutation-on-changed-files.mjs` scopes every
+ * commit/push to just the files that commit/push actually touches (via
+ * `--mutate`), which is what keeps it fast enough to run on every commit.
+ * A full run mutates every production statement in the logic layer and
+ * re-runs only the tests that cover it (coverageAnalysis: 'perTest').
  *
  * Scope excludes src/data/** on purpose: those files are declarative content
  * catalogs (experience entries, testimonials, skills), not logic — mutating
@@ -68,11 +70,20 @@ const strykerConfig = {
     fileName: 'reports/mutation/mutation.json',
   },
   thresholds: {
-    high: 90,
-    low: 70,
-    // No break threshold — this gate is advisory/manual only (see header),
-    // never fails the process regardless of score.
-    break: null,
+    // Raised 2026-07: every logic-heavy file actually swept so far
+    // (predator-prey-logic.ts, reaction-time-game-logic.ts,
+    // glyph-dissolve-logic.ts, and the five files listed in
+    // ENGINEERING-STANDARDS.md §6 item 13) has landed at 100%, or one
+    // hand-verified equivalent mutant away from it — 90/70 undersold what
+    // this codebase actually holds itself to.
+    high: 100,
+    low: 90,
+    // Blocking as of 2026-07 (see header) — a scoped run whose survivors push
+    // the changed file(s) below 90% fails the commit/push. 90, not 100: a
+    // file can carry one or two hand-verified equivalent mutants forever
+    // (documented at their source and in ENGINEERING-STANDARDS.md §6 item 13)
+    // without every unrelated future commit to that file tripping the gate.
+    break: 90,
   },
   incremental: true,
   incrementalFile: '.stryker-tmp/incremental.json',
