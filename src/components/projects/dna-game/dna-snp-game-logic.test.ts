@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { DnaRound } from './dna-snp-game-logic';
+import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
+import type { Base, DnaRound } from './dna-snp-game-logic';
 import {
   BASES,
   BASE_COLOR_CLASSES,
@@ -94,6 +95,30 @@ describe('generateRound', () => {
 
     expect(round).toEqual(generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH));
     expect(round.reference).toHaveLength(STRAND_LENGTH);
+  });
+
+  it('derives each base and the SNP position as exactly Math.floor(random() * N) — not random() / N', () => {
+    // Independently re-derives the expected sequence from the same seeded
+    // PRNG, calling it in the identical order generateRound does, rather
+    // than asserting loose membership/range checks that a `*` -> `/`
+    // mutant can still satisfy for many seeds.
+    const seed = 555;
+    const length = 8;
+    const random = createSeededRandom(seed);
+
+    const expectedReference: Base[] = [];
+    for (let i = 0; i < length; i += 1) {
+      expectedReference.push(BASES[Math.floor(random() * BASES.length)]);
+    }
+    const expectedSnpIndex = Math.floor(random() * length);
+    const originalIndex = BASES.indexOf(expectedReference[expectedSnpIndex]);
+    const offset = 1 + Math.floor(random() * (BASES.length - 1));
+    const expectedMutatedBase = BASES[(originalIndex + offset) % BASES.length];
+
+    const round = generateRound(seed, length);
+    expect(round.reference).toEqual(expectedReference);
+    expect(round.snpIndex).toBe(expectedSnpIndex);
+    expect(round.sample[expectedSnpIndex]).toBe(expectedMutatedBase);
   });
 });
 
@@ -197,6 +222,21 @@ describe('getTileClassName', () => {
     expect(incorrect).toContain('red');
     expect(correct).toContain('emerald');
   });
+
+  it('animates guessed-incorrect too when motion is allowed', () => {
+    // guessed-incorrect's own membership in the animated-states set was
+    // never exercised with motion allowed — only its reduced-motion form.
+    expect(getTileClassName('guessed-incorrect', false)).toBe('ring-4 ring-red-300 bg-red-500 animate-pulse');
+  });
+
+  it('gives reveal-snp the exact same highlight as guessed-correct, and animates it too', () => {
+    // Never exercised before: getTileVisualState's tests only check that the
+    // STATE NAME 'reveal-snp' comes back, never that getTileClassName
+    // actually renders it correctly — its class value and its membership in
+    // the animated-states set were both untested.
+    expect(getTileClassName('reveal-snp', false)).toBe('ring-4 ring-emerald-300 bg-emerald-500 animate-pulse');
+    expect(getTileClassName('reveal-snp', true)).toBe('ring-4 ring-emerald-300 bg-emerald-500');
+  });
 });
 
 describe('getBaseColorClass / BASE_COLOR_CLASSES', () => {
@@ -207,6 +247,17 @@ describe('getBaseColorClass / BASE_COLOR_CLASSES', () => {
     for (const base of BASES) {
       expect(getBaseColorClass(base)).toBe(BASE_COLOR_CLASSES[base]);
     }
+  });
+
+  it('maps every base to its exact hardcoded class — not just self-referential equality', () => {
+    // The test above compares getBaseColorClass(base) against the SAME
+    // imported BASE_COLOR_CLASSES constant, so a mutation emptying an entry
+    // empties both sides of that comparison at once and can never be caught
+    // that way. These hardcoded literals are what actually pin the content.
+    expect(getBaseColorClass('A')).toBe('bg-emerald-700');
+    expect(getBaseColorClass('T')).toBe('bg-cyan-700');
+    expect(getBaseColorClass('C')).toBe('bg-amber-700');
+    expect(getBaseColorClass('G')).toBe('bg-fuchsia-700');
   });
 });
 
