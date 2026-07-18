@@ -27,7 +27,7 @@ dist/
 coverage/
 .nyc_output/
 
-# Stryker mutation testing (manual-only — see stryker.config.mjs)
+# Stryker mutation testing — see stryker.config.mjs
 .stryker-tmp/
 reports/mutation/
 

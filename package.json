@@ -2,7 +2,7 @@
   "name": "cameron-aaron-portfolio",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.14.0",
+  "packageManager": "pnpm@11.15.0",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -21,8 +21,8 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test",
-    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test"
+    "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed",
+    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed"
   },
   "scripts": {
     "prepare": "simple-git-hooks",
@@ -49,6 +49,7 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:v8": "vitest run --coverage --coverage.provider=v8",
     "test:mutation": "stryker run",
+    "test:mutation:changed": "node scripts/verify/run-mutation-on-changed-files.mjs",
     "test:a11y:contracts": "vitest run src/app/wcag-contract.test.tsx src/app/a11y-regressions.test.tsx src/components/sections-a11y.test.tsx src/components/navigation-a11y.test.tsx src/components/faq-a11y.test.tsx src/components/ui/keyboard-shortcuts.test.tsx",
     "test:a11y:scanners": "node scripts/checks/run-a11y-scanners.mjs",
     "test:a11y:external": "node scripts/checks/run-pa11y-external.mjs",
