@@ -11,6 +11,7 @@ import {
   getResultMessage,
   getTargetAriaLabel,
   getTargetClassName,
+  isNewBestReaction,
   resolveClick,
   type RoundPhase,
   type RoundResult,
@@ -42,6 +43,7 @@ export default function ReactionTimeGame() {
   const [phase, setPhase] = useState<RoundPhase>('waiting');
   const [goTimestamp, setGoTimestamp] = useState<number | null>(null);
   const [lastResult, setLastResult] = useState<RoundResult | null>(null);
+  const [isNewBest, setIsNewBest] = useState(false);
   const [stats, setStats] = useState<SessionStats>(INITIAL_SESSION_STATS);
 
   // Every time a round enters 'waiting' (initial mount, or after Try again),
@@ -54,11 +56,31 @@ export default function ReactionTimeGame() {
 
     const delayMs = computeRandomDelayMs(Math.random());
     const timeoutId = window.setTimeout(() => {
-      setGoTimestamp(performance.now());
       setPhase('go');
     }, delayMs);
 
     return () => window.clearTimeout(timeoutId);
+  }, [phase]);
+
+  // Reaction time must be measured from when the "go" stimulus was actually
+  // PAINTED, not from the instant the setTimeout callback above fired.
+  // React's state update, re-render, and the browser's commit/paint all take
+  // real time — one frame under good conditions, more if the main thread is
+  // busy with this page's other effects — and stamping goTimestamp before
+  // any of that happens (the prior bug) systematically inflated EVERY
+  // measured reaction by however long that render+paint took, making genuine
+  // fast reactions read as merely typical and typical ones read as slow.
+  // Waiting for the next animation frame after the phase flips to 'go'
+  // aligns the timestamp with the frame the browser is about to paint — the
+  // actual moment the player can see the change — using that frame's own
+  // high-resolution timestamp rather than a separate performance.now() call.
+  useEffect(() => {
+    if (phase !== 'go') return undefined;
+
+    const frameId = requestAnimationFrame((paintTime) => {
+      setGoTimestamp(paintTime);
+    });
+    return () => cancelAnimationFrame(frameId);
   }, [phase]);
 
   // No in-handler phase guard needed: the target button's `disabled`
@@ -70,17 +92,19 @@ export default function ReactionTimeGame() {
     const result = resolveClick(phase, goTimestamp, clickTimestamp);
 
     setLastResult(result);
+    setIsNewBest(result.kind === 'reaction' && isNewBestReaction(stats.bestMs, result.reactionTimeMs));
     setStats((current) => computeStatsUpdate(current, result));
     setPhase('result');
-  }, [phase, goTimestamp]);
+  }, [phase, goTimestamp, stats.bestMs]);
 
   const handleTryAgain = useCallback(() => {
     setGoTimestamp(null);
     setLastResult(null);
+    setIsNewBest(false);
     setPhase('waiting');
   }, []);
 
-  const message = lastResult ? getResultMessage(lastResult) : '';
+  const message = lastResult ? getResultMessage(lastResult, isNewBest) : '';
   const averageMs = getAverageReactionMs(stats);
   const targetLabel = phase === 'go' ? 'Click!' : phase === 'waiting' ? 'Wait...' : 'Done';
 

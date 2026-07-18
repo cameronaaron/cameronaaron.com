@@ -36,14 +36,48 @@ export const MIN_DELAY_MS = 1500;
 export const MAX_DELAY_MS = 4000;
 
 /**
- * Reaction times strictly below this are "elite" — human simple visual
- * reaction time is typically 200-350ms, so sub-250ms reflects the fast end
- * of that real range rather than an arbitrary bar.
+ * Mean simple visual reaction time for healthy young adults, measured with
+ * dedicated lab hardware (photodiode/voice-key timing, not a browser) — a
+ * consistent figure across decades of psychophysics literature, e.g. Woods,
+ * Wyma, Yund, Herron & Reed (2015), "Factors influencing the latency of
+ * simple reaction time," Frontiers in Human Neuroscience.
  */
-export const REACTION_ELITE_THRESHOLD_MS = 250;
+export const LAB_MEAN_SIMPLE_REACTION_TIME_MS = 250;
+
+/**
+ * Real, physical latency a browser-based test still carries even after
+ * timestamping stimulus onset from the actual paint frame (this game's own
+ * fix, 2026-07, in the component: input-device polling, OS/browser event
+ * dispatch, and display response time are all hops a JS-level fix cannot
+ * remove. Online reaction-time research quantifies this residual overhead
+ * against dedicated lab hardware — e.g. Anwyl-Irvine, Dalmaijer, Hodges &
+ * Evershed (2021), "Realistic precision and accuracy of online experiment
+ * platforms, web browsers, and devices," Behavior Research Methods. Without
+ * this allowance, a bar set at the raw lab figure would fail to recognize
+ * genuinely fast players simply because they're being measured through a
+ * browser rather than dedicated lab equipment.
+ */
+export const BROWSER_MEASUREMENT_OVERHEAD_MS = 30;
+
+/**
+ * Vigilance/attention-lapse research commonly flags a response as
+ * lapse-like once it runs to roughly 1.5-2x a person's typical reaction
+ * time — the same phenomenon this game's paired research project studied.
+ * 1.6x sits inside that commonly-cited range.
+ */
+export const ATTENTION_LAPSE_MULTIPLIER = 1.6;
+
+/**
+ * Reaction times strictly below this are "elite" — the lab-measured
+ * population mean plus the browser-measurement allowance above, so the bar
+ * reflects genuinely-fast human performance rather than an arbitrary number.
+ */
+export const REACTION_ELITE_THRESHOLD_MS = LAB_MEAN_SIMPLE_REACTION_TIME_MS + BROWSER_MEASUREMENT_OVERHEAD_MS;
 
 /** Reaction times at or below this (and at/above the elite threshold) are "typical". Above it is "slow". */
-export const REACTION_SLOW_THRESHOLD_MS = 400;
+export const REACTION_SLOW_THRESHOLD_MS = Math.round(
+  LAB_MEAN_SIMPLE_REACTION_TIME_MS * ATTENTION_LAPSE_MULTIPLIER + BROWSER_MEASUREMENT_OVERHEAD_MS,
+);
 
 export type RoundPhase = 'waiting' | 'go' | 'result';
 
@@ -142,6 +176,27 @@ export function getAverageReactionMs(stats: SessionStats): number | null {
   return stats.reactionCount > 0 ? stats.sumReactionMs / stats.reactionCount : null;
 }
 
+/**
+ * True only when this reaction beats a PRIOR best — a first-ever round has
+ * nothing to compare against, so it's just a result, not a "new best" worth
+ * celebrating. Takes the pre-update best explicitly (the caller reads
+ * `stats.bestMs` before folding this round into stats) so this stays pure
+ * and doesn't need to know about update ordering.
+ *
+ * Mutation-testing note (2026-07, hand-verified per ENGINEERING-STANDARDS.md
+ * §6 item 13): a Stryker mutant that replaces `previousBestMs !== null` with
+ * `true` survives, but is a true equivalent, not a real gap. When
+ * previousBestMs is null, the mutant falls through to
+ * `reactionTimeMs < previousBestMs`, i.e. `reactionTimeMs < null`, which JS
+ * coerces to `reactionTimeMs < 0`. reactionTimeMs is a click-minus-go
+ * duration and can never be negative, so that comparison is always false —
+ * identical to the original short-circuit. No valid input can distinguish
+ * the two, so no test is written for it.
+ */
+export function isNewBestReaction(previousBestMs: number | null, reactionTimeMs: number): boolean {
+  return previousBestMs !== null && reactionTimeMs < previousBestMs;
+}
+
 /** Round to the nearest millisecond and format for display, e.g. "312ms". */
 export function formatMs(ms: number): string {
   return `${Math.round(ms)}ms`;
@@ -161,14 +216,17 @@ export function getReactionCategoryLabel(category: ReactionCategory): string {
 /**
  * Exact live-region message for a round's result. False starts get an
  * honest, non-punitive explanation tying the moment back to the research
- * theme; genuine reactions get the timed value and its category.
+ * theme; genuine reactions get the timed value and its category, plus a
+ * distinct "new personal best" callout for whoever actually earns one — the
+ * concrete reward for a genuinely fast reaction, not just a category label.
  */
-export function getResultMessage(result: RoundResult): string {
+export function getResultMessage(result: RoundResult, isNewBest: boolean): string {
   if (result.kind === 'false-start') {
     return "False start — you clicked before the target changed. That's an anticipatory response, the same kind of attention lapse the original research measured.";
   }
 
-  return `${formatMs(result.reactionTimeMs)} — ${getReactionCategoryLabel(result.category)}.`;
+  const base = `${formatMs(result.reactionTimeMs)} — ${getReactionCategoryLabel(result.category)}.`;
+  return isNewBest ? `${base} New personal best!` : base;
 }
 
 const TARGET_ARIA_LABELS: Record<RoundPhase, string> = {

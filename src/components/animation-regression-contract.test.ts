@@ -43,10 +43,21 @@
  *    Fix (both): keep `scale` on a spring; animate backgroundColor/borderColor/boxShadow with
  *    a plain tween instead (per-property transition override), which only ever interpolates
  *    within the source rgba()/rgb() space.
+ *
+ * 8. ReactionTimeGame stimulus-onset timestamp captured before paint (2026-07)
+ *    goTimestamp was stamped with performance.now() inside the setTimeout callback that
+ *    ALSO flipped phase to 'go' — before React re-rendered and the browser painted the
+ *    "go" state. Render + commit + paint take real time (a frame or more), so every
+ *    measured reaction was inflated by however long that took, making genuinely fast
+ *    reactions read as merely typical and typical ones read as slow.
+ *    Fix: setTimeout only flips the phase; a separate effect keyed on phase === 'go'
+ *    waits for the next requestAnimationFrame and uses THAT frame's own timestamp as
+ *    goTimestamp — aligned with the frame the browser is about to paint.
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 function read(path: string): string {
@@ -275,5 +286,81 @@ describe('animation regression contract', () => {
       offenders,
       `color-affecting property directly sprung — use a tween instead (see SectionRail.tsx or experience/logic.ts's getTimelineDotTransition):\n${offenders.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('ReactionTimeGame stamps goTimestamp from a requestAnimationFrame callback, not inside the go setTimeout', () => {
+    // Parsed with the real TypeScript compiler rather than a brace-matching
+    // regex reconstructing the callback bodies — the exact class of fragile
+    // check this repo's own regression ratchet (item 15) warns against.
+    const filePath = resolve(process.cwd(), 'src/components/projects/reaction-game/ReactionTimeGame.tsx');
+    const source = readFileSync(filePath, 'utf8');
+    const sourceFile = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    function forEachDescendant(node: ts.Node, visit: (n: ts.Node) => void): void {
+      visit(node);
+      ts.forEachChild(node, (child) => forEachDescendant(child, visit));
+    }
+
+    function callsIdentifier(node: ts.Node, name: string): boolean {
+      let found = false;
+      forEachDescendant(node, (n) => {
+        if (!found && ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === name) {
+          found = true;
+        }
+      });
+      return found;
+    }
+
+    function referencesPropertyAccess(node: ts.Node, objectName: string, propertyName: string): boolean {
+      let found = false;
+      forEachDescendant(node, (n) => {
+        if (
+          !found &&
+          ts.isCallExpression(n) &&
+          ts.isPropertyAccessExpression(n.expression) &&
+          ts.isIdentifier(n.expression.expression) &&
+          n.expression.expression.text === objectName &&
+          n.expression.name.text === propertyName
+        ) {
+          found = true;
+        }
+      });
+      return found;
+    }
+
+    let setTimeoutCallback: ts.Node | null = null;
+    let rafCallback: ts.ArrowFunction | null = null;
+
+    forEachDescendant(sourceFile, (node) => {
+      if (
+        ts.isCallExpression(node) &&
+        ts.isPropertyAccessExpression(node.expression) &&
+        ts.isIdentifier(node.expression.expression) &&
+        node.expression.expression.text === 'window' &&
+        node.expression.name.text === 'setTimeout' &&
+        node.arguments.length > 0
+      ) {
+        setTimeoutCallback = node.arguments[0];
+      }
+      if (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === 'requestAnimationFrame' &&
+        node.arguments.length > 0 &&
+        ts.isArrowFunction(node.arguments[0])
+      ) {
+        rafCallback = node.arguments[0];
+      }
+    });
+
+    expect(setTimeoutCallback, 'expected to find the pre-go window.setTimeout callback').not.toBeNull();
+    // The setTimeout that flips phase to 'go' must NOT also call performance.now()
+    // to seed goTimestamp — that's the exact pre-paint measurement bug (item 8 above).
+    expect(referencesPropertyAccess(setTimeoutCallback!, 'performance', 'now')).toBe(false);
+    expect(callsIdentifier(setTimeoutCallback!, 'setPhase')).toBe(true);
+
+    expect(rafCallback, 'expected to find a requestAnimationFrame(arrow) callback').not.toBeNull();
+    expect(rafCallback!.parameters[0]?.name.getText()).toBe('paintTime');
+    expect(callsIdentifier(rafCallback!, 'setGoTimestamp')).toBe(true);
   });
 });
