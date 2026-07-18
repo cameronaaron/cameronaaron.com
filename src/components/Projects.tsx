@@ -7,6 +7,8 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
 import DnaSnpGame from '@/components/projects/dna-game/DnaSnpGame';
+import ReactionTimeGame from '@/components/projects/reaction-game/ReactionTimeGame';
+import PredatorPreyChase from '@/components/projects/predator-prey/PredatorPreyChase';
 import { buildProjectCollections } from '@/components/projects/logic';
 
 export default function Projects() {
@@ -14,6 +16,10 @@ export default function Projects() {
     () => buildProjectCollections(projects),
     [],
   );
+  // otherProjects renders as a multi-column grid tile, too narrow for a full
+  // simulation widget — its paired demo (if any) renders full-width below the
+  // whole grid instead, same idea as the featured section's inline demos.
+  const otherProjectWithDemo = otherProjects.find((project) => project.interactiveDemo === 'predator-prey-chase');
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -123,6 +129,7 @@ export default function Projects() {
             >
               <FeaturedProject project={project} index={index} />
               {project.interactiveDemo === 'dna-snp-game' && <DnaSnpGame />}
+              {project.interactiveDemo === 'reaction-time-game' && <ReactionTimeGame />}
             </motion.div>
           ))}
         </motion.div>
@@ -155,6 +162,15 @@ export default function Projects() {
             </motion.div>
           ))}
         </motion.div>
+
+        {otherProjectWithDemo ? (
+          <div className="max-w-6xl mx-auto">
+            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              Try it — paired with &ldquo;{otherProjectWithDemo.title}&rdquo;
+            </p>
+            <PredatorPreyChase />
+          </div>
+        ) : null}
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 import { getPageUrl } from './site';
 
 /** Names an interactive mini-game to render alongside a project's featured card. */
-export type InteractiveDemo = 'dna-snp-game';
+export type InteractiveDemo = 'dna-snp-game' | 'reaction-time-game' | 'predator-prey-chase';
 
 export interface Project {
   title: string;
@@ -39,6 +39,7 @@ export const projects: Project[] = [
     period: "May 2021",
     cta: "View Abstract",
     featured: true,
+    interactiveDemo: "reaction-time-game",
   },
   {
     title: "Predatory and Prey Behavior Modifying MIP Robots",
@@ -47,6 +48,7 @@ export const projects: Project[] = [
     tags: ["Robotics", "Behavioral AI", "Arduino", "Research"],
     period: "2021",
     cta: "View Project",
+    interactiveDemo: "predator-prey-chase",
   },
   {
     title: "Genetic RefleXions Magic Mirror",
