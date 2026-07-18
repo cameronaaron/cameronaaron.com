@@ -29,4 +29,13 @@ describe('hero logic', () => {
       'Future NP',
     ]);
   });
+
+  it('pins the exact badge positioning classes (not just labels)', () => {
+    expect(HERO_FLOATING_BADGES).toEqual([
+      { label: 'EMT', className: '-left-4 top-10' },
+      { label: 'Security', className: 'right-1 top-3' },
+      { label: 'Research', className: '-right-8 bottom-24' },
+      { label: 'Future NP', className: 'left-2 -bottom-4' },
+    ]);
+  });
 });

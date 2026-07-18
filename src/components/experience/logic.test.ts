@@ -31,6 +31,37 @@ describe('experience logic', () => {
     expect(connecticutCollege?.latestPeriod).toBe('Jan 2020 - May 2021');
   });
 
+  it('actually reorders nested positions and experiences by period, not by input order', () => {
+    // The real fixture above is already stored newest-first at both levels,
+    // so a mutant that swaps either date-key selector for a constant
+    // (`() => undefined`) would tie everything and a stable sort would
+    // silently preserve that already-correct order. Feed oldest-first input
+    // at BOTH levels so only a real key-based sort produces the right shape.
+    const oldestFirst = [
+      {
+        company: 'Older Co',
+        logo: '/logo-older.webp',
+        positions: [{ title: 'Ancient Role', period: 'Jan 2000', description: '' }],
+      },
+      {
+        company: 'Old Co',
+        logo: '/logo-old.webp',
+        positions: [
+          { title: 'Old Role', period: 'Jan 2010', description: '' },
+          { title: 'New Role', period: 'Jan 2024', description: '' },
+        ],
+      },
+    ];
+    const sorted = sortExperiencesForTimeline(oldestFirst);
+
+    // Company-level: 'Old Co' (latest position Jan 2024) sorts before
+    // 'Older Co' (latest position Jan 2000).
+    expect(sorted.map((e) => e.company)).toEqual(['Old Co', 'Older Co']);
+    // Position-level within 'Old Co': 'New Role' (2024) sorts before 'Old Role' (2010).
+    expect(sorted[0]?.positions.map((p) => p.title)).toEqual(['New Role', 'Old Role']);
+    expect(sorted[0]?.latestPeriod).toBe('Jan 2024');
+  });
+
   it('returns motion config tuned for performance tiers', () => {
     const liteConfig = getExperienceMotionConfig('lite');
     const fullConfig = getExperienceMotionConfig('full');
@@ -39,6 +70,16 @@ describe('experience logic', () => {
     expect(liteConfig.timelineStagger).toBe(0.04);
     expect(fullConfig.isCinematic).toBe(true);
     expect(fullConfig.timelineTravel).toBe(32);
+  });
+
+  it('treats "reduced" as lite motion too, not just "lite"', () => {
+    expect(getExperienceMotionConfig('reduced').isLiteMotion).toBe(true);
+  });
+
+  it('is cinematic only on the full tier, not on lite/balanced/reduced', () => {
+    expect(getExperienceMotionConfig('lite').isCinematic).toBe(false);
+    expect(getExperienceMotionConfig('balanced').isCinematic).toBe(false);
+    expect(getExperienceMotionConfig('reduced').isCinematic).toBe(false);
   });
 
   it('builds deterministic DOM ids for experience items', () => {

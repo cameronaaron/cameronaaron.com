@@ -112,6 +112,13 @@ interface NearestBest {
 
 function searchNearest(node: QuadNode, qx: number, qy: number, best: NearestBest): void {
   // Prune: if the best-so-far circle can't reach this node's box, skip it.
+  // Stryker disable next-line ConditionalExpression: this guard is a pure
+  // compute-avoidance prune, not a correctness branch — searchNearest still
+  // visits every node's points and recurses into every child even without
+  // it, so the final `best` result (and thus quadQueryNearest's return
+  // value) is bit-identical either way; only the number of nodes walked
+  // changes. Hand-verified: replacing the whole condition with `false` (so
+  // the prune never fires) leaves the full magnetic-field suite passing.
   if (!circleIntersectsRect(node.boundary, qx, qy, best.distSq)) return;
   for (const point of node.points) {
     const dx = point.x - qx;

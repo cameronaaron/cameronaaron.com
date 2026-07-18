@@ -15,6 +15,14 @@ export function shouldSkipInitialCurtain(storageKey: string = INTRO_CURTAIN_STOR
   }
   try {
     const nav = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    // Stryker disable next-line OptionalChaining: this whole lookup is
+    // wrapped in the surrounding try/catch. If `nav[0]` is nullish, dropping
+    // `?.` makes `.type` throw a TypeError instead of short-circuiting to
+    // undefined — but that throw is caught by the same catch block right
+    // below, which falls through to the identical `return false` the real
+    // (non-throwing) `undefined === 'back_forward'` path would have reached
+    // anyway. Hand-verified: removing `?.` here leaves the full intro-curtain
+    // suite (logic, coverage, and component tests) passing bit-for-bit.
     if (nav[0]?.type === 'back_forward') return true;
   } catch {
     // ignore

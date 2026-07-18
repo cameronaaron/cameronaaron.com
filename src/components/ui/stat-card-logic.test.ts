@@ -25,6 +25,19 @@ describe('parseStatValue', () => {
     expect(parseStatValue('N/A')).toEqual({ target: null, suffix: '' });
     expect(parseStatValue('')).toEqual({ target: null, suffix: '' });
   });
+
+  it('requires the digits to lead the string (anchored at start, not matched anywhere)', () => {
+    // Without the leading ^, an unanchored search would still find "123"
+    // embedded mid-string and wrongly treat "abc123" as countable.
+    expect(parseStatValue('abc123')).toEqual({ target: null, suffix: '' });
+  });
+
+  it('requires the match to consume the whole string (anchored at end)', () => {
+    // `.` never matches a newline, so a trailing newline after the suffix
+    // blocks the match entirely when `$` is required — without the trailing
+    // $, the regex would still succeed and stop before the newline.
+    expect(parseStatValue('50+\n')).toEqual({ target: null, suffix: '' });
+  });
 });
 
 describe('formatStatValue', () => {

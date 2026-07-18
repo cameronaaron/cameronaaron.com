@@ -38,6 +38,13 @@ export interface EducationCollections {
 const EMPTY_PILL_LINKS: EducationVerificationLink[] = [];
 
 export function isNonFinalizedCourseStatus(status: string): boolean {
+  // Stryker disable next-line MethodExpression: the match below is
+  // `.includes(token)` (unanchored substring search), never an exact-equality
+  // or start/end-anchored check, so leading/trailing whitespace on the full
+  // string can never prevent a token from being found — trim() has no
+  // observable effect on this function's return value for any input. Hand-
+  // verified: removing `.trim()` here leaves the full education suite
+  // (including a padded-whitespace input case) passing unchanged.
   const normalized = status.trim().toLowerCase();
 
   return NON_FINALIZED_STATUS_TOKENS.some((token) => normalized.includes(token));
