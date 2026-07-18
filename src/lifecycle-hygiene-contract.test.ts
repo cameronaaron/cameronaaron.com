@@ -77,6 +77,29 @@ describe('lifecycle-hygiene-contract — everything created gets cleaned up', ()
     ).toEqual([]);
   });
 
+  it('every file that requests an animation frame also cancels it', () => {
+    // Unlike listeners, a self-recursive step-function loop
+    // (`function step() { ...; id = requestAnimationFrame(step); }`) calls
+    // requestAnimationFrame from multiple source positions (the initial kick
+    // and the recursive re-schedule) but only ever needs ONE
+    // cancelAnimationFrame to break the whole chain — an exact count-balance
+    // check would false-positive on every one of this repo's existing
+    // canvas/physics loops (CursorComet, RibbonBand, SkillWeb,
+    // InteractiveParticles all legitimately have more request call sites than
+    // cancel call sites). A presence check — at least one cancel exists at
+    // all — still catches the real regression class (a new RAF loop that
+    // forgets cleanup entirely runs forever against a destroyed component).
+    const hits = sweep('raf', (src) => {
+      const requests = count(src, /\brequestAnimationFrame\(/g);
+      const cancels = count(src, /\bcancelAnimationFrame\(/g);
+      return requests > 0 && cancels === 0 ? `${requests} requestAnimationFrame call(s), none cancelled` : null;
+    });
+    expect(
+      hits,
+      `file(s) request animation frames without ever cancelling — track the id and cancel it in the effect cleanup:\n${hits.join('\n')}`,
+    ).toEqual([]);
+  });
+
   it('every file that constructs an observer also disconnects or unobserves', () => {
     const hits = sweep('observers', (src) => {
       const created = count(src, /\bnew (IntersectionObserver|ResizeObserver|MutationObserver)\(/g);

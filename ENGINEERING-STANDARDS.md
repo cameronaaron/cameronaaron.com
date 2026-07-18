@@ -991,3 +991,81 @@ investigate that script before touching the config.
     assert on code shape, not rendered output the user sees, and already
     carry their own review history — so `.*` there is out of scope for this
     rule.
+
+## 7. The engagement doctrine
+
+This site is not a static résumé — it's meant to feel like stepping into the
+owner's actual world: emergency medicine, genomics research, security
+research, neuroscience, software engineering, all at once. A page that just
+displays facts fails that goal even if every fact is correct. The design bar
+(set 2026-07): **every interaction should give something back.** Hovering,
+clicking, or watching a value change should never land on inert content.
+
+This doctrine sits *alongside* the complexity doctrine (§1), not in tension
+with it — "engaging" and "O(1) per event" are the same requirement read from
+two directions. A hover effect that recomputes an O(n) collection on every
+`mousemove`, or a physics loop that allocates per frame, isn't engaging once
+it's dropped frames on a mid-range phone; it's just broken. Every example
+below already respects the complexity doctrine — reused buffers, named
+constants, per-event O(1) work — because an effect that doesn't hold up
+under that constraint doesn't belong on this site regardless of how good the
+idea is.
+
+**What "gives something back" looks like, concretely, from this codebase's
+own history:**
+
+- Data that changes should say so. The certification status icons
+  (`src/components/certifications/logic.ts` — `evaluateCertificationStatus`)
+  don't just render a static checkmark; they read real expiry dates and
+  become a warning or an X, with a feedback line stating the exact month
+  count. A value that never changes is a fact; a value that reacts to time
+  passing is a *signal*.
+- Text the user points at should react. `ScrambleText` (hover-triggered
+  glyph scramble/decode, writing straight to the DOM node with zero React
+  re-renders — see its own file for why) is applied to project titles,
+  section ghost-indices, and education credentials specifically *because*
+  it's a proven, cheap, already-tested primitive — reuse it before inventing
+  a new mechanism.
+- A section themed around a real subject should have a matching flourish,
+  not a generic one. The Certifications section (EMT/BLS/ACLS content) has a
+  looping ECG trace that speeds up on hover. The Genetic RefleXions project
+  (SNP-analysis capstone) has a playable "Spot the SNP" mini-game. The
+  attention-lapses research project has a genuine reaction-time psychophysics
+  task. The theme comes FIRST — pick the subject's own real concept (a real
+  SNP, a real reaction-time paradigm, a real predator-prey steering
+  behavior), not a generic particle effect wearing the section's color
+  scheme.
+- A playable interaction beats a passive one, when the effort is justified.
+  Not everything needs to be a game — most of this list is a hover effect or
+  a live status, and that's fine. But when a project's subject matter is
+  itself an interactive concept (a puzzle, a reflex test, a chase), building
+  the real thing is worth the extra effort over a decorative animation of
+  the same idea.
+
+**Mechanically enforced floor:** `src/section-engagement-contract.test.ts`
+sweeps every top-level page section (`Hero.tsx`, `Certifications.tsx`,
+`Experience.tsx`, `Education.tsx`, `Projects.tsx`, `Skills.tsx`,
+`Testimonials.tsx`, `Contact.tsx`, plus each one's own sub-directory) for at
+least one genuine interactive signal — a real event handler wired to a
+state/DOM change, a live-region status message, or an import of a proven
+interactive primitive (`ScrambleText`, `Magnetic`, `MagneticField`, `Tilt`,
+`CursorComet`, `PointerRipple`). Found and fixed 2026-07: `Education.tsx` had
+nothing but a passive `animate-ping` dot — zero hover/click/focus interaction
+anywhere in the section — fixed by wrapping each credential heading in
+`ScrambleText`. This is a FLOOR, not a quality bar: it can't tell a great
+interaction from a token one, only distinguish "something" from "nothing." A
+future section that fails it needs one real interactive touch added, not the
+check loosened.
+
+**What this doctrine does NOT license:** it is not permission to bypass any
+other rule in this document. A "cool" effect that reads a browser API in a
+lazy `useState` initializer still trips the hydration-safety contract
+(constraint #10); one that leaks a `requestAnimationFrame` loop still trips
+the lifecycle-hygiene contract; one that does O(n) work per pointer move
+still trips the complexity doctrine. An ambitious idea that can't be built
+within those constraints gets scoped down to a version that can (a single
+contained prototype, tier-gated to `full`, easy to remove) rather than
+shipped in violation of them — see the 2026-07 canvas glyph-dissolve
+prototype (`src/components/hero/`) for the pattern: a genuinely ambitious
+visual idea, deliberately built small, reversible, and gated, instead of as
+a wholesale rendering-architecture rewrite.
