@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import PredatorPreyChase from './PredatorPreyChase';
@@ -178,6 +178,39 @@ describe('PredatorPreyChase — per-frame stepping and cleanup', () => {
 
     const preyAfterX = screen.getByTestId('pp-prey').getAttribute('cx');
     expect(preyAfterX).not.toBe(preyBeforeX);
+  });
+
+  it('moves the prey via arrow keys alone — no pointer required (WCAG 2.1.1)', () => {
+    render(<PredatorPreyChase />);
+    const arena = screen.getByTestId('pp-arena');
+
+    const preyBeforeX = screen.getByTestId('pp-prey').getAttribute('cx');
+
+    fireEvent.keyDown(arena, { key: 'ArrowRight' });
+    act(() => raf.runFrame(0));
+    act(() => raf.runFrame(16));
+
+    const preyAfterX = screen.getByTestId('pp-prey').getAttribute('cx');
+    expect(preyAfterX).not.toBe(preyBeforeX);
+  });
+
+  it('is focusable and keyboard-operable (tabIndex + application role, not just role=img)', () => {
+    render(<PredatorPreyChase />);
+    const arena = screen.getByTestId('pp-arena');
+
+    expect(arena.getAttribute('tabindex')).toBe('0');
+    expect(arena.getAttribute('role')).toBe('application');
+  });
+
+  it('ignores an unrecognized key without moving the prey', () => {
+    render(<PredatorPreyChase />);
+    const arena = screen.getByTestId('pp-arena');
+
+    const preyBeforeX = screen.getByTestId('pp-prey').getAttribute('cx');
+    fireEvent.keyDown(arena, { key: 'Tab' });
+    act(() => raf.runFrame(0));
+
+    expect(screen.getByTestId('pp-prey').getAttribute('cx')).toBe(preyBeforeX);
   });
 
   it('reports a catch through the announcement region once predator and prey collide', () => {
