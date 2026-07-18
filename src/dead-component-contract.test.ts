@@ -15,11 +15,27 @@
  * *.test.* file)?" Test-only usage does not count — that's precisely the
  * FAQ situation this contract exists to catch.
  *
- * A handful of components are deliberate reusable primitives not currently
- * wired into any page — kept intentionally as scaffolding rather than
- * deleted. Each is listed in ALLOWED_UNUSED_COMPONENTS with the reasoning,
- * the same pattern as PUBLIC_CONVENTION_EXEMPT in the sibling
- * public-assets-freshness-contract.
+ * A component only belongs in ALLOWED_UNUSED_COMPONENTS with a specific,
+ * individually-written reason — not a blanket "kept as scaffolding" excuse.
+ * (2026-07: this list previously held Card/FadeInWhenVisible/ParallaxSection/
+ * ScrollReveal as a bare Set with one shared comment and no per-entry
+ * reasoning, and no test enforcing one existed — exactly the "whitelisted
+ * because it's easier than deleting it" pattern ENGINEERING-STANDARDS.md's
+ * anti-lazy-exemption rule now bans. Investigated and deleted: none had a
+ * test of their own, none were used by ANY production code — only by
+ * ui-smoke.test.tsx, which is how they cleared the 100% coverage gate while
+ * being fully dead — none respected prefersReducedMotion/performanceTier at
+ * all despite every other animated component in this codebase being required
+ * to, and every one duplicated a pattern (SpotlightCard for cards, inline
+ * useScroll/useTransform for parallax/reveal, already used in 12+ real
+ * components) that was already the established approach. "Might want this
+ * generic primitive again someday" was the whole case for keeping them, and
+ * it wasn't backed by an actual plan — a portfolio site's section list
+ * doesn't grow the way a component library's consumer surface does.)
+ * Required shape: Record<name, reason>, same as ALLOWED_UNUSED_LOGIC_EXPORTS,
+ * ALLOWED_COMPLEXITY_EXCEPTIONS, ALLOWED_LIFECYCLE_EXCEPTIONS, and
+ * PINNED_WITH_REASON — every exemption list in this repo enforces a real,
+ * per-entry reason via its own test; this one now does too.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -27,12 +43,8 @@ import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(process.cwd());
 
-// Confirmed during the 2026-07 organization-cleanup session: these are
-// generic reusable primitives with no current callers. Decision was to keep
-// them as scaffolding for future sections rather than delete. Revisit if
-// this list grows much further — a component nobody reaches for after a few
-// months is a stronger signal to delete than to keep waiting.
-const ALLOWED_UNUSED_COMPONENTS = new Set(['Card', 'FadeInWhenVisible', 'ParallaxSection', 'ScrollReveal']);
+/** "ComponentName" → reason. Empty until a genuinely justified case appears. */
+const ALLOWED_UNUSED_COMPONENTS: Record<string, string> = {};
 
 const DEFAULT_EXPORT_RE = /export default (?:function )?(\w+)|export default memo\((\w+)\)/g;
 const NAMED_EXPORT_RE = /export function (\w+)\(/g;
@@ -103,7 +115,7 @@ describe('dead-component-contract — every component is used by production code
 
     const dead: string[] = [];
     for (const decl of decls) {
-      if (ALLOWED_UNUSED_COMPONENTS.has(decl.name)) continue;
+      if (decl.name in ALLOWED_UNUSED_COMPONENTS) continue;
 
       const tagPattern = new RegExp(`<${decl.name}[\\s/>]`);
       const usedElsewhere = files.some((f) => f !== decl.file && tagPattern.test(sources.get(f)!));
@@ -125,10 +137,16 @@ describe('dead-component-contract — every component is used by production code
     const declaredNames = new Set(
       candidates.flatMap((f) => extractComponentDecls(f, readFileSync(f, 'utf8'))).map((d) => d.name),
     );
-    for (const name of ALLOWED_UNUSED_COMPONENTS) {
+    for (const name of Object.keys(ALLOWED_UNUSED_COMPONENTS)) {
       expect(declaredNames.has(name), `Exempted component "${name}" no longer exists — remove its exemption`).toBe(
         true,
       );
+    }
+  });
+
+  it('every ALLOWED_UNUSED_COMPONENTS entry has a real, specific reason — not a placeholder', () => {
+    for (const [name, reason] of Object.entries(ALLOWED_UNUSED_COMPONENTS)) {
+      expect(reason.length, `ALLOWED_UNUSED_COMPONENTS["${name}"] needs a real reason`).toBeGreaterThan(10);
     }
   });
 });

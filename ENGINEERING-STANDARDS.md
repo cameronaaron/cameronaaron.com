@@ -1113,6 +1113,22 @@ investigate that script before touching the config.
     99.1-99.3% (one equivalent each), reaction-time-game-logic.ts at 99.04%
     (one equivalent) — effectively 100% real coverage, the same standard as
     every other swept file.
+
+    **This is a standing practice, not a one-time cleanup.** Every mutation
+    survivor chased — whether it turns into a new test or a documented
+    equivalent — is a real lesson about a blind spot in how this codebase
+    writes tests, and every one gets logged here (or inline at its source,
+    linked from here) when it's found, the same way every bug fixed anywhere
+    in this codebase gets a permanent regression test in the same commit
+    (item 1). The pre-commit gate now runs this on every commit that touches
+    a logic module (see the mandate two paragraphs up) — each new survivor it
+    surfaces goes through the same hand-verification protocol as everything
+    above: fix a real gap with an exact-value test, or write down PROVABLY why
+    it's equivalent, in the same commit. A survivor that gets silently
+    ignored, or an equivalent claim that isn't provable the way the three
+    above are, is exactly the "whitelisted because it's hard" failure item 18
+    exists to stop — mutation-testing exemptions are held to that same bar,
+    not a special case of it.
 14. **A rendered-text assertion is only as strong as its regex — a wildcard
     is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
     months.*renew soon/i))` passes as long as *something* sits between the
@@ -1251,6 +1267,53 @@ investigate that script before touching the config.
     named, cited constants (lab-measured mean simple reaction time plus a
     documented browser-measurement-overhead allowance) instead of the
     original bare numbers — see `reaction-time-game-logic.ts`.
+18. **An exemption from a gate needs a reason as specific as the gate itself
+    — a blanket excuse, or no enforced reason at all, is the gate quietly
+    turning itself off.** Every "allow-list" pattern in this codebase
+    (`ALLOWED_COMPLEXITY_EXCEPTIONS`, `ALLOWED_LIFECYCLE_EXCEPTIONS`,
+    `ALLOWED_UNUSED_LOGIC_EXPORTS`, `PINNED_WITH_REASON`) is a
+    `Record<name, reason>`, with its OWN test asserting `reason.length > 10`
+    — a real sentence, not a placeholder. `ALLOWED_UNUSED_COMPONENTS`
+    (`dead-component-contract.test.ts`) was the one exception (2026-07 audit,
+    prompted directly by "prevent us from marking sections as test-ignored or
+    whitelisted just because it's hard, opposed to there being an actual
+    valid reason"): a bare `Set<string>` holding four component names — Card,
+    FadeInWhenVisible, ParallaxSection, ScrollReveal — under ONE shared
+    comment ("generic reusable primitives... kept as scaffolding for future
+    sections") and no test enforcing that comment meant anything per-entry.
+    Investigated instead of taken on faith: none of the four had a test of
+    their own (their only usage was a single shared `ui-smoke.test.tsx` smoke
+    test, which is how they cleared the 100% coverage gate while having ZERO
+    production callers — precisely the FAQ.tsx failure mode item 5 above
+    describes); none respected `prefersReducedMotion`/`performanceTier` at
+    all, despite every other animated component in this codebase being
+    required to (§3, §4); and every one duplicated a pattern already
+    established and actually in use elsewhere (`SpotlightCard` for cards;
+    inline `useScroll`/`useTransform` for parallax/reveal, used in 12+ real
+    components, each with its own tier-appropriate gating these four
+    entirely lacked). "Might want this again someday" was the whole
+    justification, and it wasn't backed by an actual plan — a portfolio
+    site's section list doesn't grow the way a component library's consumer
+    surface does. All four deleted rather than exempted; the exemption list
+    itself converted to the same `Record<name, reason>` + reason-length-test
+    shape as its siblings, so the NEXT genuine exemption is held to the same
+    bar the other four lists already enforce, and an empty list stays
+    empty until something earns its way in with a real, specific reason.
+    **The lesson generalizes: "this is hard to test," "I don't feel like
+    fixing this," and "it might be useful later" are not reasons — they're
+    the absence of one wearing a reason's clothes. A valid reason names a
+    concrete, checkable fact** (this mutant is provably unreachable for X
+    reason; this pin is blocked by Y external constraint with a stated
+    revisit condition; this component is deliberately pre-built for a
+    specific, named upcoming section) **— if you can't write that sentence,
+    the exemption doesn't belong in the list, the underlying thing belongs
+    fixed or deleted.** Applies with equal force to `eslint-disable`
+    comments, `@ts-expect-error`, `.skip()`/`.todo()` test markers, and
+    Stryker `mutate` exclusions (`ambient-background-logic.ts`'s exclusion
+    passes this bar — hand-verified per-mutant, not assumed) — every one of
+    these is a gate choosing not to run, and every one needs the same
+    individually-checkable reason a `Record` entry does, not just a
+    comment that sounds like one.
 
 ## 7. The engagement doctrine
 

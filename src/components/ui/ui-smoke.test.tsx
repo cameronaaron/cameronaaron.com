@@ -4,12 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import AmbientBackground from './AmbientBackground';
 import Button from './Button';
-import Card from './Card';
-import FadeInWhenVisible from './FadeInWhenVisible';
 import FloatingBadge from './FloatingBadge';
 import Magnetic from './Magnetic';
-import ParallaxSection from './ParallaxSection';
-import ScrollReveal from './ScrollReveal';
 import SectionHeader from './SectionHeader';
 import SkillBar from './SkillBar';
 import SmoothScroll from './SmoothScroll';
@@ -26,14 +22,9 @@ describe('ui component smoke coverage', () => {
         <AmbientBackground />
         <Button onClick={() => undefined}>Action</Button>
         <Button href="#contact" variant="secondary">Link</Button>
-        <Card gradient>Card body</Card>
-        <FadeInWhenVisible direction="left">Fade</FadeInWhenVisible>
-        <FadeInWhenVisible>Default direction</FadeInWhenVisible>
         <FloatingBadge icon="innovation" position="top-right" />
         <FloatingBadge icon="neuro" position="bottom-left" delay={0.2} />
         <Magnetic><span>Magnetic</span></Magnetic>
-        <ParallaxSection><div>Parallax</div></ParallaxSection>
-        <ScrollReveal><div>Reveal</div></ScrollReveal>
         <SectionHeader title="Section" subtitle="Subtitle" />
         <SkillBar name="TypeScript" level={95} index={0} />
         <SmoothScroll />
