@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
+import ScrambleText from '@/components/ui/ScrambleText';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
 import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
@@ -34,7 +35,9 @@ export default function Education() {
               className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 h-full"
             >
               <p className="text-cyan-300 text-sm mb-3">{item.period}</p>
-              <h3 className="text-foreground text-xl font-bold mb-2 font-display">{item.credential}</h3>
+              <h3 className="text-foreground text-xl font-bold mb-2 font-display">
+                <ScrambleText text={item.credential} />
+              </h3>
               <div className="mb-4">
                 {item.verificationLinks?.[0] ? (
                   <a
