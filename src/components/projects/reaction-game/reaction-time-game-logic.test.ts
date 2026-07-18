@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { RoundResult, SessionStats } from './reaction-time-game-logic';
 import {
+  ATTENTION_LAPSE_MULTIPLIER,
+  BROWSER_MEASUREMENT_OVERHEAD_MS,
   INITIAL_SESSION_STATS,
+  LAB_MEAN_SIMPLE_REACTION_TIME_MS,
   MAX_DELAY_MS,
   MIN_DELAY_MS,
   REACTION_ELITE_THRESHOLD_MS,
@@ -16,6 +19,7 @@ import {
   getResultMessage,
   getTargetAriaLabel,
   getTargetClassName,
+  isNewBestReaction,
   resolveClick,
 } from './reaction-time-game-logic';
 
@@ -203,19 +207,43 @@ describe('getReactionCategoryLabel', () => {
 });
 
 describe('getResultMessage', () => {
-  it('produces the exact false-start message', () => {
-    expect(getResultMessage({ kind: 'false-start' })).toBe(
+  it('produces the exact false-start message regardless of isNewBest', () => {
+    expect(getResultMessage({ kind: 'false-start' }, false)).toBe(
+      "False start — you clicked before the target changed. That's an anticipatory response, the same kind of attention lapse the original research measured.",
+    );
+    expect(getResultMessage({ kind: 'false-start' }, true)).toBe(
       "False start — you clicked before the target changed. That's an anticipatory response, the same kind of attention lapse the original research measured.",
     );
   });
 
-  it('produces an exact reaction message combining the formatted time and category label', () => {
-    expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 220, category: 'elite' })).toBe(
+  it('produces an exact reaction message combining the formatted time and category label when not a new best', () => {
+    expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 220, category: 'elite' }, false)).toBe(
       '220ms — Elite reflexes.',
     );
-    expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 500, category: 'slow' })).toBe(
+    expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 500, category: 'slow' }, false)).toBe(
       '500ms — Slower than typical — attention may have lapsed.',
     );
+  });
+
+  it('appends the exact new-personal-best callout when isNewBest is true', () => {
+    expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 190, category: 'elite' }, true)).toBe(
+      '190ms — Elite reflexes. New personal best!',
+    );
+  });
+});
+
+describe('isNewBestReaction', () => {
+  it('is false on the very first reaction — nothing to beat yet', () => {
+    expect(isNewBestReaction(null, 500)).toBe(false);
+  });
+
+  it('is true only when the reaction beats the prior best', () => {
+    expect(isNewBestReaction(300, 250)).toBe(true);
+    expect(isNewBestReaction(250, 300)).toBe(false);
+  });
+
+  it('is false when tying the prior best exactly (strictly faster required)', () => {
+    expect(isNewBestReaction(250, 250)).toBe(false);
   });
 });
 
@@ -260,9 +288,18 @@ describe('named constants', () => {
   });
 
   it('pins the reaction-time category thresholds to the realistic human range', () => {
-    expect(REACTION_ELITE_THRESHOLD_MS).toBe(250);
-    expect(REACTION_SLOW_THRESHOLD_MS).toBe(400);
+    expect(REACTION_ELITE_THRESHOLD_MS).toBe(280);
+    expect(REACTION_SLOW_THRESHOLD_MS).toBe(430);
     expect(REACTION_ELITE_THRESHOLD_MS).toBeLessThan(REACTION_SLOW_THRESHOLD_MS);
+  });
+
+  it('derives both category thresholds from the named research-backed constants, not inline magic numbers', () => {
+    expect(LAB_MEAN_SIMPLE_REACTION_TIME_MS).toBe(250);
+    expect(BROWSER_MEASUREMENT_OVERHEAD_MS).toBeGreaterThan(0);
+    expect(REACTION_ELITE_THRESHOLD_MS).toBe(LAB_MEAN_SIMPLE_REACTION_TIME_MS + BROWSER_MEASUREMENT_OVERHEAD_MS);
+    expect(REACTION_SLOW_THRESHOLD_MS).toBe(
+      Math.round(LAB_MEAN_SIMPLE_REACTION_TIME_MS * ATTENTION_LAPSE_MULTIPLIER + BROWSER_MEASUREMENT_OVERHEAD_MS),
+    );
   });
 
   it('pins the initial session stats to all-zero/null', () => {
