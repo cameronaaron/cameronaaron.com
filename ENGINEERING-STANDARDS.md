@@ -969,3 +969,25 @@ investigate that script before touching the config.
     cosmetic even though it looks like one; (2) chasing survivors surfaces
     real bugs, not just test gaps, often enough that the exercise pays for
     itself independent of the mutation score.
+14. **A rendered-text assertion is only as strong as its regex — a wildcard
+    is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
+    months.*renew soon/i))` passes as long as *something* sits between the
+    two anchors; it can't tell "renew soon" from "renew never" if the mutant
+    also mangles what's in between, and it can't tell one exact number from
+    another the way `toBe`/`toEqual` on an exact string can. Found in this
+    repo's own `reactive-status.test.tsx` (2026-07) and fixed to an exact
+    string. Prefer, in order: an exact string passed to `getByText` (RTL
+    normalizes whitespace but still requires the full text to match); a
+    precise regex with real anchors and no `.*`/`.+` spanning meaningful
+    content (a bounded negative lookahead like `/expires in 1 month(?!s)/` is
+    fine — it's testing an exact boundary, not waving through arbitrary
+    content); or splitting one loose assertion into two exact ones. Enforced
+    by `test-quality-contract.test.tsx`'s wildcard-regex sweep for every
+    `getByText`/`getAllByText`/`queryByText`/`queryAllByText`/`findByText`/
+    `findAllByText` call in `src/**/*.test.ts(x)`. Scope is deliberately
+    narrow: static-source-text sweeps (contract tests scanning `.ts`/`.tsx`
+    source for a coding convention, e.g.
+    `animation-regression-contract.test.ts`) are a different category — they
+    assert on code shape, not rendered output the user sees, and already
+    carry their own review history — so `.*` there is out of scope for this
+    rule.
