@@ -12,6 +12,7 @@ import {
   getCatchAnnouncement,
   getInitialSimulationState,
   isAnimationEnabled,
+  nudgeTarget,
   pointerToArenaPoint,
   setTarget,
   stepSimulation,
@@ -63,6 +64,14 @@ export default function PredatorPreyChase() {
     setTarget(simRef.current!, x, y);
   }, []);
 
+  // Keyboard-only equivalent to pointer steering (WCAG 2.1.1) — arrow keys nudge
+  // the same seek target a pointer would, so the game is fully playable without a mouse.
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<SVGSVGElement>) => {
+    if (nudgeTarget(simRef.current!, event.key)) {
+      event.preventDefault();
+    }
+  }, []);
+
   useEffect(() => {
     if (!animationEnabled) return undefined;
 
@@ -82,17 +91,14 @@ export default function PredatorPreyChase() {
       const previousCatches = state.catches;
       stepSimulation(state, dtMs);
 
-      if (predatorElRef.current) {
-        predatorElRef.current.setAttribute('cx', String(state.predator.x));
-        predatorElRef.current.setAttribute('cy', String(state.predator.y));
-      }
-      if (preyElRef.current) {
-        preyElRef.current.setAttribute('cx', String(state.prey.x));
-        preyElRef.current.setAttribute('cy', String(state.prey.y));
-      }
-      if (timerElRef.current) {
-        timerElRef.current.textContent = formatSurvivalSeconds(state.elapsedMs);
-      }
+      // This effect depends on the same `animationEnabled` flag that gates the <svg>/
+      // circles/<span> below into existence, so by the time a frame runs, every ref here
+      // is guaranteed populated — no defensive null-check branch to leave untested.
+      predatorElRef.current!.setAttribute('cx', String(state.predator.x));
+      predatorElRef.current!.setAttribute('cy', String(state.predator.y));
+      preyElRef.current!.setAttribute('cx', String(state.prey.x));
+      preyElRef.current!.setAttribute('cy', String(state.prey.y));
+      timerElRef.current!.textContent = formatSurvivalSeconds(state.elapsedMs);
 
       if (state.catches !== previousCatches) {
         const bestLabel = formatSurvivalSeconds(state.bestSurvivalMs);
@@ -136,16 +142,18 @@ export default function PredatorPreyChase() {
 
       <p className="mb-4 text-sm text-muted-foreground">
         Move your cursor over the arena (or drag on touch) to steer the prey — it follows with a little lag, so lead
-        it away from the predator.
+        it away from the predator. Keyboard: focus the arena and use the arrow keys.
       </p>
 
       {animationEnabled ? (
         <svg
           viewBox={`0 0 ${ARENA_SIZE} ${ARENA_SIZE}`}
-          className="aspect-square w-full max-w-xs touch-none rounded-xl border border-white/10 bg-white/5"
-          role="img"
+          className="aspect-square w-full max-w-xs touch-none rounded-xl border border-white/10 bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70"
+          role="application"
+          tabIndex={0}
           aria-label={SIMULATION_ARIA_LABEL}
           onPointerMove={handlePointerMove}
+          onKeyDown={handleKeyDown}
           data-testid="pp-arena"
         >
           <circle

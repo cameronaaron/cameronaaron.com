@@ -1,10 +1,24 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 function readSource(relativePath: string): string {
   return readFileSync(join(process.cwd(), relativePath), 'utf8');
+}
+
+function listProductionSources(): string[] {
+  const src = resolve(process.cwd(), 'src');
+  const files: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.tsx$/.test(entry.name) && !/\.test\./.test(entry.name)) files.push(full);
+    }
+  };
+  walk(src);
+  return files;
 }
 
 describe('Accessibility regression guards', () => {
@@ -55,5 +69,24 @@ describe('Accessibility regression guards', () => {
     expect(statCardSource).not.toContain('text-muted-foreground/90');
     expect(projectsSource).not.toContain('text-cyan-100/90');
     expect(skillsSource).not.toContain('text-cyan-100/90');
+  });
+
+  it('repo-wide: every custom-widget role is keyboard-operable, not pointer-only (WCAG 2.1.1)', () => {
+    // Found 2026-07: PredatorPreyChase's arena only ever wired onPointerMove — a
+    // keyboard-only visitor had zero way to play it. role="application"/"slider"/
+    // "scrollbar" (the ARIA "custom widget with its own keyboard model" roles) are a
+    // commitment that the widget IS keyboard-operable; a file declaring one without
+    // ever handling a key event is exactly the bug this line pins shut. Present and
+    // future — walks every .tsx file, not just the one already fixed.
+    const customWidgetRolePattern = /role=(?:"|\{["'])(application|slider|scrollbar)/;
+    const offenders = listProductionSources().filter((file) => {
+      const source = readFileSync(file, 'utf8');
+      return customWidgetRolePattern.test(source) && !/onKeyDown/.test(source);
+    });
+
+    expect(
+      offenders,
+      `custom-widget role with no onKeyDown handler anywhere in the file — every pointer interaction needs a keyboard equivalent:\n${offenders.join('\n')}`,
+    ).toEqual([]);
   });
 });

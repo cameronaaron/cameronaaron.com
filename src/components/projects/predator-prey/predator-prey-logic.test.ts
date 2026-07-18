@@ -7,6 +7,7 @@ import {
   FRAME_MS,
   INITIAL_SIM_SEED,
   INITIAL_TARGET,
+  KEYBOARD_NUDGE_STEP,
   PREDATOR_START_MIN,
   PREDATOR_START_RANGE,
   PREY_START_MIN,
@@ -17,10 +18,12 @@ import {
   clampToArena,
   createInitialEntities,
   formatSurvivalSeconds,
+  getArrowKeyDelta,
   getCatchAnnouncement,
   getInitialSimulationState,
   isAnimationEnabled,
   isCaught,
+  nudgeTarget,
   pointerToArenaPoint,
   setTarget,
   stepSimulation,
@@ -387,5 +390,53 @@ describe('getCatchAnnouncement', () => {
 
   it('pins the exact plural-catches message', () => {
     expect(getCatchAnnouncement(3, '4.5', '20.0')).toBe('Caught! Survived 4.5s. Total catches: 3. Best: 20.0s.');
+  });
+});
+
+describe('getArrowKeyDelta — keyboard-only steering (WCAG 2.1.1)', () => {
+  it('returns the exact named-step delta for each arrow key', () => {
+    expect(getArrowKeyDelta('ArrowUp')).toEqual({ x: 0, y: -KEYBOARD_NUDGE_STEP });
+    expect(getArrowKeyDelta('ArrowDown')).toEqual({ x: 0, y: KEYBOARD_NUDGE_STEP });
+    expect(getArrowKeyDelta('ArrowLeft')).toEqual({ x: -KEYBOARD_NUDGE_STEP, y: 0 });
+    expect(getArrowKeyDelta('ArrowRight')).toEqual({ x: KEYBOARD_NUDGE_STEP, y: 0 });
+  });
+
+  it('returns null for any non-arrow key, including similarly-named keys', () => {
+    expect(getArrowKeyDelta('Enter')).toBeNull();
+    expect(getArrowKeyDelta('a')).toBeNull();
+    expect(getArrowKeyDelta('Up')).toBeNull();
+    expect(getArrowKeyDelta('')).toBeNull();
+  });
+});
+
+describe('nudgeTarget', () => {
+  it('moves the target by the exact arrow-key delta from its current position', () => {
+    const state = getInitialSimulationState();
+    setTarget(state, 50, 50);
+
+    const handled = nudgeTarget(state, 'ArrowRight');
+
+    expect(handled).toBe(true);
+    expect(state.target.x).toBe(50 + KEYBOARD_NUDGE_STEP);
+    expect(state.target.y).toBe(50);
+  });
+
+  it('clamps the nudged target to the arena bounds', () => {
+    const state = getInitialSimulationState();
+    setTarget(state, ARENA_SIZE, ARENA_SIZE);
+
+    nudgeTarget(state, 'ArrowRight');
+
+    expect(state.target.x).toBe(ARENA_SIZE);
+  });
+
+  it('returns false and leaves the target untouched for a non-arrow key', () => {
+    const state = getInitialSimulationState();
+    setTarget(state, 33, 44);
+
+    const handled = nudgeTarget(state, 'Tab');
+
+    expect(handled).toBe(false);
+    expect(state.target).toEqual({ x: 33, y: 44 });
   });
 });

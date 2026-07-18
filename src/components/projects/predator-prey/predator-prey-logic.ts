@@ -51,6 +51,9 @@ export const PREY_START_RANGE = 50;
 export const PREDATOR_START_MIN = 5;
 export const PREDATOR_START_RANGE = 20;
 
+/** Arena units the seek target moves per arrow-key press — a keyboard-only equivalent to pointer steering. */
+export const KEYBOARD_NUDGE_STEP = 6;
+
 export interface Entity {
   x: number;
   y: number;
@@ -198,6 +201,32 @@ export function setTarget(state: SimulationState, x: number, y: number): void {
   state.target.y = clampToArena(y);
 }
 
+/** Named per-key deltas — a dispatch table (§2.2), not an if-chain, over the four arrow keys. */
+const ARROW_KEY_DELTAS: Record<string, Point> = {
+  ArrowUp: { x: 0, y: -KEYBOARD_NUDGE_STEP },
+  ArrowDown: { x: 0, y: KEYBOARD_NUDGE_STEP },
+  ArrowLeft: { x: -KEYBOARD_NUDGE_STEP, y: 0 },
+  ArrowRight: { x: KEYBOARD_NUDGE_STEP, y: 0 },
+};
+
+/**
+ * Keyboard-only equivalent to pointer steering (WCAG 2.1.1 — every pointer
+ * interaction needs a keyboard path). Returns the arena delta for an arrow
+ * key, or null for any other key (the caller should not preventDefault or
+ * update state for a key this doesn't recognize).
+ */
+export function getArrowKeyDelta(key: string): Point | null {
+  return ARROW_KEY_DELTAS[key] ?? null;
+}
+
+/** Nudge the seek target by an arrow-key delta from its CURRENT position, clamped to the arena. */
+export function nudgeTarget(state: SimulationState, key: string): boolean {
+  const delta = getArrowKeyDelta(key);
+  if (!delta) return false;
+  setTarget(state, state.target.x + delta.x, state.target.y + delta.y);
+  return true;
+}
+
 /**
  * Map a pointer event's client coordinates to an arena-space point, given
  * the container's bounding rect. Reuses the shared normalizePointerToPercent
@@ -280,4 +309,4 @@ export const PAUSED_CAPTION = 'Chase paused — reduced motion or low-power mode
 
 /** Accessible description of the whole widget for its container aria-label. */
 export const SIMULATION_ARIA_LABEL =
-  'Predator-prey chase simulation. Move your cursor, or drag on touch, to guide the prey away from the pursuing predator.';
+  'Predator-prey chase simulation. Move your cursor, drag on touch, or use the arrow keys once focused, to guide the prey away from the pursuing predator.';
