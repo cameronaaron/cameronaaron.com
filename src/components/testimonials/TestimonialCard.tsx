@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import type { Testimonial } from '@/data/testimonials';
 import SpotlightCard from '@/components/ui/SpotlightCard';
@@ -16,7 +17,12 @@ interface TestimonialCardProps {
   index: number;
 }
 
-export default function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
+// Memoized: Testimonials.tsx's relationship filter re-renders every visible
+// card on every click. `testimonial` is a stable object reference (the
+// filter/sort helpers in ./logic never clone items), so a card whose filtered
+// position didn't shift skips re-rendering entirely — measured contributor to
+// the filter interaction's INP (scripts/checks/measure-interaction-latency.mjs).
+function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -92,3 +98,5 @@ export default function TestimonialCard({ testimonial, index }: TestimonialCardP
     </motion.div>
   );
 }
+
+export default memo(TestimonialCard);

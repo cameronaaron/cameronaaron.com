@@ -1,9 +1,9 @@
 'use client';
 
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { navItems } from '@/data/navigation';
+import { navItems, type NavItem } from '@/data/navigation';
 import Magnetic from '@/components/ui/Magnetic';
 import ScrambleText from '@/components/ui/ScrambleText';
 import {
@@ -13,6 +13,81 @@ import {
   pickActiveHref,
   shouldCloseMobileMenuOnResize,
 } from '@/components/navigation/logic';
+
+// Memoized so toggling mobileMenuOpen — which re-renders all of Navigation —
+// doesn't also reconcile all 8 desktop links (each wrapping a Magnetic with
+// two useSpring hooks). Confirmed necessary: this list was the dominant cost
+// of the mobile-menu-toggle interaction's one long task (measured via
+// scripts/checks/measure-interaction-latency.mjs, 2026-07).
+const DesktopNavLink = memo(function DesktopNavLink({
+  item,
+  isActive,
+  isScrolled,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  isScrolled: boolean;
+}) {
+  return (
+    <Magnetic>
+      <motion.a
+        href={item.href}
+        className={`relative inline-block whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors xl:px-3 xl:text-base ${
+          isScrolled ? 'text-foreground hover:text-cyan-100' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
+        } ${isActive ? 'text-cyan-100' : ''}`}
+        whileHover={{ y: -2 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        {isActive ? (
+          <motion.span
+            layoutId="active-nav-pill"
+            className="absolute inset-0 -z-10 rounded-full border"
+            style={{
+              background: 'linear-gradient(90deg, rgba(12, 189, 242, 0.24), rgba(12, 189, 242, 0.18))',
+              borderColor: 'rgba(126, 231, 255, 0.25)',
+            }}
+            transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.35 }}
+          />
+        ) : null}
+        <span className="relative z-10">{item.name}</span>
+      </motion.a>
+    </Magnetic>
+  );
+});
+
+// Memoized for the same reason as DesktopNavLink — these only mount while
+// the mobile panel is open, but once open, re-renders of Navigation for
+// unrelated reasons (e.g. scroll-driven activeHref changes) would otherwise
+// still reconcile all of them.
+const MobileNavLink = memo(function MobileNavLink({
+  item,
+  index,
+  isActive,
+  onNavigate,
+}: {
+  item: NavItem;
+  index: number;
+  isActive: boolean;
+  onNavigate: () => void;
+}) {
+  return (
+    <motion.a
+      href={item.href}
+      onClick={onNavigate}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className={`min-h-[44px] rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
+        isActive
+          ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
+          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground active:bg-white/10'
+      }`}
+    >
+      {item.name}
+    </motion.a>
+  );
+});
 
 export default function Navigation() {
   const isScrolled = useScrollPosition(50);
@@ -88,6 +163,7 @@ export default function Navigation() {
 
   const navLabelMap = useMemo(() => buildNavLabelMap(navItems), []);
   const activeNavLabel = navLabelMap.get(activeHref) ?? 'Home';
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   return (
     <>
@@ -147,33 +223,8 @@ export default function Navigation() {
             </motion.div>
 
             <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5" aria-label="Primary navigation">
-              {navItems.map((item, index) => (
-                <Magnetic key={index}>
-                  <motion.a
-                    href={item.href}
-                    className={`relative inline-block whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors xl:px-3 xl:text-base ${
-                      isScrolled
-                        ? 'text-foreground hover:text-cyan-100'
-                        : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
-                    } ${activeHref === item.href ? 'text-cyan-100' : ''}`}
-                    whileHover={{ y: -2 }}
-                    transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-                    aria-current={activeHref === item.href ? 'page' : undefined}
-                  >
-                    {activeHref === item.href ? (
-                      <motion.span
-                        layoutId="active-nav-pill"
-                        className="absolute inset-0 -z-10 rounded-full border"
-                        style={{
-                          background: 'linear-gradient(90deg, rgba(12, 189, 242, 0.24), rgba(12, 189, 242, 0.18))',
-                          borderColor: 'rgba(126, 231, 255, 0.25)',
-                        }}
-                        transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.35 }}
-                      />
-                    ) : null}
-                    <span className="relative z-10">{item.name}</span>
-                  </motion.a>
-                </Magnetic>
+              {navItems.map((item) => (
+                <DesktopNavLink key={item.href} item={item} isActive={activeHref === item.href} isScrolled={isScrolled} />
               ))}
             </nav>
 
@@ -223,21 +274,13 @@ export default function Navigation() {
               <div className="container mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-2">
                   {navItems.map((item, index) => (
-                    <motion.a
+                    <MobileNavLink
                       key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className={`min-h-[44px] rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
-                        activeHref === item.href
-                          ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
-                          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground active:bg-white/10'
-                      }`}
-                    >
-                      {item.name}
-                    </motion.a>
+                      item={item}
+                      index={index}
+                      isActive={activeHref === item.href}
+                      onNavigate={closeMobileMenu}
+                    />
                   ))}
                 </div>
               </div>

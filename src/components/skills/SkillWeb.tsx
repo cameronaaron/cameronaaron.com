@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import {
@@ -26,7 +26,12 @@ interface SkillWebProps {
  * in, repels from the cursor, and the rAF loop SLEEPS once it settles and the
  * pointer leaves. Full tier only; other tiers render nothing (decorative).
  */
-export default function SkillWeb({ nodes, performanceTier = 'full', className = '' }: SkillWebProps) {
+// Memoized: Skills.tsx re-renders on every technicalView toggle (sort order),
+// which has nothing to do with this component's props — without memo, that
+// re-runs this function body (and its useMemo/useRef bookkeeping) for no
+// visible benefit, since the animation loop itself already runs outside
+// React via requestAnimationFrame.
+function SkillWeb({ nodes, performanceTier = 'full', className = '' }: SkillWebProps) {
   const interactive = performanceTier === 'full';
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -130,3 +135,5 @@ export default function SkillWeb({ nodes, performanceTier = 'full', className = 
     </div>
   );
 }
+
+export default memo(SkillWeb);
