@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useInView } from 'framer-motion';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   ARENA_SIZE,
@@ -38,6 +39,17 @@ import {
  * layout (CLAUDE.md #10 — hydration safety). The requestAnimationFrame loop
  * itself only ever runs client-side after mount, and only on tiers with
  * headroom for continuous motion — lite/reduced tiers get a static frame.
+ *
+ * The loop is also gated on the card actually being scrolled into view
+ * (framer-motion's `useInView`, real IntersectionObserver under the hood —
+ * already mocked to `true` by this suite's shared framer-motion mock, so no
+ * new test infrastructure was needed). Previously the timer and catch count
+ * started accruing the instant this component mounted — which, since every
+ * section renders statically from initial load (§4.7's rejected code-
+ * splitting experiment), meant the survival clock and catches were already
+ * running before a visitor had scrolled anywhere near Projects. The effect's
+ * own cleanup (`cancelAnimationFrame`) pauses the simulation when scrolled
+ * out of view and resumes it — not reset — when scrolled back in.
  */
 export default function PredatorPreyChase() {
   const { performanceTier } = usePerformanceProfile();
@@ -49,6 +61,9 @@ export default function PredatorPreyChase() {
   // loop below and writes straight to the DOM, bypassing React entirely for position.
   const [initialSim] = useState(getInitialSimulationState);
   const simRef = useRef<SimulationState>(initialSim);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { amount: 0.3 });
 
   const preyElRef = useRef<SVGCircleElement>(null);
   const predatorElRef = useRef<SVGCircleElement>(null);
@@ -73,7 +88,7 @@ export default function PredatorPreyChase() {
   }, []);
 
   useEffect(() => {
-    if (!animationEnabled) return undefined;
+    if (!animationEnabled || !isInView) return undefined;
 
     const state = simRef.current!;
     let frameId: number;
@@ -112,10 +127,11 @@ export default function PredatorPreyChase() {
 
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [animationEnabled]);
+  }, [animationEnabled, isInView]);
 
   return (
     <div
+      ref={containerRef}
       className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
       data-testid="predator-prey-chase"
     >

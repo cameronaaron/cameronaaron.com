@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useInView } from 'framer-motion';
 
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import {
@@ -36,9 +37,13 @@ function SkillWeb({ nodes, performanceTier = 'full', className = '' }: SkillWebP
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const graph = useMemo(() => buildSkillGraph(nodes), [nodes]);
+  // Skills sits well below the fold — without this, the simulation started
+  // driving frames (and its own resize/mousemove listeners) the instant the
+  // page mounted, not when a visitor actually scrolled here.
+  const isInView = useInView(containerRef, { amount: 0.2 });
 
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || !isInView) return;
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -125,7 +130,7 @@ function SkillWeb({ nodes, performanceTier = 'full', className = '' }: SkillWebP
       window.removeEventListener('mousemove', handlePointerMove);
       cancelAnimationFrame(frameId);
     };
-  }, [interactive, graph]);
+  }, [interactive, isInView, graph]);
 
   if (!interactive) return null;
 

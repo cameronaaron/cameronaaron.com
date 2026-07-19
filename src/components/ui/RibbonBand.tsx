@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useInView } from 'framer-motion';
 
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import {
@@ -28,9 +29,13 @@ export default function RibbonBand({ performanceTier = 'full', className = '' }:
   const interactive = performanceTier === 'full';
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Sits between Education and Projects, well below the fold — gate the
+  // physics loop and its global resize/mousemove listeners on actually
+  // being scrolled here rather than running from initial page load.
+  const isInView = useInView(containerRef, { amount: 0.2 });
 
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || !isInView) return;
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -116,7 +121,7 @@ export default function RibbonBand({ performanceTier = 'full', className = '' }:
       window.removeEventListener('mousemove', handlePointerMove);
       cancelAnimationFrame(frameId);
     };
-  }, [interactive]);
+  }, [interactive, isInView]);
 
   return (
     <div

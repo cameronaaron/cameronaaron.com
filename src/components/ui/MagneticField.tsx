@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useInView } from 'framer-motion';
 
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
@@ -36,9 +37,12 @@ export default function MagneticField({
   const interactive = performanceTier === 'full';
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Contact is the last section — gate the quadtree rebuild and global
+  // resize/mousemove listeners on actually being scrolled here.
+  const isInView = useInView(wrapperRef, { amount: 0.2 });
 
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || !isInView) return;
     const wrapper = wrapperRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -130,7 +134,7 @@ export default function MagneticField({
       window.removeEventListener('mousemove', handlePointerMove);
       cancelAnimationFrame(frameId);
     };
-  }, [interactive, targetSelector]);
+  }, [interactive, isInView, targetSelector]);
 
   return (
     <div ref={wrapperRef} className={`relative ${className}`}>

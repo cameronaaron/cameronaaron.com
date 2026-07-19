@@ -39,7 +39,7 @@ const AuroraSurge = dynamic(() => import('@/components/ui/AuroraSurge'), { ssr: 
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
-  const { performanceTier } = usePerformanceProfile();
+  const { performanceTier, isProfileReady } = usePerformanceProfile();
   const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
@@ -71,7 +71,10 @@ export default function Home() {
     <>
       <IntroCurtain />
       <div className="grain-overlay" aria-hidden="true" />
-      <AmbientBackground performanceTier={performanceTier} />
+      {/* Mount only once the real tier is known — mounting under the optimistic
+          'full' default and then re-rendering as 'balanced' flashed 7 orbs → 4
+          on every mobile load (the CLAUDE.md #10 trade-off, now avoided). */}
+      {isProfileReady ? <AmbientBackground performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <QuickActionsDock performanceTier={performanceTier} /> : null}
       {showFloatingOverlays ? <SectionRail /> : null}
       {/* Interaction layer: deferred until first input (same LCP-friendly gate

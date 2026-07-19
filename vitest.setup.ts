@@ -78,7 +78,12 @@ vi.mock('framer-motion', () => {
     useSpring: <T,>(value: T) => value,
     useVelocity: () => createMotionValue(0),
     useReducedMotion: () => false,
-    useInView: () => true,
+    // A real vi.fn (not a plain arrow fn) so individual tests can override
+    // it with mockReturnValueOnce(false) to exercise the "not yet scrolled
+    // here" branch of components gated on it (PredatorPreyChase, SkillWeb,
+    // RibbonBand, MagneticField, ReactionTimeGame) — default stays `true` so
+    // every other test keeps seeing "already in view", unchanged.
+    useInView: vi.fn(() => true),
     useScroll: () => ({
       scrollY: createMotionValue(0),
       scrollYProgress: createMotionValue(0),
