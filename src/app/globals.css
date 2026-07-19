@@ -80,6 +80,12 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Reserve the scrollbar gutter permanently: without this, anything that
+       changes page height (deferred below-fold CSS arriving, content
+       expanding) toggles the scrollbar and shifts the whole page ~1px
+       horizontally — a real micro-CLS the critical-css verifier caught on
+       its first run (2026-07-19). Supported by the full browserslist floor. */
+    scrollbar-gutter: stable;
     /* Offset for fixed nav so anchor jumps don't hide under it */
     scroll-padding-top: 5rem;
     /* Prevent iOS Safari font scaling on orientation change */

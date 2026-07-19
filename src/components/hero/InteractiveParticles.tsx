@@ -248,6 +248,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />
 
       <motion.div
+        aria-hidden="true"
         className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{
           background:

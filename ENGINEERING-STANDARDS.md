@@ -743,12 +743,35 @@ History (2026-07, kept because the reasoning still applies):
       unstyled content on every page load — `font-display: swap` only covers
       the small font-face stylesheet, not the ~110KB Tailwind bundle that
       styles the entire page. Rejected on inspection; not worth measuring.
+   4. *Runtime-exact critical CSS with proof* (2026-07-19,
+      `scripts/generate/inline-critical-css.mjs` — kept in-repo as a working
+      tool with this verdict attached): built to remove the guessing that
+      killed attempt 1 — render the real built page in real Chromium at both
+      form factors, collect exactly the rules matching elements in/near the
+      initial viewport (recursing Tailwind v4's `@layer` blocks; naive
+      walking keeps whole layers and "extracts" the entire 142KB sheet), and
+      VERIFY by re-rendering with the deferred sheet blocked and requiring
+      per-element computed-style identity above the fold, under virtualized
+      clocks and seeded `Math.random` (infinite rAF decorations never land
+      on the same frame twice otherwise; transforms compare by form,
+      `none` vs `matrix`, as the one documented tolerance). The verification
+      machinery WORKED — it mechanically proved FOUC/CLS-safety and caught
+      two real pre-existing bugs along the way (a scrollbar-appearance
+      micro-CLS on every page load, fixed with `scrollbar-gutter: stable` in
+      `globals.css`; a missing `aria-hidden` on the hero pulse ring). The
+      economics did not: the homepage's genuine above-fold set is 89KB raw /
+      ~11KB gzip, and adding that to the DOCUMENT — the first, unavoidably
+      blocking fetch — measured FCP +150ms, LCP +150ms, mobile 0.90 → 0.85
+      under the honest gate. The above-fold of this page simply uses too
+      much CSS for inlining to pay. **Rejected on measurement; the
+      document-size tax exceeded the round-trip saving.** Do not re-attempt
+      without first shrinking what the hero actually consumes.
 
       `network-dependency-tree-insight` inherits the same root cause as
       render-blocking (the CSS request chain) and stays open for the same
       reason.
 
-   All four (`legacy-javascript-insight`, `network-dependency-tree-insight`,
+   All open ones (`legacy-javascript-insight`, `network-dependency-tree-insight`,
    `render-blocking-insight`, `render-blocking-resources`) stay bare `warn` —
    confirmed via the same three LHCI runs that none exposes a usable
    `numericValue` in the LHR, so no `maxNumericValue` ceiling is possible;
