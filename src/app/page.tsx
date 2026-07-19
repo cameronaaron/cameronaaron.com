@@ -21,7 +21,11 @@ import CommandPalette from '@/components/ui/CommandPalette';
 import IntroCurtain from '@/components/ui/IntroCurtain';
 import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransitions';
 import VelocityMarquee from '@/components/ui/VelocityMarquee';
-import RibbonBand from '@/components/ui/RibbonBand';
+// Code-split (2026-07-19): decorative physics band between sections, already
+// useInView-gated — its Verlet chain code stays out of the initial bundle.
+// The non-full-tier static hairline it renders is aria-hidden decoration, so
+// ssr:false loses nothing indexable.
+const RibbonBand = dynamic(() => import('@/components/ui/RibbonBand'), { ssr: false });
 import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/velocity-marquee-logic';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { navItems } from '@/data/navigation';

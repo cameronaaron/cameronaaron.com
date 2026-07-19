@@ -6,10 +6,18 @@ import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
-import DnaSnpGame from '@/components/projects/dna-game/DnaSnpGame';
-import ReactionTimeGame from '@/components/projects/reaction-game/ReactionTimeGame';
-import PredatorPreyChase from '@/components/projects/predator-prey/PredatorPreyChase';
+import dynamic from 'next/dynamic';
 import { buildProjectCollections } from '@/components/projects/logic';
+
+// Code-split (2026-07-19, measured — see ENGINEERING-STANDARDS §4.7 item 8):
+// the games are interactive-only widgets deep below the fold, already gated
+// on useInView; their code has no business in the initial bundle that every
+// visitor parses on a 4x-throttled phone CPU. ssr:false is safe here because
+// nothing inside them is indexable content — the surrounding project cards
+// (which ARE content) stay statically rendered.
+const DnaSnpGame = dynamic(() => import('@/components/projects/dna-game/DnaSnpGame'), { ssr: false });
+const ReactionTimeGame = dynamic(() => import('@/components/projects/reaction-game/ReactionTimeGame'), { ssr: false });
+const PredatorPreyChase = dynamic(() => import('@/components/projects/predator-prey/PredatorPreyChase'), { ssr: false });
 
 export default function Projects() {
   const { featuredProjects, otherProjects, researchSignals } = useMemo(

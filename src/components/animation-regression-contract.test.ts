@@ -366,4 +366,37 @@ describe('animation regression contract', () => {
     expect(rafCallback!.parameters[0]?.name.getText()).toBe('paintTime');
     expect(callsIdentifier(rafCallback!, 'setGoTimestamp')).toBe(true);
   });
+
+  it('continuous-work widgets gate on visibility — ENGINEERING-STANDARDS §3.7', () => {
+    // Each of these runs a rAF loop, physics sim, or countdown; before the
+    // gate (2026-07-19) they all started at page mount and the predator-prey
+    // score accrued before a visitor ever scrolled to Projects. Honest-
+    // throttled mobile TBT went 690ms -> 27ms with gating in place.
+    const gatedWidgets = [
+      'src/components/projects/predator-prey/PredatorPreyChase.tsx',
+      'src/components/projects/reaction-game/ReactionTimeGame.tsx',
+      'src/components/skills/SkillWeb.tsx',
+      'src/components/ui/RibbonBand.tsx',
+      'src/components/ui/MagneticField.tsx',
+    ];
+    for (const file of gatedWidgets) {
+      const source = read(file);
+      expect(source, `${file} must import useInView (§3.7 visibility gate)`).toContain('useInView');
+      expect(source, `${file} must gate its effect on the in-view flag`).toMatch(/isInView/);
+    }
+  });
+
+  it('below-fold non-content widgets are code-split — ENGINEERING-STANDARDS §3.8', () => {
+    // Split (measured +0.03 mobile, desktop flat — §4.7 item 8):
+    const projects = read('src/components/Projects.tsx');
+    for (const widget of ['dna-game/DnaSnpGame', 'reaction-game/ReactionTimeGame', 'predator-prey/PredatorPreyChase']) {
+      expect(projects).toMatch(new RegExp(`dynamic\\(\\(\\) => import\\('@/components/projects/${widget.replace('/', '\\/')}'\\), \\{ ssr: false \\}\\)`));
+    }
+    expect(read('src/components/Skills.tsx')).toContain("dynamic(() => import('@/components/skills/SkillWeb'), { ssr: false })");
+    expect(read('src/app/page.tsx')).toContain("dynamic(() => import('@/components/ui/RibbonBand'), { ssr: false })");
+
+    // Deliberately NOT split — it wraps real content (the contact links),
+    // which must stay in the prerendered HTML (§3.8's content boundary):
+    expect(read('src/components/Contact.tsx')).toContain("import MagneticField from '@/components/ui/MagneticField'");
+  });
 });

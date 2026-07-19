@@ -467,6 +467,46 @@ component (as ProjectCard does), so it never round-trips through the parent.
 Never call a hook inside a JSX expression (`style={{ y: useTransform(...) }}`).
 Extract to a named const in the function body.
 
+### 3.7 Continuous work runs only while visible (mandatory, 2026-07-19)
+
+Any component that does continuous or scheduled work — a `requestAnimationFrame`
+loop, a physics/canvas simulation, a game timer, a countdown — **must gate that
+work on actually being scrolled into view** (`useInView` from framer-motion:
+real IntersectionObserver, and the shared test mock already returns `true` so
+existing tests are unaffected; override with `mockReturnValue(false)` to test
+the off-screen branch). Off-screen work is not "cheap because it sleeps" — five
+idle-but-armed simulations still each pay listener registration, first-frame
+layout reads, and wake-on-mousemove churn during the exact window the page is
+trying to hydrate.
+
+Measured origin of the rule: before gating, every below-fold widget started at
+mount, and the predator-prey game's survival timer was accruing catches before
+a visitor ever reached Projects. Gating them (plus item 3.8 below) took the
+honestly-throttled mobile TBT from 690ms to 27ms.
+
+The gate must **pause, not reset**: the effect's cleanup cancels the frame/timer
+and the state lives outside the effect, so scrolling away and back resumes.
+
+### 3.8 Below-fold non-content widgets are code-split (mandatory, 2026-07-19)
+
+A widget that is (a) below the fold, (b) decorative or interactive-only —
+nothing in it belongs in the prerendered HTML for crawlers — and (c) already
+visibility-gated per 3.7, **must be `next/dynamic`-imported with `ssr: false`**
+so its code stays out of the initial bundle entirely (games, canvas
+simulations, physics bands). Measured: +0.03 mobile performance, −82ms TTI,
+desktop flat to the millisecond (§4.7 item 8's table).
+
+The two hard boundaries, each learned from a measured failure:
+
+- **Never split content.** Whole-section splitting was measured and rejected
+  (§4.7 item 4: the extra chunk round-trip deepened the critical graph,
+  LCP/TTI regressed on both form factors). A wrapper whose *children* are
+  content (`MagneticField` around the contact links) counts as content —
+  splitting it would drop real markup from the static export.
+- **Never split anything above the fold** — `IntroCurtain` stays a static
+  import (CLAUDE.md critical constraint #1), and hero-visible decorations
+  render via the `isProfileReady` gate, not lazy chunks.
+
 ---
 
 ## 4. Mobile-first performance law
@@ -858,6 +898,34 @@ History (2026-07, kept because the reasoning still applies):
    script evaluation at 4x CPU) — item 4's own revisit condition is met,
    so re-measuring splitting is now justified. Measure, don't assume, in
    either direction.
+
+   **Re-measured same day; verdict reversed for widgets (not sections).**
+   Dynamic-imported (`ssr: false`) the three project games, `SkillWeb`, and
+   `RibbonBand` — all decorative or interactive-only, all already
+   `useInView`-gated, none carrying indexable content (`MagneticField` was
+   deliberately left static: it *wraps* the contact links, which must stay
+   in the prerendered HTML). Three-run medians, warmed server:
+
+   | Metric | Mobile before | Mobile after | Desktop before | Desktop after |
+   | --- | --- | --- | --- | --- |
+   | Performance | 0.87 | **0.90** | 0.99 | 0.99 |
+   | TTI | 4039ms | 3957ms | 763ms | 763ms |
+   | Speed Index | 2367ms | 2338ms | 764ms | 764ms |
+   | LCP | 3776ms | 3763ms | 761ms | 761ms |
+   | TBT | 27.5ms | 33ms | 0ms | 0ms |
+
+   Mobile gained a real +0.03 with −82ms TTI; desktop is flat to the
+   millisecond — the regression that killed the original experiment (an
+   extra chunk round-trip deepening the critical graph) doesn't occur when
+   the split code is *below-fold, visibility-gated decoration* rather than
+   whole content sections. Item 4's core lesson stands refined, not
+   contradicted: **splitting content sections was and remains wrong here;
+   splitting non-content widgets wins once a slow-CPU simulation makes
+   script-evaluation cost visible.** A false CLS scare during verification
+   (0.1 vs the 0.087 baseline) turned out to be display rounding — the
+   actual value was 0.0927, and the shifting elements were the hero
+   typewriter spans, pre-existing and unrelated. Check raw `numericValue`,
+   not rounded output, before reverting anything on a CLS delta.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
