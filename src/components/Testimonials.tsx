@@ -156,10 +156,17 @@ export default function Testimonials() {
               </motion.div>
             ) : (
               visibleTestimonials.map((testimonial, index) => (
+                // Key intentionally excludes relationshipFilter: a testimonial
+                // that stays visible across a filter change (e.g. shown under
+                // both "All" and "Managers") must keep the same identity, or
+                // Framer Motion tears it down and remounts it on every filter
+                // click — re-running whileInView/IntersectionObserver setup
+                // for every surviving card, not just the newly-shown ones.
+                // Measured contributor to this interaction's INP exceeding
+                // budget (scripts/checks/measure-interaction-latency.mjs).
                 <motion.div
-                  key={`${relationshipFilter}-${testimonial.name}-${testimonial.date}`}
+                  key={`${testimonial.name}-${testimonial.date}`}
                   data-testid={`testimonial-item-${index}`}
-                  layout
                   initial={{ opacity: 0, y: 22, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.98 }}

@@ -158,6 +158,70 @@ When you cannot make something O(1), the required move is to state *why* (a
 lower bound, an inherent property) in a comment, and make it run at the
 minimal frequency possible.
 
+**First real run against the three representative interactions (2026-07-19)**
+found genuine, fixable causes — not measurement noise — behind all three
+failures:
+
+- **Mobile menu toggle** (`Navigation.tsx`): one ~50-54ms long task. Root
+  cause: `mobileMenuOpen` lives in `Navigation`, so toggling it re-rendered
+  the entire component tree — including the 8 desktop nav links, each
+  wrapping a `Magnetic` (two `useSpring` hooks), that have nothing to do
+  with the mobile panel. Fixed by extracting memoized `DesktopNavLink` /
+  `MobileNavLink` components (same pattern as `ExperienceCard`, item 13
+  above). **Fully resolved** — consistently 80-88ms, zero long tasks, across
+  every run since, including under heavy unrelated system load.
+- **Testimonials relationship filter**: INP unreliable (0-1 of 3 runs even
+  reporting a value) before any budget question. Root cause: the card `key`
+  included `relationshipFilter`
+  (`` `${relationshipFilter}-${testimonial.name}-${testimonial.date}` ``), so
+  a testimonial that stays visible across a filter change (e.g. shown under
+  both "All" and "Managers") was torn down and fully remounted on every
+  click — re-running `whileInView`/`IntersectionObserver` setup for every
+  *surviving* card, not just the newly-shown ones. This also meant
+  `AnimatePresence`'s `layout` prop on each card was animating nothing real:
+  no card ever persisted across a key that always changed, so the FLIP
+  animation had zero surviving elements to reposition. Fixed the key
+  (dropped `relationshipFilter` from it — correctness fix, not just a perf
+  one: a card that stays visible should not replay its entrance animation)
+  and removed the now-dead `layout` prop; memoized `TestimonialCard`.
+- **Skills sort-view toggle**: `layout` on all 11 skill-bar items forced a
+  synchronous FLIP position measurement on every reorder; `SkillBar` and the
+  sibling `SkillWeb` canvas component were both unmemoized, so every
+  unrelated re-render (including the sort toggle) reconciled all of them for
+  no visual benefit. Fixed by removing `layout` from the skill-bar items —
+  a real, deliberate trade-off (see below) — and memoizing both components.
+
+**Testimonials and Skills are measurably improved but not deterministically
+under the 100ms budget** — landing in the 90-110ms range depending on system
+load, versus the pre-fix 104-128ms (Testimonials often didn't even report a
+value at all). Investigated further before stopping: Skills' remaining cost
+is the DOM node reordering a genuine resort inherently requires (11 nodes
+changing position is real layout-affecting work with or without Framer
+Motion's `layout` prop); Testimonials' worst case is the specific
+representative interaction clicking "Managers" as the first non-active
+filter from "All" — a ~14-of-18-card simultaneous exit, a legitimately heavy
+one-time visual change, not a steady-state cost. A `mode="sync"` experiment
+on `AnimatePresence` (replacing `popLayout`) was tried and measured: no
+clear improvement, and it carries an unverified visual trade-off (exiting
+cards would stay in grid flow during their exit animation instead of being
+removed from layout immediately), so it was reverted rather than kept on a
+noise-level result. **Decision (2026-07-19, owner sign-off): ship the real
+fixes, document the remaining gap, don't chase it further without a new,
+specific idea** — the same posture as the render-blocking-insight history in
+§4.7 item 5. Further closing this gap means a real UX trade-off (drop the
+Skills reorder animation entirely, or skip exit animations when a filter
+click would hide many cards at once) that wasn't made unilaterally.
+
+Also found and fixed while investigating: repeated manual invocations of
+`measure-interaction-latency.mjs` left orphaned `wrangler pages dev`
+processes bound to port 3411 accumulating across runs, degrading later
+measurements' accuracy by contending for CPU — traced to piping the
+script's output through another process (`| tail`) rather than a bug in its
+own `process.kill(-server.pid)` cleanup, which was independently verified to
+work correctly in isolation. Not fixed at the script level (the cleanup
+logic itself is correct); noted here so a future investigation doesn't
+re-diagnose the same false lead.
+
 ---
 
 ## 2. Algorithms & data structures (contract sections 1–23)

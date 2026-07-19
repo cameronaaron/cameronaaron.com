@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 import { useInteractionMode } from '@/hooks/useInteractionMode';
@@ -10,7 +11,11 @@ interface SkillBarProps {
   index: number;
 }
 
-export default function SkillBar({ name, level, index }: SkillBarProps) {
+// Memoized for the same reason as TestimonialCard: Skills.tsx's sort-view
+// toggle re-renders every bar on every click, and each bar carries a
+// continuously-repeating shimmer animation that gains nothing from
+// re-evaluating on an unrelated parent re-render.
+function SkillBar({ name, level, index }: SkillBarProps) {
   const { prefersReducedMotion } = useInteractionMode();
 
   return (
@@ -37,3 +42,5 @@ export default function SkillBar({ name, level, index }: SkillBarProps) {
     </div>
   );
 }
+
+export default memo(SkillBar);

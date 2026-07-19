@@ -157,7 +157,6 @@ export default function Skills() {
               {technicalSkills.map((skill, index) => (
                 <motion.div
                   key={skill.name}
-                  layout
                   initial={{ opacity: 0, y: entryYOffset }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
