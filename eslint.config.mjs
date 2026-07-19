@@ -75,6 +75,12 @@ export default defineConfig([
     'node_modules/**',
     'coverage/**',
     '.stryker-tmp/**',
-    'reports/**'
+    'reports/**',
+    // Cloudflare's generated dev-server scaffold (wrangler pages dev) —
+    // already gitignored; missing here meant a local `wrangler pages dev`
+    // run left lintable-looking generated JS under .wrangler/tmp/ that
+    // could fail `pnpm run lint`'s zero-warning gate for reasons that have
+    // nothing to do with this repo's own source.
+    '.wrangler/**'
   ])
 ]);

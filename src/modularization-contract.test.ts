@@ -444,6 +444,24 @@ describe('modularization contract', () => {
     expect(source).not.toContain("title: 'Cameron Aaron on the Internet'");
   });
 
+  it('keeps nursing page metadata built from its own metadata module, and dashboard extracted', () => {
+    const source = read('src/app/nursing/page.tsx');
+
+    expect(source).toContain("from './metadata'");
+    expect(source).toContain('export const metadata = buildNursingMetadata(pageUrl);');
+    expect(source).not.toContain("title: 'Nursing Program Tracker'");
+    expect(source).toContain("from './NursingDashboard'");
+  });
+
+  it('keeps nursing dashboard state composition extracted to dashboard-logic', () => {
+    const source = read('src/app/nursing/NursingDashboard.tsx');
+
+    expect(source).toContain("from './dashboard-logic'");
+    expect(source).toContain('groupProgramsByCity(filterViewsByCity(views, selectedCity))');
+    // No inline city bucketing/sorting in the component itself.
+    expect(source).not.toContain('.sort((a, b) => a.localeCompare(b))');
+  });
+
   it('every hardcoded https://cameronaaron.com literal is gone — SITE_URL is the only source of truth', () => {
     // 2026-07: the literal was independently hardcoded in 9 files (14
     // occurrences) — layout.tsx, sitemap.ts, robots.ts, three page.tsx

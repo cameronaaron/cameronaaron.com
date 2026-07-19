@@ -247,6 +247,43 @@ beforeAll(() => {
     })),
   });
 
+  // jsdom in this vitest setup doesn't implement Storage — Node's own global
+  // `localStorage` (opt-in, file-backed) shadows it instead and throws/warns
+  // without --localstorage-file. Polyfill a plain in-memory Storage so any
+  // component/hook can read and write localStorage in tests.
+  class MemoryStorage {
+    private store = new Map<string, string>();
+
+    getItem(key: string): string | null {
+      return this.store.has(key) ? this.store.get(key)! : null;
+    }
+
+    setItem(key: string, value: string): void {
+      this.store.set(key, String(value));
+    }
+
+    removeItem(key: string): void {
+      this.store.delete(key);
+    }
+
+    clear(): void {
+      this.store.clear();
+    }
+
+    key(index: number): string | null {
+      return Array.from(this.store.keys())[index] ?? null;
+    }
+
+    get length(): number {
+      return this.store.size;
+    }
+  }
+
+  Object.defineProperty(window, 'localStorage', {
+    writable: true,
+    value: new MemoryStorage(),
+  });
+
   Object.defineProperty(navigator, 'serviceWorker', {
     configurable: true,
     value: {

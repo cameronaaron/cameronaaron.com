@@ -157,6 +157,10 @@ next-env.d.ts
 /Cameron_Aaron_Medical_Resume*.md
 /_local_archive/
 
+# Source transcripts and school documents (SSN fragments, student IDs) used
+# to build the /nursing tracker's data files — never meant for the repo.
+/College_data/
+
 # DNS and Cloudflare one-off operational artifacts (not part of deployed site)
 2eschool.org.bind.zone
 *.bind.zone
