@@ -47,6 +47,15 @@ export function usePerformanceProfile() {
   const [isCoarsePointer, setIsCoarsePointer] = useState(false);
   const [saveDataEnabled, setSaveDataEnabled] = useState(false);
   const [lowHardware, setLowHardware] = useState(false);
+  // False during SSR/build AND the client's first render — flips true only
+  // once the detection effect below has read the real device capabilities.
+  // Purely-decorative effects gate on this so they never mount under the
+  // optimistic default tier and then unmount when the real tier lands
+  // (the mobile "flash" — CLAUDE.md #10's trade-off, now avoided rather
+  // than accepted): the build HTML and the first client render both agree
+  // on "no decorations yet" (hydration-safe), and the effects mount exactly
+  // once, under the correct tier.
+  const [isProfileReady, setIsProfileReady] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: coarse)');
@@ -60,6 +69,7 @@ export function usePerformanceProfile() {
     setIsCoarsePointer(media.matches);
     setSaveDataEnabled(Boolean(connection?.saveData));
     setLowHardware(readLowHardware());
+    setIsProfileReady(true);
 
     const handlePointerChange = (event: MediaQueryListEvent) => {
       setIsCoarsePointer(event.matches);
@@ -93,8 +103,9 @@ export function usePerformanceProfile() {
     isCoarsePointer,
     saveDataEnabled,
     lowHardware,
-    shouldRenderHeavyEffects: performanceTier === 'full',
-    shouldRenderAmbientEffects: performanceTier === 'full' || performanceTier === 'balanced',
-    shouldRenderParticles: performanceTier === 'full',
+    isProfileReady,
+    shouldRenderHeavyEffects: isProfileReady && performanceTier === 'full',
+    shouldRenderAmbientEffects: isProfileReady && (performanceTier === 'full' || performanceTier === 'balanced'),
+    shouldRenderParticles: isProfileReady && performanceTier === 'full',
   };
 }

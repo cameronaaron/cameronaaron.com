@@ -115,7 +115,10 @@ describe('animation regression contract', () => {
 
   it('usePerformanceProfile.shouldRenderParticles is false on the balanced (mobile) tier', () => {
     const source = read('src/hooks/usePerformanceProfile.ts');
-    expect(source).toContain("shouldRenderParticles: performanceTier === 'full'");
+    // isProfileReady gate added 2026-07-19 (mobile load-flash fix): decorative
+    // effects must not mount under the optimistic 'full' default and then
+    // unmount when the real tier lands post-hydration.
+    expect(source).toContain("shouldRenderParticles: isProfileReady && performanceTier === 'full'");
     // Must NOT include 'balanced' in the particle-render condition
     expect(source).not.toMatch(/shouldRenderParticles:.*balanced/);
   });

@@ -136,7 +136,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
+              className="text-3xl sm:text-4xl md:text-[2rem] lg:text-[2.6rem] xl:text-[3.4rem] 2xl:text-[4rem] md:whitespace-nowrap font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
             >
               <GlyphDissolveName
                 text={profile.name}

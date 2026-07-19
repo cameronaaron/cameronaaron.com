@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useInView } from 'framer-motion';
 
 import ReactionTimeGame from './ReactionTimeGame';
 import { MAX_DELAY_MS, MIN_DELAY_MS, getResultMessage, getTargetAriaLabel } from './reaction-time-game-logic';
@@ -88,6 +89,43 @@ describe('ReactionTimeGame — initial render (hydration safety)', () => {
     const secondLabel = screen.getByTestId('reaction-game-target').getAttribute('aria-label');
 
     expect(secondLabel).toBe(firstLabel);
+  });
+});
+
+describe('ReactionTimeGame — visibility gating (round must not run off-screen)', () => {
+  afterEach(() => {
+    vi.mocked(useInView).mockReturnValue(true);
+  });
+
+  it('never schedules the go countdown while the card has not scrolled into view', () => {
+    vi.mocked(useInView).mockReturnValue(false);
+    vi.useFakeTimers();
+    render(<ReactionTimeGame />);
+
+    act(() => {
+      vi.advanceTimersByTime(MAX_DELAY_MS * 2);
+    });
+
+    expect(screen.getByLabelText(getTargetAriaLabel('waiting'))).not.toBeNull();
+  });
+
+  it('starts the countdown once scrolled into view', () => {
+    vi.mocked(useInView).mockReturnValue(false);
+    vi.useFakeTimers();
+    const { rerender } = render(<ReactionTimeGame />);
+
+    act(() => {
+      vi.advanceTimersByTime(MAX_DELAY_MS * 2);
+    });
+    expect(screen.getByLabelText(getTargetAriaLabel('waiting'))).not.toBeNull();
+
+    vi.mocked(useInView).mockReturnValue(true);
+    rerender(<ReactionTimeGame />);
+    act(() => {
+      vi.advanceTimersByTime(MAX_DELAY_MS);
+    });
+
+    expect(screen.getByLabelText(getTargetAriaLabel('go'))).not.toBeNull();
   });
 });
 

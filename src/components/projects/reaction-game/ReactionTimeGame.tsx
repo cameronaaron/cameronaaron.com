@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useInView } from 'framer-motion';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
   INITIAL_SESSION_STATS,
@@ -39,6 +40,12 @@ import {
  */
 export default function ReactionTimeGame() {
   const { prefersReducedMotion } = useInteractionMode();
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Below the fold inside Projects — without this, the "go" countdown was
+  // scheduling itself the instant the page mounted, so a visitor could
+  // arrive to find the target had already been sitting in "Click!" for a
+  // while (or land mid-round with no context for what happened).
+  const isInView = useInView(containerRef, { amount: 0.3 });
 
   const [phase, setPhase] = useState<RoundPhase>('waiting');
   const [goTimestamp, setGoTimestamp] = useState<number | null>(null);
@@ -50,9 +57,11 @@ export default function ReactionTimeGame() {
   // schedule the random "go" delay. If the player clicks early (false
   // start) or the round otherwise leaves 'waiting', this effect's cleanup
   // clears the pending timer so it can never fire late against a resolved
-  // round (lifecycle-hygiene contract).
+  // round (lifecycle-hygiene contract). Also gated on isInView: scrolling
+  // away mid-wait clears the pending timer, and scrolling back re-schedules
+  // a fresh delay rather than resolving one nobody was present for.
   useEffect(() => {
-    if (phase !== 'waiting') return undefined;
+    if (phase !== 'waiting' || !isInView) return undefined;
 
     const delayMs = computeRandomDelayMs(Math.random());
     const timeoutId = window.setTimeout(() => {
@@ -60,7 +69,7 @@ export default function ReactionTimeGame() {
     }, delayMs);
 
     return () => window.clearTimeout(timeoutId);
-  }, [phase]);
+  }, [phase, isInView]);
 
   // Reaction time must be measured from when the "go" stimulus was actually
   // PAINTED, not from the instant the setTimeout callback above fired.
@@ -110,6 +119,7 @@ export default function ReactionTimeGame() {
 
   return (
     <div
+      ref={containerRef}
       className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
       data-testid="reaction-time-game"
     >

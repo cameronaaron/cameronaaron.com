@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useInView } from 'framer-motion';
 
 import PredatorPreyChase from './PredatorPreyChase';
 import {
@@ -231,6 +232,56 @@ describe('PredatorPreyChase — per-frame stepping and cleanup', () => {
     expect(finalAnnouncement).not.toBe('');
     expect(finalAnnouncement).toContain('Caught!');
     expect(Number(screen.getByTestId('pp-catches').textContent)).toBeGreaterThan(0);
+  });
+});
+
+describe('PredatorPreyChase — visibility gating (score must not accrue off-screen)', () => {
+  let raf: ReturnType<typeof stubOneShotRaf>;
+
+  beforeEach(() => {
+    raf = stubOneShotRaf();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.mocked(useInView).mockReturnValue(true);
+  });
+
+  it('never starts the simulation loop while the card has not scrolled into view', () => {
+    vi.mocked(useInView).mockReturnValue(false);
+    render(<PredatorPreyChase />);
+
+    act(() => raf.runFrame(0));
+    act(() => raf.runFrame(500));
+
+    // requestAnimationFrame was never even called — the effect bailed before
+    // scheduling a frame, not just before advancing the timer visibly.
+    expect(screen.getByTestId('pp-timer').textContent).toBe('0.0');
+  });
+
+  it('starts advancing only once useInView flips true, and pauses again when it flips back', () => {
+    vi.mocked(useInView).mockReturnValue(false);
+    const { rerender } = render(<PredatorPreyChase />);
+
+    act(() => raf.runFrame(0));
+    act(() => raf.runFrame(500));
+    expect(screen.getByTestId('pp-timer').textContent).toBe('0.0');
+
+    // Scrolled into view: rerender so the mocked hook's new return value is
+    // picked up (matching a real IntersectionObserver callback flipping it).
+    vi.mocked(useInView).mockReturnValue(true);
+    rerender(<PredatorPreyChase />);
+    act(() => raf.runFrame(0));
+    act(() => raf.runFrame(500));
+    expect(screen.getByTestId('pp-timer').textContent).not.toBe('0.0');
+
+    const cancelSpy = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancelSpy);
+
+    // Scrolled back out: the effect's cleanup must cancel the in-flight frame.
+    vi.mocked(useInView).mockReturnValue(false);
+    rerender(<PredatorPreyChase />);
+    expect(cancelSpy).toHaveBeenCalled();
   });
 });
 
