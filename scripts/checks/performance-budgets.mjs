@@ -21,13 +21,24 @@ const requiredOutputFiles = [
 // 61,900B gzip, total HTML 1,113,927B raw / 195,084B gzip, total JS
 // 1,043,608B raw / 321,400B gzip. New ceilings give ~15-18% headroom over
 // that baseline, not unlimited room — a real regression still trips this.
+//
+// Recalibrated again 2026-07-18: the new /nursing page (a real, distinct
+// route, not a bug) added an 8th HTML output file. A fresh `npm run build`
+// measured total HTML 1,249,562B raw / 223,892B gzip across all 8 pages —
+// raw was still just inside the old 1,300,000 ceiling (96% used, no headroom
+// left for the next page or content addition) and gzip had already crossed
+// the old 220,000 ceiling. Both ceilings below carry ~16% headroom over this
+// baseline. Per-page (home/single) budgets were untouched — home HTML
+// (534,925B raw / 63,721B gzip) and the largest single page still sit
+// comfortably under their existing ceilings; this was a total-across-pages
+// problem, not a per-page one.
 const budgets = {
   homeHtmlBytes: 620_000,
   homeHtmlGzipBytes: 72_000,
   singleHtmlBytes: 620_000,
   singleHtmlGzipBytes: 70_000,
-  totalHtmlBytes: 1_300_000,
-  totalHtmlGzipBytes: 220_000,
+  totalHtmlBytes: 1_450_000,
+  totalHtmlGzipBytes: 260_000,
   singleJsBytes: 320_000,
   singleJsGzipBytes: 95_000,
   totalJsBytes: 1_200_000,
@@ -42,6 +53,41 @@ const budgets = {
 };
 
 const imageExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico', '.avif']);
+
+// Next's own next/dist/build/polyfills/polyfill-module.js ships unconditionally
+// to every browser regardless of the browserslist target (vercel/next.js#86785)
+// — worked around via `pnpm patch` (patches/next@*.patch), which empties that
+// file at the source, so the bundler has nothing to inline. This fingerprint
+// is the exact literal source of the `String.trimStart` shim from that file;
+// it doesn't appear in application code or in real third-party polyfill
+// libraries (e.g. core-js implements trimStart differently), so a match here
+// means the patch silently stopped applying — most likely because a `next`
+// version bump left `patchedDependencies` pointing at a version that's no
+// longer installed. Scoped to non-`noModule` scripts only: the legacy
+// `nomodule` fallback chunk intentionally ships a full polyfill set to
+// browsers without ES module support, and those browsers are the only ones
+// that ever fetch it.
+const LEGACY_POLYFILL_FINGERPRINT = '"trimStart"in String.prototype||(String.prototype.trimStart=String.prototype.trimLeft)';
+
+function findModernScriptChunks(htmlFiles) {
+  const chunks = new Set();
+  const scriptTagPattern = /<script\b[^>]*>/gi;
+  const srcPattern = /\bsrc="([^"]+)"/;
+
+  for (const htmlFile of htmlFiles) {
+    const html = readFileSync(htmlFile, 'utf8');
+    for (const tag of html.matchAll(scriptTagPattern)) {
+      const [tagText] = tag;
+      if (/\bnoModule\b/i.test(tagText)) continue;
+      const srcMatch = srcPattern.exec(tagText);
+      if (srcMatch && srcMatch[1].startsWith('/_next/static/chunks/')) {
+        chunks.add(srcMatch[1]);
+      }
+    }
+  }
+
+  return chunks;
+}
 
 function walkFiles(dirPath) {
   const entries = readdirSync(dirPath, { withFileTypes: true });
@@ -223,6 +269,21 @@ if (imageMetrics.maxBytes > budgets.singleImageBytes) {
 
 if (imageMetrics.totalBytes > budgets.totalImageBytes) {
   pushBudgetError(errors, 'Total image size', imageMetrics.totalBytes, budgets.totalImageBytes);
+}
+
+const modernScriptChunks = findModernScriptChunks(htmlFiles);
+for (const chunkSrc of modernScriptChunks) {
+  const chunkPath = resolve(outDir, chunkSrc.replace(/^\//, ''));
+  if (!existsSync(chunkPath)) continue;
+  const chunkContent = readFileSync(chunkPath, 'utf8');
+  if (chunkContent.includes(LEGACY_POLYFILL_FINGERPRINT)) {
+    errors.push(
+      `Legacy polyfill shipped to modern browsers: ${chunkSrc} contains Next's unconditional ` +
+        `polyfill-module.js (vercel/next.js#86785). The pnpm patch (patches/next@*.patch) that ` +
+        `strips it has stopped applying — check "next"'s resolved version against ` +
+        `pnpm-workspace.yaml's patchedDependencies key and re-run "pnpm patch next@<version>".`,
+    );
+  }
 }
 
 const serviceWorkerPath = resolve(outDir, 'sw.js');
