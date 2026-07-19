@@ -55,6 +55,7 @@ Enforcing test files:
 | Logic extraction per component | `src/modularization-contract.test.ts` |
 | Root files / path conventions | `src/repo-hygiene-contract.test.ts` |
 | Lighthouse thresholds | `src/performance-regression-contract.test.ts` |
+| Real-browser interaction latency (INP, long tasks) | `src/interaction-latency-contract.test.ts` (fast wiring) + `scripts/checks/measure-interaction-latency.mjs` (real measurement, deploy-time) |
 | bfcache blank-screen | `src/app/section-reveal-bfcache.test.ts` |
 
 ---
@@ -77,6 +78,81 @@ elements. The actual standard, which **is** achievable and **is** enforced:
 4. **Where linear-per-frame is inherent (particle engines), use the optimal
    structure** — spatial hash grid O(n·k) not brute force O(n²), typed arrays
    not object arrays, squared distances not sqrt.
+5. **O(1) is necessary but not sufficient — it says nothing about the
+   constant.** A per-event handler can be algorithmically O(1) and still take
+   40ms if the constant factor is large (a heavy re-render, an unbatched
+   layout read, an expensive animation start). Items 1–4 bound the *shape* of
+   the work; this item bounds its *duration* in real milliseconds, measured
+   in a real browser, not estimated from the algorithm on paper.
+
+   **The honest target, and why it's phrased this way (2026-07):** the goal
+   for this site is for every interaction to feel instant — the kind of
+   response latency where a UI stops reading as software and starts reading
+   as a physical object. The literal framing "sub-5ms response at a locked
+   120Hz" was considered and rejected as a *written standard*, because
+   neither half is something a web page can honestly claim: a browser cannot
+   force a display's refresh rate (most monitors people will actually view
+   this site on are 60Hz; only some phones/tablets/newer laptops run
+   90–144Hz — the correct behavior is matching whatever the display already
+   does, never fighting it or dropping frames), and even a perfect page has a
+   floor of one full frame of scan-out (8.3ms at 120Hz, 16.6ms at 60Hz) plus
+   input-queue and compositor-hop latency between a real click and real
+   photons — a floor this document's own prime directive ("nothing ships on
+   'should work'") won't let stand unmeasured. Aerospace/Neuralink-grade
+   real-time systems hit sub-5ms because there is no browser process, no
+   garbage collector, and no OS-level input queue between their input and
+   their output; that is a different engineering domain, not a bar this
+   stack can honestly claim to clear.
+
+   The real, measured, industry-standard bar for "this interaction feels
+   instant" is **INP (Interaction to Next Paint)**, the Core Web Vital that
+   replaced FID specifically for measuring click/tap/keypress → next visual
+   update. This site's floor:
+   - **Every representative interaction: median INP < 100ms** — the low
+     half of Core Web Vitals' "good" range (<200ms), where interactions
+     read as instant rather than merely acceptable.
+   - **Zero `PerformanceObserver({type:'longtask'})` entries during any
+     interaction** — not a threshold this repo chose: the Long Tasks API
+     itself defines "long" as >50ms of continuous main-thread blocking, so
+     any entry at all is already a violation by the spec's own definition.
+
+   **Why this can't be a Vitest/jsdom test, and how it's actually enforced:**
+   jsdom has no compositor, no real browser task queue, and (confirmed by
+   audit) no `PerformanceObserver` — it structurally cannot produce a
+   genuine long task or a real Event-Timing-API interaction. This is
+   measured against a real, static-export production build with real
+   Chromium (Playwright) and Google's own `web-vitals` library (the actual
+   INP algorithm — interaction grouping, worst-of-session selection,
+   presentation-time measurement — not worth hand-rolling) via
+   `scripts/checks/measure-interaction-latency.mjs`
+   (`pnpm run test:interaction-latency`), following the identical
+   server-lifecycle pattern this repo's Lighthouse gate already established
+   (`wrangler pages dev out`). Same posture as Lighthouse and the external-
+   links ledger checker: slow and real-browser, so it lives in the
+   deploy-time tier (`deploy:pages:prod`), never the pre-commit/pre-push
+   hook. The fast, every-commit half
+   (`src/interaction-latency-contract.test.ts`) only asserts the *wiring* —
+   the documented budgets, a non-empty representative-interaction list each
+   naming a real file, and that both the npm script and the deploy pipeline
+   actually invoke the real measurement — the same relationship
+   `performance-regression-contract.test.ts` has to Lighthouse.
+
+   Real-browser interaction timing is genuinely noisy run to run (confirmed
+   by hand: the same interaction reported 80ms, 96ms, and 128ms across three
+   otherwise-identical runs) — the measurement script takes the median of 3
+   runs per interaction, the same fix this repo already applies to
+   Lighthouse (`numberOfRuns: 3`, §4.7): more samples stabilize how reliably
+   a value is measured, they don't move the value itself. A reading that
+   never gets reported at all is treated as a failure, not a silent pass —
+   per item 8 below, a test that cannot fail is worse than no test; if
+   web-vitals stops reporting, that is itself a regression worth knowing
+   about, not "nothing to check here." Three interaction types were tried
+   and reproducibly never produced a reading (0/3) — two that steal focus
+   into a modal on open (CommandPalette, KeyboardShortcuts) and one revealed
+   by an immediately-preceding scroll (BackToTop) — and were left out of the
+   representative set rather than shipped as false-negative passes on
+   missing data; documented inline at the script's source as a known gap
+   worth its own investigation, not silently dropped.
 
 When you cannot make something O(1), the required move is to state *why* (a
 lower bound, an inherent property) in a comment, and make it run at the
@@ -1154,6 +1230,40 @@ investigate that script before touching the config.
     loop assigns every index 0..length-1 sequentially and a plain array grows
     to fit each write identically to a pre-sized one — documented inline at
     its source. Final: 98.92%, one equivalent.
+
+    **2026-07, nursing-tracker feature:** six new logic modules
+    (`matching-logic.ts`, `gpa-logic.ts`, `window-logic.ts`,
+    `readiness-logic.ts`, `dashboard-logic.ts`, `program-card-logic.ts` under
+    `src/app/nursing/`) swept in the same session they were introduced, per
+    the mandate. First pass: 78.79%, 83 survivors, almost all real: every
+    style dispatch table (`FULFILLMENT_STYLES`, `WINDOW_STATUS_STYLES`,
+    `READINESS_BAND_STYLES`, `getChemistryBadge`) had only a `showPulse`/
+    `.label` spot-check, never an exact `{label, className}` assertion per
+    entry — same class of gap as `BASE_COLOR_CLASSES` in round three, fixed
+    the same way. `getActiveWindow`'s original single-pass, three-way branch
+    (return-early / update-upcoming / update-closed all interleaved in one
+    loop) was rewritten into three sequential single-purpose passes (find
+    active, then find soonest upcoming, then the first remaining entry is
+    closed) specifically because the entangled version was both hard to
+    reason about and hard to kill mutants in — same lesson as `applySeek`
+    above: untangling control flow shrinks the mutation surface for free.
+    `pickBestCourse` got the same treatment (one loop tracking a single
+    running-max `bestGradePoints`, replacing a mid-loop "does this beat best
+    or is there no best yet" decision). `getProgramProgressCount`'s test used
+    a symmetric 2-completed/2-other mix, so `state === 'completed'` and its
+    `!==` mutant produced the same count by coincidence — fixed with an
+    asymmetric 3/1 split. Two off-by-one boundary gaps (`now < opens`/`now >
+    closes` in `getWindowStatus`) had never been tested at the exact instant
+    — added now-equals-opens and now-equals-closes cases confirming both
+    boundaries are inclusive. Second pass: 99.65%, one survivor, confirmed
+    equivalent: `course.gradePoints !== undefined` in `matching-logic.ts`'s
+    `pickBestCourse` — required for TypeScript to narrow `gradePoints` to
+    `number` before the following assignment, but at runtime provably
+    redundant, since JS's `>` returns `false` whenever either operand is
+    `undefined`, so the following `course.gradePoints > bestGradePoints`
+    comparison already excludes an ungraded course on its own. Documented
+    inline at its source. Final: matching-logic.ts 98.57% (one equivalent);
+    the other five files at 100%.
 14. **A rendered-text assertion is only as strong as its regex — a wildcard
     is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
     months.*renew soon/i))` passes as long as *something* sits between the
