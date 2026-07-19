@@ -567,15 +567,53 @@ History (2026-07, kept because the reasoning still applies):
    even though today's baseline stays non-blocking — real teeth, not just
    documentation.
 
-   **Root-caused, not fixable from `src/`** — `legacy-javascript-insight`
-   traces to Next.js's own `next/dist/build/polyfills/polyfill-module.js`:
-   conditional guards like `Array.prototype.at||(Array.prototype.at=function
-   (){…})` for `Array.at`/`flat`/`flatMap`/`Object.fromEntries`/
-   `Object.hasOwn`/`String.trimEnd`, confirmed by grepping the exact polyfill
+   **Root-caused as not fixable from `src/` — fixed anyway via `pnpm patch`
+   (2026-07-18).** `legacy-javascript-insight` traces to Next.js's own
+   `next/dist/build/polyfills/polyfill-module.js`: conditional guards like
+   `Array.prototype.at||(Array.prototype.at=function(){…})` for
+   `Array.at`/`flat`/`flatMap`/`Object.fromEntries`/`Object.hasOwn`/
+   `String.trimStart`/`trimEnd`, confirmed by grepping the exact polyfill
    source into the shipped chunk (`grep -rl` across `node_modules` matched
    only Next's own polyfill module — no third-party package). It's injected
-   by Next's build pipeline itself, loaded via a normal (non-`nomodule`)
-   async script, and not exposed through any `next.config.mjs` flag.
+   by Next's build pipeline itself unconditionally — loaded via a normal
+   (non-`nomodule`) async script regardless of the project's browserslist
+   target — and not exposed through any `next.config.mjs` flag. This is the
+   same defect as [vercel/next.js#86785](https://github.com/vercel/next.js/issues/86785):
+   no official fix or opt-out exists upstream as of Next 16.2.10.
+
+   "Not fixable from `src/`" turned out to mean exactly that and no more —
+   application code can't reach into Next's build pipeline, but `node_modules`
+   itself can be patched. `pnpm patch next@16.2.10` empties
+   `dist/build/polyfills/polyfill-module.js` to zero bytes
+   (`patches/next@16.2.10.patch`, `pnpm-workspace.yaml`'s
+   `patchedDependencies`). Verified safe before applying: (1) every API that
+   file shims — `Array.at`/`flat`/`flatMap`, `Object.fromEntries`/`hasOwn`,
+   `String.trimStart`/`trimEnd`, `Symbol.prototype.description` — is natively
+   supported by this repo's browserslist floor (Chrome/Edge 111+, Firefox
+   113+, Safari 16.4+); (2) `grep -rn "canParse" src/` found zero call sites,
+   so the one shimmed API *not* covered by that floor (`URL.canParse`, which
+   needs Firefox 115+/Safari 17+) is never called by application code; (3)
+   Next's own internal use of `URL.canParse`
+   (`shared/lib/normalized-asset-prefix.js`) only runs when `assetPrefix` is
+   configured — this project doesn't set one, so the call site is dead in our
+   build regardless. Measured before/after with a live `lighthouse` run
+   against a `wrangler pages dev` build of `/out`:
+   `legacy-javascript-insight` went from "Est savings of 14 KiB" (score 0) to
+   zero waste (score 1); no other audit moved outside run-to-run noise.
+
+   **Fragility this trades in:** `pnpm patch` pins to an exact version
+   (`next@16.2.10`). `package.json` still ranges on `^16.2.10`, so a future
+   `pnpm install`/`pnpm up` that resolves a newer `next` will silently stop
+   applying the patch — no error, just the polyfill quietly coming back.
+   Two independent guards catch this: `performance-regression-contract.test.ts`
+   asserts `pnpm-workspace.yaml`'s pinned patch version matches the lockfile's
+   *resolved* `next` version (fails fast on every `npm test`, before any
+   build); `performance-budgets.mjs`'s `LEGACY_POLYFILL_FINGERPRINT` check
+   greps the actual built `/out` chunks reachable by a non-`nomodule` script
+   tag for the polyfill's literal source (fails on `test:performance:contracts`,
+   post-build). After any `next` version bump: re-run
+   `pnpm patch next@<new-version>`, re-apply the same one-line edit, and
+   `pnpm patch-commit`.
 
    `render-blocking-insight` / `render-blocking-resources` — three distinct
    fixes were attempted and measured, not one:
@@ -654,6 +692,53 @@ History (2026-07, kept because the reasoning still applies):
    refactor introduces genuinely unmemoized re-render-heavy code the manual
    discipline hasn't caught** — and re-run this same measurement, don't
    assume the verdict transfers.
+7. **Two budget ceilings recalibrated with real data (2026-07-18) after
+   organic content growth, not a bug, tripped them** — same pattern as item
+   5's `dom-size`/`unused-javascript`/`legacy-javascript` recalibration and
+   the top-of-section HTML-budget history: measure the real baseline, give
+   real headroom, document why, don't just raise the number.
+
+   *Total HTML weight* (`performance-budgets.mjs`): the new `/nursing` route
+   added an 8th static HTML output file. Fresh measurement: 1,249,562B raw /
+   223,892B gzip across all 8 pages — raw was already 96% of the 1,300,000
+   ceiling with no headroom left for the *next* page, and gzip had already
+   crossed the old 220,000 ceiling. `totalHtmlBytes` → 1,450,000,
+   `totalHtmlGzipBytes` → 260,000 (~16% headroom over the new baseline).
+   Per-page budgets (`homeHtmlBytes`, `singleHtmlBytes`) were untouched —
+   home HTML (534,925B raw / 63,721B gzip) sits comfortably under its
+   existing ceiling; this was a total-across-pages problem, not a per-page
+   one, so it wasn't fixable by shrinking any single page.
+
+   *`dom-size`* (`lighthouserc.json`/`.mobile.json`,
+   `performance-regression-contract.test.ts`): 3 fresh authoritative LHCI
+   runs per form factor measured 3273/3273/3273 (desktop) and
+   3249/3249/3249 (mobile) elements — stable, not a fluke, and both above
+   the old 3200 ceiling. Root-caused before touching the number: walked the
+   built homepage HTML section-by-section (`<section id="…">` boundaries)
+   and counted tags per section — `projects` (716 tags, 20 portfolio
+   entries), `testimonials` (603 tags, 18 entries), and `education` (535
+   tags, the full LACCD prerequisite course table) account for the bulk of
+   it. All three render every item unconditionally with no pagination or
+   "show more" truncation — genuine content on a portfolio site, not
+   accidental markup bloat, and confirmed unrelated to any change in the
+   diff that surfaced this (no homepage-rendering component was touched).
+   `domSizeMaxElements` → 3900 for both form factors (~19% headroom over the
+   new baseline, matching the ~19% the original 3200 carried over 2689) —
+   kept as one shared ceiling rather than two separately-tightened values,
+   mirroring how the original 3200 was shared despite desktop/mobile having
+   different baselines (2689 vs 2672): DOM element count is a property of
+   the markup, not render timing, so it doesn't vary by form factor the way
+   speed-index does.
+
+   **Not attempted:** trimming `projects`/`testimonials`/`education` down to
+   a paginated "show more" view would give a genuine, non-cosmetic dom-size
+   win (unlike raising the ceiling, it would actually shrink the initial DOM
+   Lighthouse measures) — but for a static export, an initially-collapsed
+   list is *absent from the pre-rendered HTML* until client JS expands it,
+   which is a real content-visibility trade-off for crawlers that don't
+   execute JS, not just a technical tweak. That's a product decision about
+   how the portfolio presents itself, not a performance-budget fix, and
+   wasn't made unilaterally.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job

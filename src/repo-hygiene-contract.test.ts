@@ -30,7 +30,10 @@ const EXPECTED_ROOT_FILES = [
   'wrangler.toml',
 ] as const;
 
-const EXPECTED_ROOT_DIRS = ['.github', 'public', 'scripts', 'src'] as const;
+// patches/: pnpm patch's on-disk store for patchedDependencies (currently
+// next@16.2.10 — see ENGINEERING-STANDARDS.md §4.7 item 5's
+// legacy-javascript-insight fix).
+const EXPECTED_ROOT_DIRS = ['.github', 'patches', 'public', 'scripts', 'src'] as const;
 
 function getTrackedFiles(): string[] {
   const output = execFileSync('git', ['ls-files'], {

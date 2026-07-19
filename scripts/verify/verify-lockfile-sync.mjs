@@ -16,7 +16,7 @@
 // package.json) as the very first command, before any other pnpm command has
 // a chance to touch the lockfile.
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -26,6 +26,16 @@ const scratchDir = mkdtempSync(join(tmpdir(), 'lockfile-sync-check-'));
 try {
   for (const file of ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']) {
     cpSync(join(root, file), join(scratchDir, file));
+  }
+
+  // pnpm-workspace.yaml's patchedDependencies references files under patches/
+  // by relative path (e.g. patches/next@16.2.10.patch) — pnpm hashes that
+  // file during `install --frozen-lockfile` even with --ignore-scripts, so
+  // it must exist in the scratch dir too or the check fails with an
+  // unrelated-looking ENOENT instead of a real drift signal.
+  const patchesDir = join(root, 'patches');
+  if (existsSync(patchesDir)) {
+    cpSync(patchesDir, join(scratchDir, 'patches'), { recursive: true });
   }
 
   execFileSync('pnpm', ['install', '--frozen-lockfile', '--ignore-scripts'], {

@@ -44,7 +44,7 @@
         "uses-responsive-images": "warn",
         "render-blocking-insight": "warn",
         "render-blocking-resources": "warn",
-        "dom-size": ["warn", {"maxNumericValue": 3200}],
+        "dom-size": ["warn", {"maxNumericValue": 3900}],
         "unused-javascript": ["warn", {"maxNumericValue": 150, "maxLength": 4}],
         "legacy-javascript": ["warn", {"maxNumericValue": 100, "maxLength": 3}]
       }

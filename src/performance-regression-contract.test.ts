@@ -68,9 +68,17 @@ function expectStrictAssertions(
   // next/dist/build/polyfills/polyfill-module.js — conditional guards like
   // `Array.prototype.at||(Array.prototype.at=function(){...})` for
   // Array.at/flat/flatMap/Object.fromEntries/Object.hasOwn/String.trimEnd,
-  // shipped by Next's build pipeline itself (confirmed by grepping the exact
-  // polyfill source into the built chunk), not application code and not
-  // exposed via any next.config.mjs opt-out.
+  // shipped by Next's build pipeline itself regardless of the browserslist
+  // target (vercel/next.js#86785), not exposed via any next.config.mjs
+  // opt-out. Fixed anyway (2026-07) via `pnpm patch next` — patches/next@*.patch
+  // empties that file at the source since every API it shims is natively
+  // supported by this repo's browserslist floor (Chrome/Edge 111+, Firefox
+  // 113+, Safari 16.4+); see performance-budgets.mjs's LEGACY_POLYFILL_FINGERPRINT
+  // check for the build-output regression guard. Stays a bare 'warn' here
+  // regardless — the LHR exposes no numericValue for this audit even when it
+  // fails, so no maxNumericValue ceiling is possible — but with the patch
+  // applied it now simply never fires (score 1, confirmed via a live
+  // `lighthouse` run against a patched build, 2026-07).
   expect(assertions['legacy-javascript-insight']).toBe('warn');
   //
   // network-dependency-tree-insight / render-blocking-insight /
@@ -162,8 +170,18 @@ describe('performance regression contract', () => {
     // Numeric ceilings (2026-07): desktop's 3 authoritative LHCI runs measured
     // dom-size 2689 elements, unused-javascript 70-80ms/2 files, legacy-
     // javascript 40ms/1 file. Ceilings below carry real headroom.
+    //
+    // dom-size recalibrated 2026-07-18: 3 fresh authoritative LHCI runs
+    // measured 3273/3273/3273 elements (stable, not a fluke) — real content
+    // growth (20 projects, 18 testimonials, the full LACCD prerequisite
+    // course table), confirmed by walking the built homepage HTML per
+    // section (projects: 716 tags, testimonials: 603, education: 535); no
+    // homepage-rendering component changed in the diff that surfaced this,
+    // so it predates and is unrelated to that diff. 3900 carries ~19%
+    // headroom over the new baseline, matching the ~19% the original 3200
+    // carried over 2689.
     expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.85, {
-      domSizeMaxElements: 3200,
+      domSizeMaxElements: 3900,
       unusedJavascriptMaxMs: 150,
       unusedJavascriptMaxFiles: 4,
       legacyJavascriptMaxMs: 100,
@@ -201,8 +219,16 @@ describe('performance regression contract', () => {
     // dom-size 2672 elements, unused-javascript 50ms/2 files, legacy-
     // javascript 10ms/1 file — lower than desktop, so mobile's ceilings are
     // tighter (real headroom, not copy-pasted from desktop).
+    //
+    // dom-size recalibrated 2026-07-18 alongside desktop (same content
+    // growth, same root cause): 3 fresh authoritative LHCI runs measured
+    // 3249/3249/3249 elements. Kept equal to desktop's 3900 rather than a
+    // separately-tightened mobile value — that mirrors the original pairing
+    // (2672 mobile / 2689 desktop both shared one 3200 ceiling) and DOM
+    // element count doesn't vary by form factor the way render timing does;
+    // the same homepage markup ships to both.
     expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.95, {
-      domSizeMaxElements: 3200,
+      domSizeMaxElements: 3900,
       unusedJavascriptMaxMs: 120,
       unusedJavascriptMaxFiles: 4,
       legacyJavascriptMaxMs: 60,
@@ -218,5 +244,41 @@ describe('performance regression contract', () => {
     const verifyScript = read('scripts/verify/verify-deployment.sh');
 
     expect(verifyScript).toContain('pnpm run test:performance');
+  });
+
+  it('keeps the next polyfill-module.js patch wired up and pinned to the installed next version', () => {
+    // Regression guard for the legacy-javascript-insight fix above: pnpm
+    // patches are keyed to an exact package version, so a `next` bump that
+    // isn't accompanied by a matching patch re-cut silently stops applying
+    // the patch — the polyfill comes back with no test failure to flag it
+    // short of this check (the build-output-level check lives in
+    // performance-budgets.mjs, which only runs post-build; this one is fast
+    // and runs on every `npm test`).
+    const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
+    const nextRange = packageJson.dependencies?.next;
+    expect(nextRange, 'package.json must declare a "next" dependency').toBeTruthy();
+
+    const workspaceYaml = read('pnpm-workspace.yaml');
+    const patchMatch = /patchedDependencies:\s*\n\s+next@([\d.]+):\s*(\S+)/.exec(workspaceYaml);
+    expect(patchMatch, 'pnpm-workspace.yaml must pin a patchedDependencies entry for "next"').not.toBeNull();
+
+    const [, patchedVersion, patchRelativePath] = patchMatch!;
+    // The lockfile's resolved next version, not just the package.json range —
+    // a caret range can resolve to a newer version than the patch was cut
+    // against without package.json itself ever changing.
+    const lockfile = read('pnpm-lock.yaml');
+    const resolvedMatch = /\n {2}next@([\d.]+):/.exec(lockfile);
+    expect(resolvedMatch, 'pnpm-lock.yaml must have a resolved "next" version').not.toBeNull();
+    const [, resolvedVersion] = resolvedMatch!;
+
+    expect(
+      patchedVersion,
+      `patchedDependencies pins next@${patchedVersion} but the lockfile resolved next@${resolvedVersion} — ` +
+        `re-cut the patch with "pnpm patch next@${resolvedVersion}" after any next.js version bump`,
+    ).toBe(resolvedVersion);
+
+    const patchContent = read(patchRelativePath);
+    expect(patchContent).toContain('dist/build/polyfills/polyfill-module.js');
+    expect(patchContent).toContain('-"trimStart"in String.prototype');
   });
 });
