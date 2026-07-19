@@ -30,9 +30,22 @@ interface NumericCeilings {
   legacyJavascriptMaxFiles: number;
 }
 
+/** Core-Web-Vitals error ceilings — per form factor since 2026-07-19, when the
+ *  mobile config gained honest device throttling (4x CPU / slow-4G, what
+ *  PageSpeed Insights runs) and its ceilings were recalibrated against a
+ *  measured baseline instead of sharing desktop's unthrottled numbers. */
+interface CwvCeilings {
+  fcpMaxMs: number;
+  lcpMaxMs: number;
+  tbtMaxMs: number;
+  siMaxMs: number;
+  ttiMaxMs: number;
+}
+
 function expectStrictAssertions(
   assertions: Record<string, unknown>,
   performanceMinScore: number,
+  cwv: CwvCeilings,
   ceilings: NumericCeilings,
 ): void {
   expect(assertions['categories:performance']).toEqual(['error', { minScore: performanceMinScore }]);
@@ -41,14 +54,14 @@ function expectStrictAssertions(
   expect(assertions['categories:seo']).toEqual(['error', { minScore: 1 }]);
   // Core Web Vitals — exact thresholds, not just "the key exists" (a
   // toBeTruthy() check here would pass even if maxNumericValue were silently
-  // loosened to something meaningless). Values match Google's "good" CWV
-  // bar: FCP/LCP in ms, CLS unitless, TBT/interactive in ms.
-  expect(assertions['first-contentful-paint']).toEqual(['error', { maxNumericValue: 1500 }]);
-  expect(assertions['largest-contentful-paint']).toEqual(['error', { maxNumericValue: 2500 }]);
+  // loosened to something meaningless). FCP/LCP in ms, CLS unitless,
+  // TBT/interactive in ms.
+  expect(assertions['first-contentful-paint']).toEqual(['error', { maxNumericValue: cwv.fcpMaxMs }]);
+  expect(assertions['largest-contentful-paint']).toEqual(['error', { maxNumericValue: cwv.lcpMaxMs }]);
   expect(assertions['cumulative-layout-shift']).toEqual(['error', { maxNumericValue: 0.1 }]);
-  expect(assertions['total-blocking-time']).toEqual(['error', { maxNumericValue: 300 }]);
-  expect(assertions['speed-index']).toEqual(['error', { maxNumericValue: 3000 }]);
-  expect(assertions['interactive']).toEqual(['error', { maxNumericValue: 3500 }]);
+  expect(assertions['total-blocking-time']).toEqual(['error', { maxNumericValue: cwv.tbtMaxMs }]);
+  expect(assertions['speed-index']).toEqual(['error', { maxNumericValue: cwv.siMaxMs }]);
+  expect(assertions['interactive']).toEqual(['error', { maxNumericValue: cwv.ttiMaxMs }]);
 
   // ── Tier 1: bare "warn" — audits with no meaningful numericValue in the LHR
   // (confirmed 2026-07 by inspecting real collected reports), so LHCI's
@@ -180,13 +193,20 @@ describe('performance regression contract', () => {
     // so it predates and is unrelated to that diff. 3900 carries ~19%
     // headroom over the new baseline, matching the ~19% the original 3200
     // carried over 2689.
-    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.85, {
-      domSizeMaxElements: 3900,
-      unusedJavascriptMaxMs: 150,
-      unusedJavascriptMaxFiles: 4,
-      legacyJavascriptMaxMs: 100,
-      legacyJavascriptMaxFiles: 3,
-    });
+    // Desktop CWV ceilings are Google's "good" bar unchanged — desktop's
+    // throttling (the standard Lighthouse desktop preset) was always honest.
+    expectStrictAssertions(
+      lighthouseConfig.ci?.assert?.assertions ?? {},
+      0.85,
+      { fcpMaxMs: 1500, lcpMaxMs: 2500, tbtMaxMs: 300, siMaxMs: 3000, ttiMaxMs: 3500 },
+      {
+        domSizeMaxElements: 3900,
+        unusedJavascriptMaxMs: 150,
+        unusedJavascriptMaxFiles: 4,
+        legacyJavascriptMaxMs: 100,
+        legacyJavascriptMaxFiles: 3,
+      },
+    );
   });
 
   it('keeps desktop Lighthouse at three runs (median absorbs CI rendering-speed variance)', () => {
@@ -205,39 +225,91 @@ describe('performance regression contract', () => {
     expect(lighthouseConfig.ci?.collect?.numberOfRuns).toBe(3);
   });
 
+  it('both gates measure a WARMED server, not wrangler cold-start latency', () => {
+    // LHCI boots its server fresh per session; wrangler pages dev's first
+    // requests (worker compile, lazy asset reads) are several times slower
+    // than steady-state, and Lighthouse's lantern simulation scales those
+    // observed latencies under throttling — measured 2026-07-19 as a 3-6s
+    // LCP inflation on otherwise-identical runs. serve-out-warmed.mjs
+    // pre-fetches every page twice before printing the ready marker.
+    for (const config of ['lighthouserc.json', 'lighthouserc.mobile.json']) {
+      const parsed = JSON.parse(read(config)) as {
+        ci?: { collect?: { startServerCommand?: string; startServerReadyPattern?: string } };
+      };
+      expect(parsed.ci?.collect?.startServerCommand, config).toBe('node scripts/checks/serve-out-warmed.mjs');
+      expect(parsed.ci?.collect?.startServerReadyPattern, config).toBe('WARM_READY');
+    }
+  });
+
   it('keeps mobile lighthouse thresholds stricter than desktop, with mobile emulation', () => {
     const lighthouseConfig = JSON.parse(read('lighthouserc.mobile.json')) as LighthouseConfig;
 
     expect(lighthouseConfig.ci?.assert?.preset).toBe('lighthouse:recommended');
-    // Mobile's scoring curve is far more forgiving of the same CI rendering
-    // slowdown (the ~2130ms speed-index value that costs desktop ~10 points
-    // scores 0.99 under mobile's curve) — observed mobile category scores
-    // have held at 0.99 across every CI run in this investigation. 0.95
-    // keeps a strict bar with a small margin, well above desktop's 0.85.
-    //
-    // Numeric ceilings (2026-07): mobile's 3 authoritative LHCI runs measured
-    // dom-size 2672 elements, unused-javascript 50ms/2 files, legacy-
-    // javascript 10ms/1 file — lower than desktop, so mobile's ceilings are
-    // tighter (real headroom, not copy-pasted from desktop).
+    // Honest device throttling since 2026-07-19: 4x CPU slowdown + slow-4G
+    // (rttMs 150 / 1638.4 Kbps) — the same simulation PageSpeed Insights
+    // runs. The previous config (cpuSlowdownMultiplier: 1, desktop-grade
+    // network) never simulated a real phone, which is why the gate said 0.99
+    // while PageSpeed measured 61 on the identical build. Floor and ceilings
+    // below recalibrated against a measured warmed-server baseline (3 runs,
+    // perfectly stable: score 0.87/0.87/0.87, FCP 1360ms, LCP 3776ms, TBT
+    // 27.5ms, SI 2367ms, TTI 4039ms) — see ENGINEERING-STANDARDS §4.7 for
+    // the full history, including the stray-dev-server-on-port-3000 pitfall
+    // that corrupted the first calibration attempt.
     //
     // dom-size recalibrated 2026-07-18 alongside desktop (same content
-    // growth, same root cause): 3 fresh authoritative LHCI runs measured
-    // 3249/3249/3249 elements. Kept equal to desktop's 3900 rather than a
-    // separately-tightened mobile value — that mirrors the original pairing
-    // (2672 mobile / 2689 desktop both shared one 3200 ceiling) and DOM
-    // element count doesn't vary by form factor the way render timing does;
-    // the same homepage markup ships to both.
-    expectStrictAssertions(lighthouseConfig.ci?.assert?.assertions ?? {}, 0.95, {
-      domSizeMaxElements: 3900,
-      unusedJavascriptMaxMs: 120,
-      unusedJavascriptMaxFiles: 4,
-      legacyJavascriptMaxMs: 60,
-      legacyJavascriptMaxFiles: 3,
-    });
+    // growth, same root cause): kept equal to desktop's 3900 — DOM element
+    // count is a property of the markup, not render timing, so it doesn't
+    // vary by form factor.
+    expectStrictAssertions(
+      lighthouseConfig.ci?.assert?.assertions ?? {},
+      0.80,
+      { fcpMaxMs: 1700, lcpMaxMs: 4500, tbtMaxMs: 300, siMaxMs: 3000, ttiMaxMs: 5000 },
+      {
+        domSizeMaxElements: 3900,
+        unusedJavascriptMaxMs: 500,
+        unusedJavascriptMaxFiles: 4,
+        legacyJavascriptMaxMs: 60,
+        legacyJavascriptMaxFiles: 1,
+      },
+    );
 
     // Must actually emulate a mobile device — otherwise this is just desktop scoring twice.
     expect(lighthouseConfig.ci?.collect?.settings?.formFactor).toBe('mobile');
     expect(lighthouseConfig.ci?.collect?.settings?.screenEmulation?.mobile).toBe(true);
+
+    // The honest-throttling settings themselves, pinned: reverting to the
+    // old unthrottled values would silently make the whole recalibration a lie.
+    const settings = lighthouseConfig.ci?.collect?.settings as {
+      throttling?: { rttMs?: number; throughputKbps?: number; cpuSlowdownMultiplier?: number };
+    };
+    expect(settings?.throttling?.cpuSlowdownMultiplier).toBe(4);
+    expect(settings?.throttling?.rttMs).toBe(150);
+    expect(settings?.throttling?.throughputKbps).toBe(1638.4);
+
+    // Local-environment noise pins (mobile only — these fire under simulated
+    // throttling): insight audits that produce NaN against a wrangler pages
+    // dev preview, plus the documented bf-cache false positive (wrangler's
+    // own inspector WebSocket, ENGINEERING-STANDARDS §4.7). Warn keeps them
+    // visible without letting a preset default fail the gate on audits that
+    // structurally cannot compute here.
+    const assertions = lighthouseConfig.ci?.assert?.assertions ?? {};
+    for (const audit of [
+      'bf-cache',
+      'cls-culprits-insight',
+      'document-latency-insight',
+      'duplicated-javascript-insight',
+      'font-display-insight',
+      'interaction-to-next-paint-insight',
+      'lcp-discovery-insight',
+      'lcp-lazy-loaded',
+      'lcp-phases-insight',
+      'modern-http-insight',
+      'non-composited-animations',
+      'prioritize-lcp-image',
+      'third-parties-insight',
+    ]) {
+      expect(assertions[audit], `${audit} must stay pinned to warn in the mobile config`).toBe('warn');
+    }
   });
 
   it('keeps pre-deployment verification wired to strict performance checks', () => {

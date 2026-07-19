@@ -2,17 +2,17 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "npx wrangler pages dev out --port 3000 --ip 127.0.0.1",
-      "startServerReadyPattern": "Ready on http://127.0.0.1:3000",
+      "startServerCommand": "node scripts/checks/serve-out-warmed.mjs",
+      "startServerReadyPattern": "WARM_READY",
       "url": [
         "http://localhost:3000"
       ],
       "settings": {
         "formFactor": "mobile",
         "throttling": {
-          "rttMs": 40,
-          "throughputKbps": 10240,
-          "cpuSlowdownMultiplier": 1
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "cpuSlowdownMultiplier": 4
         },
         "screenEmulation": {
           "mobile": true,
@@ -26,16 +26,66 @@
     "assert": {
       "preset": "lighthouse:recommended",
       "assertions": {
-        "categories:performance": ["error", {"minScore": 0.95}],
-        "categories:accessibility": ["error", {"minScore": 1}],
-        "categories:best-practices": ["error", {"minScore": 1}],
-        "categories:seo": ["error", {"minScore": 1}],
-        "first-contentful-paint": ["error", {"maxNumericValue": 1500}],
-        "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
-        "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}],
-        "total-blocking-time": ["error", {"maxNumericValue": 300}],
-        "speed-index": ["error", {"maxNumericValue": 3000}],
-        "interactive": ["error", {"maxNumericValue": 3500}],
+        "categories:performance": [
+          "error",
+          {
+            "minScore": 0.8
+          }
+        ],
+        "categories:accessibility": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "categories:best-practices": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "categories:seo": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "first-contentful-paint": [
+          "error",
+          {
+            "maxNumericValue": 1700
+          }
+        ],
+        "largest-contentful-paint": [
+          "error",
+          {
+            "maxNumericValue": 4500
+          }
+        ],
+        "cumulative-layout-shift": [
+          "error",
+          {
+            "maxNumericValue": 0.1
+          }
+        ],
+        "total-blocking-time": [
+          "error",
+          {
+            "maxNumericValue": 300
+          }
+        ],
+        "speed-index": [
+          "error",
+          {
+            "maxNumericValue": 3000
+          }
+        ],
+        "interactive": [
+          "error",
+          {
+            "maxNumericValue": 5000
+          }
+        ],
         "forced-reflow-insight": "warn",
         "image-delivery-insight": "warn",
         "label-content-name-mismatch": "warn",
@@ -44,9 +94,39 @@
         "uses-responsive-images": "warn",
         "render-blocking-insight": "warn",
         "render-blocking-resources": "warn",
-        "dom-size": ["warn", {"maxNumericValue": 3900}],
-        "unused-javascript": ["warn", {"maxNumericValue": 120, "maxLength": 4}],
-        "legacy-javascript": ["warn", {"maxNumericValue": 60, "maxLength": 3}]
+        "dom-size": [
+          "warn",
+          {
+            "maxNumericValue": 3900
+          }
+        ],
+        "unused-javascript": [
+          "warn",
+          {
+            "maxNumericValue": 500,
+            "maxLength": 4
+          }
+        ],
+        "legacy-javascript": [
+          "warn",
+          {
+            "maxNumericValue": 60,
+            "maxLength": 1
+          }
+        ],
+        "bf-cache": "warn",
+        "cls-culprits-insight": "warn",
+        "document-latency-insight": "warn",
+        "duplicated-javascript-insight": "warn",
+        "font-display-insight": "warn",
+        "interaction-to-next-paint-insight": "warn",
+        "lcp-discovery-insight": "warn",
+        "lcp-lazy-loaded": "warn",
+        "lcp-phases-insight": "warn",
+        "modern-http-insight": "warn",
+        "non-composited-animations": "warn",
+        "prioritize-lcp-image": "warn",
+        "third-parties-insight": "warn"
       }
     },
     "upload": {

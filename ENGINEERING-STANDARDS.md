@@ -803,6 +803,61 @@ History (2026-07, kept because the reasoning still applies):
    execute JS, not just a technical tweak. That's a product decision about
    how the portfolio presents itself, not a performance-budget fix, and
    wasn't made unilaterally.
+8. **The mobile gate got honest device throttling (2026-07-19, owner
+   sign-off) — the single most consequential calibration fix in this file's
+   history.** Both configs had `cpuSlowdownMultiplier: 1` and desktop-grade
+   network throttling (rttMs 40 / 10240 Kbps), undocumented — the "mobile"
+   gate emulated a mobile *screen* on a desktop-class CPU and network. That
+   is why the gate reported 0.99 mobile while PageSpeed Insights measured
+   **61** on the identical deployed build (LCP 3.5s, TBT 1,210ms, Moto G
+   Power emulation). The gate wasn't noisy; it was answering a different
+   question than "how does this page perform on a phone."
+
+   Mobile now runs Lighthouse's standard mobile simulation — 4x CPU
+   slowdown, slow-4G network (rttMs 150 / 1638.4 Kbps) — the same profile
+   PageSpeed uses. Desktop was already honest (the standard desktop preset)
+   and is unchanged.
+
+   Recalibration was done against a **warmed** local server after two real
+   pitfalls were root-caused, both worth knowing about:
+   - *Cold-start inflation:* LHCI boots its `startServerCommand` fresh per
+     session, and `wrangler pages dev`'s first requests (worker compile,
+     lazy asset reads) run several times slower than steady-state.
+     Lighthouse's lantern simulation scales observed request latencies
+     under throttling, so cold-start noise inflated LCP 3–6s across
+     otherwise-identical runs. `scripts/checks/serve-out-warmed.mjs`
+     (now both configs' `startServerCommand`, pinned by the contract test)
+     pre-fetches every page twice before printing its ready marker.
+   - *The stray-dev-server pitfall:* a leftover `next dev` process was
+     bound to port 3000, so an entire calibration round measured the DEV
+     build (unminified chunks, next-devtools, no source maps) instead of
+     `/out` — LHCI happily audited whatever answered the port. Symptoms
+     that give it away instantly next time: `unminified-javascript`
+     flagging 16 files on a supposedly-production build, `valid-source-maps`
+     failing, chunk names like `next_dist_client_….js`. Check
+     `pgrep -fl "next dev"` before trusting any local Lighthouse number.
+
+   Measured baseline against the real production build, warmed server —
+   perfectly stable across 3 runs (score 0.87/0.87/0.87, spread of 2ms on
+   LCP): FCP 1360ms, LCP 3776ms, TBT 27.5ms, CLS 0.087, SI 2367ms, TTI
+   4039ms. New mobile assertions from that baseline with real headroom:
+   floor 0.80 (was 0.95 — a number the old dishonest simulation had made
+   meaningless), FCP ≤1700, LCP ≤4500, TBT ≤300, SI ≤3000, TTI ≤5000,
+   unused-javascript ≤500ms/4 files (ms estimates scale with the 4x CPU
+   multiplier), legacy-javascript ≤60ms/1 file (measured 0/0 since the
+   polyfill patch). Under simulated throttling the newer "insight" audits
+   fire and produce NaN against a local wrangler preview, and wrangler's
+   inspector WebSocket still trips `bf-cache` — 13 such audits are pinned
+   to `warn` in the mobile config only (visible, non-blocking; the exact
+   list is asserted by `performance-regression-contract.test.ts`).
+
+   The honest gate also reopens §4.7 item 4's code-splitting question: that
+   experiment was rejected when the page scored 0.99–1.0 with "no headroom
+   left for a code-split to win back." Under honest throttling there IS
+   headroom (0.87, LCP- and hydration-bound: TTI 4.0s is dominated by
+   script evaluation at 4x CPU) — item 4's own revisit condition is met,
+   so re-measuring splitting is now justified. Measure, don't assume, in
+   either direction.
 
 **CI (`treosh/lighthouse-ci-action`) is the authoritative gate — local
 `npm run test:performance:desktop`/`:mobile` can show extra noise the CI job
