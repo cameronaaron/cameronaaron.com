@@ -5,7 +5,14 @@ import { useMemo, useRef, useState } from 'react';
 import { skills } from '@/data/skills';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SkillBar from '@/components/ui/SkillBar';
-import SkillWeb from '@/components/skills/SkillWeb';
+import dynamic from 'next/dynamic';
+
+// Code-split (2026-07-19): §4.7 item 4's earlier SkillWeb-split experiment was
+// reverted for "no measurable benefit" — but that was measured under the old
+// unthrottled mobile simulation. Re-tried and re-measured under the honest 4x
+// CPU gate per that item's own "measure again" clause. Decorative canvas only
+// (renders null off the full tier), so ssr:false loses nothing indexable.
+const SkillWeb = dynamic(() => import('@/components/skills/SkillWeb'), { ssr: false });
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
