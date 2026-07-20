@@ -106,12 +106,12 @@ export default function Hero() {
         style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
         <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
-          <motion.div
-            initial={false}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-foreground order-2 md:order-1"
-          >
+          {/* Pure-entrance motion.* here were all initial={false} — framer
+              rendered them already-visible with no animation, so they were
+              framer mount cost on the LCP-critical hero for zero visual effect.
+              Converted to plain elements (§5 render-path law); the ones with a
+              real whileHover stay motion. */}
+          <div className="text-foreground order-2 md:order-1">
             <motion.div
               initial={false}
               animate={{ opacity: 1, y: 0 }}
@@ -132,10 +132,7 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            <motion.h1
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
+            <h1
               className="text-3xl sm:text-4xl md:text-[2rem] lg:text-[2.6rem] xl:text-[3.4rem] 2xl:text-[4rem] md:whitespace-nowrap font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
             >
               <GlyphDissolveName
@@ -143,27 +140,17 @@ export default function Hero() {
                 typingSpeed={80}
                 className="bg-gradient-to-br from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent"
               />
-            </motion.h1>
+            </h1>
 
             <div className="text-lg sm:text-2xl md:text-3xl font-light mb-6 md:mb-8 text-muted-foreground leading-tight">
               <TextReveal text={profile.title} delay={0.25} />
             </div>
 
-            <motion.p
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-base md:text-lg text-foreground/90 mb-6 md:mb-10 leading-relaxed max-w-xl"
-            >
+            <p className="text-base md:text-lg text-foreground/90 mb-6 md:mb-10 leading-relaxed max-w-xl">
               {profile.tagline}
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-wrap gap-3 md:gap-4"
-            >
+            <div className="flex flex-wrap gap-3 md:gap-4">
               <Magnetic strength={0.15}>
                 <Button href="#certifications" variant="primary" size="lg">
                   View Credentials
@@ -179,14 +166,9 @@ export default function Hero() {
                   Online Features
                 </Button>
               </Magnetic>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="mt-6 flex flex-wrap gap-2"
-            >
+            <div className="mt-6 flex flex-wrap gap-2">
               {HERO_SIGNAL_CHIPS.map((chip, index) => (
                 <motion.span
                   key={chip}
@@ -199,14 +181,9 @@ export default function Hero() {
                   <ScrambleText text={chip} />
                 </motion.span>
               ))}
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/5 pt-6 md:pt-8"
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/5 pt-6 md:pt-8">
               {profile.stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -218,8 +195,8 @@ export default function Hero() {
                   <StatCard value={stat.value} label={stat.label} />
                 </motion.div>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           <motion.div
             className="relative order-1 md:order-2 flex justify-center md:block"
