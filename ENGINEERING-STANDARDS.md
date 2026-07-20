@@ -57,6 +57,7 @@ Enforcing test files:
 | Lighthouse thresholds | `src/performance-regression-contract.test.ts` |
 | Real-browser interaction latency (INP, long tasks) | `src/interaction-latency-contract.test.ts` (fast wiring) + `scripts/checks/measure-interaction-latency.mjs` (real measurement, deploy-time) |
 | bfcache blank-screen | `src/app/section-reveal-bfcache.test.ts` |
+| Internal doc cross-references resolve | `src/docs-cross-reference-contract.test.ts` |
 
 ---
 
@@ -1871,6 +1872,26 @@ investigate that script before touching the config.
     these is a gate choosing not to run, and every one needs the same
     individually-checkable reason a `Record` entry does, not just a
     comment that sounds like one.
+19. **A document that references its own sections needs those references
+    checked — a pointer is drift too.** This file and CLAUDE.md are dense with
+    internal pointers (`§4.7`, `§6 item 13`, `CLAUDE.md constraint #17`), and §0
+    leans on several by name to tie the first-principles doctrine to the
+    concrete rules and ledger entries that enforce it. markdownlint
+    (`docs-quality-contract`) checks formatting, not whether a pointer resolves,
+    so a section renumber or a deleted constraint would silently turn every
+    reference to it into a lie with a green gate — the same
+    ecosystem-nobody-watches blind spot as items 4 and 9, one level in, aimed at
+    the docs themselves. `docs-cross-reference-contract.test.ts` parses the real
+    heading / list structure of both files and fails, naming the exact
+    `file:line — ref → reason`, on any `§N.M`, `§6 item N`, or `constraint #N`
+    that doesn't resolve. It is a forward guard (everything resolves today, so it
+    passes now and only bites a future edit) with the guard-the-guard floors
+    item 8 demands — if the parser ever finds zero headings or zero references,
+    that itself fails rather than passing vacuously. Bare `#N` tokens that are
+    *not* constraints (`React #418`, `next.js#86785`) are deliberately excluded.
+    **The lesson generalizes once more: the moment a document's own structure
+    becomes load-bearing — cross-referenced, not just read top to bottom — that
+    structure is another ecosystem, and an unwatched ecosystem drifts.**
 
 ## 7. The engagement doctrine
 

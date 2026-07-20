@@ -115,6 +115,7 @@ src/dead-logic-export-contract.test.ts       # every exported logic fn has a pro
 src/dead-dependency-contract.test.ts         # every package.json dep has a real import/require somewhere
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
+src/docs-cross-reference-contract.test.ts    # every §N/§6-item/constraint #N ref resolves
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
