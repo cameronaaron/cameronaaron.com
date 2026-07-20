@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { m, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode, type MouseEvent } from 'react';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { calculateMagneticOffset } from './magnetic-logic';
@@ -40,7 +40,7 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -49,6 +49,6 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

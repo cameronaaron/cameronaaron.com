@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { motion, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
+import { m, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useEffect } from 'react';
 import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
@@ -68,31 +68,31 @@ export default function Hero() {
       aria-label="Hero section"
     >
       <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/5" aria-hidden="true">
-        <motion.div
+        <m.div
           className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
           style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
         />
       </div>
 
       {shouldRenderHeavyEffects ? (
-        <motion.div
+        <m.div
           className="absolute inset-0 pointer-events-none"
           style={{ background: pointerAura, opacity: dynamicAuraOpacity }}
           aria-hidden="true"
         />
       ) : null}
 
-      <motion.div 
+      <m.div 
         className="absolute inset-0 bg-hero-glow opacity-40" 
         style={shouldUseParallax ? { y: yParallax, opacity: opacityFade } : { opacity: 0.32 }}
         aria-hidden="true" 
       />
-      <motion.div 
+      <m.div 
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" 
         style={shouldUseParallax ? { y: topGlowY } : { y: 0 }}
         aria-hidden="true" 
       />
-      <motion.div 
+      <m.div 
         className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none" 
         style={shouldUseParallax ? { y: bottomGlowY } : { y: 0 }}
         aria-hidden="true" 
@@ -101,7 +101,7 @@ export default function Hero() {
       {shouldUseParallax ? <BackgroundParticles quality={performanceTier} /> : null}
       {shouldUseParallax ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
 
-      <motion.div
+      <m.div
         className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10"
         style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
       >
@@ -112,7 +112,7 @@ export default function Hero() {
               Converted to plain elements (§5 render-path law); the ones with a
               real whileHover stay motion. */}
           <div className="text-foreground order-2 md:order-1">
-            <motion.div
+            <m.div
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -130,7 +130,7 @@ export default function Hero() {
                 <span> · </span>
                 <span className="text-xs align-middle">{profile.citizenshipFlag}</span> {profile.citizenshipLabel}
               </span>
-            </motion.div>
+            </m.div>
 
             <h1
               className="text-3xl sm:text-4xl md:text-[2rem] lg:text-[2.6rem] xl:text-[3.4rem] 2xl:text-[4rem] md:whitespace-nowrap font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
@@ -170,7 +170,7 @@ export default function Hero() {
 
             <div className="mt-6 flex flex-wrap gap-2">
               {HERO_SIGNAL_CHIPS.map((chip, index) => (
-                <motion.span
+                <m.span
                   key={chip}
                   initial={false}
                   animate={{ opacity: 1, y: 0 }}
@@ -179,13 +179,13 @@ export default function Hero() {
                   className="font-mono-accent rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100/90 whitespace-nowrap"
                 >
                   <ScrambleText text={chip} />
-                </motion.span>
+                </m.span>
               ))}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/5 pt-6 md:pt-8">
               {profile.stats.map((stat, index) => (
-                <motion.div
+                <m.div
                   key={stat.label}
                   initial={false}
                   animate={{ opacity: 1, scale: 1 }}
@@ -193,12 +193,12 @@ export default function Hero() {
                   whileHover={shouldRenderHeavyEffects ? { scale: 1.1, y: -5 } : undefined}
                 >
                   <StatCard value={stat.value} label={stat.label} />
-                </motion.div>
+                </m.div>
               ))}
             </div>
           </div>
 
-          <motion.div
+          <m.div
             className="relative order-1 md:order-2 flex justify-center md:block"
             style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}
           >
@@ -207,7 +207,7 @@ export default function Hero() {
              {showFloatingBadges ? (
                <>
                  {HERO_FLOATING_BADGES.map((badge, index) => (
-                   <motion.span
+                   <m.span
                      key={badge.label}
                      className={`absolute z-20 inline-block cursor-grab active:cursor-grabbing ${badge.className}`}
                      drag
@@ -220,22 +220,22 @@ export default function Hero() {
                    >
                      {/* The idle bob lives on an inner span so dragging and the
                          infinite float never fight over the same transform. */}
-                     <motion.span
+                     <m.span
                        className="font-mono-accent block rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100 backdrop-blur-md"
                        animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
                        transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
                      >
                        {badge.label}
-                     </motion.span>
-                   </motion.span>
+                     </m.span>
+                   </m.span>
                  ))}
                </>
              ) : null}
              <ProfileImage src="/images/profile-hero.webp" alt={profile.name} />
             </div>
-          </motion.div>
+          </m.div>
         </div>
-      </motion.div>
+      </m.div>
 
       {shouldUseParallax ? <ScrollIndicator /> : null}
     </section>

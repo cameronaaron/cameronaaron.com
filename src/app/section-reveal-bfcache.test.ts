@@ -64,14 +64,14 @@ describe('Section wrapper bfcache safety', () => {
     const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionReveal');
     const afterReturn = body.slice(body.indexOf('return ('));
     expect(afterReturn).toMatch(/return \(\s*<div\b/);
-    expect(afterReturn).not.toMatch(/return \(\s*<motion\./);
+    expect(afterReturn).not.toMatch(/return \(\s*<(?:motion|m)\./);
   });
 
   it('SectionHandoff outer wrapper is a framer-free plain div for the same reason', () => {
     const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionHandoff');
     const afterReturn = body.slice(body.indexOf('return ('));
     expect(afterReturn).toMatch(/return \(\s*<div\b/);
-    expect(afterReturn).not.toMatch(/return \(\s*<motion\./);
+    expect(afterReturn).not.toMatch(/return \(\s*<(?:motion|m)\./);
   });
 
   it('Home composes Hero inside a SectionReveal so the above-the-fold hero never starts hidden', () => {

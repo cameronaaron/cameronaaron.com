@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useMemo } from 'react';
 import ScrambleText from '@/components/ui/ScrambleText';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -24,7 +24,7 @@ export default function Education() {
 
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-14">
           {sortedEducationItems.map((item, index) => (
-            <motion.article
+            <m.article
               key={`${item.institution}-${item.credential}`}
               data-testid={`education-card-${index}`}
               data-period={item.period}
@@ -75,7 +75,7 @@ export default function Education() {
                   </li>
                 ))}
               </ul>
-            </motion.article>
+            </m.article>
           ))}
         </div>
 
@@ -100,7 +100,7 @@ export default function Education() {
             aria-valuemax={100}
             aria-label={`Nursing prerequisite coursework: ${prerequisiteProgress.completed} of ${prerequisiteProgress.total} courses complete`}
           >
-            <motion.div
+            <m.div
               className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
               initial={{ width: '0%' }}
               whileInView={{ width: `${prerequisiteProgress.percent}%` }}
@@ -124,7 +124,7 @@ export default function Education() {
               count versus rendering separate mobile/desktop trees. */}
           <div className="space-y-3 md:space-y-0 md:min-w-[920px]">
             {sortedPrerequisiteCourses.map((course, index) => (
-              <motion.div
+              <m.div
                 key={`${course.requirement}-${course.course}`}
                 data-testid={`prereq-row-${index}`}
                 data-status={course.status}
@@ -178,7 +178,7 @@ export default function Education() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function Education() {
                 transition: { delay: index * 0.04 },
               };
               return honor.url ? (
-                <motion.a
+                <m.a
                   key={honor.label}
                   {...sharedProps}
                   href={honor.url}
@@ -205,11 +205,11 @@ export default function Education() {
                   className={`${pillClass} hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background`}
                 >
                   {honor.label}
-                </motion.a>
+                </m.a>
               ) : (
-                <motion.span key={honor.label} {...sharedProps} className={pillClass}>
+                <m.span key={honor.label} {...sharedProps} className={pillClass}>
                   {honor.label}
-                </motion.span>
+                </m.span>
               );
             })}
           </div>

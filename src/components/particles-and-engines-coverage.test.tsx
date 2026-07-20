@@ -13,6 +13,10 @@ const mockMQ = () =>
 const mockMotionValue = (v: unknown) => ({ get: () => v, set: vi.fn(), on: vi.fn(), subscribe: vi.fn() });
 
 vi.mock('framer-motion', () => ({
+  get m() { return this.motion; },
+  LazyMotion: ({ children }) => React.createElement(React.Fragment, null, children),
+  domMax: {},
+  domAnimation: {},
   motion: new Proxy({}, {
     get: (_t, tag: string) => {
       const SAFE = ['div','section','span','canvas'];

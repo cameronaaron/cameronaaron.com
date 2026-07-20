@@ -243,9 +243,9 @@ describe('animation regression contract', () => {
     // combined with whileInView — that is the same double-animation blank pattern from
     // ExperienceCard. The parent stagger drives column visibility; headings ride along.
     expect(source).toContain('<h3 className="text-2xl font-bold mb-6 text-white">');
-    expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Core Competencies/);
-    expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Domain Expertise/);
-    expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Certification Highlights/);
+    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Core Competencies/);
+    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Domain Expertise/);
+    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Certification Highlights/);
   });
 
   it('repo-wide: every file with a framer infinite animation references a motion gate (2026-07)', () => {

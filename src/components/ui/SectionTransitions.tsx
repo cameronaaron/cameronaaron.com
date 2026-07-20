@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { CSSProperties } from 'react';
 import { getSectionGlowTone } from './section-transitions-logic';
 
@@ -44,7 +44,7 @@ export function SectionReveal({ index, children }: SectionRevealProps) {
   // glow animation below whenever the section is off-screen.
   const containmentClass = index === 0 ? '' : ' cv-section';
 
-  // Plain <div>, not motion.div: the outer wrapper was `initial={false}`, so
+  // Plain <div>, not m.div: the outer wrapper was `initial={false}`, so
   // framer rendered it already-visible with no entrance animation (chosen for
   // bfcache safety — a section must never restore hidden). A plain div is that
   // same always-visible behavior with zero framer mount cost — and framer
@@ -68,7 +68,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
   // initial={false}). The inner decorative reveals below stay framer for now.
   return (
     <div className="relative z-10 px-6 py-10">
-      <motion.div
+      <m.div
         className="pointer-events-none absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -79,11 +79,11 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
           style={handoffDelayStyle(index)}
           aria-hidden="true"
         />
-      </motion.div>
+      </m.div>
 
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center gap-4">
-          <motion.div
+          <m.div
             className="h-px flex-1 bg-gradient-to-r from-transparent via-cyan-300/25 to-emerald-300/10"
             initial={{ scaleX: 0.4, opacity: 0.45 }}
             whileInView={{ scaleX: 1, opacity: 0.78 }}
@@ -91,7 +91,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
             transition={{ duration: 0.75, ease: 'easeOut' }}
           />
 
-          <motion.div
+          <m.div
             className="group pointer-events-auto relative"
             whileHover={{ y: -2, scale: 1.03 }}
             transition={{ type: 'spring', stiffness: 320, damping: 22 }}
@@ -100,16 +100,16 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
               className="handoff-ring-anim absolute -inset-2 rounded-full border border-cyan-300/25"
               aria-hidden="true"
             />
-            <motion.a
+            <m.a
               href={`#${targetId}`}
               className="relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.14em] sm:tracking-[0.2em] text-muted-foreground/90 transition-colors group-hover:border-cyan-300/35 group-hover:text-cyan-100"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
               {label}
-            </motion.a>
-          </motion.div>
+            </m.a>
+          </m.div>
 
-          <motion.div
+          <m.div
             className="h-px flex-1 bg-gradient-to-l from-transparent via-emerald-300/25 to-cyan-300/10"
             initial={{ scaleX: 0.4, opacity: 0.45 }}
             whileInView={{ scaleX: 1, opacity: 0.78 }}
@@ -118,7 +118,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
           />
         </div>
 
-        <motion.div
+        <m.div
           className="mt-4 flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-cyan-200/85"
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -135,7 +135,7 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
               />
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

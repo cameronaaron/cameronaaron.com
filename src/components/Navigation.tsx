@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
+import { AnimatePresence, m, useScroll, useSpring } from 'framer-motion';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems, type NavItem } from '@/data/navigation';
@@ -30,7 +30,7 @@ const DesktopNavLink = memo(function DesktopNavLink({
 }) {
   return (
     <Magnetic>
-      <motion.a
+      <m.a
         href={item.href}
         className={`relative inline-block whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors xl:px-3 xl:text-base ${
           isScrolled ? 'text-foreground hover:text-cyan-100' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
@@ -40,7 +40,7 @@ const DesktopNavLink = memo(function DesktopNavLink({
         aria-current={isActive ? 'page' : undefined}
       >
         {isActive ? (
-          <motion.span
+          <m.span
             layoutId="active-nav-pill"
             className="absolute inset-0 -z-10 rounded-full border"
             style={{
@@ -51,7 +51,7 @@ const DesktopNavLink = memo(function DesktopNavLink({
           />
         ) : null}
         <span className="relative z-10">{item.name}</span>
-      </motion.a>
+      </m.a>
     </Magnetic>
   );
 });
@@ -72,7 +72,7 @@ const MobileNavLink = memo(function MobileNavLink({
   onNavigate: () => void;
 }) {
   return (
-    <motion.a
+    <m.a
       href={item.href}
       onClick={onNavigate}
       initial={{ opacity: 0, y: 6 }}
@@ -85,7 +85,7 @@ const MobileNavLink = memo(function MobileNavLink({
       }`}
     >
       {item.name}
-    </motion.a>
+    </m.a>
   );
 });
 
@@ -168,7 +168,7 @@ export default function Navigation() {
   return (
     <>
       {/* Scroll Progress Bar */}
-      <motion.div
+      <m.div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-primary to-secondary origin-left z-[60]"
         style={{ scaleX }}
       />
@@ -180,7 +180,7 @@ export default function Navigation() {
         Skip to main content
       </a>
 
-      <motion.nav
+      <m.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className="fixed top-0 left-0 right-0 z-50"
@@ -199,15 +199,15 @@ export default function Navigation() {
         >
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <motion.a
+            <m.a
               href="#home"
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold text-white transition-colors hover:text-cyan-100 font-display"
             >
               <ScrambleText text="Cameron" />
-            </motion.a>
+            </m.a>
 
-            <motion.div
+            <m.div
               key={activeHref}
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -220,7 +220,7 @@ export default function Navigation() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
               </span>
               {activeNavLabel}
-            </motion.div>
+            </m.div>
 
             <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5" aria-label="Primary navigation">
               {navItems.map((item) => (
@@ -229,7 +229,7 @@ export default function Navigation() {
             </nav>
 
             <div className="flex items-center lg:hidden">
-              <motion.button
+              <m.button
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
                 whileTap={{ scale: 0.92 }}
@@ -240,30 +240,30 @@ export default function Navigation() {
               >
                 <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
                 <span className="relative block h-3.5 w-5" aria-hidden="true">
-                  <motion.span
+                  <m.span
                     className="absolute left-0 top-0 h-[2px] w-full origin-center rounded-full bg-current"
                     animate={mobileMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                     transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                   />
-                  <motion.span
+                  <m.span
                     className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rounded-full bg-current"
                     animate={mobileMenuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
                     transition={{ duration: 0.18 }}
                   />
-                  <motion.span
+                  <m.span
                     className="absolute bottom-0 left-0 h-[2px] w-full origin-center rounded-full bg-current"
                     animate={mobileMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                     transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                   />
                 </span>
-              </motion.button>
+              </m.button>
             </div>
           </div>
         </div>
 
         <AnimatePresence>
           {mobileMenuOpen ? (
-            <motion.div
+            <m.div
               id="mobile-nav-panel"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -284,12 +284,12 @@ export default function Navigation() {
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           ) : null}
         </AnimatePresence>
         </div>
         </div>
-      </motion.nav>
+      </m.nav>
     </>
   );
 }

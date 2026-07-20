@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { m, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { type ReactNode, type MouseEvent } from 'react';
 import { calculateTiltOffset } from './tilt-logic';
 
@@ -39,7 +39,7 @@ export default function Tilt({
   };
 
   return (
-    <motion.div
+    <m.div
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -51,6 +51,6 @@ export default function Tilt({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

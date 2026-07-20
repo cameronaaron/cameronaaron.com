@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { readInitialReveal, splitRevealWords } from '@/components/ui/text-reveal-logic';
 
@@ -53,7 +53,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
       {words.map((word, i) => (
         <span key={i} className="inline-block whitespace-nowrap mr-[0.25em]">
           {word.split("").map((char, j) => (
-            <motion.span
+            <m.span
               key={j}
               initial={{ y: "100%" }}
               animate={shouldReveal ? { y: 0 } : {}}
@@ -65,7 +65,7 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
               className="inline-block"
             >
               {char}
-            </motion.span>
+            </m.span>
           ))}
         </span>
       ))}

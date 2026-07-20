@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import { getVisibleAmbientOrbs, shouldAnimateOrbs } from './ambient-background-logic';
 
@@ -17,7 +17,7 @@ export default function AmbientBackground({ performanceTier = 'full' }: AmbientB
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
       {visibleOrbs.map((orb, index) => (
         animateOrbs ? (
-          <motion.div
+          <m.div
             key={`ambient-orb-${index}`}
             className={orb.className}
             animate={orb.animate}

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { memo, useMemo, useState } from 'react';
 import type { Experience } from '@/data/experience';
@@ -42,7 +42,7 @@ function ExperienceCard({
 
   return (
     <SpotlightCard
-      as={motion.div}
+      as={m.div}
       whileHover={
         enableHoverMotion
           ? {
@@ -73,26 +73,26 @@ function ExperienceCard({
       animate={isActive ? { y: -4 } : { y: 0 }}
       data-testid={`experience-card-${index}`}
     >
-      <motion.div
+      <m.div
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-400/12 via-transparent to-primary/12"
         animate={{ opacity: isActive ? 1 : 0 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       />
 
       {/* Animated background on hover */}
-      <motion.div
+      <m.div
         className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         initial={false}
       />
       
       {/* Border glow effect */}
-      <motion.div
+      <m.div
         className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-10 blur-lg transition-opacity duration-500"
         initial={false}
       />
       
       <div className="flex items-start gap-6 relative z-10">
-        <motion.div 
+        <m.div 
           className="flex-shrink-0"
           whileHover={enableHoverMotion ? { scale: 1.15, rotate: 5 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -114,14 +114,14 @@ function ExperienceCard({
               />
             )}
             {/* Shimmer effect */}
-            <motion.div
+            <m.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent"
               initial={{ x: '-100%' }}
               whileHover={enableHoverMotion ? { x: '100%' } : undefined}
               transition={{ duration: 0.6 }}
             />
           </div>
-        </motion.div>
+        </m.div>
 
         <div className="flex-1">
           <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
@@ -145,13 +145,13 @@ function ExperienceCard({
           
           <div className="space-y-4">
             {experience.positions.map((pos, posIndex) => (
-              <motion.div
+              <m.div
                 key={posIndex}
                 className="border-l-2 border-primary/30 pl-4 hover:border-primary/80 transition-colors group/position relative"
                 whileHover={enableHoverMotion ? { x: 5 } : undefined}
               >
                 {/* Dot indicator */}
-                <motion.div
+                <m.div
                   className="absolute -left-[5px] top-2 w-2 h-2 bg-primary rounded-full"
                   whileHover={enableHoverMotion ? { scale: 1.5 } : undefined}
                 />
@@ -160,7 +160,7 @@ function ExperienceCard({
                   <span className="text-sm text-muted-foreground font-medium">{pos.period}</span>
                 </div>
                 <p className="text-muted-foreground/80 leading-relaxed">{pos.description}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

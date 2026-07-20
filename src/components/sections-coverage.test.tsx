@@ -48,6 +48,10 @@ const mockMotionValue = (initial: unknown) => ({
 });
 
 vi.mock('framer-motion', () => ({
+  get m() { return this.motion; },
+  LazyMotion: ({ children }) => React.createElement(React.Fragment, null, children),
+  domMax: {},
+  domAnimation: {},
   motion: new Proxy({}, { get: (_t, tag: string) => makeMotionEl(tag) }),
   AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
   useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
@@ -451,6 +455,10 @@ describe('Projects coverage (branches 37-80, 50%)', () => {
   it('renders with useReducedMotion=true (covers prefersReducedMotion ? undefined : animate branches)', async () => {
     // Override the static framer-motion mock for this test by using doMock
     vi.doMock('framer-motion', () => ({
+  get m() { return this.motion; },
+  LazyMotion: ({ children }) => React.createElement(React.Fragment, null, children),
+  domMax: {},
+  domAnimation: {},
       motion: new Proxy({}, { get: (_t: object, tag: string) => makeMotionEl(tag) }),
       AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
       useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),

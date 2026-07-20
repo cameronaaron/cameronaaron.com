@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import {
   INTRO_CURTAIN_STORAGE_KEY,
@@ -60,7 +60,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
   return (
     <AnimatePresence>
       {visible ? (
-        <motion.div
+        <m.div
           key="intro-curtain"
           data-testid="intro-curtain"
           role="presentation"
@@ -78,7 +78,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
           }}
         >
           {/* Radial glow */}
-          <motion.div
+          <m.div
             className="absolute inset-0"
             style={{
               background:
@@ -91,7 +91,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
           />
 
           {/* Top sweep line */}
-          <motion.div
+          <m.div
             className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent"
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
@@ -100,7 +100,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
           />
 
           {/* Bottom sweep line */}
-          <motion.div
+          <m.div
             className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-300/40 to-transparent"
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
@@ -109,7 +109,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
           />
 
           {/* Center horizontal rule */}
-          <motion.div
+          <m.div
             className="absolute inset-x-0 top-1/2 mx-auto h-px w-3/4 max-w-2xl -translate-y-1/2 bg-gradient-to-r from-transparent via-cyan-300/50 to-transparent"
             initial={{ scaleX: 0.05, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
@@ -119,7 +119,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
 
           {/* Name lockup */}
           <div className="relative z-10 flex flex-col items-center gap-3 select-none">
-            <motion.span
+            <m.span
               className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.5em] text-cyan-100/80"
               initial={{ opacity: 0, y: 10, letterSpacing: '0.15em' }}
               animate={{ opacity: 1, y: 0, letterSpacing: '0.5em' }}
@@ -133,9 +133,9 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
                 style={{ '--curtain-dot-delay': '1s' } as React.CSSProperties}
                 aria-hidden="true"
               />
-            </motion.span>
+            </m.span>
 
-            <motion.p
+            <m.p
               className="text-[9px] uppercase tracking-[0.35em] text-muted-foreground/60"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -143,12 +143,12 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
               transition={{ duration: 0.45, delay: 0.22, ease: 'easeOut' }}
             >
               EMT · Software Engineer · Security Researcher
-            </motion.p>
+            </m.p>
           </div>
 
           {/* Corner accents */}
           {(['tl', 'tr', 'bl', 'br'] as const).map((corner, i) => (
-            <motion.div
+            <m.div
               key={corner}
               className={`absolute h-8 w-8 ${
                 corner === 'tl' ? 'top-6 left-6 border-l border-t' :
@@ -162,7 +162,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
               transition={{ duration: 0.4, delay: 0.08 + i * 0.04, ease: 'easeOut' }}
             />
           ))}
-        </motion.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

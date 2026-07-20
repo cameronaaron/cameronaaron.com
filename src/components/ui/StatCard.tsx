@@ -1,6 +1,6 @@
 'use client';
 
-import { animate, motion } from 'framer-motion';
+import { animate, m } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { useInteractionMode } from '@/hooks/useInteractionMode';
@@ -42,7 +42,7 @@ export default function StatCard({ value, label }: StatCardProps) {
   }, [prefersReducedMotion, parsedValue]);
 
   return (
-    <motion.div
+    <m.div
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md [transform-style:preserve-3d]"
       onMouseMove={enableHoverMotion ? tilt.handleMouseMove : undefined}
       onMouseLeave={enableHoverMotion ? tilt.handleMouseLeave : undefined}
@@ -73,6 +73,6 @@ export default function StatCard({ value, label }: StatCardProps) {
         className="stat-underline-anim pointer-events-none absolute inset-x-4 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent"
         aria-hidden="true"
       />
-    </motion.div>
+    </m.div>
   );
 }

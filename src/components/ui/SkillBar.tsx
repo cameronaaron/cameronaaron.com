@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface SkillBarProps {
   name: string;
@@ -21,7 +21,7 @@ function SkillBar({ name, level, index }: SkillBarProps) {
         <span className="text-primary font-bold">{level}%</span>
       </div>
       <div className="h-3 bg-white/10 rounded-full overflow-hidden relative">
-        <motion.div
+        <m.div
           initial={{ width: 0 }}
           whileInView={{ width: `${level}%` }}
           viewport={{ once: true }}
@@ -32,7 +32,7 @@ function SkillBar({ name, level, index }: SkillBarProps) {
             className="skill-sheen-anim absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full"
             aria-hidden="true"
           />
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

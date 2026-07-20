@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildShortcutJumpMap,
@@ -96,7 +96,7 @@ export default function KeyboardShortcuts() {
 
       <AnimatePresence>
         {open ? (
-          <motion.div
+          <m.div
             key="keyboard-shortcuts-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -106,7 +106,7 @@ export default function KeyboardShortcuts() {
             onClick={close}
             data-testid="keyboard-shortcuts-backdrop"
           >
-            <motion.div
+            <m.div
               role="dialog"
               aria-modal="true"
               aria-labelledby="keyboard-shortcuts-title"
@@ -160,8 +160,8 @@ export default function KeyboardShortcuts() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </>

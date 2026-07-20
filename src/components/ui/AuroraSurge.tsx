@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 import { isEditableTarget } from '@/components/ui/keyboard-shortcuts-logic';
@@ -48,7 +48,7 @@ export default function AuroraSurge() {
   return (
     <AnimatePresence>
       {active ? (
-        <motion.div
+        <m.div
           className="pointer-events-none fixed inset-0 z-[80] flex items-center justify-center overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -56,7 +56,7 @@ export default function AuroraSurge() {
           aria-hidden="true"
           data-testid="aurora-surge-overlay"
         >
-          <motion.div
+          <m.div
             className="absolute inset-[-40%]"
             style={{
               background:
@@ -69,7 +69,7 @@ export default function AuroraSurge() {
           />
 
           {[0, 1, 2].map((ring) => (
-            <motion.span
+            <m.span
               key={ring}
               className="absolute h-60 w-60 rounded-full border border-cyan-300/40"
               initial={{ scale: 0.3, opacity: 0.8 }}
@@ -78,15 +78,15 @@ export default function AuroraSurge() {
             />
           ))}
 
-          <motion.span
+          <m.span
             className="font-mono-accent relative text-xs font-medium uppercase tracking-[0.4em] text-cyan-100 sm:text-sm"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: [0, 1, 1, 0], y: 0 }}
             transition={{ duration: SURGE_DURATION_MS / 1000, times: [0, 0.15, 0.75, 1] }}
           >
             Aurora surge unlocked
-          </motion.span>
-        </motion.div>
+          </m.span>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

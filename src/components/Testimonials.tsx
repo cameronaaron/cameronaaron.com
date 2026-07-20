@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { testimonials } from '@/data/testimonials';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -50,7 +50,7 @@ export default function Testimonials() {
         />
 
         {spotlightTestimonial ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
@@ -63,7 +63,7 @@ export default function Testimonials() {
                   Spotlight Recommendation
                 </p>
                 <div className="flex items-center gap-2">
-                  <motion.button
+                  <m.button
                     type="button"
                     onClick={() => cycleSpotlight(-1)}
                     whileHover={{ y: -1 }}
@@ -72,8 +72,8 @@ export default function Testimonials() {
                     aria-label="Show previous testimonial"
                   >
                     Previous
-                  </motion.button>
-                  <motion.button
+                  </m.button>
+                  <m.button
                     type="button"
                     onClick={() => cycleSpotlight(1)}
                     whileHover={{ y: -1 }}
@@ -82,12 +82,12 @@ export default function Testimonials() {
                     aria-label="Show next testimonial"
                   >
                     Next
-                  </motion.button>
+                  </m.button>
                 </div>
               </div>
 
               <AnimatePresence mode="wait">
-                <motion.div
+                <m.div
                   key={`${spotlightTestimonial.name}-${spotlightTestimonial.date}`}
                   initial={{ opacity: 0, y: 16, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -104,13 +104,13 @@ export default function Testimonials() {
                     <span aria-hidden="true">•</span>
                     <span>{spotlightTestimonial.date}</span>
                   </div>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             </SpotlightCard>
-          </motion.div>
+          </m.div>
         ) : null}
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -121,7 +121,7 @@ export default function Testimonials() {
             const isActive = relationshipFilter === option.key;
 
             return (
-              <motion.button
+              <m.button
                 key={option.key}
                 type="button"
                 onClick={() => setRelationshipFilter(option.key)}
@@ -135,15 +135,15 @@ export default function Testimonials() {
                 aria-pressed={isActive}
               >
                 {option.label}
-              </motion.button>
+              </m.button>
             );
           })}
-        </motion.div>
+        </m.div>
 
-        <motion.div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
+        <m.div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
           <AnimatePresence mode="popLayout">
             {visibleTestimonials.length === 0 ? (
-              <motion.div
+              <m.div
                 key={`empty-${relationshipFilter}`}
                 className="col-span-full rounded-2xl border border-white/12 bg-white/[0.03] px-6 py-10 text-center"
                 initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -153,7 +153,7 @@ export default function Testimonials() {
               >
                 <p className="text-lg font-semibold text-foreground">No testimonials in this filter yet.</p>
                 <p className="mt-2 text-sm text-muted-foreground">Try All Voices, Managers, or Colleagues to explore more recommendations.</p>
-              </motion.div>
+              </m.div>
             ) : (
               visibleTestimonials.map((testimonial, index) => (
                 // Key intentionally excludes relationshipFilter: a testimonial
@@ -164,7 +164,7 @@ export default function Testimonials() {
                 // for every surviving card, not just the newly-shown ones.
                 // Measured contributor to this interaction's INP exceeding
                 // budget (scripts/checks/measure-interaction-latency.mjs).
-                <motion.div
+                <m.div
                   key={`${testimonial.name}-${testimonial.date}`}
                   data-testid={`testimonial-item-${index}`}
                   initial={{ opacity: 0, y: 22, scale: 0.96 }}
@@ -173,11 +173,11 @@ export default function Testimonials() {
                   transition={{ duration: 0.34, ease: 'easeOut', delay: getTestimonialStaggerDelay(index) }}
                 >
                   <TestimonialCard testimonial={testimonial} index={index} />
-                </motion.div>
+                </m.div>
               ))
             )}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

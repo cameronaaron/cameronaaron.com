@@ -4,6 +4,7 @@ import StructuredData from "@/components/StructuredData";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import IframeTitleGuard from "@/components/ui/IframeTitleGuard";
+import MotionProvider from "@/components/ui/MotionProvider";
 import { buildRootMetadata, buildRootViewport } from "@/data/metadata";
 
 const manrope = Manrope({
@@ -56,7 +57,7 @@ export default function RootLayout({
             This website requires JavaScript to be enabled for the best experience.
           </div>
         </noscript>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
+import { m, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 import ScrambleText from '@/components/ui/ScrambleText';
@@ -30,7 +30,7 @@ export default function SectionHeader({ title, subtitle, className = '', heading
   const skewX = useTransform(smoothVelocity, (velocity: number) => sectionTitleVelocityToSkewDeg(velocity));
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
@@ -47,7 +47,7 @@ export default function SectionHeader({ title, subtitle, className = '', heading
             />
           </span>
         ) : null}
-        <motion.div
+        <m.div
           className="h-px flex-1 origin-left bg-gradient-to-r from-cyan-300/50 via-white/10 to-transparent"
           initial={{ scaleX: 0.35, opacity: 0 }}
           whileInView={{ scaleX: 1, opacity: 1 }}
@@ -60,7 +60,7 @@ export default function SectionHeader({ title, subtitle, className = '', heading
           the gradient paint in Chrome, so the text renders fully transparent —
           i.e. invisible headings. Transforming the h2 from an ancestor keeps
           the clip and the skew independent. */}
-      <motion.div
+      <m.div
         data-testid="section-title-motion"
         className="inline-block"
         style={velocityReactive ? { skewX } : undefined}
@@ -71,9 +71,9 @@ export default function SectionHeader({ title, subtitle, className = '', heading
         >
           <TextReveal text={title} />
         </h2>
-      </motion.div>
+      </m.div>
       {subtitle ? (
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -81,8 +81,8 @@ export default function SectionHeader({ title, subtitle, className = '', heading
           className="max-w-2xl text-lg text-muted-foreground"
         >
           {subtitle}
-        </motion.p>
+        </m.p>
       ) : null}
-    </motion.div>
+    </m.div>
   );
 }
