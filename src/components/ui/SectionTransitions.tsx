@@ -19,10 +19,15 @@ interface SectionHandoffProps {
 export function SectionReveal({ index, children }: SectionRevealProps) {
   const { prefersReducedMotion } = useInteractionMode();
   const glowTone = getSectionGlowTone(index);
+  // The hero (index 0) is above the fold — it must always be laid out and
+  // painted (it holds the LCP). Every section below it is skipped by the
+  // browser until scrolled near, cutting the initial layout pass. See
+  // `.cv-section` in globals.css.
+  const containmentClass = index === 0 ? '' : ' cv-section';
 
   return (
     <motion.div
-      className="relative"
+      className={`relative${containmentClass}`}
       initial={false}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-10% 0px -10% 0px' }}

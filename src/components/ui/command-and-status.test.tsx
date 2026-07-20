@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CommandPalette from '@/components/ui/CommandPalette';
@@ -237,6 +238,20 @@ describe('LocalTimeStatus', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  // CLS regression: the SSR/pre-mount render (no effects) MUST still emit the
+  // slot at its reserved width, hidden. Returning null here — as it did before —
+  // means the clock text appears only after hydration, wrapping the hero
+  // availability pill to a second line and shifting the LCP block down (~0.09
+  // CLS). The static export bakes this SSR output into out/index.html.
+  it('reserves the clock slot in server markup so it does not shift layout', () => {
+    const html = renderToStaticMarkup(<LocalTimeStatus />);
+    expect(html).toContain('data-testid="local-time-status"');
+    expect(html).toContain('in LA');
+    expect(html).toMatch(/visibility:\s*hidden/);
+    // The reserved width comes from a full "HH:MM AM/PM" placeholder.
+    expect(html).toMatch(/\d{1,2}:\d{2}\s?(AM|PM)/i);
   });
 });
 

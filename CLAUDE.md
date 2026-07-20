@@ -222,6 +222,36 @@ Every `buildXxx`/`sortXxx` call in a `'use client'` component body is wrapped in
 
 A motion element whose transform updates continuously (e.g. the section-title velocity skew) never settles at exact identity, so Chrome promotes it to its own compositing layer — and `bg-clip-text` on an ancestor cannot paint the gradient into that layer. The text is `text-transparent`, so it renders **invisible**. This shipped once as fully transparent section titles (fixed 2026-07). Rule: apply persistent transforms on an ancestor **wrapping** the gradient-clipped element, never on a descendant inside it. Transient transforms that clean up to `none` (TextReveal letters) are fine.
 
+### 16. Hydration-only hero content must reserve its layout slot
+
+`LocalTimeStatus` (the live "· 2:34 PM in LA" clock in the hero availability
+pill) renders only on the client — the server can't bake in a wall-clock time.
+It used to return `null` during SSR and the first client paint, then inject the
+time text after hydration. That injection wrapped the pill to a second line and
+pushed the name, tagline, and CTA row (the mobile **LCP** element) down — a
+measured **~0.09 CLS**, the whole mobile CLS budget. Fix (2026-07): always
+render the slot, showing a fixed-width `12:30 PM in LA` placeholder at
+`visibility:hidden` until the real clock mounts, so the pill wraps identically
+in SSR and after hydration (measured CLS ~0.001). Rule: any hero/above-the-fold
+element whose content only exists after hydration must reserve its final
+dimensions in the SSR output — never grow into place. Pinned by
+`command-and-status.test.tsx` (SSR-markup reserves the slot) and the ratcheted
+`cumulative-layout-shift ≤ 0.05` LHCI assertion.
+
+### 17. Below-the-fold sections use `content-visibility` (`.cv-section`), not code-splitting
+
+`SectionReveal` adds `.cv-section` (`content-visibility: auto` +
+`contain-intrinsic-size: auto 1200px`, in globals.css) to every section except
+the hero (index 0). This lets the browser skip layout/paint of the seven
+off-screen sections during load — the initial styleLayout pass dropped from
+~2.26s to ~1.66s (simulated 4x-CPU). It is **DOM-preserving** (SEO-safe) and
+does **not** touch the request graph, which is why it works where code-splitting
+does not: `dynamic()`-splitting sections was measured (2026-07) to *hurt*
+Lighthouse, and both a re-test and a LazyMotion migration (2026-07) confirmed
+that **Next/Turbopack force-modulepreloads every reachable chunk into the
+initial wave** — so no import-level deferral can pull JS out of the load. Keep
+`.cv-section` off the hero (it holds the LCP and must always paint).
+
 ## Data
 
 Site content lives in `src/data/`:
@@ -415,6 +445,24 @@ npm run deploy:prod   # builds → runs Lighthouse CI → deploys to Cloudflare 
 Static site lives in `/out` after `npm run build`. Cloudflare Pages serves it directly. There is no server-side rendering after the build step.
 
 Lighthouse thresholds: accessibility/best-practices/SEO stay at **1.0** on both form factors; the performance category is **0.85 desktop / 0.95 mobile**, with `numberOfRuns: 3` in both configs (enforced by `lighthouserc.json`, `lighthouserc.mobile.json`, and `src/performance-regression-contract.test.ts`). The asymmetric performance floor is root-caused, not guessed (2026-07): local Lighthouse desktop runs score `speed-index` at 700–950ms (~1.0), but CI's shared runners render the identical build's Speed Index at 2100–2400ms — a headless-Chrome rendering-speed limit, not an app regression. Desktop's scoring curve punishes that value far harder than mobile's (the same ~2130ms scores 0.56 on desktop vs 0.99 on mobile), which is why desktop needs the lower floor. `numberOfRuns: 3` has LHCI take the median run instead of a single sample. See `ENGINEERING-STANDARDS.md` §4.7 for prior history (including a measured-and-rejected code-splitting experiment) and for a known local-vs-CI Lighthouse false positive (`bf-cache`) — trust CI's numbers over a local `npm run test:performance:*` run.
+
+**Mobile LCP is a Lantern simulation artifact, not a real regression (2026-07).**
+Median mobile perf sits at ~0.89, gated almost entirely by a *simulated* LCP of
+~3.76s (score ~0.55) while every other metric is ~1.0 (CLS 0.001, TBT <40ms, FCP
+1.36s, SI 2.5s). Under **applied** throttling (`--throttling-method=devtools`,
+real 4x-CPU + slow-4G) the same build's LCP is **1.9s (score 0.98) / perf 0.95**,
+and the raw observed LCP is ~0.1–0.4s. The gap is structural to Lantern: its LCP
+estimate blends an optimistic value (≈FCP, CSS-blocked only) with a pessimistic
+one that sums the download+execute of **all async JS in the initial wave** — here
+react-dom (~220KB) + framer-motion (~325KB across two chunks). Because
+Next/Turbopack force-modulepreloads every chunk into that first wave (verified
+via both an overlay-deferral test and a full LazyMotion/`m` migration, both of
+which left the pre-LCP bytes and the LCP score unchanged), **no import-level
+deferral, code-split, or LazyMotion split can move this number** — only cutting
+total initial JS (i.e. removing framer-motion, a product decision) would. Do not
+re-attempt JS deferral for mobile LCP; it has been measured to not work in this
+setup. The curtain, fonts, and initial layout were each individually ruled out
+as the gate.
 
 ## graphify
 
