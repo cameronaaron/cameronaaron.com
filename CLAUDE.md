@@ -8,7 +8,14 @@
 > requirement → delete → simplify → accelerate → automate); pursue the
 > theoretical-best algorithm/structure, and ship a novel approach **only** when
 > a measurement shows it beats the incumbent — deleting and *recording* the ones
-> that don't. §1–§7 are the conclusions that method produced: the complexity
+> that don't. **§0.5 is not optional reading before touching any perf number:**
+> validate the ruler before trusting it. A stray `next dev` on port 3000 made
+> local Lighthouse audit the DEV build twice, producing false data that got a
+> genuinely-good optimization reverted; `serve-out-warmed.mjs` now *refuses* to
+> measure an occupied port or a non-production response, and a contract pins
+> both guards. If a local number disagrees sharply with PageSpeed Insights,
+> audit the instrument before theorizing about the site. §1–§7 are the
+> conclusions that method produced: the complexity
 > doctrine (per-event/per-render work is O(1); linear work runs exactly once),
 > the full algorithm/data-structure law, the React render-path law, the
 > mobile-first law, and the regression ratchet. Every rule there is enforced by

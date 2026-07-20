@@ -247,6 +247,37 @@ describe('performance regression contract', () => {
     }
   });
 
+  it('the warmed server refuses to measure a contaminated target (ENGINEERING-STANDARDS §0.5)', () => {
+    // A stray `next dev` on the port made local Lighthouse audit the DEV bundle
+    // instead of /out — twice (2026-07-19, 2026-07-20). It reported ~0.57 for a
+    // build that really measures ~0.88, and an earlier contaminated round
+    // reported ~0.89 mobile while real PSI was 52, which became a documented
+    // (wrong) premise and got a genuinely-good LazyMotion migration reverted.
+    // §4.7 item 8 documented the pitfall after the first incident and it
+    // recurred anyway — a warning is not a gate. These two guards make it
+    // structurally impossible, so they may not be quietly deleted.
+    const source = read('scripts/checks/serve-out-warmed.mjs');
+
+    // 1. Refuses to start when something else already owns the port.
+    expect(source, 'must detect an occupied port before measuring').toMatch(/lsof -iTCP:/);
+    expect(source, 'must abort (non-zero) on an occupied port').toMatch(/REFUSING TO MEASURE/);
+
+    // 2. Refuses to signal ready unless the bytes are the production export.
+    for (const devMarker of ['next-devtools', '_next_dist_compiled', '_next_dist_client']) {
+      expect(source, `must reject the dev-build marker ${devMarker}`).toContain(devMarker);
+    }
+    expect(source, 'must require a content-hashed production chunk').toMatch(/_next\\\/static\\\/chunks/);
+    expect(source, 'must exit non-zero rather than warn').toMatch(/process\.exit\(1\)/);
+
+    // The ready marker must be printed only AFTER the production assertion —
+    // otherwise LHCI proceeds against an unverified server.
+    const assertIdx = source.indexOf('assertServingProductionBuild(homepageHtml)');
+    const readyIdx = source.indexOf('WARM_READY on');
+    expect(assertIdx, 'production assertion must exist').toBeGreaterThan(-1);
+    expect(readyIdx, 'ready marker must exist').toBeGreaterThan(-1);
+    expect(assertIdx, 'production build must be asserted BEFORE WARM_READY is printed').toBeLessThan(readyIdx);
+  });
+
   it('keeps mobile lighthouse thresholds stricter than desktop, with mobile emulation', () => {
     const lighthouseConfig = JSON.parse(read('lighthouserc.mobile.json')) as LighthouseConfig;
 

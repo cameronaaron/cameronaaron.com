@@ -199,9 +199,63 @@ any "we're stuck at X" number:
   is only as honest as the measurement behind it — when the number won't move,
   suspect the ruler before the wall.**
 
+### 0.5 Validate the ruler before you trust the number (mandatory)
+
+§0 rests entirely on measurement. That makes a *wrong* measurement worse than no
+measurement: no data leaves you knowing you're ignorant, bad data leaves you
+confidently wrong and spending real effort in the wrong direction. This section
+exists because that happened here, twice, and cost more than every genuine
+regression in this file combined.
+
+**The incident (2026-07-19, recurred 2026-07-20).** A stray `next dev` was left
+listening on port 3000. Every local Lighthouse run therefore audited the **dev**
+bundle — unminified, devtools attached — instead of `/out`. The consequences
+were not academic:
+
+- A production build that really measures ~0.88 locally reported ~0.57, so
+  "the site is catastrophically slow locally" was investigated as real.
+- Conversely, an earlier contaminated round reported ~0.89 mobile and became the
+  documented premise that mobile was *fine* — while real PSI on a Moto G Power
+  was **52**. The whole "mobile LCP is just a Lantern artifact" narrative was
+  built on it.
+- A LazyMotion migration was built, "measured," judged useless, and **reverted**
+  — then re-measured cleanly weeks later and found to be the single biggest
+  TBT win available (§0.4). Good work was thrown away because of the ruler.
+- §4.7 item 8 documented the pitfall after the *first* incident, in detail,
+  with the exact `pgrep -fl "next dev"` command. It recurred anyway.
+
+**The rule, and why it is a gate and not a paragraph.** That last bullet is the
+whole point: a documented warning is a suggestion, and suggestions lose to
+whatever the machine is actually doing at 2am. So:
+
+1. **A measurement harness must prove its subject before reporting a number.**
+   `scripts/checks/serve-out-warmed.mjs` now refuses to start if the port is
+   already occupied (printing the offending process), and refuses to print
+   `WARM_READY` unless the bytes it just fetched are provably the production
+   export — dev-only markers absent (`next-devtools`, `_next_dist_compiled`,
+   `_next_dist_client`) *and* a content-hashed `_next/static` chunk present.
+   Both paths exit non-zero with the fix command. Verified by starting a real
+   `next dev` on the port and confirming the refusal fires.
+2. **A number that disagrees sharply with a trusted external signal is a
+   measurement bug until proven otherwise.** Local said 0.89, PSI said 52. The
+   correct first move was to reconcile the instruments, not to theorize about
+   Lantern. When local and field disagree by more than a grade, stop optimizing
+   and go audit the setup.
+3. **State the subject with every number you record.** "0.88" is meaningless;
+   "0.88, clean `/out` via warmed wrangler on a free port, 4x CPU, headless" is
+   a fact someone can reproduce or falsify. Every measurement written into this
+   file or a commit message carries its conditions.
+4. **This generalizes past Lighthouse.** Any harness that can silently point at
+   the wrong target — a warm `node_modules` hiding a lockfile drift (§6 item 4),
+   a Stryker cache reporting a stale survivor (§6 item 13), a test asserting
+   against a mock of the thing it claims to test (§6 item 8) — belongs to this
+   same family. Before trusting *any* measurement: what exactly did this
+   measure, and how would I know if it measured something else?
+
 The lesson §0 encodes: chase the theoretical best relentlessly, measure every
 step, ship what wins, delete what loses, and write down both — so the next
-person starts from the frontier, not from zero.
+person starts from the frontier, not from zero. And before any of that: make
+sure the instrument is pointed at the thing you think it is.
 
 ---
 
