@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { InternetFeature } from '@/data/internetFeatures';
 import { internetFeatures } from '@/data/internetFeatures';
-import { CATEGORY_ORDER, groupFeaturesByCategory } from './logic';
+import { CATEGORY_ORDER, groupFeaturesByCategory } from './internet-logic';
 
 function feature(overrides: Partial<InternetFeature>): InternetFeature {
   return {

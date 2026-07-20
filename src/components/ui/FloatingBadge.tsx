@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import FloatingBadgeIcon from '@/components/ui/floating-badge-icon';
+import FloatingBadgeIcon from '@/components/ui/FloatingBadgeIcon';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
   getFloatingBadgeFloatAnimation,

@@ -7,7 +7,7 @@ import {
   hrefToSectionId,
   pickActiveHref,
   shouldCloseMobileMenuOnResize,
-} from './logic';
+} from './navigation-logic';
 
 describe('navigation logic', () => {
   it('maps hash hrefs to section ids', () => {

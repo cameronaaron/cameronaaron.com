@@ -16,7 +16,7 @@ import {
   getTimelineDotAnimation,
   getTimelineDotTransition,
   sortExperiencesForTimeline,
-} from '@/components/experience/logic';
+} from '@/components/experience/experience-logic';
 
 export default function Experience() {
   const [activeExperienceIndex, setActiveExperienceIndex] = useState(0);

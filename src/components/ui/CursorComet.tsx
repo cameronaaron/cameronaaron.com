@@ -7,7 +7,7 @@ import {
   GLOW_SPRITE_SIZE,
   PARTICLE_COLORS,
   getGlowGradientStops,
-} from '@/components/hero/interactive-particles/engine';
+} from '@/components/hero/interactive-particles/interactive-particles-engine';
 import { AURORA_SURGE_EVENT } from '@/components/ui/aurora-surge-logic';
 import {
   SURGE_SPARK_COUNT,

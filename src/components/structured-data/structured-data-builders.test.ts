@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildStructuredDataGraph, splitPeriod, toIsoDate } from './builders';
+import { buildStructuredDataGraph, splitPeriod, toIsoDate } from './structured-data-builders';
 import { profile } from '@/data/profile';
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';

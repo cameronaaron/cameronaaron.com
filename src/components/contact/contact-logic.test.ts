@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { socialPlatforms } from '@/data/contact';
 import { profile, type SocialLinks } from '@/data/profile';
-import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/logic';
+import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/contact-logic';
 
 describe('contact logic', () => {
   it('defines stable offsets and spring config for reveal animation', () => {

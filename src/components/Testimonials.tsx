@@ -15,7 +15,7 @@ import {
   RELATIONSHIP_OPTIONS,
   sortTestimonialsByDate,
   type RelationshipFilter,
-} from '@/components/testimonials/logic';
+} from '@/components/testimonials/testimonials-logic';
 
 export default function Testimonials() {
   const [spotlightIndex, setSpotlightIndex] = useState(0);

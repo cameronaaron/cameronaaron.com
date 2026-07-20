@@ -26,7 +26,7 @@
  * cleanup of an existing mess.
  */
 import { readFileSync, readdirSync } from 'node:fs';
-import { basename, extname, join, relative, resolve } from 'node:path';
+import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
@@ -66,7 +66,18 @@ const FRAMEWORK_RESERVED_FILENAMES = new Set([
 // match its role's casing.
 const TEST_SUFFIX = String.raw`(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)*\.test`;
 
-const LOGIC_FILE_NAME = /^(logic\.ts|engine\.ts|builders\.ts)$|^[a-z0-9]+(?:-[a-z0-9]+)*-logic\.ts$/;
+// Bare "logic.ts"/"engine.ts"/"builders.ts" (with or without a test suffix) is
+// ambiguous the instant it's seen outside its own directory — a search
+// result, an open editor tab, a stack trace. Generic KEBAB_CASE below would
+// otherwise happily accept these (a single-segment word is valid kebab-case),
+// so they must be rejected explicitly, not merely left unlisted as "also OK."
+// ENGINEERING-STANDARDS §8.1 requires the qualified, directory-prefixed form
+// (`hero-logic.ts`, `background-particles-engine.ts`) everywhere, no
+// exceptions — `src/components/projects/` once held a bare `logic.ts` right
+// beside `card-logic.ts` and `featured-logic.ts`, indistinguishable at a
+// glance; fixed 2026-07 by qualifying all eleven bare `logic.ts` files plus
+// the two bare `engine.ts` and the one bare `builders.ts` file repo-wide.
+const BARE_LOGIC_FILE_NAME = new RegExp(`^(logic|engine|builders)(${TEST_SUFFIX})?\\.tsx?$`);
 const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*\.tsx?$/;
 const KEBAB_CASE_TEST = new RegExp(`^[a-z0-9]+(?:-[a-z0-9]+)*${TEST_SUFFIX}\\.tsx?$`);
 const PASCAL_CASE_TSX = /^[A-Z][A-Za-z0-9]*\.tsx$/;
@@ -120,9 +131,18 @@ function checkFilenameCasing(absPath: string): string | null {
     return KEBAB_CASE.test(name) || KEBAB_CASE_TEST.test(name) ? null : `src/test-utils files must be kebab-case (got "${name}")`;
   }
 
+  // A bare logic/engine/builders module name is banned everywhere, before any
+  // other check — it must be qualified with its directory's own name instead
+  // (§8.1). Checked ahead of the PascalCase/kebab-case acceptance below,
+  // since kebab-case alone would otherwise wave a single-segment word through.
+  if (BARE_LOGIC_FILE_NAME.test(name)) {
+    const parentDir = basename(dirname(absPath));
+    return `bare "${name}" is banned — qualify it with the directory/component name (e.g. "${parentDir}-${name}") so it's unambiguous outside its own folder (§8.1)`;
+  }
+
   // src/components/**, src/app/**, src/hooks-adjacent, and any other production dir:
   // a .tsx file is either a PascalCase component or a kebab-case logic/util file;
-  // a .ts file is either a recognized logic-module name or kebab-case.
+  // a .ts file is either a qualified logic-module name or kebab-case.
   if (extname(name) === '.tsx') {
     if (isTest) {
       return PASCAL_CASE_TEST_TSX.test(name) || KEBAB_CASE_TEST.test(name)
@@ -140,7 +160,7 @@ function checkFilenameCasing(absPath: string): string | null {
       ? null
       : `.ts test files must be kebab-case.test.ts or match their logic module's name (got "${rel}")`;
   }
-  return LOGIC_FILE_NAME.test(name) || KEBAB_CASE.test(name) ? null : `.ts files must be logic.ts/*-logic.ts/engine.ts/builders.ts or kebab-case (got "${rel}")`;
+  return KEBAB_CASE.test(name) ? null : `.ts files must be *-logic.ts/*-engine.ts/*-builders.ts (qualified) or kebab-case (got "${rel}")`;
 }
 
 // ── Sweep 1b: a .tsx file's default export name must match its filename ─────

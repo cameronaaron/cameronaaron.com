@@ -12,7 +12,7 @@ vi.mock('@/data/experience', () => ({
   ],
 }));
 
-import { buildStructuredDataGraph } from './builders';
+import { buildStructuredDataGraph } from './structured-data-builders';
 
 describe('structured data builders — role-name collection guard', () => {
   it('skips positions with empty titles when collecting occupation names', () => {

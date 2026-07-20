@@ -30,9 +30,15 @@ function toWorkspacePath(absolutePath: string): string {
   return relative(PROJECT_ROOT, absolutePath).replace(/\\/g, '/');
 }
 
+// ENGINEERING-STANDARDS §8.1 requires the qualified, directory-prefixed form
+// repo-wide (2026-07) — a bare `logic.ts`/`engine.ts`/`builders.ts` is
+// ambiguous the moment it's seen outside its own directory (a search result,
+// an open editor tab, a stack trace). `src/components/projects/` alone once
+// held a bare `logic.ts` beside `card-logic.ts` and `featured-logic.ts` — the
+// exact confusion this convention exists to rule out.
 function isExtractedLogicModule(path: string): boolean {
   const fileName = basename(path);
-  return fileName === 'logic.ts' || fileName === 'engine.ts' || fileName === 'builders.ts' || fileName.endsWith('-logic.ts');
+  return /-logic\.ts$|-engine\.ts$|-builders\.ts$/.test(fileName);
 }
 
 function hasCompanionTest(modulePath: string): boolean {
@@ -44,18 +50,6 @@ function hasCompanionTest(modulePath: string): boolean {
     `${moduleDir}/${stem}.test.ts`,
     `${moduleDir}/${stem}.test.tsx`,
   ];
-
-  if (fileName === 'logic.ts') {
-    candidates.push(`${moduleDir}/logic.test.ts`, `${moduleDir}/logic.test.tsx`);
-  }
-
-  if (fileName === 'engine.ts') {
-    candidates.push(`${moduleDir}/engine.test.ts`, `${moduleDir}/engine.test.tsx`);
-  }
-
-  if (fileName === 'builders.ts') {
-    candidates.push(`${moduleDir}/builders.test.ts`, `${moduleDir}/builders.test.tsx`);
-  }
 
   return candidates.some((candidate) => existsSync(resolve(PROJECT_ROOT, candidate)));
 }
@@ -101,7 +95,7 @@ describe('module testability contract', () => {
   it('requires extracted visual helper components to keep dedicated tests', () => {
     const requiredPairs: Array<[string, string]> = [
       ['src/components/ui/SectionTransitions.tsx', 'src/components/ui/section-transitions.test.tsx'],
-      ['src/components/ui/floating-badge-icon.tsx', 'src/components/ui/floating-badge-icon.test.tsx'],
+      ['src/components/ui/FloatingBadgeIcon.tsx', 'src/components/ui/FloatingBadgeIcon.test.tsx'],
       ['src/components/projects/FeaturedIcon.tsx', 'src/components/projects/FeaturedIcon.test.tsx'],
       ['src/components/contact/SocialPlatformIcon.tsx', 'src/components/contact/SocialPlatformIcon.test.tsx'],
     ];
@@ -121,7 +115,7 @@ describe('module testability contract', () => {
 
     expect(modularizationScript).toContain('src/modularization-contract.test.ts');
     expect(modularizationScript).toContain('src/module-testability-contract.test.ts');
-    expect(modularizationScript).toContain('floating-badge-icon.test.tsx');
+    expect(modularizationScript).toContain('FloatingBadgeIcon.test.tsx');
 
     const repoHygieneScript = packageJson.scripts?.['test:repo:hygiene'] ?? '';
     expect(repoHygieneScript).toContain('src/repo-hygiene-contract.test.ts');

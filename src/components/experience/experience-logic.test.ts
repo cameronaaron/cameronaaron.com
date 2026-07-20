@@ -10,7 +10,7 @@ import {
   getTimelineDotAnimation,
   getTimelineDotTransition,
   sortExperiencesForTimeline,
-} from '@/components/experience/logic';
+} from '@/components/experience/experience-logic';
 
 describe('experience logic', () => {
   it('exposes stable phase labels for the timeline chips', () => {

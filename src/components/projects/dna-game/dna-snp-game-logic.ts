@@ -1,4 +1,4 @@
-import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
+import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
 
 /**
  * "Spot the SNP" — a single-nucleotide-polymorphism spotting mini-game.

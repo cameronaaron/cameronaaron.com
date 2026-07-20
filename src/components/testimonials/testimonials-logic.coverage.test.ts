@@ -7,7 +7,7 @@ import {
   getSpotlightTestimonial,
   RELATIONSHIP_OPTIONS,
   sortTestimonialsByDate,
-} from '@/components/testimonials/logic';
+} from '@/components/testimonials/testimonials-logic';
 
 const makeTestimonial = (overrides: Partial<Testimonial> & Pick<Testimonial, 'name' | 'role' | 'relationship' | 'date' | 'text'>): Testimonial => ({
   ...overrides,

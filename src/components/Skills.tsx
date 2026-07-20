@@ -24,7 +24,7 @@ import {
   getStrongestSkill,
   sortTechnicalSkills,
   type TechnicalView,
-} from '@/components/skills/logic';
+} from '@/components/skills/skills-logic';
 
 export default function Skills() {
   const [technicalView, setTechnicalView] = useState<TechnicalView>('priority');

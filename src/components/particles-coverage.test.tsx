@@ -1,6 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import * as engine from './hero/background-particles/engine';
+import * as engine from './hero/background-particles/background-particles-engine';
 
 import BackgroundParticles from './hero/BackgroundParticles';
 import InteractiveParticles from './hero/InteractiveParticles';

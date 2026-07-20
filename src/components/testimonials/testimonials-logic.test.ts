@@ -8,7 +8,7 @@ import {
   getTestimonialStaggerDelay,
   RELATIONSHIP_OPTIONS,
   sortTestimonialsByDate,
-} from '@/components/testimonials/logic';
+} from '@/components/testimonials/testimonials-logic';
 
 describe('testimonials logic', () => {
   it('defines relationship filter options used by the UI', () => {

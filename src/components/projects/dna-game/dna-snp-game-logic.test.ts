@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
+import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
 import type { Base, DnaRound } from './dna-snp-game-logic';
 import {
   BASES,

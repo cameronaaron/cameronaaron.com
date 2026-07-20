@@ -3,14 +3,17 @@
  *
  * dead-component-contract asks whether a component is rendered by real
  * production code; this asks the same question one level down: is every
- * exported *function* of a logic module (logic.ts / *-logic.ts / engine.ts /
- * builders.ts) actually used by production code?
+ * exported *function* of a logic module (*-logic.ts / *-engine.ts /
+ * *-builders.ts — ENGINEERING-STANDARDS §8.1 requires the qualified,
+ * directory-prefixed form repo-wide since 2026-07) actually used by
+ * production code?
  *
- * The failure mode it closes (found 2026-07): navigation/logic.ts exported
- * getActiveNavLabel — an O(n) Array.find lookup superseded by buildNavLabelMap
- * months earlier. Its only caller was its own test, which the 100% coverage
- * gate cannot distinguish from a real caller. Dead exports rot: they keep old
- * (often slower) patterns alive as copy-paste bait and cost test maintenance.
+ * The failure mode it closes (found 2026-07): navigation/logic.ts (since
+ * renamed navigation-logic.ts) exported getActiveNavLabel — an O(n)
+ * Array.find lookup superseded by buildNavLabelMap months earlier. Its only
+ * caller was its own test, which the 100% coverage gate cannot distinguish
+ * from a real caller. Dead exports rot: they keep old (often slower) patterns
+ * alive as copy-paste bait and cost test maintenance.
  *
  * An export counts as alive if:
  *   a) any OTHER production source references its name, or
@@ -32,7 +35,7 @@ const SRC = resolve(process.cwd(), 'src');
 /** "module.ts::exportName" → reason */
 const ALLOWED_UNUSED_LOGIC_EXPORTS: Record<string, string> = {};
 
-const LOGIC_FILE = /(^logic\.ts$|-logic\.ts$|^engine\.ts$|^builders\.ts$)/;
+const LOGIC_FILE = /(-logic\.ts$|-engine\.ts$|-builders\.ts$)/;
 
 function listSources(): string[] {
   const files: string[] = [];

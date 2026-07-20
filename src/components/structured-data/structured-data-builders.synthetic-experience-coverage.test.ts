@@ -25,7 +25,7 @@ vi.mock('@/data/experience', () => ({
   ],
 }));
 
-import { buildStructuredDataGraph } from './builders';
+import { buildStructuredDataGraph } from './structured-data-builders';
 
 type SchemaNode = { '@type': string; [key: string]: unknown };
 

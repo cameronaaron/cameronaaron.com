@@ -17,7 +17,7 @@ import {
   rebuildSpatialGrid,
   shouldRenderBackgroundParticles,
   type Particle,
-} from '@/components/hero/background-particles/engine';
+} from '@/components/hero/background-particles/background-particles-engine';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

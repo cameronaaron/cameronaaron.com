@@ -1,4 +1,4 @@
-import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
+import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
 
 /**
  * Force-directed skill graph.

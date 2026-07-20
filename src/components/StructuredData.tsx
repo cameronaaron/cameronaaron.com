@@ -1,4 +1,4 @@
-import { buildStructuredDataGraph } from './structured-data/builders';
+import { buildStructuredDataGraph } from './structured-data/structured-data-builders';
 
 export default function StructuredData() {
   const schemaGraph = buildStructuredDataGraph();

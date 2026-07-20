@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import ScrambleText from '@/components/ui/ScrambleText';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
-import { buildEducationCollections, formatGradeDisplay } from '@/components/education/logic';
+import { buildEducationCollections, formatGradeDisplay } from '@/components/education/education-logic';
 
 export default function Education() {
   const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses, prerequisiteProgress } =

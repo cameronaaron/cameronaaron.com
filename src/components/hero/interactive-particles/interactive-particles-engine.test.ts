@@ -40,7 +40,7 @@ import {
   stepParticles,
   type BurstParticle,
   type Connection,
-} from './engine';
+} from './interactive-particles-engine';
 
 describe('interactive particle engine', () => {
   it('exports named constants with correct physics values', () => {

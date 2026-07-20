@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSeededRandom } from '@/components/hero/interactive-particles/engine';
+import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
 import type { Entity, SimulationState } from './predator-prey-logic';
 import {
   ARENA_SIZE,

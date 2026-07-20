@@ -15,7 +15,7 @@ import {
   STATUS_ICON_PATH,
   STATUS_ICON_STYLES,
   type CertificationStatusInfo,
-} from '@/components/certifications/logic';
+} from '@/components/certifications/certifications-logic';
 
 /** Feedback strip shown under an expiring/expired credential's status cell — the "say something" requirement. */
 function StatusFeedback({ info }: { info: CertificationStatusInfo }) {

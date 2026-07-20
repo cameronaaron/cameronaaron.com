@@ -79,13 +79,13 @@ afterEach(() => {
 // ── background-particles engine ─────────────────────────────────────────────
 describe('background-particles engine coverage (line 43)', () => {
   it('createBackgroundParticle without random arg (uses Math.random default)', async () => {
-    const { createBackgroundParticle } = await import('@/components/hero/background-particles/engine');
+    const { createBackgroundParticle } = await import('@/components/hero/background-particles/background-particles-engine');
     const p = createBackgroundParticle(800, 600);
     expect(typeof p.x).toBe('number');
   });
 
   it('createBackgroundParticle with explicit random fn', async () => {
-    const { createBackgroundParticle } = await import('@/components/hero/background-particles/engine');
+    const { createBackgroundParticle } = await import('@/components/hero/background-particles/background-particles-engine');
     const p = createBackgroundParticle(800, 600, () => 0.5);
     expect(p.x).toBe(400);
   });
@@ -94,13 +94,13 @@ describe('background-particles engine coverage (line 43)', () => {
 // ── interactive-particles engine ────────────────────────────────────────────
 describe('interactive-particles engine coverage (lines 93, 203)', () => {
   it('createInitialParticles with default args (covers default param branches at 93)', async () => {
-    const { createInitialParticles } = await import('@/components/hero/interactive-particles/engine');
+    const { createInitialParticles } = await import('@/components/hero/interactive-particles/interactive-particles-engine');
     const particles = createInitialParticles();
     expect(particles.length).toBe(42);
   });
 
   it('stepParticles with quality=balanced covers attraction branch (line 203)', async () => {
-    const { stepParticles } = await import('@/components/hero/interactive-particles/engine');
+    const { stepParticles } = await import('@/components/hero/interactive-particles/interactive-particles-engine');
     // Place a particle at (49, 50) — distance 1 from pointer (50, 50), satisfies < 22 && > 0.001
     const particles = [{
       id: 0, x: 49, y: 50, size: 2, color: '#fff',
@@ -111,7 +111,7 @@ describe('interactive-particles engine coverage (lines 93, 203)', () => {
   });
 
   it('stepParticles with quality=full covers attraction full branch (line 203)', async () => {
-    const { stepParticles } = await import('@/components/hero/interactive-particles/engine');
+    const { stepParticles } = await import('@/components/hero/interactive-particles/interactive-particles-engine');
     // Place a particle at (49, 50) — distance 1 from pointer (50, 50), satisfies < 22 && > 0.001
     const particles = [{
       id: 0, x: 49, y: 50, size: 2, color: '#fff',
