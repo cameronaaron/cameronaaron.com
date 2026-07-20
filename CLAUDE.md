@@ -1,11 +1,18 @@
 # CLAUDE.md — Cameron Aaron's Portfolio Site
 
 > **Read `ENGINEERING-STANDARDS.md` before any performance, algorithm,
-> data-structure, or mobile work.** It is the authoritative rulebook: the
-> complexity doctrine (per-event/per-render work is O(1); linear work runs
-> exactly once), the full algorithm/data-structure law, the React render-path
-> law, the mobile-first law, and the regression ratchet. Every rule there is
-> enforced by a contract test — when one fails, fix the source, not the test.
+> data-structure, or mobile work.** It is the authoritative rulebook. It opens
+> with **§0, the first-principles doctrine** — reason from ground truth
+> (measurement, physics, bytes on the wire) not convention; treat "impossible"
+> as an unmeasured claim; apply the SpaceX loop *in order* (question the
+> requirement → delete → simplify → accelerate → automate); pursue the
+> theoretical-best algorithm/structure, and ship a novel approach **only** when
+> a measurement shows it beats the incumbent — deleting and *recording* the ones
+> that don't. §1–§7 are the conclusions that method produced: the complexity
+> doctrine (per-event/per-render work is O(1); linear work runs exactly once),
+> the full algorithm/data-structure law, the React render-path law, the
+> mobile-first law, and the regression ratchet. Every rule there is enforced by
+> a contract test — when one fails, fix the source, not the test.
 
 ## Commands
 
