@@ -7,7 +7,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
 import dynamic from 'next/dynamic';
-import { buildProjectCollections } from '@/components/projects/logic';
+import { buildProjectCollections } from '@/components/projects/projects-logic';
 
 // Code-split (2026-07-19, measured — see ENGINEERING-STANDARDS §4.7 item 8):
 // the games are interactive-only widgets deep below the fold, already gated

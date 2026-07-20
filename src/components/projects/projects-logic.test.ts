@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Project } from '@/data/projects';
 import { projects } from '@/data/projects';
-import { buildProjectCollections, getResearchSignals } from '@/components/projects/logic';
+import { buildProjectCollections, getResearchSignals } from '@/components/projects/projects-logic';
 
 function makeProject(overrides: Partial<Project>): Project {
   return { title: 'T', description: 'D', link: 'https://example.com', tags: [], period: 'Jan 2020', ...overrides };

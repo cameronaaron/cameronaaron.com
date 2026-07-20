@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { PARTICLE_COLORS } from '@/components/hero/interactive-particles/engine';
+import { PARTICLE_COLORS } from '@/components/hero/interactive-particles/interactive-particles-engine';
 import {
   MAX_TRAIL_SPARKS,
   SPARK_LIFE_DECAY,

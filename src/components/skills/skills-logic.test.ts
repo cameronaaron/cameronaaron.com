@@ -9,7 +9,7 @@ import {
   getStrongestSkill,
   sortTechnicalSkills,
   type TechnicalSkill,
-} from './logic';
+} from './skills-logic';
 
 const SAMPLE: TechnicalSkill[] = [
   { name: 'B', level: 50 },

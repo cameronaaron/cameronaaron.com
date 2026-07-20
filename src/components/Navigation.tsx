@@ -12,7 +12,7 @@ import {
   computeSectionBounds,
   pickActiveHref,
   shouldCloseMobileMenuOnResize,
-} from '@/components/navigation/logic';
+} from '@/components/navigation/navigation-logic';
 
 // Memoized so toggling mobileMenuOpen — which re-renders all of Navigation —
 // doesn't also reconcile all 8 desktop links (each wrapping a Magnetic with

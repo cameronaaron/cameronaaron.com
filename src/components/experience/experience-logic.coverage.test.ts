@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getTimelineDotAnimation,
   sortExperiencesForTimeline,
-} from '@/components/experience/logic';
+} from '@/components/experience/experience-logic';
 import type { Experience } from '@/data/experience';
 
 describe('experience logic — coverage fill for lines 31 and 57', () => {

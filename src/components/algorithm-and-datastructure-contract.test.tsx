@@ -25,7 +25,7 @@ import {
   createSpatialGrid,
   getGridDimensions,
   rebuildSpatialGrid,
-} from '@/components/hero/background-particles/engine';
+} from '@/components/hero/background-particles/background-particles-engine';
 import {
   buildConnections as buildIpConnections,
   stepBursts as stepIpBursts,
@@ -33,8 +33,8 @@ import {
   type BurstParticle as IpBurstParticle,
   type Connection as IpConnection,
   type Particle as IpParticle,
-} from '@/components/hero/interactive-particles/engine';
-import { filterTestimonialsByRelationship } from '@/components/testimonials/logic';
+} from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { filterTestimonialsByRelationship } from '@/components/testimonials/testimonials-logic';
 
 // ── read helper (same pattern as modularization-contract.test.ts) ──────────
 const read = (rel: string) => readFileSync(resolve(process.cwd(), rel), 'utf8');
@@ -199,14 +199,14 @@ describe('BackgroundParticles — spatial hash grid (O(n·k))', () => {
 
 describe('SpatialGrid — typed-array backing (zero GC per frame)', () => {
   it('interface declares data as Int16Array, not number[] or any[]', () => {
-    const src = read('src/components/hero/background-particles/engine.ts');
+    const src = read('src/components/hero/background-particles/background-particles-engine.ts');
     expect(src).toContain('data: Int16Array');
     expect(src).not.toContain('data: number[]');
     expect(src).not.toContain('data: any[]');
   });
 
   it('interface declares count as Uint8Array, not number[] or any[]', () => {
-    const src = read('src/components/hero/background-particles/engine.ts');
+    const src = read('src/components/hero/background-particles/background-particles-engine.ts');
     expect(src).toContain('count: Uint8Array');
     expect(src).not.toContain('count: number[]');
     expect(src).not.toContain('count: any[]');
@@ -229,7 +229,7 @@ describe('SpatialGrid — typed-array backing (zero GC per frame)', () => {
   });
 
   it('uses count.fill(0) for O(n) SIMD-optimised reset, not individual element writes', () => {
-    const src = read('src/components/hero/background-particles/engine.ts');
+    const src = read('src/components/hero/background-particles/background-particles-engine.ts');
     // Must use TypedArray.fill which is SIMD-accelerated in all engines
     expect(src).toContain('sg.count.fill(0)');
     // Must NOT assign 0 to individual count cells (that would be a manual loop reset)
@@ -256,7 +256,7 @@ describe('SpatialGrid — typed-array backing (zero GC per frame)', () => {
 
 describe('background-particles engine — squared-distance guards', () => {
   it('forEachConnectedPair compares dist² before taking Math.sqrt', () => {
-    const src = read('src/components/hero/background-particles/engine.ts');
+    const src = read('src/components/hero/background-particles/background-particles-engine.ts');
     // Must compare against connectDist2 (squared)
     expect(src).toContain('dx * dx + dy * dy < connectDist2');
     // Any sqrt in forEachConnectedPair must appear AFTER the squared comparison
@@ -270,7 +270,7 @@ describe('background-particles engine — squared-distance guards', () => {
   });
 
   it('does not call Math.sqrt unconditionally inside the pair-check inner loop', () => {
-    const src = read('src/components/hero/background-particles/engine.ts');
+    const src = read('src/components/hero/background-particles/background-particles-engine.ts');
     // The pattern: `Math.sqrt(dx * dx + dy * dy)` BEFORE any conditional would be wrong
     expect(src).not.toContain('const distance = Math.sqrt(dx * dx + dy * dy);\n          if (distance <');
     expect(src).not.toContain('const distance = Math.sqrt(dx * dx + dy * dy);\n        if (distance <');
@@ -279,7 +279,7 @@ describe('background-particles engine — squared-distance guards', () => {
 
 describe('interactive-particles engine — squared-distance guards', () => {
   it('buildConnections defines connectDist2 = connectionDistance² and compares dist² < connectDist2', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     expect(src).toContain('connectDist2 = connectionDistance * connectionDistance');
     expect(src).toContain('dist2 < connectDist2');
     // The old wrong pattern: sqrt then compare
@@ -287,7 +287,7 @@ describe('interactive-particles engine — squared-distance guards', () => {
   });
 
   it('buildConnections exits early when maxConnections is reached — no build-all-then-slice', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     // Must cap during traversal, not after (count tracks pooled slots in use)
     expect(src).toContain('count >= maxConnections');
     expect(src).toContain('break outer');
@@ -296,7 +296,7 @@ describe('interactive-particles engine — squared-distance guards', () => {
   });
 
   it('stepBursts uses a single-pass loop — no map() then filter() double traversal', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     // Must use a for loop with conditional push (one pass)
     expect(src).toContain('for (const burst of bursts)');
     // The old pattern: .map(...).filter(...)
@@ -304,7 +304,7 @@ describe('interactive-particles engine — squared-distance guards', () => {
   });
 
   it('stepParticles uses a named squared-radius constant to guard the expensive sqrt in the pointer branch', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     // Named constants must be exported (testable + self-documenting)
     expect(src).toContain('export const POINTER_ATTRACT_RADIUS =');
     expect(src).toContain('export const POINTER_ATTRACT_RADIUS_SQ = POINTER_ATTRACT_RADIUS * POINTER_ATTRACT_RADIUS');
@@ -316,7 +316,7 @@ describe('interactive-particles engine — squared-distance guards', () => {
   });
 
   it('stepParticles uses named attraction-strength constants (no inline 0.012 / 0.008 literals)', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     expect(src).toContain('export const ATTRACTION_STRENGTH_FULL =');
     expect(src).toContain('export const ATTRACTION_STRENGTH_BALANCED =');
     expect(src).toContain('ATTRACTION_STRENGTH_FULL');
@@ -431,7 +431,7 @@ describe('BackgroundParticles — batched canvas draw calls', () => {
 
 describe('interactive-particles Connection.id — numeric, not string', () => {
   it('Connection interface declares id as number, not string', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     // Interface body with `id: number`
     expect(src).toMatch(/interface Connection\s*\{[^}]*\bid:\s*number/s);
     // Must NOT declare id as string (which would allocate per frame)
@@ -439,7 +439,7 @@ describe('interactive-particles Connection.id — numeric, not string', () => {
   });
 
   it('buildConnections uses integer arithmetic for id, not a template literal', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     // Template literal `${a.id}-${b.id}` allocates a new string every frame per pair
     expect(src).not.toContain('`${a.id}-${b.id}`');
     expect(src).not.toContain('`${a.id}${b.id}`');
@@ -554,7 +554,7 @@ describe('Projects — collection build is memoized', () => {
 
 describe('Navigation — Map lookup (O(1)) over Array.find (O(n)) for active label', () => {
   it('navigation logic exports buildNavLabelMap for O(1) label lookup', () => {
-    const src = read('src/components/navigation/logic.ts');
+    const src = read('src/components/navigation/navigation-logic.ts');
     expect(src).toContain('export function buildNavLabelMap');
     expect(src).toContain('new Map(');
   });
@@ -574,7 +574,7 @@ describe('Navigation — Map lookup (O(1)) over Array.find (O(n)) for active lab
 
 describe('Testimonials — dispatch table over if-chain in relationship filter', () => {
   it('uses a module-level RELATIONSHIP_MATCHERS dispatch table', () => {
-    const src = read('src/components/testimonials/logic.ts');
+    const src = read('src/components/testimonials/testimonials-logic.ts');
     expect(src).toContain('RELATIONSHIP_MATCHERS');
     expect(src).toContain("if (relationshipFilter === 'all') return items");
     expect(src).not.toMatch(/items\.filter[\s\S]{0,100}if \(relationshipFilter === 'manager'\)/);
@@ -685,7 +685,7 @@ describe('SpotlightCard — CSS variables for mousemove, state only for hover', 
 
 describe('Navigation — single-pass section bounds and rAF-coalesced updates', () => {
   it('computeSectionBounds is a single-pass loop, not map().filter()', () => {
-    const logic = read('src/components/navigation/logic.ts');
+    const logic = read('src/components/navigation/navigation-logic.ts');
     const fnStart = logic.indexOf('export function computeSectionBounds');
     const fnBody = logic.slice(fnStart, fnStart + 600);
     expect(fnBody).not.toContain('.map(');
@@ -707,13 +707,13 @@ describe('Navigation — single-pass section bounds and rAF-coalesced updates', 
 
 describe('structured-data builders — single-pass role collection', () => {
   it('collects role names with one loop, not flatMap+map+filter', () => {
-    const src = read('src/components/structured-data/builders.ts');
+    const src = read('src/components/structured-data/structured-data-builders.ts');
     expect(src).not.toMatch(/flatMap\([\s\S]{0,200}\.filter\(/);
     expect(src).toContain('roleNameSet');
   });
 
   it('splitPeriod/toIsoDate results are computed once per item, not once per spread', () => {
-    const src = read('src/components/structured-data/builders.ts');
+    const src = read('src/components/structured-data/structured-data-builders.ts');
     // The old pattern called splitPeriod(exp.positions[0]?.period) three times per experience
     expect(src).not.toMatch(/\.\.\.\(splitPeriod\(/);
     expect(src).not.toMatch(/\.\.\.\(toIsoDate\(/);
@@ -903,7 +903,7 @@ describe('sorting — expensive keys are precomputed, not recomputed per compari
   });
 
   it('sortPrerequisiteCourses precomputes the non-finalized bucket', () => {
-    const src = read('src/components/education/logic.ts');
+    const src = read('src/components/education/education-logic.ts');
     expect(src).toContain('nonFinalized: Number(isNonFinalizedCourseStatus(');
     // The token scan must not run inside the comparator
     expect(src).not.toMatch(/\.sort\([\s\S]{0,200}isNonFinalizedCourseStatus/);
@@ -943,7 +943,7 @@ describe('Education — collections memoized, status flag precomputed', () => {
   });
 
   it('runtime: sortPrerequisiteCourses attaches nonFinalized computed during the sort', async () => {
-    const { sortPrerequisiteCourses } = await import('@/components/education/logic');
+    const { sortPrerequisiteCourses } = await import('@/components/education/education-logic');
     const sorted = sortPrerequisiteCourses([
       { requirement: 'A', course: 'X', units: '3', grade: 'A', status: 'Completed' },
       { requirement: 'B', course: 'Y', units: '4', grade: '—', status: 'In Progress' },
@@ -1003,21 +1003,21 @@ describe('ExperienceCard — memoized so activation is O(1) cards re-rendered, n
 
 describe('projects logic — early-exit tag scan and single-pass partition', () => {
   it('getResearchSignals breaks out as soon as the limit is reached — no build-then-slice', () => {
-    const src = read('src/components/projects/logic.ts');
+    const src = read('src/components/projects/projects-logic.ts');
     expect(src).toContain('break outer');
     expect(src).not.toMatch(/new Set\([\s\S]{0,120}flatMap/);
     expect(src).not.toContain('.slice(0, limit)');
   });
 
   it('buildProjectCollections partitions featured/other in one pass — no double filter', () => {
-    const src = read('src/components/projects/logic.ts');
+    const src = read('src/components/projects/projects-logic.ts');
     expect(src).not.toContain('items.filter((project) => project.featured)');
     expect(src).not.toContain('items.filter((project) => !project.featured)');
     expect(src).toContain('project.featured ? featured : other');
   });
 
   it('runtime: getResearchSignals stops after `limit` unique tags and dedupes', async () => {
-    const { getResearchSignals } = await import('@/components/projects/logic');
+    const { getResearchSignals } = await import('@/components/projects/projects-logic');
     const items = [
       { tags: ['a', 'b', 'a'] },
       { tags: ['c', 'b', 'd'] },
@@ -1028,7 +1028,7 @@ describe('projects logic — early-exit tag scan and single-pass partition', () 
   });
 
   it('structured-data builders collect research themes with a single-pass Set, not flatMap', () => {
-    const src = read('src/components/structured-data/builders.ts');
+    const src = read('src/components/structured-data/structured-data-builders.ts');
     expect(src).toContain('researchThemeSet');
     expect(src).not.toContain('flatMap((project) => project.tags)');
   });
@@ -1071,7 +1071,7 @@ describe('usePerformanceProfile — exported named constants for hardware thresh
 
 describe('interactive-particles engine — zero-allocation frame loop', () => {
   it('stepParticles mutates in place — no per-frame map() or object spread', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     const fnStart = src.indexOf('export function stepParticles');
     const fnEnd = src.indexOf('\nexport ', fnStart + 1);
     const fnBody = src.slice(fnStart, fnEnd === -1 ? src.length : fnEnd);
@@ -1081,7 +1081,7 @@ describe('interactive-particles engine — zero-allocation frame loop', () => {
   });
 
   it('stepBursts compacts in place — no per-frame array or object allocation', () => {
-    const src = read('src/components/hero/interactive-particles/engine.ts');
+    const src = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     const fnStart = src.indexOf('export function stepBursts');
     const fnEnd = src.indexOf('\nexport ', fnStart + 1);
     const fnBody = src.slice(fnStart, fnEnd === -1 ? src.length : fnEnd);
@@ -1130,7 +1130,7 @@ describe('interactive-particles engine — zero-allocation frame loop', () => {
   });
 
   it('connection stroke styles are precomputed at module level, never built per frame', () => {
-    const engine = read('src/components/hero/interactive-particles/engine.ts');
+    const engine = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     expect(engine).toContain('export const CONNECTION_TIER_STYLES');
     const component = read('src/components/hero/InteractiveParticles.tsx');
     expect(component).toContain('CONNECTION_TIER_STYLES[tier]');

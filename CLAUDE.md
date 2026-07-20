@@ -27,7 +27,8 @@ npm run test:mutation  # Stryker mutation testing, full repo — manual sweep to
 
 Mutation testing itself is **no longer manual-only**: `pnpm run test:mutation:changed`
 (scoped to whichever changed files match the logic-module convention —
-`logic.ts`/`*-logic.ts`/`engine.ts`/`builders.ts`, not every changed `.ts(x)`
+`*-logic.ts`/`*-engine.ts`/`*-builders.ts` — the qualified, directory-prefixed
+form §8.1 requires repo-wide since 2026-07 — not every changed `.ts(x)`
 file — see ENGINEERING-STANDARDS.md §6 item 13 for why) runs inside the
 pre-commit/pre-push gate below. `pnpm run test:mutation` (the unscoped,
 full-repo command above, which does cover component files too) stays a
@@ -83,9 +84,9 @@ Every animation and effect decision is gated on `usePerformanceProfile()`:
 
 ### Modularization contract
 
-Every non-trivial component ships with a companion `logic.ts` (or `logic/` directory) containing all pure functions — sorting, math, animation config, etc. This is **enforced by contract tests** in `src/modularization-contract.test.ts`. Never inline logic that belongs in the extracted module.
+Every non-trivial component ships with a companion `<component>-logic.ts` containing all pure functions — sorting, math, animation config, etc. This is **enforced by contract tests** in `src/modularization-contract.test.ts`. Never inline logic that belongs in the extracted module.
 
-Pattern: `Component.tsx` imports from `./logic` (or `./card-logic`, `./featured-logic`, etc.).
+Pattern: `Component.tsx` imports from `./hero-logic` (or `./card-logic`, `./featured-logic`, etc.) — the qualified, directory-prefixed name, never a bare `./logic`/`./engine`/`./builders` (ENGINEERING-STANDARDS.md §8.1: a bare name is ambiguous the instant it's seen outside its own folder — a search result, an open editor tab, a stack trace).
 
 ### Component layout
 
@@ -95,10 +96,10 @@ src/
   components/
     ui/          # Reusable primitives (Button, SpotlightCard, SmoothScroll…)
     hero/        # Hero section + sub-components
-    experience/  # ExperienceCard + card-logic
-    projects/    # ProjectCard, FeaturedProject + logic
-    contact/     # SocialLink, SocialPlatformIcon + logic
-    …            # One directory per section, logic extracted alongside
+    experience/  # ExperienceCard + card-logic + experience-logic
+    projects/    # ProjectCard, FeaturedProject + projects-logic/card-logic/featured-logic
+    contact/     # SocialLink, SocialPlatformIcon + contact-logic
+    …            # One directory per section, qualified *-logic.ts extracted alongside
   data/          # Static data files (experience.ts, profile.ts, projects.ts…)
   hooks/         # usePerformanceProfile, useInteractionMode, use3DTilt…
 ```
@@ -116,6 +117,7 @@ src/dead-dependency-contract.test.ts         # every package.json dep has a real
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
 src/docs-quality-contract.test.ts            # zero markdownlint violations, lint wiring
 src/docs-cross-reference-contract.test.ts    # every §N/§6-item/constraint #N ref resolves
+src/naming-and-organization-contract.test.ts # filename casing per directory, no lazy exported names
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
@@ -389,7 +391,7 @@ const activeNavLabel = getActiveNavLabel(navItems, activeHref);
 Replace sequential `if/else if` branches with a module-level `Record<Key, Fn>` dispatch table. The key is looked up once (O(1)); the branch logic lives in the value function:
 
 ```ts
-// ✅ testimonials/logic.ts
+// ✅ testimonials/testimonials-logic.ts
 const RELATIONSHIP_MATCHERS: Record<NonAllFilter, (rel: string) => boolean> = {
   manager: (rel) => rel.includes('manager'),
   mentor:  (rel) => rel.includes('mentor') || rel.includes('professor'),
@@ -437,7 +439,7 @@ export const LOW_HARDWARE_MEMORY_GB_THRESHOLD = 4;
 export const DEFAULT_HARDWARE_CONCURRENCY = 8;
 export const DEFAULT_DEVICE_MEMORY_GB = 8;
 
-// ✅ engine.ts
+// ✅ interactive-particles-engine.ts
 export const POINTER_ATTRACT_RADIUS = 22;
 export const POINTER_ATTRACT_RADIUS_SQ = POINTER_ATTRACT_RADIUS * POINTER_ATTRACT_RADIUS;
 export const ATTRACTION_STRENGTH_FULL = 0.012;

@@ -14,7 +14,7 @@ import {
   STATUS_ICON_PATH,
   STATUS_ICON_STYLES,
   type CertificationStatusKind,
-} from '@/components/certifications/logic';
+} from '@/components/certifications/certifications-logic';
 
 describe('certifications logic', () => {
   it('builds verification urls and appends query parameter when configured', () => {

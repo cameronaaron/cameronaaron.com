@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getHeroMotionConfig } from '@/components/hero/logic';
+import { getHeroMotionConfig } from '@/components/hero/hero-logic';
 
 describe('getHeroMotionConfig — balanced tier (lines 30-31 branch coverage)', () => {
   it('returns balanced-tier parallaxDepth of 100', () => {

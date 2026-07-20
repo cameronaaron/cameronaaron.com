@@ -1,7 +1,7 @@
 import {
   type BurstParticle,
   PARTICLE_COLORS,
-} from '@/components/hero/interactive-particles/engine';
+} from '@/components/hero/interactive-particles/interactive-particles-engine';
 
 /** Hard cap on live sparks — the ring buffer never grows past this. */
 export const MAX_TRAIL_SPARKS = 180;

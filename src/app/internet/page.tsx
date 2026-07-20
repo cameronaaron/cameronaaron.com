@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { internetFeatures } from '@/data/internetFeatures';
 import { sortByDateDesc } from '@/data/dateOrdering';
 import { getPageUrl } from '@/data/site';
-import { groupFeaturesByCategory } from './logic';
+import { groupFeaturesByCategory } from './internet-logic';
 import { buildInternetMetadata } from './metadata';
 
 export const dynamic = 'force-static';

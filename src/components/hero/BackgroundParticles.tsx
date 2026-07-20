@@ -17,7 +17,7 @@ import {
   type Particle,
   type ParticleQuality,
   type SpatialGrid,
-} from '@/components/hero/background-particles/engine';
+} from '@/components/hero/background-particles/background-particles-engine';
 
 interface BackgroundParticlesProps {
   quality?: ParticleQuality;

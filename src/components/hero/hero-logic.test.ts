@@ -4,7 +4,7 @@ import {
   HERO_FLOATING_BADGES,
   HERO_SIGNAL_CHIPS,
   getHeroMotionConfig,
-} from './logic';
+} from './hero-logic';
 
 describe('hero logic', () => {
   it('returns full-motion config for full tier', () => {

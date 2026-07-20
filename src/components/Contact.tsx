@@ -6,7 +6,7 @@ import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
 import { resumeDownloads } from '@/data/resume';
 import SocialLink from '@/components/contact/SocialLink';
-import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/logic';
+import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/contact-logic';
 import Tilt from '@/components/ui/Tilt';
 import MagneticField from '@/components/ui/MagneticField';
 

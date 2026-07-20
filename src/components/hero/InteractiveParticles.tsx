@@ -29,7 +29,7 @@ import {
   percentToPx,
   stepBursts,
   stepParticles,
-} from './interactive-particles/engine';
+} from './interactive-particles/interactive-particles-engine';
 
 interface InteractiveParticlesProps {
   quality?: ParticleQuality;

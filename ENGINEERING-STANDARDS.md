@@ -58,6 +58,7 @@ Enforcing test files:
 | Real-browser interaction latency (INP, long tasks) | `src/interaction-latency-contract.test.ts` (fast wiring) + `scripts/checks/measure-interaction-latency.mjs` (real measurement, deploy-time) |
 | bfcache blank-screen | `src/app/section-reveal-bfcache.test.ts` |
 | Internal doc cross-references resolve | `src/docs-cross-reference-contract.test.ts` |
+| Filename casing + no lazy exported identifiers | `src/naming-and-organization-contract.test.ts` |
 
 ---
 
@@ -441,7 +442,7 @@ The contract greps every production comparator for `getDateSortKey` and
 
 Finding the K particles nearest the cursor each frame is "K smallest of N".
 The optimal streaming structure is a **max-heap of capacity K** keyed on squared
-distance (`interactive-particles/engine.ts`: `createKnnHeap` / `knnOffer` /
+distance (`interactive-particles/interactive-particles-engine.ts`: `createKnnHeap` / `knnOffer` /
 `collectNearestParticles`): the root is the worst of the kept set, so a
 candidate is admitted in O(log K) only when it beats the root and rejected in
 O(1) otherwise — O(N log K) per frame, versus O(N log N) for a full sort or
@@ -1104,9 +1105,10 @@ investigate that script before touching the config.
 
 ## 5. Architecture invariants
 
-- **Logic extraction**: every non-trivial component ships a pure `logic.ts`
-  (or `logic/` dir) with all sorting/math/config — enforced by the
-  modularization contract. Pure functions get direct unit tests; components
+- **Logic extraction**: every non-trivial component ships a pure
+  `<component>-logic.ts` (the qualified form §8.1 requires — never a bare
+  `logic.ts`) with all sorting/math/config — enforced by the modularization
+  contract. Pure functions get direct unit tests; components
   stay thin.
 - **Static data in `src/data/`**, typed, with completeness tests.
 - **IntroCurtain is a static import** — `dynamic(..., { ssr: false })` causes
@@ -1414,7 +1416,7 @@ investigate that script before touching the config.
    the thing being verified is inherently less reliable than your own
    CI, verify on a cadence into a ledger, and gate fast on the ledger.**
 10. **The checklist for any new component or feature:**
-    - [ ] Pure logic extracted to `logic.ts` with unit tests
+    - [ ] Pure logic extracted to `<component>-logic.ts` (qualified — §8.1) with unit tests
     - [ ] Collection builds/sorts in `useMemo`
     - [ ] List-item components `memo`'d if a parent selection re-renders them;
           callbacks `useCallback`-stable
@@ -1506,19 +1508,21 @@ investigate that script before touching the config.
     exact-value physics tests plus 10 hand-verified equivalents — mostly
     "out-of-bounds Float32Array access is a silent no-op in JS" and
     "distSq/dist is clamped *to* the exact constant it's compared against, so
-    equality is a no-op" idioms) → 100%; `structured-data/builders.ts` (35
-    real gaps closed — the survivors were `'@type'`/`name`/`inLanguage`
-    Schema.org literals silently going untested at exact-string precision, a
-    real SEO risk, not cosmetic noise, plus 1 confirmed-equivalent `.trim()`
-    and 9 confirmed Stryker-harness false positives) → 0 real survivors;
-    `hero/interactive-particles/engine.ts` (35 real gaps, 6 equivalents) →
-    100%; `hero/background-particles/engine.ts` (all 47 survivors were real —
-    this file is a genuine per-frame simulation, not decorative config —
-    closed with 22 new tests and 4 equivalents; the exercise also caught a
-    real latent bug: an asymmetric bounds-check where an out-of-range spatial-
-    grid column index aliases into a *valid but wrong* neighboring cell,
-    unlike the row index's always-safe out-of-bounds case, now pinned by a
-    dedicated regression test) → 100%; and `certifications/logic.ts` (new
+    equality is a no-op" idioms) → 100%; `structured-data/structured-data-
+    builders.ts` (35 real gaps closed — the survivors were
+    `'@type'`/`name`/`inLanguage` Schema.org literals silently going untested
+    at exact-string precision, a real SEO risk, not cosmetic noise, plus 1
+    confirmed-equivalent `.trim()` and 9 confirmed Stryker-harness false
+    positives) → 0 real survivors; `hero/interactive-particles/interactive-
+    particles-engine.ts` (35 real gaps, 6 equivalents) → 100%;
+    `hero/background-particles/background-particles-engine.ts` (all 47
+    survivors were real — this file is a genuine per-frame simulation, not
+    decorative config — closed with 22 new tests and 4 equivalents; the
+    exercise also caught a real latent bug: an asymmetric bounds-check where
+    an out-of-range spatial-grid column index aliases into a *valid but
+    wrong* neighboring cell, unlike the row index's always-safe out-of-bounds
+    case, now pinned by a dedicated regression test) → 100%; and
+    `certifications/certifications-logic.ts` (new
     file this session — 4 gaps: the reactive-status icon color/path catalogs
     untested at exact value, a `\s+`→`\s` regex narrowing, a dead-branch mask
     in `buildVerificationHref`, and an in-progress sort-order check that
@@ -1892,6 +1896,40 @@ investigate that script before touching the config.
     **The lesson generalizes once more: the moment a document's own structure
     becomes load-bearing — cross-referenced, not just read top to bottom — that
     structure is another ecosystem, and an unwatched ecosystem drifts.**
+20. **Naming and file organization are enforced the same way everything else in
+    this file is — a sweep, not a style guide (§8).** A 2026-07 audit walking
+    every filename in `src/` before writing the enforcement found the tree
+    already clean except one real mismatch: `floating-badge-icon.tsx` exported
+    `FloatingBadgeIcon` under a kebab-case name — fixed in the same commit as
+    the sweep, every import site updated, so `naming-and-organization-
+    contract.test.ts` (real TypeScript compiler, not a regex — same rewrite
+    discipline as item 15) ships already-green rather than red-then-exempted.
+    Proven with teeth before trusting it: an injected `bad_Name.tsx`, a
+    filename/default-export mismatch, and two lazy exported identifiers
+    (`data`, `helper`) each failed with a precise `file:line`-equivalent
+    message, then were reverted. Same lesson as item 19, one level up: a
+    directory tree and an identifier's name are both structure a reader
+    depends on, and depended-on structure needs a contract the moment it stops
+    being obviously true by inspection.
+
+    **Revised the same day (§8's own text now documents this):** the first
+    draft still allowed a bare `logic.ts`/`engine.ts`/`builders.ts` as valid,
+    because that was already the established convention — exactly the
+    "convention, not ground truth" mistake §0 exists to catch, caught here by
+    someone pointing directly at the repo rather than by the audit that had
+    just been run. Eleven directories held a bare `logic.ts`; two held a bare
+    `engine.ts`; one held a bare `builders.ts` — all indistinguishable from
+    each other outside their own folder, and `src/components/projects/` held
+    the bare form sitting *right next to* the already-qualified
+    `card-logic.ts` and `featured-logic.ts`. All fourteen renamed to the
+    qualified form in the same pass, every import site and every contract
+    that recognized a logic module by name (`dead-logic-export-contract`,
+    `module-testability-contract`, `naming-and-organization-contract` itself)
+    updated together. **The lesson generalizes past filenames: a rule this
+    file writes down is not exempt from §0 just because writing it down felt
+    like the finish line — the standard itself gets checked against ground
+    truth, same as the code it governs, and gets corrected the same day if it
+    doesn't hold up.**
 
 ## 7. The engagement doctrine
 
@@ -1916,7 +1954,7 @@ idea is.
 own history:**
 
 - Data that changes should say so. The certification status icons
-  (`src/components/certifications/logic.ts` — `evaluateCertificationStatus`)
+  (`src/components/certifications/certifications-logic.ts` — `evaluateCertificationStatus`)
   don't just render a static checkmark; they read real expiry dates and
   become a warning or an X, with a feedback line stating the exact month
   count. A value that never changes is a fact; a value that reacts to time
@@ -1970,3 +2008,114 @@ shipped in violation of them — see the 2026-07 canvas glyph-dissolve
 prototype (`src/components/hero/`) for the pattern: a genuinely ambitious
 visual idea, deliberately built small, reversible, and gated, instead of as
 a wholesale rendering-architecture rewrite.
+
+---
+
+## 8. Naming and organization law
+
+A codebase that is easy to navigate is not a nicety layered on top of correct
+code — it's part of what makes the codebase's other guarantees trustworthy.
+A dispatch table you can't find, a logic module hiding under a name that
+doesn't say what it does, a component split from its test by an inconsistent
+convention: each of these is friction that compounds, and friction is where
+laziness hides ("I'll just inline it here instead of finding the right
+module"). §0's method applies here exactly as it does to an algorithm: reason
+from what the name or the file location is actually *for*, not from "this is
+close enough" or "I'll fix the name later."
+
+**Audited 2026-07, before writing any rule here:** every filename in `src/`
+was walked and classified. Zero snake_case, zero space-containing, zero
+mixed-convention filenames exist today; the only files that don't match a
+simple PascalCase-component / `use*`-hook / kebab-case-logic shape are Next.js
+App Router's own reserved filenames (`page.tsx`, `layout.tsx`, `error.tsx`,
+`not-found.tsx`, `sitemap.ts`, `robots.ts`, `metadata.ts`, …) and a handful of
+already-correct camelCase data files matching `src/data/`'s existing
+documented convention. A repo-wide sweep for a denylist of lazy exported
+identifier names (`foo`, `bar`, `temp`, `data`, `thing`, `stuff`, `helper`,
+`util`, …) found zero matches.
+
+**Revised the same day, on direct pushback:** the first draft of this section
+still allowed a bare `logic.ts`/`engine.ts`/`builders.ts` as a valid
+convention — because that was the established pattern, not because it was
+the *best* one. That is exactly the "reason from convention, not from ground
+truth" failure §0 exists to catch, and it took someone pointing at the
+codebase directly ("the million generic logic.ts") to surface it: eleven
+directories each held a file literally named `logic.ts`, indistinguishable
+from one another in a search result, an open editor tab, or a stack trace —
+`src/components/projects/` alone held a bare `logic.ts` sitting right next to
+the already-qualified `card-logic.ts` and `featured-logic.ts`, the exact
+ambiguity this section exists to rule out. Fixed by requiring the qualified,
+directory-prefixed form everywhere (`hero-logic.ts`, not `logic.ts`;
+`background-particles-engine.ts`, not `engine.ts`) with no bare exception, and
+renaming all fourteen offending files (eleven `logic.ts`, two `engine.ts`, one
+`builders.ts`) plus every import site in the same pass. **This section is
+therefore a forward guard, same posture as §6 item 19: it codifies a
+genuinely-already-true state as a permanently enforced floor, not a cleanup
+of a current mess** — but only after the standard itself was first held to
+its own bar.
+
+### 8.1 Filenames say what's in them, by a convention keyed to role
+
+| Role | Convention | Example |
+| --- | --- | --- |
+| React component (default-exports JSX) | `PascalCase.tsx` | `ExperienceCard.tsx` |
+| Hook | `use` + `PascalCase.ts(x)` | `usePerformanceProfile.ts` |
+| Extracted logic module | `*-logic.ts`, `*-engine.ts`, or `*-builders.ts` (qualified — never bare) | `hero-logic.ts`, `command-palette-logic.ts` |
+| Static data catalog | camelCase `.ts` (existing `src/data/` convention) | `experience.ts`, `additionalCredentials.ts` |
+| Test file | source name + `.test.ts(x)`, same casing family as its source | `Button.test.tsx`, `local-time-logic.test.ts` |
+| Next.js App Router reserved file | whatever Next.js requires, never renamed | `page.tsx`, `layout.tsx`, `metadata.ts`, `robots.ts` |
+
+The rule isn't "pick a convention" — every one of these already exists
+independently, in different corners of this repo, for a reason (component
+files are `PascalCase` because the exported symbol is; hooks are `use*`
+because React's own rules-of-hooks lint depends on the prefix; data files are
+camelCase because that predates this document). §8.1's contribution is
+**making the existing conventions repo-wide and enforced**, not inventing a
+new one: `src/repo-hygiene-contract.test.ts` checked this only for
+`src/data/` and `src/hooks/`; `naming-and-organization-contract.test.ts` (see
+enforcement below) extends the identical shape to every directory under
+`src/`.
+
+### 8.2 Every exported name says what it does — no lazy placeholders
+
+An exported `const`, `function`, or `class` name is part of this codebase's
+public surface the same way a logic module's export is (§6 item 5's dead-
+export sweep already treats it that way). A name that could describe
+anything — `data`, `temp`, `thing`, `helper`, `util`, `val`, `res`, `misc`,
+`foo`, `bar` — describes nothing, and a reader has to open the implementation
+to learn what a reference to it would have told them for free. This is
+banned outright, not style-guided: `naming-and-organization-contract.test.ts`
+walks every exported declaration in `src/` with the real TypeScript compiler
+(the same `ts.createSourceFile` pattern established in §6 item 15's rewrite —
+a regex denylist is exactly the kind of fixed-shape check that item warns
+against, since `const dat_a` or a destructured re-export would evade a naive
+string match) and fails on a match against a documented denylist.
+
+This is a **floor, not a style bar** — the same relationship §7's engagement-
+doctrine sweep has to "is this interaction actually good." The contract can
+tell "specific" from "generic"; it cannot tell "well-named" from "adequately
+named," and doesn't try to. A name passing this check is not automatically a
+*good* name — code review still owns that judgment call, the same way it owns
+whether a §7 interaction is actually engaging, not just present.
+
+### 8.3 Directory structure mirrors the domain, not the framework
+
+`src/components/<section>/` holds a section's component plus its qualified
+`<section>-logic.ts` side by side — never split across `src/lib/` or `src/utils/`, which this
+repo does not have and should not gain (a `utils/` directory is where names
+go to become generic — see 8.2). `src/data/` holds every static content
+catalog; `src/hooks/` holds every hook; `src/app/` holds only routes and their
+Next.js-reserved files. A new file's location should be answerable from its
+*role* (is it a component? logic? a hook? data?) in one step, never "wherever
+seemed convenient at the time." This is the same principle §5's architecture
+invariants already state for logic extraction — §8.3 generalizes it to the
+whole tree, and `repo-hygiene-contract.test.ts`'s root-file allowlist already
+enforces the top level; §8's contribution is making the *rest* of the tree's
+shape just as explicit.
+
+**Enforcement:** `src/naming-and-organization-contract.test.ts` — repo-wide
+filename-casing sweep (§8.1) plus the lazy-identifier AST sweep (§8.2), both
+described above. Deliberate exceptions to either sweep go in a documented
+`Record<name, reason>` allowlist matching every other exemption list in this
+file, held to the same bar §6 item 18 already sets — no exemption without a
+concrete, checkable reason.

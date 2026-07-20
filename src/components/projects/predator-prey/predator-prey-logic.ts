@@ -1,4 +1,4 @@
-import { createSeededRandom, normalizePointerToPercent } from '@/components/hero/interactive-particles/engine';
+import { createSeededRandom, normalizePointerToPercent } from '@/components/hero/interactive-particles/interactive-particles-engine';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 
 /**

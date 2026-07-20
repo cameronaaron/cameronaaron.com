@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import FloatingBadgeIcon from '@/components/ui/floating-badge-icon';
+import FloatingBadgeIcon from '@/components/ui/FloatingBadgeIcon';
 
 describe('FloatingBadgeIcon', () => {
   it('renders a neuro icon variant', () => {

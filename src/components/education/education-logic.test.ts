@@ -7,7 +7,7 @@ import {
   formatGradeDisplay,
   isNonFinalizedCourseStatus,
   sortPrerequisiteCourses,
-} from '@/components/education/logic';
+} from '@/components/education/education-logic';
 
 function makeCourse(overrides: Partial<PrerequisiteCourse>): PrerequisiteCourse {
   return { requirement: 'Req', course: 'Course', units: '3', grade: 'A', status: 'Completed', ...overrides };

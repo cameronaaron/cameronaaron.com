@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toYouTubeEmbedUrl } from './logic';
+import { toYouTubeEmbedUrl } from './capstone-logic';
 
 describe('toYouTubeEmbedUrl', () => {
   it('converts youtu.be short URL', () => {

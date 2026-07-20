@@ -14,7 +14,7 @@ import Magnetic from '@/components/ui/Magnetic';
 import ScrambleText from '@/components/ui/ScrambleText';
 import LocalTimeStatus from '@/components/ui/LocalTimeStatus';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
-import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/logic';
+import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/hero-logic';
 
 const BackgroundParticles = dynamic(() => import('@/components/hero/BackgroundParticles'), { ssr: false });
 const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), { ssr: false });

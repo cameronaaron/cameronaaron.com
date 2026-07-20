@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { capstone } from '@/data/capstone';
 import { getPageUrl, SITE_URL } from '@/data/site';
-import { toYouTubeEmbedUrl } from './logic';
+import { toYouTubeEmbedUrl } from './capstone-logic';
 import { buildCapstoneMetadata } from './metadata';
 
 export const dynamic = 'force-static';

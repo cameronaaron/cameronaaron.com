@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { viewport } from '@/app/layout';
 import Education from '@/components/Education';
 import Navigation from '@/components/Navigation';
-import { MOBILE_MENU_DESKTOP_BREAKPOINT } from '@/components/navigation/logic';
+import { MOBILE_MENU_DESKTOP_BREAKPOINT } from '@/components/navigation/navigation-logic';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';

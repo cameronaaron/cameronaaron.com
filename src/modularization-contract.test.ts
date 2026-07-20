@@ -31,7 +31,7 @@ describe('modularization contract', () => {
   it('keeps InteractiveParticles wired to extracted simulation engine', () => {
     const source = read('src/components/hero/InteractiveParticles.tsx');
 
-    expect(source).toContain("from './interactive-particles/engine'");
+    expect(source).toContain("from './interactive-particles/interactive-particles-engine'");
     expect(source).not.toContain('function createSeededRandom(');
     expect(source).not.toContain('function createInitialParticles(');
   });
@@ -39,7 +39,7 @@ describe('modularization contract', () => {
   it('keeps StructuredData schema construction in builders module', () => {
     const source = read('src/components/StructuredData.tsx');
 
-    expect(source).toContain("from './structured-data/builders'");
+    expect(source).toContain("from './structured-data/structured-data-builders'");
     expect(source).not.toContain('const personSchema =');
     expect(source).not.toContain('const faqPageSchema =');
   });
@@ -55,7 +55,7 @@ describe('modularization contract', () => {
   it('keeps Navigation section-tracking logic extracted', () => {
     const source = read('src/components/Navigation.tsx');
 
-    expect(source).toContain("from '@/components/navigation/logic'");
+    expect(source).toContain("from '@/components/navigation/navigation-logic'");
     expect(source).not.toContain('const triggerLine = 140;');
     expect(source).not.toContain("const sectionId = item.href.replace('#', '');");
   });
@@ -63,7 +63,7 @@ describe('modularization contract', () => {
   it('keeps Skills sorting, motion config, and static data extracted', () => {
     const source = read('src/components/Skills.tsx');
 
-    expect(source).toContain("from '@/components/skills/logic'");
+    expect(source).toContain("from '@/components/skills/skills-logic'");
     // Sort logic
     expect(source).not.toContain("return [...skills.technical].sort((a, b) => b.level - a.level);");
     expect(source).not.toContain("return [...skills.technical].sort((a, b) => a.name.localeCompare(b.name));");
@@ -86,7 +86,7 @@ describe('modularization contract', () => {
   it('keeps Hero motion config and static badge/chip catalogs extracted', () => {
     const source = read('src/components/Hero.tsx');
 
-    expect(source).toContain("from '@/components/hero/logic'");
+    expect(source).toContain("from '@/components/hero/hero-logic'");
     expect(source).not.toContain("const parallaxDepth = performanceTier === 'full' ? 150 : performanceTier === 'balanced' ? 100 : 45;");
     expect(source).not.toContain("['Engineering', 'Security', 'Clinical Care', 'NP Path']");
   });
@@ -94,7 +94,7 @@ describe('modularization contract', () => {
   it('keeps Experience sorting and timeline config extracted', () => {
     const source = read('src/components/Experience.tsx');
 
-    expect(source).toContain("from '@/components/experience/logic'");
+    expect(source).toContain("from '@/components/experience/experience-logic'");
     expect(source).not.toContain('const isLiteMotion = performanceTier === \'lite\' || performanceTier === \'reduced\';');
     expect(source).not.toContain("['Clinical operations', 'Research translation', 'Security and systems']");
     expect(source).not.toContain('const sortedExperiences = [...experiences]');
@@ -107,7 +107,7 @@ describe('modularization contract', () => {
   it('keeps Projects data grouping and signal derivation extracted', () => {
     const source = read('src/components/Projects.tsx');
 
-    expect(source).toContain("from '@/components/projects/logic'");
+    expect(source).toContain("from '@/components/projects/projects-logic'");
     expect(source).not.toContain('projects.filter((project) => project.featured)');
     expect(source).not.toContain('Array.from(new Set(projects.flatMap((project) => project.tags))).slice(0, 10)');
   });
@@ -115,7 +115,7 @@ describe('modularization contract', () => {
   it('keeps Testimonials filtering and spotlight logic extracted', () => {
     const source = read('src/components/Testimonials.tsx');
 
-    expect(source).toContain("from '@/components/testimonials/logic'");
+    expect(source).toContain("from '@/components/testimonials/testimonials-logic'");
     expect(source).not.toContain("type RelationshipFilter = 'all' | 'manager' | 'mentor' | 'colleague';");
     expect(source).not.toContain('const relationshipOptions: Array<{ key: RelationshipFilter; label: string }> = [');
     expect(source).not.toContain('const next = (current + direction + featuredTestimonials.length) % featuredTestimonials.length;');
@@ -124,7 +124,7 @@ describe('modularization contract', () => {
   it('keeps Contact social-link derivation and animation config extracted', () => {
     const source = read('src/components/Contact.tsx');
 
-    expect(source).toContain("from '@/components/contact/logic'");
+    expect(source).toContain("from '@/components/contact/contact-logic'");
     expect(source).not.toContain("offset: ['start 85%', 'center 40%']");
     expect(source).not.toContain('const revealProgress = useSpring(revealRaw, { stiffness: 130, damping: 26, mass: 0.45 });');
     expect(source).not.toContain('socialPlatforms.map((social, index) => (');
@@ -133,7 +133,7 @@ describe('modularization contract', () => {
   it('keeps Certifications URL and sorting helpers extracted', () => {
     const source = read('src/components/Certifications.tsx');
 
-    expect(source).toContain("from '@/components/certifications/logic'");
+    expect(source).toContain("from '@/components/certifications/certifications-logic'");
     expect(source).not.toContain('function buildVerificationHref(cert: Certification): string {');
     expect(source).not.toContain('const sortedCertifications = sortByDateDesc(certifications, (certification) => certification.status);');
     expect(source).not.toContain('index % 2 === 0 ? -16 : 16');
@@ -142,7 +142,7 @@ describe('modularization contract', () => {
   it('keeps Education sorting and status helpers extracted', () => {
     const source = read('src/components/Education.tsx');
 
-    expect(source).toContain("from '@/components/education/logic'");
+    expect(source).toContain("from '@/components/education/education-logic'");
     expect(source).not.toContain('function isNonFinalizedCourseStatus(status: string): boolean {');
     expect(source).not.toContain('const sortedPrerequisiteCourses = [...prerequisiteCourses].sort((left, right) => {');
     expect(source).not.toContain('const formatGradeDisplay = (grade: string, gpa?: string) => {');
@@ -205,7 +205,7 @@ describe('modularization contract', () => {
   it('keeps BackgroundParticles engine and quality config extracted', () => {
     const source = read('src/components/hero/BackgroundParticles.tsx');
 
-    expect(source).toContain("from '@/components/hero/background-particles/engine'");
+    expect(source).toContain("from '@/components/hero/background-particles/background-particles-engine'");
     expect(source).not.toContain('const qualityConfig = {');
     expect(source).not.toContain('particles.push({');
     expect(source).not.toContain('const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);');
@@ -215,7 +215,7 @@ describe('modularization contract', () => {
     const source = read('src/components/ui/FloatingBadge.tsx');
 
     expect(source).toContain("from '@/components/ui/floating-badge-logic'");
-    expect(source).toContain("from '@/components/ui/floating-badge-icon'");
+    expect(source).toContain("from '@/components/ui/FloatingBadgeIcon'");
     expect(source).not.toContain('const positionStyles = {');
     expect(source).not.toContain('function BadgeIcon(');
   });
@@ -290,9 +290,9 @@ describe('modularization contract', () => {
 
   it('keeps capstone YouTube embed helper extracted to logic module', () => {
     const page = read('src/app/capstone/page.tsx');
-    const logic = read('src/app/capstone/logic.ts');
+    const logic = read('src/app/capstone/capstone-logic.ts');
 
-    expect(page).toContain("from './logic'");
+    expect(page).toContain("from './capstone-logic'");
     expect(page).not.toContain('function toYouTubeEmbedUrl(');
     expect(logic).toContain('export function toYouTubeEmbedUrl(');
   });
@@ -395,7 +395,7 @@ describe('modularization contract', () => {
   it('keeps internet page category grouping extracted to its logic module', () => {
     const source = read('src/app/internet/page.tsx');
 
-    expect(source).toContain("from './logic'");
+    expect(source).toContain("from './internet-logic'");
     expect(source).toContain('groupFeaturesByCategory(sortedFeatures)');
     // No per-category filter scan inline in the page
     expect(source).not.toContain('sortedFeatures.filter((feature) => feature.category === category)');
