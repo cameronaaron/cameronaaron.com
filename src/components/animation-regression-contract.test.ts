@@ -64,6 +64,26 @@ function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), 'utf8');
 }
 
+/** Source with all comments blanked out (kept as whitespace so offsets are
+ * preserved), via the real TypeScript scanner — a comment mentioning
+ * `repeat: Infinity` while documenting the framer→CSS migration must not read
+ * as an actual animation (§6 item 15: match code, not prose). */
+function stripComments(src: string): string {
+  const scanner = ts.createScanner(ts.ScriptTarget.Latest, /* skipTrivia */ false, ts.LanguageVariant.JSX, src);
+  let out = '';
+  let token = scanner.scan();
+  while (token !== ts.SyntaxKind.EndOfFileToken) {
+    const text = scanner.getTokenText();
+    if (token === ts.SyntaxKind.SingleLineCommentTrivia || token === ts.SyntaxKind.MultiLineCommentTrivia) {
+      out += text.replace(/[^\n]/g, ' ');
+    } else {
+      out += text;
+    }
+    token = scanner.scan();
+  }
+  return out;
+}
+
 describe('animation regression contract', () => {
   it('ExperienceCard has no standalone whileInView on its card root element', () => {
     const source = read('src/components/experience/ExperienceCard.tsx');
@@ -228,16 +248,20 @@ describe('animation regression contract', () => {
     expect(source).not.toMatch(/<motion\.h3[^>]+whileInView[^>]+>[\s\S]*?Certification Highlights/);
   });
 
-  it('repo-wide: every file with an infinite animation references a motion gate (2026-07)', () => {
-    // An ungated `repeat: Infinity` runs forever for every visitor — including
-    // reduced-motion users and low-power mobile devices. Sweep every production
-    // source, present and future: any file declaring an infinite animation must
-    // also reference at least one gating signal (prefersReducedMotion /
-    // reducedMotion variable, performance tier, hover-motion flag, tier-derived
-    // quality prop, or a shouldAnimate* helper). The gate keyword appearing in
-    // the file is a necessary (string-level) condition; the per-component
-    // coverage tests exercise both branches at runtime.
-    const gatePattern = /prefersReducedMotion|reducedMotion|performanceTier|enableHoverMotion|shouldAnimate|quality/;
+  it('repo-wide: every file with a framer infinite animation references a motion gate (2026-07)', () => {
+    // A framer `repeat: Infinity` drives a requestAnimationFrame + MotionValue
+    // write on the MAIN thread every frame, forever, for every visitor — the
+    // exact class of work that pegged real-mobile TBT to 4.6s until the
+    // decorative loops were moved to CSS (see the CSS-conversion sweep below).
+    // Any framer infinite animation that remains must reference a gating signal
+    // (prefersReducedMotion / reducedMotion, performance tier, hover-motion
+    // flag, tier-derived quality prop, isCoarsePointer, or a shouldAnimate*
+    // helper) so it never runs on the reduced-motion / low-power mobile path.
+    // CSS `@keyframes ... infinite` animations are exempt: they run on the
+    // compositor, are frozen globally by globals.css's prefers-reduced-motion
+    // block, and pause off-screen with their section's content-visibility —
+    // they are the *fix*, not the thing being gated.
+    const gatePattern = /prefersReducedMotion|reducedMotion|performanceTier|enableHoverMotion|shouldAnimate|quality|isCoarsePointer/;
     const files: string[] = [];
     const walk = (dir: string) => {
       for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -249,13 +273,71 @@ describe('animation regression contract', () => {
     walk(resolve(process.cwd(), 'src'));
 
     const ungated = files.filter((file) => {
-      const src = readFileSync(file, 'utf8');
-      return src.includes('repeat: Infinity') && !gatePattern.test(src);
+      // Match `repeat: Infinity` in real code only, not in a prose comment
+      // describing the framer→CSS migration (§6 item 15: a sweep that matches
+      // its own documentation is a broken sweep).
+      const src = stripComments(readFileSync(file, 'utf8'));
+      return /repeat:\s*Infinity/.test(src) && !gatePattern.test(src);
     });
 
     expect(
       ungated,
-      `ungated infinite animation(s) — gate on prefersReducedMotion (see StatCard.tsx):\n${ungated.join('\n')}`,
+      `ungated framer infinite animation(s) — gate it (prefersReducedMotion / isCoarsePointer / tier), or convert it to a CSS @keyframes loop (see globals.css):\n${ungated.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('mobile-path decorative loops stay CSS, and every *-anim class exists in globals.css (2026-07)', () => {
+    // These components render on the mobile (balanced/reduced) path and each
+    // carried framer repeat:Infinity loops that, multiplied across the page
+    // (SectionHandoff ×7 × {glow,ring,3 dots}, StatCard ×5 × 3, per-card
+    // ProjectCard/SkillBar), pegged a real Moto G Power's main thread to a 4.6s
+    // TBT. Their infinite animations are now CSS @keyframes — compositor-run
+    // and paused off-screen by their section's content-visibility. Lock it in:
+    // (a) a framer repeat:Infinity reappearing in any of them is a mobile-perf
+    // regression, and (b) any `*-anim` class referenced anywhere in src must be
+    // defined in globals.css — a typo'd or deleted class is a silently dead
+    // animation the type system can't catch.
+    const CSS_CONVERTED = [
+      'src/components/ui/SectionTransitions.tsx',
+      'src/components/ui/StatCard.tsx',
+      'src/components/ui/SkillBar.tsx',
+      'src/components/projects/ProjectCard.tsx',
+      'src/components/certifications/HeartbeatMonitor.tsx',
+    ];
+    const reintroduced = CSS_CONVERTED.filter((rel) => /repeat:\s*Infinity/.test(stripComments(read(rel))));
+    expect(
+      reintroduced,
+      `framer repeat:Infinity reintroduced on the mobile path — keep these decorative loops as CSS @keyframes:\n${reintroduced.join('\n')}`,
+    ).toEqual([]);
+
+    const globals = read('src/app/globals.css');
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.tsx?$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) files.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const missing: string[] = [];
+    let referencedCount = 0;
+    for (const file of files) {
+      const src = stripComments(readFileSync(file, 'utf8'));
+      for (const match of src.matchAll(/\b([a-z]+(?:-[a-z]+)*-anim)\b/g)) {
+        referencedCount += 1;
+        const cls = match[1];
+        if (!globals.includes(`.${cls} `) && !globals.includes(`.${cls}\n`) && !globals.includes(`.${cls}{`)) {
+          missing.push(`${file.replace(`${resolve(process.cwd())}/`, '')} → .${cls}`);
+        }
+      }
+    }
+    // Guard the guard (§6 item 8): the sweep must actually be finding classes.
+    expect(referencedCount, 'no *-anim classes found — the sweep regex is broken').toBeGreaterThanOrEqual(10);
+    expect(
+      Array.from(new Set(missing)),
+      `*-anim class referenced in a component but not defined in globals.css (dead animation):\n${Array.from(new Set(missing)).join('\n')}`,
     ).toEqual([]);
   });
 

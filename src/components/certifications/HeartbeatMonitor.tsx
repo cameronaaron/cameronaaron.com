@@ -1,13 +1,17 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
   HEARTBEAT_PATH,
   HEARTBEAT_VIEWBOX,
   getHeartbeatDuration,
 } from '@/components/certifications/heartbeat-logic';
+
+// Total length of HEARTBEAT_PATH in viewBox units (~165), rounded up so the
+// stroke-dasharray fully covers the trace at the drawn keyframe. Only used to
+// seed the CSS draw animation's dash geometry.
+const ECG_DASH_LENGTH = 180;
 
 /**
  * A small looping ECG trace next to the section header — a nod to the EMT /
@@ -31,14 +35,18 @@ export default function HeartbeatMonitor() {
         {prefersReducedMotion ? (
           <path d={HEARTBEAT_PATH} stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
         ) : (
-          <motion.path
+          // CSS stroke-dashoffset draw (compositor) instead of framer pathLength;
+          // hover still speeds it up by driving --ecg-duration off React state
+          // (low-frequency), and the section's content-visibility pauses it while
+          // off-screen. data-duration kept for the existing tests.
+          <path
+            className="ecg-trace-anim"
             d={HEARTBEAT_PATH}
             stroke="currentColor"
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"
-            animate={{ pathLength: [0, 1, 1], opacity: [0.3, 1, 0.3] }}
-            transition={{ duration, repeat: Infinity, ease: 'linear' }}
+            style={{ '--ecg-len': ECG_DASH_LENGTH, '--ecg-duration': `${duration}s` } as CSSProperties}
             data-testid="heartbeat-monitor-path"
             data-duration={duration}
           />

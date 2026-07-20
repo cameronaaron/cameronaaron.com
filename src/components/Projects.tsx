@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { useMemo, useRef } from 'react';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useMemo, useRef, type CSSProperties } from 'react';
 import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
@@ -28,7 +28,6 @@ export default function Projects() {
   // simulation widget — its paired demo (if any) renders full-width below the
   // whole grid instead, same idea as the featured section's inline demos.
   const otherProjectWithDemo = otherProjects.find((project) => project.interactiveDemo === 'predator-prey-chase');
-  const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -50,16 +49,17 @@ export default function Projects() {
         style={{ y: backgroundY2 }}
         className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none"
       />
-      <motion.div
-        className="pointer-events-none absolute -right-24 top-36 hidden h-64 w-64 rounded-full border border-cyan-300/20 lg:block"
-        animate={prefersReducedMotion ? undefined : { rotate: [0, 360] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+      {/* CSS spin (compositor) — was framer rAF that ran even though these are
+          display:none on mobile (hidden lg:block); CSS animations don't tick on
+          display:none, so this also stops the off-screen mobile waste. */}
+      <div
+        className="spin-anim pointer-events-none absolute -right-24 top-36 hidden h-64 w-64 rounded-full border border-cyan-300/20 lg:block"
+        style={{ '--spin-duration': '18s' } as CSSProperties}
         aria-hidden="true"
       />
-      <motion.div
-        className="pointer-events-none absolute -right-14 top-44 hidden h-44 w-44 rounded-full border border-emerald-300/20 lg:block"
-        animate={prefersReducedMotion ? undefined : { rotate: [360, 0] }}
-        transition={{ duration: 13, repeat: Infinity, ease: 'linear' }}
+      <div
+        className="spin-anim spin-anim-reverse pointer-events-none absolute -right-14 top-44 hidden h-44 w-44 rounded-full border border-emerald-300/20 lg:block"
+        style={{ '--spin-duration': '13s' } as CSSProperties}
         aria-hidden="true"
       />
 
@@ -93,10 +93,9 @@ export default function Projects() {
         />
 
         <div className="mb-12 overflow-hidden rounded-2xl border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
-          <motion.div
-            className="flex w-max items-center gap-2"
-            animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
-            transition={prefersReducedMotion ? undefined : { duration: 22, repeat: Infinity, ease: 'linear' }}
+          <div
+            className="marquee-track flex w-max items-center gap-2"
+            style={{ '--marquee-duration': '22s' } as CSSProperties}
           >
             {[...researchSignals, ...researchSignals].map((signal, index) => (
               <span
@@ -107,10 +106,10 @@ export default function Projects() {
                 {signal}
               </span>
             ))}
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div 
+        <motion.div
           className="space-y-20 mb-20"
           initial="hidden"
           whileInView="visible"

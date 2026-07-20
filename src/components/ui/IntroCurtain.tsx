@@ -126,16 +126,12 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
               exit={{ opacity: 0, y: -8, letterSpacing: '0.6em' }}
               transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.span
-                className="h-1.5 w-1.5 rounded-full bg-cyan-400"
-                animate={reducedMotion ? {} : { scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              />
+              <span className="curtain-dot-anim h-1.5 w-1.5 rounded-full bg-cyan-400" aria-hidden="true" />
               Cameron Aaron
-              <motion.span
-                className="h-1.5 w-1.5 rounded-full bg-emerald-400"
-                animate={reducedMotion ? {} : { scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, delay: 1, repeat: Infinity, ease: 'easeInOut' }}
+              <span
+                className="curtain-dot-anim h-1.5 w-1.5 rounded-full bg-emerald-400"
+                style={{ '--curtain-dot-delay': '1s' } as React.CSSProperties}
+                aria-hidden="true"
               />
             </motion.span>
 

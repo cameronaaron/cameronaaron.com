@@ -3,8 +3,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 
-import { useInteractionMode } from '@/hooks/useInteractionMode';
-
 interface SkillBarProps {
   name: string;
   level: number;
@@ -12,12 +10,10 @@ interface SkillBarProps {
 }
 
 // Memoized for the same reason as TestimonialCard: Skills.tsx's sort-view
-// toggle re-renders every bar on every click, and each bar carries a
-// continuously-repeating shimmer animation that gains nothing from
-// re-evaluating on an unrelated parent re-render.
+// toggle re-renders every bar on every click. The shimmer is now a pure CSS
+// sweep (compositor, paused off-screen with the section's content-visibility)
+// rather than a framer repeat:Infinity rAF loop.
 function SkillBar({ name, level, index }: SkillBarProps) {
-  const { prefersReducedMotion } = useInteractionMode();
-
   return (
     <div>
       <div className="flex justify-between mb-2">
@@ -32,10 +28,9 @@ function SkillBar({ name, level, index }: SkillBarProps) {
           transition={{ duration: 1, delay: index * 0.1, ease: "easeOut" }}
           className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full relative overflow-hidden"
         >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full -translate-x-full"
-            animate={prefersReducedMotion ? undefined : { translateX: ["0%", "200%"] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2, ease: "linear" }}
+          <div
+            className="skill-sheen-anim absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full"
+            aria-hidden="true"
           />
         </motion.div>
       </div>
