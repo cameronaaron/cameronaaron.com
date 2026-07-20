@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 interface BackToTopProps {
@@ -29,7 +29,7 @@ export default function BackToTop({ threshold = 600 }: BackToTopProps) {
   return (
     <AnimatePresence>
       {visible ? (
-        <motion.button
+        <m.button
           key="back-to-top"
           type="button"
           onClick={handleClick}
@@ -55,7 +55,7 @@ export default function BackToTop({ threshold = 600 }: BackToTopProps) {
           >
             <polyline points="6 15 12 9 18 15" />
           </svg>
-        </motion.button>
+        </m.button>
       ) : null}
     </AnimatePresence>
   );

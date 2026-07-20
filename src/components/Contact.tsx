@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useMemo, useRef } from 'react';
 import { profile } from '@/data/profile';
 import { socialPlatforms } from '@/data/contact';
@@ -29,7 +29,7 @@ export default function Contact() {
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -41,13 +41,13 @@ export default function Contact() {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Open to healthcare, clinical research, and interdisciplinary collaboration opportunities.
           </p>
-        </motion.div>
+        </m.div>
 
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center mb-12">
             {/* Email */}
             <Tilt className="w-full max-w-md">
-              <motion.a
+              <m.a
                 href={`mailto:${profile.email}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -74,12 +74,12 @@ export default function Contact() {
                 <p className="text-muted-foreground group-hover:text-primary transition-colors text-center">
                   {profile.email}
                 </p>
-              </motion.a>
+              </m.a>
             </Tilt>
           </div>
 
           {/* Resume Downloads */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -117,17 +117,17 @@ export default function Contact() {
                 </a>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Social Links */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <motion.h3 
+            <m.h3 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -135,9 +135,9 @@ export default function Contact() {
               className="text-2xl font-bold text-foreground mb-6"
             >
               Connect With Me
-            </motion.h3>
+            </m.h3>
             <MagneticField targetSelector="a">
-            <motion.div
+            <m.div
               className="flex flex-wrap justify-center gap-4"
               initial="hidden"
               whileInView="visible"
@@ -152,7 +152,7 @@ export default function Contact() {
               }}
             >
               {socialLinks.map((social, index) => (
-                <motion.div
+                <m.div
                   key={social.key}
                   variants={{
                     hidden: { opacity: 0, y: 20, scale: 0.8 },
@@ -168,11 +168,11 @@ export default function Contact() {
                     index={index}
                     revealProgress={revealProgress}
                   />
-                </motion.div>
+                </m.div>
               ))}
-            </motion.div>
+            </m.div>
             </MagneticField>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>

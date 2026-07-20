@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform } from 'framer-motion';
 import { useMemo, useRef, useState } from 'react';
 import { skills } from '@/data/skills';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -53,7 +53,7 @@ export default function Skills() {
       ref={containerRef}
       aria-labelledby="skills-heading"
     >
-      <motion.div
+      <m.div
         style={{ y, opacity }}
         className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-emerald-900/10 to-transparent pointer-events-none"
       />
@@ -69,7 +69,7 @@ export default function Skills() {
           className="[&>h2]:font-display"
         />
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -79,7 +79,7 @@ export default function Skills() {
           aria-label="Skills journey phases"
         >
           {SKILLS_JOURNEY_PHASES.map((phase, index) => (
-            <motion.div
+            <m.div
               key={phase}
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -89,11 +89,11 @@ export default function Skills() {
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" aria-hidden="true" />
               {phase}
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -104,7 +104,7 @@ export default function Skills() {
             <span className="font-semibold text-foreground">Sort skills:</span> view by proficiency or alphabetical order.
           </div>
           <div className="flex items-center gap-2">
-            <motion.button
+            <m.button
               type="button"
               onClick={() => setTechnicalView('priority')}
               whileHover={isCinematic ? { y: -1 } : undefined}
@@ -117,8 +117,8 @@ export default function Skills() {
               aria-pressed={technicalView === 'priority'}
             >
               Priority
-            </motion.button>
-            <motion.button
+            </m.button>
+            <m.button
               type="button"
               onClick={() => setTechnicalView('alphabetical')}
               whileHover={isCinematic ? { y: -1 } : undefined}
@@ -131,11 +131,11 @@ export default function Skills() {
               aria-pressed={technicalView === 'alphabetical'}
             >
               Alphabetical
-            </motion.button>
+            </m.button>
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12"
           initial="hidden"
           whileInView="visible"
@@ -147,10 +147,10 @@ export default function Skills() {
             },
           }}
         >
-          <motion.div variants={getSkillColumnVariants(isLiteMotion, 'left', entryYOffset)}>
+          <m.div variants={getSkillColumnVariants(isLiteMotion, 'left', entryYOffset)}>
             <h3 className="text-2xl font-bold mb-6 text-white">Core Competencies</h3>
             {strongestSkill ? (
-              <motion.p
+              <m.p
                 key={`${technicalView}-${strongestSkill.name}`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -158,11 +158,11 @@ export default function Skills() {
                 className="mb-5 text-sm text-cyan-200/90"
               >
                 Top skill: {strongestSkill.name} ({strongestSkill.level}%)
-              </motion.p>
+              </m.p>
             ) : null}
             <div className="space-y-4">
               {technicalSkills.map((skill, index) => (
-                <motion.div
+                <m.div
                   key={skill.name}
                   initial={{ opacity: 0, y: entryYOffset }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -170,16 +170,16 @@ export default function Skills() {
                   transition={getSkillBarEntryTransition(isLiteMotion, index)}
                 >
                   <SkillBar name={skill.name} level={skill.level} index={index} />
-                </motion.div>
+                </m.div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div variants={getSkillColumnVariants(isLiteMotion, 'right', entryYOffset)}>
+          <m.div variants={getSkillColumnVariants(isLiteMotion, 'right', entryYOffset)}>
             <h3 className="text-2xl font-bold mb-6 text-white">Domain Expertise</h3>
             <div className="grid grid-cols-2 gap-4">
               {skills.domains.map((domain, index) => (
-                <motion.div
+                <m.div
                   key={domain}
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -188,20 +188,20 @@ export default function Skills() {
                 >
                   <SpotlightCard
                     className="p-4 flex items-center justify-center text-center h-full group cursor-default"
-                    as={motion.div}
+                    as={m.div}
                     whileHover={isCinematic ? { scale: 1.05, y: -5, boxShadow: '0 10px 30px rgba(129, 140, 248, 0.3)' } : undefined}
                     transition={getDomainCardHoverTransition(isLiteMotion)}
                   >
                     <p className="text-gray-300 font-medium group-hover:text-primary transition-colors">{domain}</p>
                   </SpotlightCard>
-                </motion.div>
+                </m.div>
               ))}
             </div>
 
             <h3 className="text-2xl font-bold mt-12 mb-6 text-white">Certification Highlights</h3>
             <div className="space-y-3">
               {skills.certifications.map((cert, index) => (
-                <motion.div
+                <m.div
                   key={cert}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -210,7 +210,7 @@ export default function Skills() {
                   whileHover={isCinematic ? { x: 10, scale: 1.02 } : undefined}
                   className="flex items-start gap-3 group cursor-default"
                 >
-                  <motion.div
+                  <m.div
                     className="flex-shrink-0 mt-1"
                     whileHover={isCinematic ? { rotate: 360, scale: 1.2 } : undefined}
                     transition={{ duration: isLiteMotion ? 0.25 : 0.5 }}
@@ -218,13 +218,13 @@ export default function Skills() {
                     <svg className="w-5 h-5 text-emerald-400 group-hover:text-cyan-300 transition-colors" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                  </motion.div>
+                  </m.div>
                   <p className="text-gray-400 group-hover:text-gray-200 transition-colors">{cert}</p>
-                </motion.div>
+                </m.div>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </div>
     </section>
   );

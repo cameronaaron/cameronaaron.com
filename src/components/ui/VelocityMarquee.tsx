@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
+import { m, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useMemo } from 'react';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import {
@@ -54,7 +54,7 @@ export default function VelocityMarquee({
       data-testid="velocity-marquee"
       className={`pointer-events-none relative select-none overflow-hidden border-y border-white/5 bg-white/[0.015] py-8 md:py-12 ${className}`}
     >
-      <motion.div style={velocityReactive ? { skewX, x } : undefined} className="will-change-transform">
+      <m.div style={velocityReactive ? { skewX, x } : undefined} className="will-change-transform">
         <div
           data-testid="marquee-track"
           className={`flex w-max items-center gap-6 md:gap-10 pr-6 md:pr-10 ${
@@ -77,7 +77,7 @@ export default function VelocityMarquee({
             </span>
           ))}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

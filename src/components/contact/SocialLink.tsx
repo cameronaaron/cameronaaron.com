@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type MotionValue, useTransform } from 'framer-motion';
+import { m, type MotionValue, useTransform } from 'framer-motion';
 import SocialPlatformIcon from '@/components/contact/SocialPlatformIcon';
 import { getSocialRevealRange, type SocialPlatformKey } from '@/components/contact/social-link-logic';
 
@@ -20,7 +20,7 @@ export default function SocialLink({ name, platformKey, url, color, index, revea
   const revealScale = useTransform(stagedReveal, [0, 1], [0.95, 1]);
 
   return (
-    <motion.a
+    <m.a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
@@ -37,6 +37,6 @@ export default function SocialLink({ name, platformKey, url, color, index, revea
         <SocialPlatformIcon platformKey={platformKey} />
       </span>
       <span className="font-semibold tracking-wide">{name}</span>
-    </motion.a>
+    </m.a>
   );
 }

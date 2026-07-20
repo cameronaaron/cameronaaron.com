@@ -257,10 +257,22 @@ off-screen sections during load — the initial styleLayout pass dropped from
 ~2.26s to ~1.66s (simulated 4x-CPU). It is **DOM-preserving** (SEO-safe) and
 does **not** touch the request graph, which is why it works where code-splitting
 does not: `dynamic()`-splitting sections was measured (2026-07) to *hurt*
-Lighthouse, and both a re-test and a LazyMotion migration (2026-07) confirmed
-that **Next/Turbopack force-modulepreloads every reachable chunk into the
-initial wave** — so no import-level deferral can pull JS out of the load. Keep
-`.cv-section` off the hero (it holds the LCP and must always paint).
+Lighthouse, and a re-test confirmed **Next/Turbopack force-modulepreloads every
+reachable chunk into the initial wave** — so no import-level deferral can pull
+JS out of the *download* graph (LCP). Keep `.cv-section` off the hero (it holds
+the LCP and must always paint).
+
+**LazyMotion is the exception, and it's shipped (2026-07):** the site renders
+via `m` under a `LazyMotion` provider (`MotionProvider`) that loads the DOM
+feature pack (`domMax`) as an async chunk. Force-preload means the feature
+bytes still *download* early (no LCP win — this is why an earlier LazyMotion
+attempt was reverted when judged on LCP with contaminated measurements), but it
+does NOT force the feature code to *evaluate* on the hydration-critical path:
+that parse/compile/execute is deferred until `LazyMotion` resolves its dynamic
+import after mount. Measured against clean `/out`: framer's bootup dropped
+~1.4s → ~0.8s and total scriptEvaluation ~940ms → ~760ms (simulated 4x-CPU),
+which is a TBT/main-thread win, not an LCP one. `strict` mode makes any stray
+`motion.*` throw, so new components must use `m.*`.
 
 ## Data
 
@@ -481,10 +493,22 @@ estimate blends an optimistic value (≈FCP, CSS-blocked only) with a pessimisti
 one that sums the download+execute of **all async JS in the initial wave** — here
 react-dom (~220KB) + framer-motion (~325KB across two chunks). Because
 Next/Turbopack force-modulepreloads every chunk into that first wave (verified
-via both an overlay-deferral test and a full LazyMotion/`m` migration, both of
-which left the pre-LCP bytes and the LCP score unchanged), **no import-level
-deferral, code-split, or LazyMotion split can move this number** — only cutting
-total initial JS (i.e. removing framer-motion, a product decision) would. Do not
+via both an overlay-deferral test and the LazyMotion/`m` migration, both of
+which left the pre-LCP *bytes* and the LCP score unchanged), **no import-level
+deferral, code-split, or LazyMotion split can move the LCP number** — only
+cutting total initial JS (i.e. removing framer-motion, a product decision)
+would.
+
+**Correction (2026-07):** the "~0.89 median mobile" premise above was a
+measurement artifact — a stray `next dev` on port 3000 meant local Lighthouse
+audited the DEV build, not `/out` (the §4.7 item 8 pitfall, recurred). Real PSI
+on a Moto G Power scores **~52**, gated by TBT ~4.6s, not LCP — the load cost is
+hydration (framer + react-dom bundle *evaluation* over a 3,266-element DOM), a
+different problem than the LCP artifact this section describes. LazyMotion,
+reverted here on LCP grounds, was later **re-shipped**: it doesn't move LCP
+(bytes still preload) but defers framer feature *evaluation* off the critical
+path, cutting scriptEvaluation ~20% — a TBT win. See the §8-adjacent perf notes
+and MotionProvider. Do not
 re-attempt JS deferral for mobile LCP; it has been measured to not work in this
 setup. The curtain, fonts, and initial layout were each individually ruled out
 as the gate.

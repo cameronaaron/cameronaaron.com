@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { m, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
@@ -40,7 +40,7 @@ export default function Button({
 
   const styles = getButtonStyles(size, variant, className);
 
-  const Component = href ? motion.a : motion.button;
+  const Component = href ? m.a : m.button;
   const props = href ? { href } : { onClick, type: 'button' as const };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {

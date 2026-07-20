@@ -4,6 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock framer-motion with useInView returning false so the || forceVisible branch is exercised
 vi.mock('framer-motion', () => ({
+  get m() { return this.motion; },
+  LazyMotion: ({ children }) => React.createElement(React.Fragment, null, children),
+  domMax: {},
+  domAnimation: {},
   motion: new Proxy({}, {
     get: (_t: object, tag: string) => {
       const SAFE = ['div','section','span','p','h1','h2','button','ul','li'];

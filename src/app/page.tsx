@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { m, useScroll, useSpring } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
@@ -94,7 +94,7 @@ export default function Home() {
       {showFloatingOverlays ? (
         <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 xl:hidden" aria-hidden="true">
           <div className="h-1 w-full bg-white/10 backdrop-blur-sm">
-            <motion.div
+            <m.div
               className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
               style={{ scaleX: pageProgress, transformOrigin: 'left' }}
             />
@@ -141,7 +141,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <motion.footer
+      <m.footer
         className="border-t border-white/5 bg-background/80 text-white py-14 relative overflow-hidden"
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -203,7 +203,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </motion.footer>
+      </m.footer>
     </>
   );
 }

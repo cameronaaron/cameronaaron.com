@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useState } from 'react';
 import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
 import { QUICK_DOCK_LINKS, getDockLinkMotion, getDockMenuMotion } from './quick-actions-dock-logic';
@@ -21,7 +21,7 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
       <div className="pointer-events-auto flex flex-col items-end gap-2">
         <AnimatePresence>
           {open ? (
-            <motion.div
+            <m.div
               id="quick-actions-menu"
               {...getDockMenuMotion(reduced)}
               animate={{ opacity: 1, y: 0 }}
@@ -29,7 +29,7 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
               className="flex flex-col items-end gap-2"
             >
               {QUICK_DOCK_LINKS.map((link, index) => (
-                <motion.a
+                <m.a
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
@@ -38,13 +38,13 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
                   className="rounded-full border border-white/15 bg-black/55 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45"
                 >
                   {link.label}
-                </motion.a>
+                </m.a>
               ))}
-            </motion.div>
+            </m.div>
           ) : null}
         </AnimatePresence>
 
-        <motion.button
+        <m.button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
           whileHover={reduced ? undefined : { scale: 1.05 }}
@@ -54,15 +54,15 @@ export default function QuickActionsDock({ performanceTier }: QuickActionsDockPr
           aria-controls={open ? 'quick-actions-menu' : undefined}
           aria-label="Explore quick actions"
         >
-          <motion.span
+          <m.span
             animate={open && !reduced ? { rotate: 45 } : { rotate: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="inline-block text-sm"
           >
             +
-          </motion.span>
+          </m.span>
           Explore
-        </motion.button>
+        </m.button>
       </div>
     </nav>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { Testimonial } from '@/data/testimonials';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import {
@@ -24,7 +24,7 @@ interface TestimonialCardProps {
 // the filter interaction's INP (scripts/checks/measure-interaction-latency.mjs).
 function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -95,7 +95,7 @@ function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
           </div>
         </div>
       </SpotlightCard>
-    </motion.div>
+    </m.div>
   );
 }
 

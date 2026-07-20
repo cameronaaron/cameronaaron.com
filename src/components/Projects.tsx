@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useMemo, useRef, type CSSProperties } from 'react';
 import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -41,11 +41,11 @@ export default function Projects() {
 
   return (
     <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef} aria-labelledby="projects-heading">
-      <motion.div 
+      <m.div 
         style={{ y: backgroundY, rotate }}
         className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" 
       />
-      <motion.div
+      <m.div
         style={{ y: backgroundY2 }}
         className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none"
       />
@@ -71,7 +71,7 @@ export default function Projects() {
               <span>Scroll-driven chapter</span>
             </div>
             <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
-              <motion.div
+              <m.div
                 className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
                 style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
               />
@@ -109,7 +109,7 @@ export default function Projects() {
           </div>
         </div>
 
-        <motion.div
+        <m.div
           className="space-y-20 mb-20"
           initial="hidden"
           whileInView="visible"
@@ -124,7 +124,7 @@ export default function Projects() {
           }}
         >
           {featuredProjects.map((project, index) => (
-            <motion.div
+            <m.div
               key={project.title}
               data-testid={`featured-project-item-${index}`}
               data-period={project.period}
@@ -137,11 +137,11 @@ export default function Projects() {
               <FeaturedProject project={project} index={index} />
               {project.interactiveDemo === 'dna-snp-game' && <DnaSnpGame />}
               {project.interactiveDemo === 'reaction-time-game' && <ReactionTimeGame />}
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
-        <motion.div 
+        <m.div 
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
           initial="hidden"
           whileInView="visible"
@@ -156,7 +156,7 @@ export default function Projects() {
           }}
         >
           {otherProjects.map((project, index) => (
-            <motion.div
+            <m.div
               key={project.title}
               variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.9 },
@@ -166,9 +166,9 @@ export default function Projects() {
               whileHover={{ y: -10, transition: { duration: 0.2 } }}
             >
               <ProjectCard project={project} index={index} />
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
         {otherProjectWithDemo ? (
           <div className="max-w-6xl mx-auto">

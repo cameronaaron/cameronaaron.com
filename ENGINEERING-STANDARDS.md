@@ -149,11 +149,19 @@ That record — the *measured-and-rejected ledger* — is a first-class artifact
 not an apology. §4.7 already carries one (the code-splitting experiment that
 *hurt* mobile LCP and was reversed; the local-vs-CI `bf-cache` false positive).
 CLAUDE.md constraint #17 carries another (Next/Turbopack force-preloads every
-chunk, so no import-level deferral can pull JS out of Lantern's LCP graph —
-proven twice, including a full LazyMotion migration built, measured, and
-reverted). A rejected experiment with a number attached is *progress*: it
+chunk, so no import-level deferral can pull JS out of Lantern's LCP *download*
+graph). A rejected experiment with a number attached is *progress*: it
 permanently narrows the search space. Recording it is mandatory; hiding it, or
 never trying because "it probably won't work," is the actual failure.
+
+But the ledger is not a *gravestone* — a rejection is only final for the metric
+and the measurement it was judged against. LazyMotion is the cautionary example
+(0.5): it was rejected here on LCP grounds — correctly, LCP never moved — and
+then, weeks later, found to be *the* win on a different metric (TBT/main-thread)
+once a measurement bug was fixed (see 0.4). A rejected experiment should carry
+not just its number but *which metric and which measurement* rejected it, so a
+future engineer can tell "physically impossible" from "didn't help *that* number
+under *that* setup." Re-open the ledger when either changes.
 
 ### 0.4 Worked example — this doctrine in one sitting (2026-07)
 
@@ -170,14 +178,26 @@ any "we're stuck at X" number:
   (0.093 → 0.001, both form factors) and `content-visibility` on below-fold
   sections (styleLayout 2.26s → 1.66s), each with a contract test and the CLS
   ratchet tightened 0.1 → 0.05.
-- **Deleted what didn't, with evidence:** the LazyMotion migration and the
-  image-as-LCP attempt were both built, measured to *not* move the metric, and
-  reverted — then written into the ledger (§4.7, CLAUDE.md #17) so they are not
-  re-attempted blind.
-- **Named the real wall honestly:** the only remaining lever is cutting total
-  initial JS (removing framer-motion — a product decision), so the ceiling for
-  *this* design was stated with a number rather than papered over. That is the
-  difference between a proven physical limit and an assumed one.
+- **Deleted what didn't, with evidence:** the image-as-LCP attempt was built,
+  measured to *not* move the metric, and reverted into the ledger. The
+  LazyMotion migration was *also* reverted here — but only against LCP; see the
+  sequel below.
+- **Named the real wall honestly (and then it moved):** the LCP ceiling was
+  stated as "cut total initial JS." What that framing missed — because the
+  measurement was contaminated — is that the load score's real gate was never
+  LCP at all. A stray `next dev` on port 3000 (the §4.7 item 8 pitfall,
+  recurred) meant local Lighthouse had audited the *dev* build the whole time;
+  real PSI on a Moto G Power scored **~52**, gated by **TBT ~4.6s** — hydration
+  cost (framer + react-dom bundle *evaluation* over a 3,266-element DOM), a
+  different problem than the LCP artifact. Re-questioned on the right metric
+  with clean data: the ~60 decorative infinite framer animations moved to CSS
+  (compositor); the `initial={false}` no-op entrance wrappers became plain
+  elements; and **LazyMotion — the same migration reverted two bullets up —
+  was re-shipped**, because deferring framer feature *evaluation* off the
+  hydration path cut scriptEvaluation ~20% (a TBT win it never had to be for
+  LCP). The lesson that outranks all the others here: **an honestly-named wall
+  is only as honest as the measurement behind it — when the number won't move,
+  suspect the ruler before the wall.**
 
 The lesson §0 encodes: chase the theoretical best relentlessly, measure every
 step, ship what wins, delete what loses, and write down both — so the next

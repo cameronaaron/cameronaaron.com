@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import ScrambleText from '@/components/ui/ScrambleText';
 import Tilt from '@/components/ui/Tilt';
@@ -38,7 +38,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -52,7 +52,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
           onMouseLeave={handleMouseLeave}
           data-cursor="interactive"
         >
-          <motion.div className="pointer-events-none absolute inset-0" style={{ background: spotlight }} />
+          <m.div className="pointer-events-none absolute inset-0" style={{ background: spotlight }} />
           
           {/* Content Side */}
           <div className="p-8 md:p-12 flex flex-col justify-center relative z-10">
@@ -101,7 +101,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
             <ProjectPattern index={index} />
             
             {/* Floating 3D Element */}
-            <motion.div
+            <m.div
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 + index * 0.1 }}
@@ -115,11 +115,11 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
                   {getFeaturedProjectLeadToken(project.title)}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
 
         </div>
       </Tilt>
-    </motion.div>
+    </m.div>
   );
 }

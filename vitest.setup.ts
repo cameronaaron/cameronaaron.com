@@ -61,6 +61,13 @@ vi.mock('framer-motion', () => {
 
   return {
     motion,
+    // The site renders via `m` under a LazyMotion provider (MotionProvider).
+    // In tests `m` is the same prop-stripping Proxy as `motion`, LazyMotion is
+    // a passthrough, and the feature packs are inert tokens.
+    m: motion,
+    LazyMotion: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+    domAnimation: {},
+    domMax: {},
     // Deterministic imperative animate(): jump straight to the final frame so
     // tests observe the settled DOM (count-ups land on their target).
     animate: (

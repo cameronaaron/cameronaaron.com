@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
+import { m, useScroll, useSpring, useReducedMotion } from 'framer-motion';
 import { getMostVisibleEntry, RAIL_SECTIONS, type SectionRailItem } from './section-rail-logic';
 import { getActiveLenis } from './lenis-registry';
 import { useEffect, useState } from 'react';
@@ -82,7 +82,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
           className="absolute left-1/2 top-5 bottom-5 w-px -translate-x-1/2 overflow-hidden rounded-full bg-white/10 list-none"
           aria-hidden="true"
         >
-          <motion.span
+          <m.span
             className="block w-full origin-top bg-gradient-to-b from-cyan-300 via-primary to-emerald-300"
             style={{ scaleY: progress, height: '100%' }}
           />
@@ -101,7 +101,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                 data-section-id={section.id}
                 className="group relative block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                <motion.span
+                <m.span
                   className="relative z-10 block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/10 transition-colors group-hover:border-cyan-200 group-focus-visible:border-cyan-200"
                   animate={
                     isActive
@@ -111,7 +111,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                   transition={{
                     // A spring computes color samples through an interpolation path that can
                     // serialize to oklab() mid-transition — some browsers reject setting that
-                    // via inline style ("not an animatable color", motion.dev/troubleshooting/
+                    // via inline style ("not an animatable color", m.dev/troubleshooting/
                     // color-not-animatable). Scale keeps its springy feel; color properties use
                     // a plain tween, which only ever interpolates within the source rgba() space.
                     scale: { type: 'spring', stiffness: 320, damping: 22 },
@@ -120,7 +120,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
                   }}
                 />
                 {isActive ? (
-                  <motion.span
+                  <m.span
                     layoutId="section-rail-halo"
                     className="absolute -inset-2 z-0 rounded-full border"
                     style={{ borderColor: 'rgba(126, 231, 255, 0.4)' }}

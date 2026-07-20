@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import type { Project } from '@/data/projects';
 import ScrambleText from '@/components/ui/ScrambleText';
@@ -42,7 +42,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
   return (
     <SpotlightCard
-      as={motion.a}
+      as={m.a}
       href={project.link}
       target="_blank"
       rel="noopener noreferrer"
@@ -73,13 +73,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       data-period={project.period}
     >
       {/* Animated gradient overlay on hover */}
-      <motion.div
+      <m.div
         className="absolute inset-0 bg-gradient-to-br from-primary/10 via-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         initial={false}
       />
       
       {/* Glow effect on hover */}
-      <motion.div
+      <m.div
         className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"
         initial={false}
       />
@@ -90,20 +90,20 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       </div>
       
       <div className="relative z-10">
-        <motion.h3 
+        <m.h3 
           className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors"
           whileHover={enableHoverMotion ? { x: 5 } : undefined}
           transition={{ duration: 0.2 }}
         >
           <ScrambleText text={project.title} />
-        </motion.h3>
+        </m.h3>
         <p className="text-muted-foreground mb-6 line-clamp-3 leading-relaxed flex-grow">
           {project.description}
         </p>
         <p className="text-cyan-300 text-sm font-medium mb-4">{project.period}</p>
         <div className="flex flex-wrap gap-2 mb-6">
           {topTags.map((tag, tagIndex) => (
-            <motion.span
+            <m.span
               key={tagIndex}
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -112,17 +112,17 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               className="px-3 py-1 bg-white/5 text-muted-foreground/80 rounded-lg text-xs font-medium border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-colors"
             >
               {tag}
-            </motion.span>
+            </m.span>
           ))}
         </div>
-        <motion.div
+        <m.div
           className="mb-5 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground/90"
           initial={{ opacity: 0.55 }}
           whileHover={enableHoverMotion ? { opacity: 1 } : undefined}
         >
           <span className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1">{project.tags.length} tags</span>
-        </motion.div>
-        <motion.div 
+        </m.div>
+        <m.div 
           className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform mt-auto"
           whileHover={enableHoverMotion ? { x: 8 } : undefined}
           transition={{ duration: 0.2 }}
@@ -137,7 +137,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
-        </motion.div>
+        </m.div>
       </div>
     </SpotlightCard>
   );

@@ -20,6 +20,10 @@ const mockMotionValue = (initial: unknown) => ({
 const motionValueInstances: Array<ReturnType<typeof mockMotionValue>> = [];
 
 vi.mock('framer-motion', () => ({
+  get m() { return this.motion; },
+  LazyMotion: ({ children }) => React.createElement(React.Fragment, null, children),
+  domMax: {},
+  domAnimation: {},
   motion: new Proxy({}, {
     get: (_t, tag: string) => {
       const SAFE = ['div','section','button','span','h1','p','footer','ul','li','nav','header','a'];

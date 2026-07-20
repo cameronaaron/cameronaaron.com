@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import FloatingBadgeIcon from '@/components/ui/FloatingBadgeIcon';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import {
@@ -27,7 +27,7 @@ export default function FloatingBadge({ icon, position, delay = 0 }: FloatingBad
   const reducedMotion = Boolean(prefersReducedMotion) || isCoarsePointer;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0 }}
       animate={{
         opacity: 1,
@@ -46,6 +46,6 @@ export default function FloatingBadge({ icon, position, delay = 0 }: FloatingBad
       <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/20 bg-black/15">
         <FloatingBadgeIcon icon={icon} />
       </div>
-    </motion.div>
+    </m.div>
   );
 }

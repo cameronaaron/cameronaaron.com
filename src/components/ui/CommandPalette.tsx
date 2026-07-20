@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { navItems } from '@/data/navigation';
@@ -136,7 +136,7 @@ export default function CommandPalette() {
 
       <AnimatePresence>
         {open ? (
-          <motion.div
+          <m.div
             key="command-palette-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -147,7 +147,7 @@ export default function CommandPalette() {
             onKeyDown={handleKeyDown}
             data-testid="command-palette-backdrop"
           >
-            <motion.div
+            <m.div
               role="dialog"
               aria-modal="true"
               aria-label="Command palette"
@@ -219,8 +219,8 @@ export default function CommandPalette() {
                   ))
                 )}
               </ul>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </>

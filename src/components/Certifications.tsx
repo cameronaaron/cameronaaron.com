@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import HeartbeatMonitor from '@/components/certifications/HeartbeatMonitor';
@@ -43,7 +43,7 @@ function StatusFeedback({ info }: { info: CertificationStatusInfo }) {
 function StatusIcon({ index, info }: { index: number; info: CertificationStatusInfo }) {
   const transition = getVerifiedCheckmarkTransition(index);
   return (
-    <motion.svg
+    <m.svg
       viewBox="0 0 24 24"
       className={`h-4 w-4 flex-shrink-0 ${STATUS_ICON_STYLES[info.kind]}`}
       aria-hidden="true"
@@ -58,7 +58,7 @@ function StatusIcon({ index, info }: { index: number; info: CertificationStatusI
       transition={transition}
     >
       <path d={STATUS_ICON_PATH[info.kind]} />
-    </motion.svg>
+    </m.svg>
   );
 }
 
@@ -107,7 +107,7 @@ export default function Certifications() {
             <p className="col-span-2">Credential ID</p>
           </div>
           {sortedCertifications.map((cert, index) => (
-            <motion.div
+            <m.div
               key={`${cert.name}-${cert.credentialId}`}
               data-testid={`cert-row-${index}`}
               initial={{ opacity: 0, y: 12 }}
@@ -134,13 +134,13 @@ export default function Certifications() {
               >
                 {cert.credentialId}
               </a>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 
         <div className="lg:hidden space-y-4">
           {sortedCertifications.map((cert, index) => (
-            <motion.article
+            <m.article
               key={`${cert.name}-${cert.credentialId}-mobile`}
               data-testid={`cert-mobile-row-${index}`}
               initial={{ opacity: 0, y: 12 }}
@@ -168,7 +168,7 @@ export default function Certifications() {
                   {cert.credentialId}
                 </a>
               </p>
-            </motion.article>
+            </m.article>
           ))}
         </div>
 
@@ -176,7 +176,7 @@ export default function Certifications() {
           <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Certifications In Progress</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {sortedInProgressCertifications.map((cert, index) => (
-              <motion.div
+              <m.div
                 key={cert.name}
                 initial={{ opacity: 0, x: getInProgressAnimationOffset(index) }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -193,7 +193,7 @@ export default function Certifications() {
                 </div>
                 <p className="text-emerald-300 text-sm mt-1">Expected: {cert.expectedCompletion}</p>
                 <p className="text-muted-foreground text-sm mt-1">{cert.status}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

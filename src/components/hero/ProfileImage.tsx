@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { m, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import FloatingBadge from '@/components/ui/FloatingBadge';
@@ -58,7 +58,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
   }, [enableHoverMotion, mouseX, mouseY]);
 
   return (
-    <motion.div
+    <m.div
       id={PROFILE_CONTAINER_ID}
       ref={containerRef}
       initial={{ opacity: 0, scale: 0.8 }}
@@ -77,7 +77,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
       }}
       className="relative"
     >
-      <motion.div 
+      <m.div 
         style={{
           rotateX: rotateXSpring,
           rotateY: rotateYSpring,
@@ -91,7 +91,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full blur-3xl opacity-30 ${reducedMotion ? '' : 'animate-pulse'}`} style={{ transform: 'translateZ(-50px)' }} />
         
         {/* Secondary glow layer */}
-        <motion.div 
+        <m.div 
           className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-full blur-2xl"
           animate={{
             scale: reducedMotion ? 1 : [1, 1.2, 1],
@@ -106,7 +106,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         />
         
         {/* Image container with 3D depth */}
-        <motion.div 
+        <m.div 
           className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
           style={{ transform: 'translateZ(20px)' }}
           whileHover={
@@ -136,20 +136,20 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
           </picture>
           
           {/* Shine effect on hover */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0"
             initial={{ x: '-100%', y: '-100%' }}
             whileHover={enableHoverMotion ? { x: '100%', y: '100%' } : undefined}
             transition={{ duration: 0.8 }}
           />
-        </motion.div>
+        </m.div>
 
         {/* Floating badges with depth */}
         <div style={{ transform: 'translateZ(40px)' }}>
           <FloatingBadge icon="innovation" position="top-right" />
           <FloatingBadge icon="neuro" position="bottom-left" delay={0.5} />
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

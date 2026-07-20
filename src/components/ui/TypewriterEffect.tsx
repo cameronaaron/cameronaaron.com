@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { getVisibleTypedText } from '@/components/ui/typewriter-effect-logic';
 
 interface TypewriterEffectProps {
@@ -83,7 +83,7 @@ export default function TypewriterEffect({
       {/* Visible typed text + cursor overlaid at the same origin as the spacer */}
       <span aria-hidden="true" className={className} style={{ position: 'absolute', left: 0, top: 0 }}>
         {getVisibleTypedText(displayedText, text)}
-        <motion.span
+        <m.span
           initial={{ opacity: 0 }}
           animate={{ opacity: isComplete ? 0 : 1 }}
           transition={{ duration: 0.5, repeat: isComplete ? 0 : Infinity, repeatType: "reverse" }}

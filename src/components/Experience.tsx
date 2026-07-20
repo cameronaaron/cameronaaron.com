@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform } from 'framer-motion';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { experiences } from '@/data/experience';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -53,7 +53,7 @@ export default function Experience() {
           className="[&>h2]:font-display"
         />
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -63,7 +63,7 @@ export default function Experience() {
           aria-label="Experience flow phases"
         >
           {EXPERIENCE_FLOW_PHASES.map((phase, index) => (
-            <motion.div
+            <m.div
               key={phase}
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -73,11 +73,11 @@ export default function Experience() {
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
               {phase}
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -90,7 +90,7 @@ export default function Experience() {
             const isActive = activeExperienceIndex === index;
 
             return (
-              <motion.button
+              <m.button
                 key={`${exp.company}-${index}`}
                 type="button"
                 initial={{ opacity: 0, y: 8 }}
@@ -112,20 +112,20 @@ export default function Experience() {
                 aria-pressed={isActive}
               >
                 <span>{exp.company}</span>
-              </motion.button>
+              </m.button>
             );
           })}
-        </motion.div>
+        </m.div>
 
         <div className="max-w-5xl mx-auto relative">
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
-            <motion.div 
+            <m.div 
               style={{ scaleY, transformOrigin: "top" }}
               className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-400 via-emerald-400 to-cyan-400"
             />
           </div>
 
-          <motion.div
+          <m.div
             className="space-y-12 md:space-y-24"
             initial="hidden"
             whileInView="visible"
@@ -140,7 +140,7 @@ export default function Experience() {
             }}
           >
             {sortedExperiences.map((exp, index) => (
-              <motion.div
+              <m.div
                 key={exp.company}
                 id={getExperienceItemId(index)}
                 data-testid={`experience-item-${index}`}
@@ -164,7 +164,7 @@ export default function Experience() {
                 className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
               >
 
-                <motion.div
+                <m.div
                   className="absolute left-8 md:left-1/2 z-20 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-background md:block"
                   animate={getTimelineDotAnimation(isLiteMotion, activeExperienceIndex === index)}
                   transition={getTimelineDotTransition(isLiteMotion)}
@@ -178,9 +178,9 @@ export default function Experience() {
                     onActivate={handleActivate}
                   />
                 </div>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
