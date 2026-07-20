@@ -60,6 +60,129 @@ Enforcing test files:
 
 ---
 
+## 0. The first-principles doctrine — how every other rule is derived
+
+Everything below §0 is a *conclusion*. This section is the *method* that
+produced them and the method every future change must use. The rules in §1–§7
+are not sacred because they are written down; they are correct because they were
+derived from ground truth, and the moment a better derivation appears, backed by
+measurement, the rule changes and the ratchet locks the new floor.
+
+**Reason from the physics, never from the convention.** The default engineering
+move is analogy: "this is how portfolio sites / React apps / everyone does it."
+Analogy copies other people's constraints along with their solution. First
+principles instead asks: what is *actually* true here — the frame budget, the
+bytes on the wire, the CPU cycles under 4× throttle, the specific line the
+profiler blames — and what is the best thing physics permits given only that?
+Boil every problem down to its irreducible truths and reason up from there. A
+"best practice" is a cached answer to someone else's question; verify it still
+holds for *our* question or discard it.
+
+### 0.1 "Impossible" is a measurement you haven't taken yet
+
+Treat the word *impossible* as a bug report against your own understanding.
+Almost every "can't be done" is really one of three things wearing a disguise:
+
+1. **Unmeasured** — nobody has actually profiled it; the wall is assumed.
+2. **Un-questioned requirement** — the thing that's expensive shouldn't exist
+   (see 0.2 step 1).
+3. **Expensive, not impossible** — it costs cycles/bytes/effort, and the real
+   decision is whether the win is worth the price, stated honestly.
+
+The only genuine walls are physical limits — the speed of light, a device's
+real core count, the size of a payload that *must* ship — and you must *prove*
+you've hit one, with a number, before you accept it. Everything else is
+negotiable. Aim at the theoretical optimum (zero allocation per frame, one frame
+of input latency, the smallest byte count that renders the content) and let
+measurement tell you how close you got — do not start from "good enough" and
+stop there. Ambition sets the target; §6's ratchet and every contract test keep
+the ambition honest.
+
+### 0.2 The algorithm (apply strictly in order)
+
+Adapted from the SpaceX design loop. The ordering is the whole point — most
+engineering waste is optimizing, and even automating, a thing that should have
+been deleted two steps earlier.
+
+1. **Question the requirement.** Every requirement carries the name of the
+   person who set it, never a department or a convention — so it can be
+   challenged. "The hero must have an intro curtain," "sections must animate in,"
+   "the CI perf floor must read 1.00" are all requirements to interrogate, not
+   givens. Requirements from smart, senior sources included: they are the *most*
+   dangerous, because they get questioned least. Make the requirement less dumb
+   before writing a line to satisfy it.
+2. **Delete the part or the process.** The best part is no part; the best code
+   is no code; the best request is no request. Delete aggressively — if you are
+   not later forced to add back at least ~10% of what you removed, you did not
+   delete enough. A deleted component can't have a bug, a render cost, a byte
+   weight, or a test. Only what survives deletion earns the right to exist.
+3. **Simplify / optimize — but only what survived step 2.** Optimizing a thing
+   that shouldn't exist is the most common and most invisible waste in software.
+   This is where §1–§3 live (O(1) per event, Map over scan, zero-alloc frame
+   loops). They come *third*, never first.
+4. **Accelerate the loop.** Shorten the distance between an idea and a measured
+   verdict — the fast offline `test:complexity` subset, a scriptable Lighthouse
+   run, a one-file spike. A fast idea→measurement loop is what makes aggressive
+   novelty affordable instead of reckless.
+5. **Automate — last.** Only automate a process that has already been
+   questioned, deleted down to its core, and simplified. Automating waste just
+   produces waste faster. This is why contract tests (§6) are written *after* a
+   rule is proven correct, not before.
+
+### 0.3 Novelty is mandatory — and it earns its place by measurement
+
+Being novel and being disciplined are the same practice here, not opposites.
+The mandate is to reach for the best algorithm, structure, or approach that
+exists — or that *could* exist and hasn't been built yet — not the familiar one.
+Cutting-edge is the default target. But this codebase's other prime directive is
+that **nothing ships on "should work"** (see the preamble). So novelty is bound
+to one rule:
+
+> A novel approach ships **only** when a measurement shows it beats the
+> incumbent on the metric that matters. A novel approach that does not beat the
+> baseline is **deleted**, and the attempt is **recorded** so no one burns the
+> same hours re-deriving the same dead end.
+
+That record — the *measured-and-rejected ledger* — is a first-class artifact,
+not an apology. §4.7 already carries one (the code-splitting experiment that
+*hurt* mobile LCP and was reversed; the local-vs-CI `bf-cache` false positive).
+CLAUDE.md constraint #17 carries another (Next/Turbopack force-preloads every
+chunk, so no import-level deferral can pull JS out of Lantern's LCP graph —
+proven twice, including a full LazyMotion migration built, measured, and
+reverted). A rejected experiment with a number attached is *progress*: it
+permanently narrows the search space. Recording it is mandatory; hiding it, or
+never trying because "it probably won't work," is the actual failure.
+
+### 0.4 Worked example — this doctrine in one sitting (2026-07)
+
+The mobile-LCP work is the loop in miniature, and the template for how to attack
+any "we're stuck at X" number:
+
+- **Questioned the requirement** ("mobile Lighthouse must read 1.00"): measured
+  real applied-throttling LCP at 1.9s / perf 0.95 versus Lantern's *simulated*
+  3.76s, and proved the gap is a simulator artifact, not the site.
+- **Found ground truth before touching code:** isolated the gate by elimination
+  — ruled out the curtain, fonts, and layout individually — and traced Lantern's
+  LCP to the sum of *all* first-wave JS bytes.
+- **Shipped what beat the baseline, with tests:** the CLS reserved-slot fix
+  (0.093 → 0.001, both form factors) and `content-visibility` on below-fold
+  sections (styleLayout 2.26s → 1.66s), each with a contract test and the CLS
+  ratchet tightened 0.1 → 0.05.
+- **Deleted what didn't, with evidence:** the LazyMotion migration and the
+  image-as-LCP attempt were both built, measured to *not* move the metric, and
+  reverted — then written into the ledger (§4.7, CLAUDE.md #17) so they are not
+  re-attempted blind.
+- **Named the real wall honestly:** the only remaining lever is cutting total
+  initial JS (removing framer-motion — a product decision), so the ceiling for
+  *this* design was stated with a number rather than papered over. That is the
+  difference between a proven physical limit and an assumed one.
+
+The lesson §0 encodes: chase the theoretical best relentlessly, measure every
+step, ship what wins, delete what loses, and write down both — so the next
+person starts from the frontier, not from zero.
+
+---
+
 ## 1. The complexity doctrine
 
 "Everything O(1)" is not a coherent goal — sorting has an O(n log n) lower
