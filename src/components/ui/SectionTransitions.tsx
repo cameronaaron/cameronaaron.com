@@ -44,33 +44,30 @@ export function SectionReveal({ index, children }: SectionRevealProps) {
   // glow animation below whenever the section is off-screen.
   const containmentClass = index === 0 ? '' : ' cv-section';
 
+  // Plain <div>, not motion.div: the outer wrapper was `initial={false}`, so
+  // framer rendered it already-visible with no entrance animation (chosen for
+  // bfcache safety — a section must never restore hidden). A plain div is that
+  // same always-visible behavior with zero framer mount cost — and framer
+  // hydration over 157 motion components is the homepage's real load gate
+  // (/capstone, with none, hydrates in 0.3s vs the homepage's 3.8s of main
+  // thread). §5 render-path law.
   return (
-    <motion.div
-      className={`relative${containmentClass}`}
-      initial={false}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
-      transition={{ duration: 0.7, delay: index * 0.03, ease: 'easeOut' }}
-    >
+    <div className={`relative${containmentClass}`}>
       <div
         className={`section-glow-anim pointer-events-none absolute inset-x-0 top-6 mx-auto h-24 w-3/4 rounded-full bg-gradient-to-r ${glowTone} blur-3xl`}
         style={glowDurationStyle(index)}
         aria-hidden="true"
       />
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffProps) {
+  // Outer wrapper plain for the same reason as SectionReveal (was
+  // initial={false}). The inner decorative reveals below stay framer for now.
   return (
-    <motion.div
-      className="relative z-10 px-6 py-10"
-      initial={false}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.7, delay: index * 0.04, ease: 'easeOut' }}
-    >
+    <div className="relative z-10 px-6 py-10">
       <motion.div
         className="pointer-events-none absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 0 }}
@@ -140,6 +137,6 @@ export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffPr
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }

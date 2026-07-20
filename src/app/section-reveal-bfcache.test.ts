@@ -55,18 +55,23 @@ function extractFunctionBody(src: string, name: string): string {
 }
 
 describe('Section wrapper bfcache safety', () => {
-  it('SectionReveal outer wrapper uses initial={false} so sections are visible after bfcache restore', () => {
+  it('SectionReveal outer wrapper is a framer-free plain div, so sections can never restore hidden from bfcache', () => {
+    // Stronger than the old `initial={false}` assertion (2026-07): the wrapper
+    // is now a plain <div>, not motion.div — no framer state at all means no
+    // way to restore hidden after a back/forward-cache navigation, and no
+    // framer mount cost (the homepage's real load gate). The first JSX element
+    // the function returns must be a plain <div>, never <motion.*>.
     const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionReveal');
-    const outerWrapper = extractFirstMotionDivProps(body);
-    expect(outerWrapper).toMatch(/initial=\{false\}/);
-    expect(outerWrapper).not.toMatch(/opacity:\s*0/);
+    const afterReturn = body.slice(body.indexOf('return ('));
+    expect(afterReturn).toMatch(/return \(\s*<div\b/);
+    expect(afterReturn).not.toMatch(/return \(\s*<motion\./);
   });
 
-  it('SectionHandoff outer wrapper uses initial={false} for the same reason', () => {
+  it('SectionHandoff outer wrapper is a framer-free plain div for the same reason', () => {
     const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionHandoff');
-    const outerWrapper = extractFirstMotionDivProps(body);
-    expect(outerWrapper).toMatch(/initial=\{false\}/);
-    expect(outerWrapper).not.toMatch(/opacity:\s*0/);
+    const afterReturn = body.slice(body.indexOf('return ('));
+    expect(afterReturn).toMatch(/return \(\s*<div\b/);
+    expect(afterReturn).not.toMatch(/return \(\s*<motion\./);
   });
 
   it('Home composes Hero inside a SectionReveal so the above-the-fold hero never starts hidden', () => {
@@ -74,31 +79,3 @@ describe('Section wrapper bfcache safety', () => {
     expect(body).toMatch(/<SectionReveal[^>]*index=\{0\}>\s*<Hero\s*\/>/);
   });
 });
-
-/**
- * Return the JSX prop block of the first `<motion.div ...>` tag in `body`
- * (everything between the opening `<motion.div` and the matching `>`).
- */
-function extractFirstMotionDivProps(body: string): string {
-  const start = body.indexOf('<motion.div');
-  if (start === -1) throw new Error('no <motion.div> in body');
-  let i = start;
-  let depth = 0;
-  let inString: string | null = null;
-  while (i < body.length) {
-    const c = body[i];
-    if (inString) {
-      if (c === inString && body[i - 1] !== '\\') inString = null;
-    } else if (c === '"' || c === "'") {
-      inString = c;
-    } else if (c === '{') {
-      depth++;
-    } else if (c === '}') {
-      depth--;
-    } else if (c === '>' && depth === 0) {
-      return body.slice(start, i + 1);
-    }
-    i++;
-  }
-  throw new Error('unterminated <motion.div> tag');
-}
