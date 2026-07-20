@@ -58,7 +58,13 @@ function expectStrictAssertions(
   // TBT/interactive in ms.
   expect(assertions['first-contentful-paint']).toEqual(['error', { maxNumericValue: cwv.fcpMaxMs }]);
   expect(assertions['largest-contentful-paint']).toEqual(['error', { maxNumericValue: cwv.lcpMaxMs }]);
-  expect(assertions['cumulative-layout-shift']).toEqual(['error', { maxNumericValue: 0.1 }]);
+  // Ratcheted 0.1 → 0.05 (2026-07): the hero availability pill used to inject
+  // its live LA-time clock only after hydration, wrapping to a second line and
+  // shifting the name/tagline/CTA (the LCP block) down for ~0.09 CLS. The clock
+  // slot is now reserved in SSR HTML (LocalTimeStatus), so measured CLS sits at
+  // ~0.001 on both form factors — this lower ceiling keeps the fix from
+  // silently regressing.
+  expect(assertions['cumulative-layout-shift']).toEqual(['error', { maxNumericValue: 0.05 }]);
   expect(assertions['total-blocking-time']).toEqual(['error', { maxNumericValue: cwv.tbtMaxMs }]);
   expect(assertions['speed-index']).toEqual(['error', { maxNumericValue: cwv.siMaxMs }]);
   expect(assertions['interactive']).toEqual(['error', { maxNumericValue: cwv.ttiMaxMs }]);

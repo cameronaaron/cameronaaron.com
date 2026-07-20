@@ -186,6 +186,21 @@
     }
   }
 
+  /* Below-the-fold section skip-rendering. content-visibility:auto lets the
+     browser drop the layout, style, and paint of a section while it is outside
+     the viewport, and resume it just before it scrolls in. On this page the
+     initial styleLayout pass was 2.26s (simulated 4x-CPU) — the largest main-
+     thread cost and the gate on the hero LCP — because the browser laid out all
+     eight sections' blur/gradient DOM before first paint. Skipping the seven
+     off-screen sections collapses that pass. `auto` in contain-intrinsic-size
+     means "remember the real measured size once rendered, else use the fallback
+     height", so scrolling never jumps. Applied only to sections below the fold;
+     the hero (index 0) is never contained. */
+  .cv-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
+  }
+
   .font-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.03em;
