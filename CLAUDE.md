@@ -448,9 +448,24 @@ export const ATTRACTION_STRENGTH_BALANCED = 0.008;
 
 ## Deployment
 
+**Pushing to `master` on GitHub auto-deploys the live site** — Cloudflare Pages
+has its own native git integration watching this repo, separate from GitHub
+Actions CI (disabled) and separate from the manual command below. No deploy
+step is needed after a normal push; it goes live within Cloudflare's usual
+build time (a minute or two). Confirmed 2026-07 by checking live response
+headers: static assets return `cf-cache-status: HIT` with headers matching
+`public/_headers` exactly, meaning Cloudflare Pages serves the site directly.
+`wrangler.toml`'s `main = "src/index.js"` Worker is **not** in the live
+request path for the main domain's pages/assets (it may back some other
+route, e.g. the `workshop.cameronaaron.com` redirect, but changes to it are
+not visible on cameronaaron.com without a separate `wrangler deploy`).
+
 ```bash
-npm run deploy:prod   # builds → runs Lighthouse CI → deploys to Cloudflare Pages
+npm run deploy:prod   # manual path: builds → runs Lighthouse CI → wrangler pages deploy
 ```
+
+Use `deploy:prod` only to force a manual deploy or test that specific path —
+not as part of normal day-to-day pushes, which already auto-deploy.
 
 Static site lives in `/out` after `npm run build`. Cloudflare Pages serves it directly. There is no server-side rendering after the build step.
 
