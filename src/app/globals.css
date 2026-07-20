@@ -296,6 +296,183 @@
     animation-direction: reverse;
   }
 
+  /* Decorative section-transition ambience — glows, a rotating ring, bobbing
+     dots. Every one of these was a framer-motion `repeat: Infinity` animation
+     (2026-07): ~43 of them ran simultaneously on mobile from page load (8
+     SectionReveal glows + 7 SectionHandoffs × {glow, rotating ring, 3 dots}),
+     each driving a requestAnimationFrame + MotionValue write on the MAIN
+     thread every frame. On a real Moto G Power that was ~13.6s of framer CPU
+     and a 4.6s Total Blocking Time — the site's actual mobile lag, invisible
+     to local testing because a dev CPU is too fast to feel it even at 4x
+     throttle. Moved to pure CSS keyframes: opacity/transform only, so they run
+     on the COMPOSITOR with zero main-thread JS per frame, and because their
+     host sections are `content-visibility: auto` (.cv-section) the browser
+     also pauses each one while its section is off-screen — something framer's
+     rAF loop never did. prefers-reduced-motion (above) freezes them all. */
+  @keyframes section-glow-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.98); }
+    50% { opacity: 0.55; transform: scale(1.02); }
+  }
+
+  @keyframes handoff-glow-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(0.96); }
+    50% { opacity: 0.55; transform: scale(1.04); }
+  }
+
+  @keyframes handoff-ring-rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes handoff-dot-bob {
+    0%, 100% { opacity: 0.5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  .section-glow-anim {
+    animation: section-glow-pulse var(--glow-duration, 7s) ease-in-out infinite;
+  }
+
+  .handoff-glow-anim {
+    animation: handoff-glow-pulse 6.5s ease-in-out infinite;
+    animation-delay: var(--handoff-delay, 0s);
+  }
+
+  .handoff-ring-anim {
+    animation: handoff-ring-rotate 9s linear infinite;
+  }
+
+  .handoff-dot-anim {
+    animation: handoff-dot-bob 1.1s ease-in-out infinite;
+    animation-delay: var(--dot-delay, 0s);
+  }
+
+  /* StatCard ambience (×5 in the hero, above the fold) and the footer hairline
+     shimmer — all formerly framer `repeat: Infinity`, 15+ main-thread rAF
+     loops in the first viewport alone. Now compositor-only CSS (opacity/
+     transform), same visual, zero per-frame JS. Reduced-motion handled by the
+     global media block above. */
+  @keyframes stat-sheen {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes stat-value-pulse {
+    0%, 100% { opacity: 0.92; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes stat-underline {
+    0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+    50% { opacity: 0.8; transform: scaleX(1); }
+  }
+
+  @keyframes hairline-shimmer {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.7; }
+  }
+
+  .stat-sheen-anim {
+    animation: stat-sheen 3.6s ease-in-out infinite;
+  }
+
+  .stat-value-anim {
+    animation: stat-value-pulse 4s ease-in-out infinite;
+  }
+
+  .stat-underline-anim {
+    animation: stat-underline 2.2s ease-in-out infinite;
+  }
+
+  .hairline-shimmer-anim {
+    animation: hairline-shimmer 5s ease-in-out infinite;
+  }
+
+  /* Below-the-fold ambient loops — Projects section rings + tag marquee,
+     ProjectCard pulse/arrow, SkillBar sheen, hero floating-badge bob. All were
+     framer `repeat: Infinity` and, being statically imported, ran their rAF
+     loops from page load even while off-screen (framer's loop ignores
+     viewport; only content-visibility can pause it). As CSS they ride the
+     compositor AND pause automatically whenever their host `.cv-section` is
+     off-screen. duration/direction/rotate come in via inline CSS vars so the
+     per-index/per-instance variation stays a component concern. */
+  @keyframes spin-360 {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes badge-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(var(--bob-rot, 1.5deg)); }
+  }
+
+  @keyframes dot-ping {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+  }
+
+  @keyframes arrow-nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+  }
+
+  /* Sweep across (0%→200% of own width) in the first ~43% of the cycle, then
+     hold off-screen-right for the rest — a 1.5s sweep + 2s rest, matching the
+     framer repeatDelay:2 this replaced (total 3.5s cycle). */
+  @keyframes skill-sheen {
+    0% { transform: translateX(-100%); }
+    43% { transform: translateX(200%); }
+    100% { transform: translateX(200%); }
+  }
+
+  @keyframes ecg-trace {
+    0% { stroke-dashoffset: var(--ecg-len, 1000); opacity: 0.3; }
+    50% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0.3; }
+  }
+
+  .spin-anim {
+    animation: spin-360 var(--spin-duration, 18s) linear infinite;
+  }
+
+  .spin-anim-reverse {
+    animation-direction: reverse;
+  }
+
+  .badge-bob-anim {
+    animation: badge-bob var(--bob-duration, 2.4s) ease-in-out infinite;
+    animation-delay: var(--bob-delay, 0s);
+  }
+
+  .dot-ping-anim {
+    animation: dot-ping 1.2s ease-in-out infinite;
+  }
+
+  .arrow-nudge-anim {
+    animation: arrow-nudge 1.5s ease-in-out infinite;
+  }
+
+  .skill-sheen-anim {
+    animation: skill-sheen 3.5s linear infinite;
+    animation-delay: var(--sheen-delay, 0s);
+  }
+
+  .ecg-trace-anim {
+    stroke-dasharray: var(--ecg-len, 1000);
+    animation: ecg-trace var(--ecg-duration, 2.5s) linear infinite;
+  }
+
+  /* IntroCurtain name-lockup dots — brief, but they run during the exact
+     hydration window we're trying to keep the main thread clear, so compositor
+     CSS rather than framer rAF. */
+  @keyframes curtain-dot-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.5); opacity: 1; }
+  }
+
+  .curtain-dot-anim {
+    animation: curtain-dot-pulse 2s ease-in-out infinite;
+    animation-delay: var(--curtain-dot-delay, 0s);
+  }
+
   /* Film-grain texture: a static SVG turbulence tile composited once over the
      page. Pure CSS, no animation, no JS. Hidden on touch devices — blend
      modes cost real GPU on mobile and the texture is a desktop nicety. */

@@ -148,10 +148,8 @@ export default function Home() {
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <motion.div
-          className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent"
-          animate={{ opacity: [0.35, 0.7, 0.35] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        <div
+          className="hairline-shimmer-anim pointer-events-none absolute inset-x-0 top-0 mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent"
           aria-hidden="true"
         />
         <div className="container mx-auto px-6 relative z-10">

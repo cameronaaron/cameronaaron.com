@@ -50,30 +50,27 @@ export default function StatCard({ value, label }: StatCardProps) {
       whileHover={enableHoverMotion ? { y: -4, scale: 1.03 } : undefined}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
     >
-      <motion.div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-400/18 via-transparent to-emerald-400/12"
-        animate={prefersReducedMotion ? undefined : { opacity: [0.25, 0.5, 0.25] }}
-        transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+      {/* Ambient loops are pure CSS (globals.css) so they ride the compositor
+          instead of framer's main-thread rAF — 3 per card × 5 cards in the
+          hero was 15 main-thread loops in the first viewport. */}
+      <div
+        className="stat-sheen-anim pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-400/18 via-transparent to-emerald-400/12"
         aria-hidden="true"
       />
 
-      <motion.div
+      <div
         ref={valueRef}
-        className="relative font-display text-3xl font-bold tracking-tight text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
-        animate={prefersReducedMotion ? undefined : { opacity: [0.92, 1, 0.92] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="stat-value-anim relative font-display text-3xl font-bold tracking-tight text-cyan-100 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
       >
         {value}
-      </motion.div>
+      </div>
 
       <div className="font-mono-accent relative mt-1 break-words text-[10px] font-medium uppercase leading-relaxed tracking-[0.08em] text-foreground/80">
         {label}
       </div>
 
-      <motion.div
-        className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent"
-        animate={prefersReducedMotion ? undefined : { opacity: [0.3, 0.8, 0.3], scaleX: [0.8, 1, 0.8] }}
-        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+      <div
+        className="stat-underline-anim pointer-events-none absolute inset-x-4 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent"
         aria-hidden="true"
       />
     </motion.div>

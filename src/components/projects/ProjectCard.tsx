@@ -85,11 +85,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       />
 
       <div className="absolute right-4 top-4 z-20 flex translate-y-0 items-center gap-2 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-200/90 opacity-100 backdrop-blur-md transition-all duration-300 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
-        <motion.span
-          className="h-1.5 w-1.5 rounded-full bg-cyan-300"
-          animate={prefersReducedMotion ? undefined : { scale: [1, 1.5, 1] }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        <span className="dot-ping-anim h-1.5 w-1.5 rounded-full bg-cyan-300" />
         Deep dive {readingMinutes}m
       </div>
       
@@ -132,16 +128,15 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           transition={{ duration: 0.2 }}
         >
           {getProjectCardCta(project.cta)}
-          <motion.svg 
-            className="w-4 h-4 ml-2" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="arrow-nudge-anim w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
-            animate={prefersReducedMotion ? undefined : { x: [0, 5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </motion.svg>
+          </svg>
         </motion.div>
       </div>
     </SpotlightCard>

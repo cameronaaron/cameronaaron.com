@@ -18,8 +18,13 @@ interface FloatingBadgeProps {
 }
 
 export default function FloatingBadge({ icon, position, delay = 0 }: FloatingBadgeProps) {
-  const { prefersReducedMotion } = useInteractionMode();
-  const reducedMotion = Boolean(prefersReducedMotion);
+  const { prefersReducedMotion, isCoarsePointer } = useInteractionMode();
+  // Treat coarse pointers (mobile) as reduced-motion, same as ProfileImage:
+  // the infinite y-bob + rotate is a framer repeat:Infinity rAF loop, and two
+  // of these run in the hero above the fold — pure main-thread cost on the
+  // exact device (a phone) least able to afford it. The entrance (opacity/
+  // scale) still plays; only the perpetual float is dropped on touch.
+  const reducedMotion = Boolean(prefersReducedMotion) || isCoarsePointer;
 
   return (
     <motion.div
