@@ -160,8 +160,23 @@ async function handleRequest(event) {
 
   const isHtmlRoute = isHtmlLikePath(url.pathname) || url.pathname === '/';
   const options = {
-    // Cache static assets aggressively, but always bypass cache for HTML so
-    // fresh deploys do not keep serving stale chunk references.
+    // Cache static assets aggressively at Cloudflare's edge (bypassCache:
+    // false — content-hashed filenames mean a new deploy never reuses an old
+    // URL, so a year-long edge cache carries zero staleness risk), but always
+    // bypass cache for HTML so fresh deploys do not keep serving stale chunk
+    // references.
+    //
+    // bypassCache: true was set on BOTH branches until 2026-07 — a real bug,
+    // not a deliberate trade-off: it meant every static-asset request (every
+    // JS/CSS/image on every page view, from every visitor, at every edge PoP)
+    // skipped Cloudflare's edge cache entirely and round-tripped through this
+    // Worker's KV read on every single request, despite the comment directly
+    // above it saying assets should be cached "aggressively." Caught via a
+    // live production Lighthouse audit showing `cf-cache-status: DYNAMIC` on
+    // every response and real-world mobile TBT/LCP far worse than local
+    // testing against a warmed static build ever showed — local tests always
+    // hit an already-warm server with no real KV round-trip, so this bug was
+    // invisible to every local and CI Lighthouse run.
     cacheControl: isHtmlRoute
       ? {
           browserTTL: 0,
@@ -171,7 +186,7 @@ async function handleRequest(event) {
       : {
           browserTTL: 31536000,
           edgeTTL: 31536000,
-          bypassCache: true,
+          bypassCache: false,
         },
   };
 

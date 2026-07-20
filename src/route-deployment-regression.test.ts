@@ -35,6 +35,37 @@ function findHtmlBranchSource(workerSrc: string): string | undefined {
   return branch?.getText(sourceFile);
 }
 
+/** Real source span of each branch of the `cacheControl: isHtmlRoute ? {...}
+ * : {...}` conditional passed to `getAssetFromKV` — parsed via the TS AST
+ * (per §6 item 15's rewrite discipline) rather than a text scan, since the
+ * two branches are structurally identical object literals a regex can't
+ * reliably tell apart. Returns { htmlBranch, assetBranch } source text. */
+function findCacheControlBranches(workerSrc: string): { htmlBranch?: string; assetBranch?: string } {
+  const sourceFile = ts.createSourceFile('index.js', workerSrc, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  let conditional: ts.ConditionalExpression | undefined;
+
+  const visit = (node: ts.Node) => {
+    if (conditional) return;
+    if (
+      ts.isPropertyAssignment(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === 'cacheControl' &&
+      ts.isConditionalExpression(node.initializer)
+    ) {
+      conditional = node.initializer;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+
+  if (!conditional) return {};
+  return {
+    htmlBranch: conditional.whenTrue.getText(sourceFile),
+    assetBranch: conditional.whenFalse.getText(sourceFile),
+  };
+}
+
 describe('route deployment regression checks', () => {
   it('keeps canonical app routes and avoids conflicting .html app segments', () => {
     expect(fs.existsSync(path.join(repoRoot, 'src/app/capstone/page.tsx'))).toBe(true);
@@ -131,5 +162,29 @@ describe('route deployment regression checks', () => {
     const headers = fs.readFileSync(path.join(repoRoot, 'public/_headers'), 'utf8');
     const htmlBlock = headers.split('/*.html')[1] ?? '';
     expect(htmlBlock).not.toContain('no-store');
+  });
+
+  it('serves long-lived static assets from Cloudflare\'s own edge cache, not a KV round-trip per request', () => {
+    // Real production bug (found 2026-07 via a live Lighthouse audit showing
+    // cf-cache-status: DYNAMIC on every response, and real mobile TBT/LCP far
+    // worse than any local test against a warmed static build ever showed):
+    // getAssetFromKV's cacheControl.bypassCache was `true` on BOTH branches,
+    // directly contradicting the comment above it ("cache static assets
+    // aggressively"). That meant every JS/CSS/image request, from every
+    // visitor, at every edge PoP, skipped Cloudflare's edge cache entirely and
+    // round-tripped through this Worker's KV read — invisible to every local
+    // test because local tests always hit an already-warm server, never a
+    // real KV round-trip. HTML intentionally keeps bypassCache: true (a fresh
+    // deploy must never keep serving stale chunk references); only the
+    // long-lived static-asset branch was the bug.
+    const workerSrc = fs.readFileSync(path.join(repoRoot, 'src/index.js'), 'utf8');
+    const { htmlBranch, assetBranch } = findCacheControlBranches(workerSrc);
+
+    expect(htmlBranch, 'could not locate the cacheControl ternary\'s HTML branch').toBeTruthy();
+    expect(assetBranch, 'could not locate the cacheControl ternary\'s asset branch').toBeTruthy();
+
+    expect(htmlBranch).toContain('bypassCache: true');
+    expect(assetBranch).not.toContain('bypassCache: true');
+    expect(assetBranch).toContain('bypassCache: false');
   });
 });
