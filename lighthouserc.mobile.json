@@ -95,7 +95,7 @@
         "render-blocking-insight": "warn",
         "render-blocking-resources": "warn",
         "dom-size": [
-          "warn",
+          "error",
           {
             "maxNumericValue": 3900
           }

@@ -112,13 +112,26 @@ function expectStrictAssertions(
   expect(assertions['render-blocking-insight']).toBe('warn');
   expect(assertions['render-blocking-resources']).toBe('warn');
 
+  // ── dom-size is a HARD ERROR (2026-07-20, promoted from warn). DOM element
+  // count is the *proven* vertical-scaling gate for this static-export React
+  // app: hydration cost (react-dom + framer evaluating over the DOM) is what
+  // sets the load-time score, and it scales directly with element count. A byte
+  // budget doesn't catch "added a section" the way this does. The number is a
+  // rock-stable error ceiling — LHCI (Lighthouse 12.6.1) measured 3273/3273/3273
+  // with zero run-to-run variance — carrying ~19% headroom over that baseline,
+  // so it never false-fires on noise but bites the moment real content growth
+  // crosses it, at the cause, instead of waiting for the downstream perf-score
+  // error to notice. Recalibrate WITH data (measure a fresh LHCI baseline) if a
+  // deliberate content addition legitimately needs more room; never just raise
+  // the number to make a red gate green.
+  expect(assertions['dom-size']).toEqual(['error', { maxNumericValue: ceilings.domSizeMaxElements }]);
+
   // ── Tier 2: warn + numeric regression ceiling. These DO expose a stable
   // numericValue (confirmed via 3 authoritative LHCI runs per form factor,
   // 2026-07) — a future regression that meaningfully worsens them now fails
   // the gate even though today's baseline stays non-blocking. Ceilings carry
   // real headroom over the observed baseline, not a tight pin, so normal
   // content growth doesn't false-positive.
-  expect(assertions['dom-size']).toEqual(['warn', { maxNumericValue: ceilings.domSizeMaxElements }]);
   expect(assertions['unused-javascript']).toEqual([
     'warn',
     { maxNumericValue: ceilings.unusedJavascriptMaxMs, maxLength: ceilings.unusedJavascriptMaxFiles },

@@ -1079,6 +1079,27 @@ History (2026-07, kept because the reasoning still applies):
    the markup, not render timing, so it doesn't vary by form factor the way
    speed-index does.
 
+   **Promoted from `warn` to `error` (2026-07-20).** Everything above treated
+   `dom-size` as a soft, informational ceiling. But this static-export React
+   app's whole load-time story is hydration cost — react-dom + framer
+   evaluating over the DOM — which scales *directly* with element count, making
+   DOM size the one metric that is both the proven vertical-scaling gate and a
+   thing byte budgets can't see ("added a section" adds elements, not
+   necessarily many bytes). So it is now a hard `error` on both form factors:
+   content growth is blocked at the cause, with a clear "crossed the DOM
+   budget" message, instead of indirectly whenever the downstream
+   `categories:performance` error eventually notices. Safe to gate hard because
+   the value is exceptionally stable — LHCI (Lighthouse 12.6.1, the version
+   `@lhci/cli@0.15.1` bundles) measured 3273/3273/3273 with *zero* run-to-run
+   variance — and 3900 keeps its ~19% headroom, so it never false-fires on
+   noise. Verified end-to-end: a full desktop `autorun` with the error-level
+   assertion exits 0 at the 3273 baseline. Pinned by
+   `performance-regression-contract.test.ts` (asserts the `error` level and the
+   ceiling). Note the LH12/LH13 audit rename: `@lhci/cli`'s bundled LH 12.6.1
+   still emits `dom-size` (what the gate asserts); a bare `npx lighthouse`
+   (LH 13.4) emits `dom-size-insight` instead — don't "fix" the config to the
+   insight name until the pinned LHCI version actually ships it.
+
    **Not attempted:** trimming `projects`/`testimonials`/`education` down to
    a paginated "show more" view would give a genuine, non-cosmetic dom-size
    win (unlike raising the ceiling, it would actually shrink the initial DOM
