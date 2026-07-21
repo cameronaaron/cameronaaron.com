@@ -18,6 +18,7 @@ import {
   type ParticleQuality,
   type SpatialGrid,
 } from '@/components/hero/background-particles/background-particles-engine';
+import { gateLoopOnVisibility } from '@/components/hero/visibility-gate';
 
 interface BackgroundParticlesProps {
   quality?: ParticleQuality;
@@ -34,7 +35,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
     let particles: Particle[] = [];
     let width = 0;
     let height = 0;
@@ -144,6 +145,18 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       animationFrameId = requestAnimationFrame(draw);
     };
 
+    // §3.7: run the draw loop only while the hero is actually on-screen and the
+    // tab is foregrounded. Particle state lives in `particles` (this closure),
+    // so pausing/resuming the loop is seamless. `animationFrameId` doubles as
+    // the running flag — 0 means paused, so startLoop can't double-schedule.
+    const startLoop = () => {
+      if (!animationFrameId) draw();
+    };
+    const stopLoop = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+    };
+
     window.addEventListener('resize', resize, { passive: true });
 
     if (activeConfig.useMousePull) {
@@ -152,9 +165,11 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
     }
 
     resize();
-    draw();
+    startLoop();
+    const releaseGate = gateLoopOnVisibility(canvas, { onResume: startLoop, onPause: stopLoop });
 
     return () => {
+      releaseGate();
       window.removeEventListener('resize', resize);
 
       if (activeConfig.useMousePull) {
@@ -162,7 +177,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
         window.removeEventListener('mouseout', handleMouseLeave);
       }
 
-      cancelAnimationFrame(animationFrameId);
+      stopLoop();
     };
   }, [quality]);
 

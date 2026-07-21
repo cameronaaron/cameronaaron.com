@@ -30,6 +30,7 @@ import {
   stepBursts,
   stepParticles,
 } from './interactive-particles/interactive-particles-engine';
+import { gateLoopOnVisibility } from '@/components/hero/visibility-gate';
 
 interface InteractiveParticlesProps {
   quality?: ParticleQuality;
@@ -223,19 +224,37 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       frameId = requestAnimationFrame(animate);
     };
 
+    // §3.7: draw only while the hero is on-screen and the tab is foregrounded.
+    // Particle/burst state persists in this closure, so pause/resume is
+    // seamless; resetting lastTick avoids a single catch-up frame on resume.
+    // frameId doubles as the running flag (0 = paused) so startLoop can't
+    // double-schedule.
+    const startLoop = () => {
+      if (!frameId) {
+        lastTick = 0;
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+    const stopLoop = () => {
+      cancelAnimationFrame(frameId);
+      frameId = 0;
+    };
+
     resize();
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     window.addEventListener('mouseout', handlePointerLeave, { passive: true });
     window.addEventListener('mousedown', handlePointerDown, { passive: true });
-    frameId = requestAnimationFrame(animate);
+    startLoop();
+    const releaseGate = gateLoopOnVisibility(canvas, { onResume: startLoop, onPause: stopLoop });
 
     return () => {
+      releaseGate();
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('mouseout', handlePointerLeave);
       window.removeEventListener('mousedown', handlePointerDown);
-      cancelAnimationFrame(frameId);
+      stopLoop();
     };
   }, [prefersReducedMotion, quality]);
 
