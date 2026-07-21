@@ -686,6 +686,29 @@ honestly-throttled mobile TBT from 690ms to 27ms.
 The gate must **pause, not reset**: the effect's cleanup cancels the frame/timer
 and the state lives outside the effect, so scrolling away and back resumes.
 
+**The always-mounted exception, and how it slipped through (2026-07-20).** The
+rule above is satisfied for free by below-fold widgets because §3.8 `useInView`-
+unmounts them. But a component that is *always mounted* — the hero particle
+canvases (`BackgroundParticles`, `InteractiveParticles`, index 0, never
+unmounted) — has no unmount to hang the gate on, so both ran their
+`requestAnimationFrame` draw loop **forever**: every frame cleared, advanced,
+and re-rasterised even after the hero scrolled off, even in a background tab.
+Root-caused from a CPU-throttled trace where `RasterTask` dominated the desktop
+main thread while `FunctionCall` (JS) was idle — i.e. the cost was *painting*,
+not React. Fixed with `gateLoopOnVisibility` (`hero/visibility-gate.ts`): an
+`IntersectionObserver` combined with the Page Visibility API drives the loop's
+start/stop, and because particle state lives in the effect closure, pause/resume
+is seamless — a viewer sees nothing change. Verified: rAF callbacks drop when
+the hero scrolls off and resume on scroll back. Enforced repo-wide by
+`animation-regression-contract.test.ts` — **any** `.tsx` that renders a
+`<canvas>` and calls `requestAnimationFrame` must reference a visibility gate
+(`gateLoopOnVisibility`/`useInView`) or sit in `ALLOWED_UNGATED_CANVAS_LOOPS`
+with a concrete reason (only two qualify: `CursorComet` self-sleeps on idle,
+`GlyphDissolveName` is a finite one-shot). The lesson generalizes: "gate
+continuous work on visibility" and "unmount below-fold widgets" are two
+different mechanisms — an always-mounted animator needs the *former*, and the
+absence of an unmount is exactly what hides the missing gate.
+
 ### 3.8 Below-fold non-content widgets are code-split (mandatory, 2026-07-19)
 
 A widget that is (a) below the fold, (b) decorative or interactive-only —

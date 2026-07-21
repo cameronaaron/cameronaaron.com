@@ -238,6 +238,29 @@ beforeAll(() => {
     value: ResizeObserver,
   });
 
+  // jsdom has no IntersectionObserver. Components that gate a rAF loop on
+  // visibility (gateLoopOnVisibility — the hero particle canvases) construct one
+  // in their effect; without this stub the effect throws before it can draw.
+  // Inert by default (never fires); a test that needs to drive intersection
+  // stubs its own, as visibility-gate.test.ts does.
+  class IntersectionObserver {
+    observe() {}
+
+    unobserve() {}
+
+    disconnect() {}
+
+    takeRecords() {
+      return [];
+    }
+  }
+
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
+    writable: true,
+    configurable: true, // a test may vi.stubGlobal its own driving double
+    value: IntersectionObserver,
+  });
+
   Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
     writable: true,
     value: vi.fn(() => ({

@@ -341,6 +341,63 @@ describe('animation regression contract', () => {
     ).toEqual([]);
   });
 
+  it('every canvas rAF loop is gated on visibility so it never draws frames nobody sees (§3.7, 2026-07)', () => {
+    // A component that renders a <canvas> and runs a requestAnimationFrame draw
+    // loop is the most expensive continuous-work pattern on the page — every
+    // frame clears, advances, and RE-RASTERISES. §3.7 requires that work to run
+    // only while visible. Below-fold canvases get it free (useInView unmounts
+    // them), but the hero particle canvases are always mounted (index 0) and so
+    // ran their loop forever — even scrolled off-screen, even in a background
+    // tab. Root-caused via a CPU-throttled trace where RasterTask dominated the
+    // desktop main thread. Fixed with gateLoopOnVisibility; this locks it in so
+    // a new canvas animation can't reintroduce the waste.
+    //
+    // A file passes by referencing a real visibility gate (gateLoopOnVisibility
+    // or useInView). Genuine exceptions — a loop that self-terminates or
+    // self-sleeps, so it is not perpetual — go in ALLOWED_UNGATED_CANVAS_LOOPS
+    // with a concrete, checkable reason (§6 item 18), never a blanket excuse.
+    const ALLOWED_UNGATED_CANVAS_LOOPS: Record<string, string> = {
+      'src/components/ui/CursorComet.tsx':
+        'Self-sleeps: the loop sets frameId=0 and returns when pool.liveCount===0 and nothing emitted, so it stops within one spark lifetime of the pointer going still — bounded off-screen work, restarted by wake() on real movement, never perpetual.',
+      'src/components/hero/GlyphDissolveName.tsx':
+        'Finite: the tick returns without rescheduling once hasEnteringFinished/hasLeavingFinished, so the name dissolve plays exactly once and stops — it is not a perpetual loop.',
+    };
+    const VISIBILITY_GATE = /gateLoopOnVisibility|useInView/;
+
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.tsx$/.test(entry.name) && !/\.test\./.test(entry.name)) files.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src/components'));
+
+    const canvasLoops: string[] = [];
+    const ungated: string[] = [];
+    for (const file of files) {
+      const src = stripComments(readFileSync(file, 'utf8'));
+      if (!src.includes('<canvas') || !/requestAnimationFrame\s*\(/.test(src)) continue;
+      const rel = file.replace(`${resolve(process.cwd())}/`, '');
+      canvasLoops.push(rel);
+      if (rel in ALLOWED_UNGATED_CANVAS_LOOPS) continue;
+      if (!VISIBILITY_GATE.test(src)) ungated.push(rel);
+    }
+
+    // Guard the guard (§6 item 8): the sweep must actually be finding the
+    // canvas components, or it would pass vacuously.
+    expect(canvasLoops.length, 'no canvas rAF components found — the sweep is broken').toBeGreaterThanOrEqual(5);
+    expect(
+      ungated,
+      `canvas rAF loop not gated on visibility (§3.7) — wire it through gateLoopOnVisibility / useInView, or add a reasoned ALLOWED_UNGATED_CANVAS_LOOPS entry:\n${ungated.join('\n')}`,
+    ).toEqual([]);
+
+    for (const [key, reason] of Object.entries(ALLOWED_UNGATED_CANVAS_LOOPS)) {
+      expect(reason.length, `ALLOWED_UNGATED_CANVAS_LOOPS["${key}"] needs a real, specific reason`).toBeGreaterThan(30);
+    }
+  });
+
   it('repo-wide: no color-affecting property is directly sprung (2026-07)', () => {
     // See incident 7 above. Precise, not a proximity heuristic: flags only a
     // color-affecting property key whose OWN value object sets `type: 'spring'`
