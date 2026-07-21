@@ -398,6 +398,61 @@ describe('animation regression contract', () => {
     }
   });
 
+  it('every CSS @keyframes animates only compositor-friendly properties (2026-07)', () => {
+    // A CSS animation that touches transform/opacity/filter runs on the
+    // compositor thread — zero main-thread cost per frame, which is the entire
+    // reason the decorative loops were moved off framer's rAF onto CSS. Animate
+    // anything else (box-shadow, width/height/top/left, background-position,
+    // stroke-dashoffset) and the browser must re-paint or re-layout every frame
+    // on the MAIN thread — the exact jank Lighthouse's "avoid non-composited
+    // animations" audit flags. This keeps every keyframe compositable, so a
+    // future decorative loop can't silently reintroduce per-frame paint work.
+    // Genuine exceptions go in ALLOWED_NONCOMPOSITED with a reason (§6 item 18).
+    const COMPOSITABLE = new Set(['transform', 'opacity', 'filter', '-webkit-filter', 'visibility']);
+    const ALLOWED_NONCOMPOSITED: Record<string, string> = {
+      'ecg-trace':
+        'A genuine SVG line-draw (the "Live vitals" ECG) needs stroke-dashoffset, which has no compositable equivalent. Scoped to one 12x4px single-element decoration in the Certifications section; Lighthouse scores this audit as UNSCORED (no effect on the perf number), and the element is off-screen-paused by its section content-visibility. Not worth a fragile mask-based rewrite.',
+    };
+
+    const css = read('src/app/globals.css');
+    const violations: string[] = [];
+    let keyframeCount = 0;
+    const re = /@keyframes\s+([A-Za-z0-9_-]+)\s*\{/g;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(css))) {
+      keyframeCount += 1;
+      const name = match[1];
+      // Brace-match the block body.
+      let i = re.lastIndex;
+      let depth = 1;
+      const start = i;
+      while (i < css.length && depth > 0) {
+        if (css[i] === '{') depth += 1;
+        else if (css[i] === '}') depth -= 1;
+        i += 1;
+      }
+      const body = css.slice(start, i - 1);
+      const animated = new Set(
+        [...body.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1]).filter((p) => p !== 'content'),
+      );
+      const offenders = [...animated].filter((p) => !COMPOSITABLE.has(p));
+      if (offenders.length && !(name in ALLOWED_NONCOMPOSITED)) {
+        violations.push(`  @keyframes ${name} animates non-composited: ${offenders.join(', ')}`);
+      }
+    }
+
+    // Guard the guard (§6 item 8): the parser must be finding keyframes.
+    expect(keyframeCount, 'no @keyframes found — the parser is broken').toBeGreaterThanOrEqual(10);
+    expect(
+      violations,
+      `CSS keyframes must animate only transform/opacity/filter (compositor thread). Rework to a compositable property, or add a reasoned ALLOWED_NONCOMPOSITED entry:\n${violations.join('\n')}`,
+    ).toEqual([]);
+
+    for (const [key, reason] of Object.entries(ALLOWED_NONCOMPOSITED)) {
+      expect(reason.length, `ALLOWED_NONCOMPOSITED["${key}"] needs a real, specific reason`).toBeGreaterThan(30);
+    }
+  });
+
   it('repo-wide: no color-affecting property is directly sprung (2026-07)', () => {
     // See incident 7 above. Precise, not a proximity heuristic: flags only a
     // color-affecting property key whose OWN value object sets `type: 'spring'`
