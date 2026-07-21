@@ -1,15 +1,20 @@
-'use client';
-
-import { m } from 'framer-motion';
-import { useMemo } from 'react';
 import ScrambleText from '@/components/ui/ScrambleText';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { educationItems, prerequisiteCourses, honorsAndAffiliations } from '@/data/education';
 import { buildEducationCollections, formatGradeDisplay } from '@/components/education/education-logic';
 
+// Server Component (no 'use client'): Education is display content — cards, a
+// prerequisite table, honor pills — with zero interactive state. It ships zero
+// client JS and never hydrates; only the small client islands it embeds
+// (SectionHeader, the per-credential ScrambleText headings) hydrate. The
+// former framer `whileInView` entrance fades are dropped (RSC migration,
+// 2026-07): the section is below the fold, content-visibility already skips its
+// off-screen paint, and the collections are sorted once here at BUILD time
+// (previously a client-side memoized call — pointless for static data that
+// never changes between renders). §5 render-path law.
 export default function Education() {
   const { sortedEducationItems, sortedHonorsAndAffiliations, sortedPrerequisiteCourses, prerequisiteProgress } =
-    useMemo(() => buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations), []);
+    buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations);
 
   return (
     <section id="education" className="py-20 bg-background relative overflow-hidden" aria-labelledby="education-heading">
@@ -24,14 +29,10 @@ export default function Education() {
 
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-14">
           {sortedEducationItems.map((item, index) => (
-            <m.article
+            <article
               key={`${item.institution}-${item.credential}`}
               data-testid={`education-card-${index}`}
               data-period={item.period}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.12, duration: 0.5 }}
               className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 h-full"
             >
               <p className="text-cyan-300 text-sm mb-3">{item.period}</p>
@@ -75,7 +76,7 @@ export default function Education() {
                   </li>
                 ))}
               </ul>
-            </m.article>
+            </article>
           ))}
         </div>
 
@@ -100,12 +101,11 @@ export default function Education() {
             aria-valuemax={100}
             aria-label={`Nursing prerequisite coursework: ${prerequisiteProgress.completed} of ${prerequisiteProgress.total} courses complete`}
           >
-            <m.div
+            {/* Static fill (no framer entrance): the width is the real value,
+                rendered server-side. */}
+            <div
               className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
-              initial={{ width: '0%' }}
-              whileInView={{ width: `${prerequisiteProgress.percent}%` }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+              style={{ width: `${prerequisiteProgress.percent}%` }}
             />
           </div>
 
@@ -124,14 +124,10 @@ export default function Education() {
               count versus rendering separate mobile/desktop trees. */}
           <div className="space-y-3 md:space-y-0 md:min-w-[920px]">
             {sortedPrerequisiteCourses.map((course, index) => (
-              <m.div
+              <div
                 key={`${course.requirement}-${course.course}`}
                 data-testid={`prereq-row-${index}`}
                 data-status={course.status}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.03 }}
                 className="rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5 p-4 md:grid md:grid-cols-12 md:items-center md:gap-3 md:rounded-none md:border-0 md:border-b md:border-white/5 md:bg-none md:from-transparent md:to-transparent md:p-3 md:last:border-b-0"
               >
                 <p className="text-xs uppercase tracking-[0.12em] text-cyan-200/80 md:col-span-3 md:normal-case md:tracking-normal md:text-sm md:font-medium md:text-foreground">
@@ -178,7 +174,7 @@ export default function Education() {
                     </p>
                   </div>
                 </div>
-              </m.div>
+              </div>
             ))}
           </div>
         </div>
@@ -188,28 +184,21 @@ export default function Education() {
           <div className="flex flex-wrap gap-3">
             {sortedHonorsAndAffiliations.map((honor, index) => {
               const pillClass = "px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-100 text-sm";
-              const sharedProps = {
-                'data-testid': `honor-pill-${index}`,
-                initial: { opacity: 0, scale: 0.92 },
-                whileInView: { opacity: 1, scale: 1 },
-                viewport: { once: true },
-                transition: { delay: index * 0.04 },
-              };
               return honor.url ? (
-                <m.a
+                <a
                   key={honor.label}
-                  {...sharedProps}
+                  data-testid={`honor-pill-${index}`}
                   href={honor.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`${pillClass} hover:border-cyan-300/40 hover:bg-cyan-500/15 hover:text-cyan-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background`}
                 >
                   {honor.label}
-                </m.a>
+                </a>
               ) : (
-                <m.span key={honor.label} {...sharedProps} className={pillClass}>
+                <span key={honor.label} data-testid={`honor-pill-${index}`} className={pillClass}>
                   {honor.label}
-                </m.span>
+                </span>
               );
             })}
           </div>

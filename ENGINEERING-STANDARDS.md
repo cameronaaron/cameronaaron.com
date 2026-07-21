@@ -59,6 +59,7 @@ Enforcing test files:
 | bfcache blank-screen | `src/app/section-reveal-bfcache.test.ts` |
 | Internal doc cross-references resolve | `src/docs-cross-reference-contract.test.ts` |
 | Filename casing + no lazy exported identifiers | `src/naming-and-organization-contract.test.ts` |
+| RSC server/client boundary (page shell + converted sections stay server) | `src/app/rsc-boundary-contract.test.ts` |
 
 ---
 
@@ -1238,6 +1239,72 @@ investigate that script before touching the config.
   (it renders as the institution-name link; index 1+ render as pills).
 - **Root files/dirs are allow-listed** in `repo-hygiene-contract.test.ts` —
   update `EXPECTED_ROOT_FILES` in the same commit that adds a root file.
+- **RSC islands: `page.tsx` is a Server Component; client orchestration lives
+  in `PageChrome`; display sections stay Server Components where possible
+  (2026-07).** Cracked the hydration floor that gates this app's load-time
+  score — every prior optimization (LazyMotion, animations→CSS, no-op-wrapper
+  removal, particle gating) worked *inside* that floor; this is the first one
+  that lowers it. Root cause: `page.tsx` used to be `'use client'` (for
+  `useScroll`/`usePerformanceProfile`/the first-interaction gate), which forces
+  *every* child — all 9 sections, ~3,290 DOM elements — into the client tree
+  regardless of whether they need it. Measured proof of the floor: `/capstone`
+  (near-zero client components) hydrates in 0.3s of main-thread work versus the
+  homepage's 3.8s.
+
+  The split: `page.tsx` renders the tree directly with no hooks of its own;
+  `PageChrome` (`src/components/ui/PageChrome.tsx`) is the one client island
+  holding everything global-and-overlay (IntroCurtain, AmbientBackground, the
+  floating docks, cursor effects, the interaction gate, the mobile scroll-
+  progress bar) — none of it wraps page content, so it renders as a sibling of
+  `<main>`. Components that took `performanceTier` as a prop from the old
+  client page (`VelocityMarquee`, `RibbonBand`, `SectionHandoff`) now self-read
+  it via `usePerformanceProfile()` so a server page can render them
+  unconditionally — each stays its own client island, unchanged in bundle
+  terms, just no longer forcing its *parent* to be client. `next/dynamic`
+  `{ssr:false}` is disallowed inside a Server Component, so `RibbonBand`'s
+  lazy import moved into a one-line `RibbonBandLazy` client wrapper — §3.8's
+  code-split is preserved, just relocated.
+
+  **Education converted first** (zero interactive state — display cards, a
+  prerequisite table, honor pills) as the prototype, per §0's "test the
+  cleanest case, measure, then decide whether to scale it" method. Its
+  `useMemo`'d collection build became a bare call (a Server Component runs
+  once at build — memoizing a value that's computed exactly once is pure
+  overhead, not a violation of §3.4's "always memoize in client components"
+  rule) and the `whileInView` entrance fades were dropped (below the fold,
+  `content-visibility` already skips their off-screen paint, and a server
+  component can't run client-only framer hooks anyway). `Footer` converted the
+  same way — static content, zero interactivity, its entrance motion dropped.
+
+  **Measured, not assumed:** grepped the built client chunks before/after for
+  Education's own symbols (`buildEducationCollections`, `formatGradeDisplay`,
+  `education-card-`) — all present before, **all absent after**: the code left
+  the client bundle entirely, not just "ran once instead of per-render." Total
+  client JS: 1,137,147 → 1,119,145 bytes (−18KB) from converting ONE section.
+  Runtime-verified headless: zero hydration errors (`#418`/`#423`/`#425` class),
+  zero console/page errors, full scroll-through, every section (including the
+  client islands: CommandPalette, KeyboardShortcuts) renders correctly.
+
+  **The `next.config.mjs` `reactRemoveProperties` gotcha, found investigating a
+  false alarm during this migration:** production builds strip `data-testid`
+  attributes, so a Playwright script asserting on `[data-testid=...]` against
+  `/out` will find zero matches whether or not the content is really there —
+  confirmed a false "content missing" reading by diffing a stashed pre-change
+  build (identical zero count) and by grepping the HTML body directly for real
+  content strings (present). **Lesson: verify content presence in a production
+  build by real content strings or element structure, never by `data-testid`
+  — that attribute does not exist in what ships.**
+
+  **The floor is not eliminated, only lowered — react-dom itself (~220KB) and
+  every remaining client island still hydrate.** The mandate going forward:
+  new display-only sections (Certifications, Testimonials' non-filter parts,
+  Experience's non-selection parts) should follow the same recipe — the
+  interactive slice becomes a small client island, the surrounding display
+  content stays server. `rsc-boundary-contract.test.ts` locks in what's already
+  converted (`page.tsx`, `Education.tsx`, `Footer.tsx` must stay Server
+  Components; `PageChrome` must stay the client island) so a future edit can't
+  silently re-add `'use client'` and re-inflate the bundle — grow that list as
+  more sections convert, never shrink it without a new measurement.
 
 ---
 

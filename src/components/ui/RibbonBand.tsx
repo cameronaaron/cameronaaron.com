@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
 
-import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   RIBBON_COLORS,
   createRibbonSet,
@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/ribbon-band-logic';
 
 interface RibbonBandProps {
-  performanceTier?: PerformanceTier;
   className?: string;
 }
 
@@ -25,7 +24,10 @@ interface RibbonBandProps {
  * physics runs on the full tier only; lower tiers render a static hairline so
  * the layout and aesthetic hold without a per-frame cost on mobile.
  */
-export default function RibbonBand({ performanceTier = 'full', className = '' }: RibbonBandProps) {
+export default function RibbonBand({ className = '' }: RibbonBandProps) {
+  // Self-read the tier (RSC islands, 2026-07) so a Server Component page can
+  // render this without passing a client-only value as a prop.
+  const { performanceTier } = usePerformanceProfile();
   const interactive = performanceTier === 'full';
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
