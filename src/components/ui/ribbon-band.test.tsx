@@ -3,6 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import RibbonBand from '@/components/ui/RibbonBand';
 
+// RibbonBand self-reads the performance tier (RSC islands migration, 2026-07)
+// instead of taking it as a prop, so a Server Component page can render it.
+// Drive the tier through the hook mock.
+let mockTier = 'full';
+vi.mock('@/hooks/usePerformanceProfile', () => ({
+  usePerformanceProfile: () => ({ performanceTier: mockTier }),
+}));
+
 // Manual rAF queue so the physics loop can be stepped deterministically.
 let rafQueue: FrameRequestCallback[] = [];
 
@@ -39,6 +47,7 @@ const BAND_RECT = { left: 0, top: 0, right: 800, bottom: 160, width: 800, height
 
 beforeEach(() => {
   rafQueue = [];
+  mockTier = 'full';
   vi.clearAllMocks();
   vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
     rafQueue.push(cb);
@@ -61,7 +70,7 @@ afterEach(() => {
 
 describe('RibbonBand', () => {
   it('renders an interactive canvas on the full tier and draws a frame', () => {
-    render(<RibbonBand performanceTier="full" />);
+    render(<RibbonBand />);
     expect(screen.getByTestId('ribbon-canvas')).toBeTruthy();
     // resize() runs on mount, seeds the ribbons, and wakes the loop.
     expect(rafQueue.length).toBeGreaterThan(0);
@@ -77,7 +86,7 @@ describe('RibbonBand', () => {
   });
 
   it('does not double-schedule a frame when the pointer moves twice mid-run', () => {
-    render(<RibbonBand performanceTier="full" />);
+    render(<RibbonBand />);
     flushFrames(600); // settle to rest → loop parked
     expect(rafQueue).toHaveLength(0);
 
@@ -87,7 +96,7 @@ describe('RibbonBand', () => {
   });
 
   it('wakes on a pointer entering the band and settles back to sleep when it leaves', () => {
-    render(<RibbonBand performanceTier="full" />);
+    render(<RibbonBand />);
     flushFrames(600); // let the mount-time motion settle to rest → loop parks
     expect(rafQueue).toHaveLength(0);
 
@@ -103,7 +112,7 @@ describe('RibbonBand', () => {
     const original = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
     Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 2 });
     try {
-      render(<RibbonBand performanceTier="full" />);
+      render(<RibbonBand />);
       expect(mockCtx.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
     } finally {
       if (original) Object.defineProperty(window, 'devicePixelRatio', original);
@@ -114,7 +123,7 @@ describe('RibbonBand', () => {
     const original = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
     Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 0 });
     try {
-      render(<RibbonBand performanceTier="full" />);
+      render(<RibbonBand />);
       expect(mockCtx.setTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
     } finally {
       if (original) Object.defineProperty(window, 'devicePixelRatio', original);
@@ -122,7 +131,8 @@ describe('RibbonBand', () => {
   });
 
   it('renders a static hairline (no canvas, no frames) on non-full tiers', () => {
-    render(<RibbonBand performanceTier="balanced" />);
+    mockTier = 'balanced';
+    render(<RibbonBand />);
     expect(screen.queryByTestId('ribbon-canvas')).toBeNull();
     expect(screen.getByTestId('ribbon-static')).toBeTruthy();
     fireEvent.mouseMove(window, { clientX: 400, clientY: 80 });
@@ -133,12 +143,12 @@ describe('RibbonBand', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValueOnce(
       null as unknown as CanvasRenderingContext2D
     );
-    render(<RibbonBand performanceTier="full" />);
+    render(<RibbonBand />);
     expect(rafQueue).toHaveLength(0);
   });
 
   it('cleans up listeners and frames on unmount', () => {
-    const { unmount } = render(<RibbonBand performanceTier="full" />);
+    const { unmount } = render(<RibbonBand />);
     unmount();
     expect(cancelAnimationFrame).toHaveBeenCalled();
     rafQueue = [];
@@ -147,7 +157,7 @@ describe('RibbonBand', () => {
   });
 
   it('rebuilds the ribbons on window resize', () => {
-    render(<RibbonBand performanceTier="full" />);
+    render(<RibbonBand />);
     flushFrames(600);
     expect(rafQueue).toHaveLength(0);
     fireEvent(window, new Event('resize'));

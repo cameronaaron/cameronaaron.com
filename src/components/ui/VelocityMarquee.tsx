@@ -2,7 +2,7 @@
 
 import { m, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useMemo } from 'react';
-import type { PerformanceTier } from '@/hooks/usePerformanceProfile';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   MARQUEE_TRACK_DURATION_S,
   buildMarqueeItems,
@@ -15,7 +15,6 @@ import {
 
 interface VelocityMarqueeProps {
   phrases: readonly string[];
-  performanceTier?: PerformanceTier;
   direction?: MarqueeDirection;
   className?: string;
 }
@@ -28,10 +27,12 @@ interface VelocityMarqueeProps {
  */
 export default function VelocityMarquee({
   phrases,
-  performanceTier = 'full',
   direction = 1,
   className = '',
 }: VelocityMarqueeProps) {
+  // Self-read the tier so a Server Component page can render this island
+  // without threading a client-only value down as a prop (RSC islands, 2026-07).
+  const { performanceTier } = usePerformanceProfile();
   const { animateTrack, velocityReactive } = getMarqueeMotionConfig(performanceTier);
   const items = useMemo(() => buildMarqueeItems(phrases), [phrases]);
 

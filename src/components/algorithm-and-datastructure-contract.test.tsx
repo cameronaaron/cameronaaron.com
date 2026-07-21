@@ -927,12 +927,18 @@ describe('sorting — expensive keys are precomputed, not recomputed per compari
 //     Contact, ExperienceCard (same rule as Testimonials/Experience/Projects)
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('Education — collections memoized, status flag precomputed', () => {
-  it('buildEducationCollections is inside useMemo, not a bare component-body call', () => {
+describe('Education — Server Component build-time collection, status flag precomputed', () => {
+  it('is a Server Component that builds collections at build time — no useMemo needed (RSC, 2026-07)', () => {
     const src = read('src/components/Education.tsx');
-    expect(src).toContain('useMemo');
+    // Education became a Server Component (RSC migration): it renders once at
+    // BUILD and ships zero client JS, so the §3.4 memoization rule (which
+    // exists to stop a CLIENT component re-running a build on every render)
+    // does not apply — a bare build-time call is the correct, cheaper pattern.
+    // Guard both directions: it must NOT be a client component, and it must
+    // still call buildEducationCollections (not inline the sort/group logic).
+    expect(src).not.toMatch(/^['"]use client['"]/m);
+    expect(src).not.toContain('useMemo');
     expect(src).toContain('buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations)');
-    expect(src).not.toMatch(/^\s*const\s+\{[^}]+\}\s*=\s*buildEducationCollections/m);
   });
 
   it('render reads the precomputed course.nonFinalized flag — no per-row token rescan', () => {

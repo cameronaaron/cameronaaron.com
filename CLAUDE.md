@@ -132,6 +132,7 @@ src/headers-integrity-contract.test.ts       # security+caching headers pinned, 
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression
+src/app/rsc-boundary-contract.test.ts   # page.tsx + converted sections stay Server Components
 src/hooks/use-performance-profile.test.tsx  # tier derivation, reactive updates
 src/components/ui/ui-coverage-hardening.test.tsx  # AmbientBackground, SmoothScroll…
 src/data/data-complete.test.ts         # data completeness + LACCD/CHEM 051/Dean's Honor assertions
@@ -317,7 +318,16 @@ export default function Section() {
 
 **Path alias:** `@/*` maps to `src/*` for all internal imports.
 
-**Adding a new section:** create `src/data/newsection.ts` → create `src/components/NewSection.tsx` (`'use client'`, imports its data, follows the client-component pattern above) → import in `src/app/page.tsx` → add a nav entry in `Navigation.tsx`'s `navItems` if it needs one.
+**Adding a new section:** create `src/data/newsection.ts` → create
+`src/components/NewSection.tsx` → import in `src/app/page.tsx` → add a nav
+entry in `Navigation.tsx`'s `navItems` if it needs one. **Default to a Server
+Component (no `'use client'`)** unless the section genuinely needs hooks/event
+handlers — `page.tsx` is itself a Server Component (ENGINEERING-STANDARDS §5,
+RSC islands, 2026-07), so a server section costs nothing to add and never
+hydrates; a `'use client'` section is the exception, made deliberately, not the
+default. If it needs one small interactive slice (a filter, a selection), keep
+the surrounding display content server and extract only that slice as its own
+client island, following `Education.tsx`'s conversion as the template.
 
 ## SEO architecture
 

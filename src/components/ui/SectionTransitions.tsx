@@ -2,6 +2,7 @@
 
 import { m } from 'framer-motion';
 import type { CSSProperties } from 'react';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { getSectionGlowTone } from './section-transitions-logic';
 
 interface SectionRevealProps {
@@ -64,6 +65,14 @@ export function SectionReveal({ index, children }: SectionRevealProps) {
 }
 
 export function SectionHandoff({ label, index, cue, targetId }: SectionHandoffProps) {
+  // Self-gate the tier (RSC islands, 2026-07): the section handoffs are a
+  // full/balanced-tier decoration. Gating here (rather than at the page) lets a
+  // Server Component page render <SectionHandoff/> unconditionally while this
+  // island decides whether to show — SSR renders under the 'full' default and
+  // the client removes it on lite/reduced, identical to the prior page-level gate.
+  const { performanceTier } = usePerformanceProfile();
+  if (performanceTier !== 'full' && performanceTier !== 'balanced') return null;
+
   // Outer wrapper plain for the same reason as SectionReveal (was
   // initial={false}). The inner decorative reveals below stay framer for now.
   return (

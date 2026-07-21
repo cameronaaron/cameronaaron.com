@@ -159,11 +159,14 @@ describe('animation regression contract', () => {
     expect(source).toMatch(/className="text-3xl sm:text-4xl md:text-/);
   });
 
-  it('IntroCurtain is a static import in the page shell (no ssr:false dynamic import)', () => {
-    const source = read('src/app/page.tsx');
-    // Static import ensures the curtain is present on first paint — no flash
+  it('IntroCurtain is a static import in the client page-chrome island (no ssr:false dynamic import)', () => {
+    // Moved from page.tsx to PageChrome in the RSC migration (2026-07): page.tsx
+    // is now a Server Component and all client orchestration (curtain, overlays,
+    // interaction gating) lives in the PageChrome island. The invariant is
+    // unchanged — CLAUDE.md #1: IntroCurtain stays a static import so it's
+    // present on first paint, never a flash-causing ssr:false dynamic.
+    const source = read('src/components/ui/PageChrome.tsx');
     expect(source).toContain("import IntroCurtain from '@/components/ui/IntroCurtain'");
-    // Dynamic lazy import of IntroCurtain must not exist
     expect(source).not.toMatch(/dynamic\s*\([^)]*IntroCurtain/);
   });
 
@@ -587,7 +590,11 @@ describe('animation regression contract', () => {
       expect(projects).toMatch(new RegExp(`dynamic\\(\\(\\) => import\\('@/components/projects/${widget.replace('/', '\\/')}'\\), \\{ ssr: false \\}\\)`));
     }
     expect(read('src/components/Skills.tsx')).toContain("dynamic(() => import('@/components/skills/SkillWeb'), { ssr: false })");
-    expect(read('src/app/page.tsx')).toContain("dynamic(() => import('@/components/ui/RibbonBand'), { ssr: false })");
+    // RibbonBand's ssr:false dynamic moved to the RibbonBandLazy client island
+    // (RSC migration, 2026-07): next/dynamic with ssr:false is disallowed inside
+    // a Server Component, so the now-server page.tsx renders <RibbonBandLazy/>,
+    // which carries the lazy import. §3.8 code-split preserved.
+    expect(read('src/components/ui/RibbonBandLazy.tsx')).toContain("dynamic(() => import('@/components/ui/RibbonBand'), { ssr: false })");
 
     // Deliberately NOT split — it wraps real content (the contact links),
     // which must stay in the prerendered HTML (§3.8's content boundary):
