@@ -959,12 +959,18 @@ describe('Education — Server Component build-time collection, status flag prec
   });
 });
 
-describe('Certifications — collection build is memoized', () => {
-  it('buildCertificationCollections is inside useMemo, not a bare component-body call', () => {
+describe('Certifications — Server Component build-time collection', () => {
+  it('is a Server Component that builds collections at build time — no useMemo needed (RSC, 2026-07)', () => {
+    // Same shape as Education (see that describe block above): Certifications
+    // became a Server Component in the RSC migration, so §3.4's memoization
+    // rule (which exists to stop a CLIENT component re-running a build on
+    // every render) does not apply here.
     const src = read('src/components/Certifications.tsx');
-    expect(src).toContain('useMemo');
-    expect(src).toContain('buildCertificationCollections(certifications, inProgressCertifications)');
-    expect(src).not.toMatch(/^\s*const\s+\{[^}]+\}\s*=\s*buildCertificationCollections/m);
+    expect(src).not.toMatch(/^['"]use client['"]/m);
+    expect(src).not.toContain('useMemo');
+    expect(src).toContain('buildCertificationCollections(');
+    expect(src).toContain('certifications,');
+    expect(src).toContain('inProgressCertifications,');
   });
 });
 

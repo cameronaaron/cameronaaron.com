@@ -1,7 +1,3 @@
-'use client';
-
-import { m } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import HeartbeatMonitor from '@/components/certifications/HeartbeatMonitor';
 import { certifications, inProgressCertifications } from '@/data/certifications';
@@ -9,13 +5,26 @@ import {
   buildCertificationCollections,
   buildVerificationHref,
   evaluateCertificationStatus,
-  getInProgressAnimationOffset,
-  getVerifiedCheckmarkTransition,
-  PRE_HYDRATION_STATUS_ANCHOR,
   STATUS_ICON_PATH,
   STATUS_ICON_STYLES,
   type CertificationStatusInfo,
 } from '@/components/certifications/certifications-logic';
+
+// Server Component (no 'use client', RSC islands, 2026-07 — see the Education
+// conversion in §5 for the full rationale): this section is display content —
+// a credential table, in-progress cards, a CTA — with no interactive state
+// besides HeartbeatMonitor, which stays its own client island.
+//
+// `now` used to be a hydration-anchored useState (PRE_HYDRATION_STATUS_ANCHOR,
+// removed) because a static export has no server runtime, so "now" could only
+// come from the client's clock, and reading it during the first client render
+// would mismatch the static HTML. A Server Component sidesteps the whole
+// problem: `new Date()` here runs exactly once, at BUILD time, and its result
+// IS the static HTML — there is no second client render to mismatch against.
+// This is strictly more honest than the anchor trick, not a compromise: a
+// visitor now sees status computed as of the last deploy (this site
+// auto-deploys on push) instead of a screen that briefly claimed every
+// credential was "verified" before the real clock kicked in a frame later.
 
 /** Feedback strip shown under an expiring/expired credential's status cell — the "say something" requirement. */
 function StatusFeedback({ info }: { info: CertificationStatusInfo }) {
@@ -39,11 +48,10 @@ function StatusFeedback({ info }: { info: CertificationStatusInfo }) {
   );
 }
 
-/** Status icon that draws itself in once, when its row scrolls into view: a check, a warning triangle, or an X — reacting to how close the credential is to expiry. */
-function StatusIcon({ index, info }: { index: number; info: CertificationStatusInfo }) {
-  const transition = getVerifiedCheckmarkTransition(index);
+/** Status icon: a check, a warning triangle, or an X — reacting to how close the credential is to expiry. */
+function StatusIcon({ info }: { info: CertificationStatusInfo }) {
   return (
-    <m.svg
+    <svg
       viewBox="0 0 24 24"
       className={`h-4 w-4 flex-shrink-0 ${STATUS_ICON_STYLES[info.kind]}`}
       aria-hidden="true"
@@ -52,32 +60,18 @@ function StatusIcon({ index, info }: { index: number; info: CertificationStatusI
       strokeWidth={2.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      initial={{ pathLength: 0, opacity: 0 }}
-      whileInView={{ pathLength: 1, opacity: 1 }}
-      viewport={{ once: true }}
-      transition={transition}
     >
       <path d={STATUS_ICON_PATH[info.kind]} />
-    </m.svg>
+    </svg>
   );
 }
 
 export default function Certifications() {
-  const { sortedCertifications, sortedInProgressCertifications } = useMemo(
-    () => buildCertificationCollections(certifications, inProgressCertifications),
-    []
+  const { sortedCertifications, sortedInProgressCertifications } = buildCertificationCollections(
+    certifications,
+    inProgressCertifications,
   );
-
-  // Hydration-safe live clock (mirrors LocalTimeStatus): anchor pre-mount so
-  // server and first client render agree, then correct to the real date
-  // once mounted — see PRE_HYDRATION_STATUS_ANCHOR's doc comment.
-  const [now, setNow] = useState(PRE_HYDRATION_STATUS_ANCHOR);
-  useEffect(() => {
-    // Post-hydration half of the SSR-safe-initial-state pattern (CLAUDE.md #10):
-    // the real clock can only be read client-side, after the anchor-dated first render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNow(new Date());
-  }, []);
+  const now = new Date();
 
   return (
     <section id="certifications" className="py-20 bg-background relative overflow-hidden" aria-labelledby="certifications-heading">
@@ -107,17 +101,13 @@ export default function Certifications() {
             <p className="col-span-2">Credential ID</p>
           </div>
           {sortedCertifications.map((cert, index) => (
-            <m.div
+            <div
               key={`${cert.name}-${cert.credentialId}`}
               data-testid={`cert-row-${index}`}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.04 }}
               className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-cyan-500/5 hover:border-cyan-500/10 transition-colors duration-200 cursor-default"
             >
               <p className="col-span-4 flex items-center gap-2 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">
-                <StatusIcon index={index} info={evaluateCertificationStatus(cert.status, now)} />
+                <StatusIcon info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
               <p className="col-span-3 text-muted-foreground group-hover:text-foreground/70 transition-colors">{cert.issuer}</p>
@@ -134,23 +124,19 @@ export default function Certifications() {
               >
                 {cert.credentialId}
               </a>
-            </m.div>
+            </div>
           ))}
         </div>
 
         <div className="lg:hidden space-y-4">
           {sortedCertifications.map((cert, index) => (
-            <m.article
+            <article
               key={`${cert.name}-${cert.credentialId}-mobile`}
               data-testid={`cert-mobile-row-${index}`}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.03 }}
               className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
             >
               <p className="flex items-center gap-2 text-foreground font-semibold mb-2">
-                <StatusIcon index={index} info={evaluateCertificationStatus(cert.status, now)} />
+                <StatusIcon info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
               <p className="text-muted-foreground text-sm mb-1">{cert.issuer}</p>
@@ -168,20 +154,16 @@ export default function Certifications() {
                   {cert.credentialId}
                 </a>
               </p>
-            </m.article>
+            </article>
           ))}
         </div>
 
         <div className="mt-12">
           <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Certifications In Progress</h3>
           <div className="grid md:grid-cols-2 gap-4">
-            {sortedInProgressCertifications.map((cert, index) => (
-              <m.div
+            {sortedInProgressCertifications.map((cert) => (
+              <div
                 key={cert.name}
-                initial={{ opacity: 0, x: getInProgressAnimationOffset(index) }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.15 + index * 0.08 }}
                 className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-5"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -193,7 +175,7 @@ export default function Certifications() {
                 </div>
                 <p className="text-emerald-300 text-sm mt-1">Expected: {cert.expectedCompletion}</p>
                 <p className="text-muted-foreground text-sm mt-1">{cert.status}</p>
-              </m.div>
+              </div>
             ))}
           </div>
         </div>

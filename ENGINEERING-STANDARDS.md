@@ -1296,15 +1296,80 @@ investigate that script before touching the config.
   — that attribute does not exist in what ships.**
 
   **The floor is not eliminated, only lowered — react-dom itself (~220KB) and
-  every remaining client island still hydrate.** The mandate going forward:
-  new display-only sections (Certifications, Testimonials' non-filter parts,
-  Experience's non-selection parts) should follow the same recipe — the
-  interactive slice becomes a small client island, the surrounding display
-  content stays server. `rsc-boundary-contract.test.ts` locks in what's already
-  converted (`page.tsx`, `Education.tsx`, `Footer.tsx` must stay Server
-  Components; `PageChrome` must stay the client island) so a future edit can't
-  silently re-add `'use client'` and re-inflate the bundle — grow that list as
-  more sections convert, never shrink it without a new measurement.
+  every remaining client island still hydrate.**
+
+  **Certifications converted next (same day), with one refinement to the
+  recipe.** It had one piece of apparent client state — a live-clock `now`
+  used only to bucket each credential into verified/expiring/expired — that
+  turned out to be a hydration-workaround artifact, not a real interactivity
+  requirement: `now` existed as a `useState` anchored at the Unix epoch
+  (`PRE_HYDRATION_STATUS_ANCHOR`, deleted) specifically so the first client
+  render wouldn't mismatch the static HTML, then corrected itself via
+  `useEffect` a frame later. A Server Component doesn't have that problem at
+  all — `new Date()` runs once, at BUILD time, and *is* the static HTML, so
+  there's no second render to mismatch against. This is strictly more honest
+  than the anchor trick, not a compromise: a visitor now sees status computed
+  as of the last deploy (this site auto-deploys on push) instead of a screen
+  that briefly, incorrectly claimed every credential was "verified" before the
+  real clock caught up. `HeartbeatMonitor` (genuine hover-driven interactivity)
+  stayed its own client island, unchanged. Two logic exports
+  (`getVerifiedCheckmarkTransition`, `getInProgressAnimationOffset`) went
+  dead alongside the dropped `whileInView` entrance animations and were
+  deleted, not left as unused code — caught immediately by
+  `dead-logic-export-contract`. Measured: client JS 1,119,145 → 1,108,741
+  bytes (−10.4KB; −28.4KB cumulative with Education), Certifications' own
+  symbols (`buildCertificationCollections`, `cert-row-`) confirmed absent
+  from the built client chunks. Runtime-verified: zero console/page errors,
+  HeartbeatMonitor and every credential still render correctly.
+
+  **Testimonials, Experience, Skills, Contact, and Projects were assessed and
+  are correctly staying client — this is a recorded verdict, not a TODO.**
+  Reading each component in full (not guessing from its section name) found
+  two genuinely different shapes from Education/Certifications, and forcing
+  either into a server split would trade a real behavior for a bundle-size
+  guess:
+
+  - **Testimonials and Experience have `useState` woven through *most* of
+    their rendered tree**, not isolated to one small widget. Testimonials'
+    `relationshipFilter`/`spotlightIndex` drive the spotlight card AND which
+    testimonials render in the grid; Experience's `activeExperienceIndex`
+    drives the nav-button active styling, the timeline dot animation, AND
+    `ExperienceCard`'s `isActive` prop, across the entire timeline. There is
+    no clean "display bulk" left over once the interactive slice is
+    extracted — the interactive slice *is* most of the section. Skills is the
+    same shape for its "Core Competencies" column (`technicalView` re-sorts
+    it), though its other two columns (Domain Expertise, Certification
+    Highlights) are pure display — extracting just those would require
+    restructuring the shared `staggerChildren` animation wrapper that
+    currently spans all three columns, a real design change, not a free
+    refactor.
+  - **Contact and Projects have no `useState` at all**, but both anchor
+    `useScroll({ target: sectionRef, offset: [...] })` on the outer
+    `<section>` itself to drive a scroll-linked decoration (Contact's
+    per-social-link reveal progress; Projects' chapter-progress bar and
+    rotating rings). Moving that ref to a child island — the only way to make
+    the section root a Server Component — changes what "0%/100% scrolled"
+    means for the effect, a measurable behavior change to a feature this
+    site's own §7 engagement doctrine explicitly values. Untested speculation
+    about whether the new trigger points look the same is exactly what §0.5
+    exists to rule out.
+
+  Converting any of these five would mean either accepting an unverified
+  behavior change or doing the restructuring work with no measured client-JS
+  win to justify it (their interactive slice is too large a fraction of the
+  section for extraction to meaningfully shrink the bundle the way Education's
+  535-element, zero-interactivity conversion did). **The mandate going
+  forward is therefore precise, not "convert everything":** a section is a
+  server-conversion candidate only when its interactive state is genuinely
+  isolable into a small island *without* moving a scroll-anchor ref or
+  restructuring a shared animation wrapper — check by reading the component in
+  full, the same way this section did, not by its name. `rsc-boundary-
+  contract.test.ts` locks in what's already converted (`page.tsx`,
+  `Education.tsx`, `Footer.tsx`, `Certifications.tsx` must stay Server
+  Components; `PageChrome` must stay the client island) so a future edit
+  can't silently re-add `'use client'` and re-inflate the bundle — grow that
+  list only when a future section is actually re-assessed and found isolable,
+  never by assumption.
 
 ---
 

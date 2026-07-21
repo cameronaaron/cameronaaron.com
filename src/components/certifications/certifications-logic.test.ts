@@ -4,13 +4,7 @@ import {
   buildCertificationCollections,
   buildVerificationHref,
   evaluateCertificationStatus,
-  getInProgressAnimationOffset,
-  getVerifiedCheckmarkTransition,
-  CHECKMARK_DRAW_BASE_DELAY,
-  CHECKMARK_DRAW_STAGGER,
-  CHECKMARK_DRAW_DURATION,
   EXPIRY_WARNING_WINDOW_MONTHS,
-  PRE_HYDRATION_STATUS_ANCHOR,
   STATUS_ICON_PATH,
   STATUS_ICON_STYLES,
   type CertificationStatusKind,
@@ -58,27 +52,6 @@ describe('certifications logic', () => {
     ]);
 
     expect(sortedInProgressCertifications.map((cert) => cert.name)).toEqual(['Later', 'Sooner']);
-  });
-
-  it('returns alternating animation offsets for in-progress cards', () => {
-    expect(getInProgressAnimationOffset(0)).toBe(-16);
-    expect(getInProgressAnimationOffset(1)).toBe(16);
-    expect(getInProgressAnimationOffset(2)).toBe(-16);
-  });
-
-  it('staggers the verified checkmark draw-in after each row fades in', () => {
-    expect(getVerifiedCheckmarkTransition(0)).toEqual({
-      delay: CHECKMARK_DRAW_BASE_DELAY,
-      duration: CHECKMARK_DRAW_DURATION,
-    });
-    expect(getVerifiedCheckmarkTransition(3)).toEqual({
-      delay: CHECKMARK_DRAW_BASE_DELAY + 3 * CHECKMARK_DRAW_STAGGER,
-      duration: CHECKMARK_DRAW_DURATION,
-    });
-    // Later rows always draw later, never sooner.
-    expect(getVerifiedCheckmarkTransition(5).delay).toBeGreaterThan(
-      getVerifiedCheckmarkTransition(2).delay
-    );
   });
 
   describe('evaluateCertificationStatus', () => {
@@ -133,12 +106,6 @@ describe('certifications logic', () => {
       const info = evaluateCertificationStatus('Active (Expires Dec 2027)', now);
       expect(info.kind).toBe('expired');
       expect(info.monthsUntilExpiry).toBeLessThan(-1);
-    });
-
-    it('every real certification reads as verified against the pre-hydration anchor', () => {
-      for (const cert of certifications) {
-        expect(evaluateCertificationStatus(cert.status, PRE_HYDRATION_STATUS_ANCHOR).kind).toBe('verified');
-      }
     });
 
     // Intentionally time-sensitive, like the external-links freshness contract:
