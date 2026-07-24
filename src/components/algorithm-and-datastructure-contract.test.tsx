@@ -12,6 +12,7 @@
  *   5. Numeric Connection.id — no per-frame string allocation
  *   7. useMemo hot paths   — render-path computations are memoized
  *  23. Zero-alloc frame loop — interactive engine mutates persistent buffers
+ *  24. No Math.hypot        — sqrt of squares repo-wide (hypot's slow path)
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -1159,3 +1160,34 @@ describe('interactive-particles engine — zero-allocation frame loop', () => {
   });
 });
 
+
+// ── Section 24: Math.hypot is banned in production code ─────────────────────
+describe('Math.hypot never appears in production source (sqrt of squares instead)', () => {
+  it('no production file calls Math.hypot', () => {
+    // Math.hypot buys overflow safety for magnitudes around 1e150 at the cost
+    // of a correctly-rounded slow path measurably slower than
+    // Math.sqrt(dx*dx + dy*dy) in V8 — and no coordinate, velocity, or force
+    // in this codebase can approach the overflow range that safety defends.
+    // Found live in two frame-hot loops (2026-07-23): the verlet ribbon's
+    // constraint solver (segments × iterations × 60fps) and the skill-web
+    // velocity clamp (which additionally gained a squared-comparison guard so
+    // the settled steady state pays zero roots). Both rewritten; this sweep
+    // keeps the pattern out repo-wide. If a future call site genuinely needs
+    // hypot's overflow behavior, add it to the allowlist below with the
+    // magnitude analysis that justifies it (§6 item 18).
+    const HYPOT_ALLOWED: Record<string, string> = {};
+    const offenders: string[] = [];
+    for (const file of listProductionSources()) {
+      const rel = file.slice(resolve(process.cwd()).length + 1);
+      if (rel in HYPOT_ALLOWED) continue;
+      if (readFileSync(file, 'utf8').includes('Math.hypot')) {
+        offenders.push(`  ${rel}`);
+      }
+    }
+    expect(
+      offenders,
+      `Math.hypot in production code — use Math.sqrt(dx*dx + dy*dy) (several times faster in V8; ` +
+        `overflow safety defends magnitudes nothing here can reach), or add a reasoned HYPOT_ALLOWED entry:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
+});

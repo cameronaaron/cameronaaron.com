@@ -91,7 +91,9 @@ export function createRibbon(
   pinned[0] = 1;
   pinned[lastIndex] = 1;
 
-  const span = Math.hypot(x1 - x0, y1 - y0);
+  const spanDx = x1 - x0;
+  const spanDy = y1 - y0;
+  const span = Math.sqrt(spanDx * spanDx + spanDy * spanDy);
   const segments = Math.max(1, lastIndex);
   const restLength = (span / segments) * RIBBON_SLACK;
 
@@ -190,7 +192,12 @@ export function satisfyConstraints(
       const j = i + 1;
       const dx = x[j] - x[i];
       const dy = y[j] - y[i];
-      const dist = Math.hypot(dx, dy);
+      // sqrt(dx²+dy²), never the hypot builtin: this is the verlet solver's
+      // innermost loop (segments × RIBBON_CONSTRAINT_ITERATIONS × 60fps) and
+      // hypot's correctly-rounded overflow-safe path costs several times
+      // sqrt in V8 — overflow safety defends magnitudes (~1e150) a ribbon
+      // coordinate can never reach. Contract section 24 bans it repo-wide.
+      const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist === 0) continue;
 
       const weightA = pinned[i] ? 0 : 1;

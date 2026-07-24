@@ -44,6 +44,7 @@ export const REPULSION_STRENGTH = 1800;
 export const CENTER_GRAVITY = 0.01;
 export const LAYOUT_DAMPING = 0.86;
 export const MAX_NODE_SPEED = 6;
+export const MAX_NODE_SPEED_SQ = MAX_NODE_SPEED * MAX_NODE_SPEED;
 export const MIN_DISTANCE_SQ = 0.01;
 
 export const POINTER_REPEL_RADIUS = 140;
@@ -248,13 +249,16 @@ export function stepSkillLayout(
   for (let i = 0; i < count; i += 1) {
     let nvx = (vx[i] + fx[i]) * LAYOUT_DAMPING;
     let nvy = (vy[i] + fy[i]) * LAYOUT_DAMPING;
-    const speed = Math.hypot(nvx, nvy);
-    // Stryker disable next-line EqualityOperator: at speed===MAX_NODE_SPEED the scale
-    // factor MAX_NODE_SPEED/speed is exactly 1, so taking the clamp branch ('>=') or
-    // skipping it ('>') both multiply nvx/nvy by 1 — bit-identical result (verified
-    // empirically with a hand-constructed exact-boundary input).
-    if (speed > MAX_NODE_SPEED) {
-      const scale = MAX_NODE_SPEED / speed;
+    // Squared-comparison guard: the sqrt only exists to compute the clamp
+    // scale, so it runs only in the (rare) over-limit branch — the settled
+    // steady state where most frames spend most nodes pays zero roots.
+    const speedSq = nvx * nvx + nvy * nvy;
+    // Stryker disable next-line EqualityOperator: at speedSq===MAX_NODE_SPEED_SQ the
+    // scale factor MAX_NODE_SPEED/sqrt(speedSq) is exactly 1, so taking the clamp
+    // branch ('>=') or skipping it ('>') both multiply nvx/nvy by 1 — bit-identical
+    // result (same exact-boundary equivalence as the pre-squared form of this guard).
+    if (speedSq > MAX_NODE_SPEED_SQ) {
+      const scale = MAX_NODE_SPEED / Math.sqrt(speedSq);
       nvx *= scale;
       nvy *= scale;
     }
