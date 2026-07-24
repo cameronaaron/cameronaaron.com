@@ -50,7 +50,7 @@ Enforcing test files:
 | --- | --- |
 | Algorithms & data structures | `src/components/algorithm-and-datastructure-contract.test.tsx` |
 | Runtime render behavior (Profiler-verified) | `src/components/render-behavior-contract.test.tsx` |
-| Animation anti-patterns | `src/components/animation-regression-contract.test.tsx` |
+| Animation anti-patterns | `src/components/animation-regression-contract.test.ts` |
 | Mobile tap targets, safe areas | `src/components/mobile-regression-contract.test.tsx` |
 | Logic extraction per component | `src/modularization-contract.test.ts` |
 | Root files / path conventions | `src/repo-hygiene-contract.test.ts` |
@@ -2478,6 +2478,7 @@ reason (§6 item 18).
 | `domAnimation` (smaller framer feature pack) | hero `drag` + nav/rail `layoutId` need `domMax` (documented in `motion-features.ts`) | those interactions are redesigned away | grep is the check: no `drag`/`layoutId` usage → swap the pack same commit |
 | `next` patch re-cuts | pnpm patches pin exact versions | every `next` version bump | contract test asserts patch version == lockfile version *and* installed polyfill files are 0 bytes |
 | Local Lighthouse numbers | §0.5 — the ruler lied twice (dev-build-on-port-3000 incident) | never fully; PSI/CI stay the arbiters | `serve-out-warmed.mjs` refuses occupied ports and non-production responses |
+| JSON-LD flight duplication (~33KB raw in home HTML) | structural to RSC: a Server Component's rendered script content rides the flight stream too, so the structured-data block ships once as `ld+json` and once flight-escaped | Next ships JSON-LD support in the Metadata API, or flight-payload exclusion for opaque script content | the home-HTML budget recalibration note in `performance-budgets.mjs` names this slack; re-measure before any future HTML-budget bump |
 
 **Rule for future entries:** the moment a measurement rejects an
 optimization or an upstream constraint blocks one, it enters this table in

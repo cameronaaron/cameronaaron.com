@@ -22,7 +22,7 @@
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed",
-    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed"
+    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed && pnpm run build && node scripts/checks/performance-budgets.mjs"
   },
   "scripts": {
     "prepare": "simple-git-hooks",

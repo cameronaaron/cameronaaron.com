@@ -120,12 +120,24 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
     expect(preCommit, 'pre-commit must run the full test suite, not a subset').toMatch(/pnpm test(?!:)/);
   });
 
-  it('pre-commit and pre-push run the identical full gate (redundant safety net)', () => {
+  it('pre-push runs everything pre-commit runs, as a strict prefix (redundant safety net)', () => {
     // Pre-push re-verifies the same gate in case a commit was made with
     // --no-verify, or a rebase/cherry-pick introduced drift after the commit
-    // hook ran. Deliberately identical, not merely equivalent — any
-    // divergence here is itself a bug.
-    expect(pkg['simple-git-hooks']?.['pre-commit']).toBe(pkg['simple-git-hooks']?.['pre-push']);
+    // hook ran — that part must never diverge. Pre-push then goes further
+    // (added 2026-07-23): a production build + artifact-level performance
+    // budgets, because every push auto-deploys via Cloudflare Pages (no
+    // GitHub Actions CI gate), so the artifact checks must sit on the push
+    // itself, not only the manual `deploy:prod` path. A full build is too
+    // slow to run on every commit, which is why this lives at push time and
+    // not in pre-commit's identical-prefix requirement above.
+    const preCommit = pkg['simple-git-hooks']?.['pre-commit'] ?? '';
+    const prePush = pkg['simple-git-hooks']?.['pre-push'] ?? '';
+    expect(prePush.startsWith(preCommit), 'pre-push must run everything pre-commit runs, unchanged, as a prefix').toBe(
+      true,
+    );
+    expect(prePush, 'pre-push must additionally build and check artifact-level performance budgets').toMatch(
+      /pnpm run build && node scripts\/checks\/performance-budgets\.mjs$/,
+    );
   });
 
   it('test:complexity stays a fast, offline, standalone subset for iterative dev use', () => {

@@ -60,8 +60,12 @@ gate** — lockfile sync, type-check, zero-warning lint, the entire test suite
 (every contract, including networked freshness checks), and mutation testing
 scoped to whichever changed files are logic modules (fails the commit if a
 changed logic module's mutation score drops below the threshold in
-`stryker.config.mjs`). Nothing is deferred to push time; a red gate blocks
-the commit itself. GitHub-hosted CI is currently **disabled** (2026-07, cost —
+`stryker.config.mjs`). A red gate blocks
+the commit itself. Pre-push runs the same gate **plus a production build and
+`scripts/checks/performance-budgets.mjs`** (added 2026-07-23 after the RSC
+migration's HTML growth sat unflagged for five days — pushes auto-deploy, so
+the artifact-level budgets must gate the push, not just the manual
+`deploy:prod` path). GitHub-hosted CI is currently **disabled** (2026-07, cost —
 `.github/workflows/ci.yml` only runs on manual `workflow_dispatch` now), so
 these local hooks are the only gate a change passes through; push after every
 commit (or at least before ending a session) anyway so work is backed up.
@@ -142,6 +146,10 @@ src/hooks/use-performance-profile.test.tsx  # tier derivation, reactive updates
 src/components/ui/ui-coverage-hardening.test.tsx  # AmbientBackground, SmoothScroll…
 src/data/data-complete.test.ts         # data completeness + LACCD/CHEM 051/Dean's Honor assertions
 src/components/education-ordering.test.tsx  # education card order + pulse indicator contract
+src/components/section-ordering-contract.test.tsx  # experience/projects render newest-first
+src/ssr-hydration-contract.test.ts     # no browser-API useState lazy initializers (React #418)
+src/coverage-provider-contract.test.ts # istanbul strict gate + V8 second-opinion provider pinned
+src/standards-enforcement-contract.test.ts  # docs cite real enforcers; contracts documented; §9.4 registry complete; artifact gate on pre-push
 ```
 
 Run a focused subset: `npx vitest run src/components/animation-regression-contract.test.ts`

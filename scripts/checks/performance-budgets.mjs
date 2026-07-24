@@ -32,11 +32,24 @@ const requiredOutputFiles = [
 // (534,925B raw / 63,721B gzip) and the largest single page still sit
 // comfortably under their existing ceilings; this was a total-across-pages
 // problem, not a per-page one.
+// Recalibrated again 2026-07-23, root-caused to the RSC islands migration
+// (§5): converting page.tsx + Education/Footer/Certifications to Server
+// Components moved their markup out of hydrated client JS and into the HTML
+// document itself — a deliberate trade (zero hydration cost for those
+// sections) whose HTML side crossed the old per-page ceilings on a clean
+// build: home 670,981B raw / 73,680B gzip vs 620,000/72,000 caps. Nothing
+// flagged it for five days because this script only ran pre-manual-deploy
+// while pushes auto-deploy — that hole is now closed (pre-push builds and
+// runs this script; see package.json simple-git-hooks). New per-page
+// ceilings carry ~5% headroom over the measured baseline: tight enough that
+// the next real regression trips, loose enough that content edits don't.
+// Known recoverable slack, parked in ENGINEERING-STANDARDS §9.4: the 33KB
+// JSON-LD block ships twice (once as ld+json, once RSC-flight-escaped).
 const budgets = {
-  homeHtmlBytes: 620_000,
-  homeHtmlGzipBytes: 72_000,
-  singleHtmlBytes: 620_000,
-  singleHtmlGzipBytes: 70_000,
+  homeHtmlBytes: 705_000,
+  homeHtmlGzipBytes: 77_500,
+  singleHtmlBytes: 705_000,
+  singleHtmlGzipBytes: 77_500,
   totalHtmlBytes: 1_450_000,
   totalHtmlGzipBytes: 260_000,
   singleJsBytes: 320_000,
@@ -63,10 +76,10 @@ const imageExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg
 // libraries (e.g. core-js implements trimStart differently), so a match here
 // means the patch silently stopped applying — most likely because a `next`
 // version bump left `patchedDependencies` pointing at a version that's no
-// longer installed. Scoped to non-`noModule` scripts only: the legacy
-// `nomodule` fallback chunk intentionally ships a full polyfill set to
-// browsers without ES module support, and those browsers are the only ones
-// that ever fetch it.
+// longer installed. Scoped to non-`noModule` scripts only; the `noModule`
+// chunk is patched to zero bytes and guarded separately below (a pre-ES-module
+// browser can't parse this site's ES2017+ chunks anyway, so its polyfills
+// defended a runtime that could never start — see ENGINEERING-STANDARDS §9.2).
 const LEGACY_POLYFILL_FINGERPRINT = '"trimStart"in String.prototype||(String.prototype.trimStart=String.prototype.trimLeft)';
 
 function findModernScriptChunks(htmlFiles) {
@@ -283,6 +296,43 @@ for (const chunkSrc of modernScriptChunks) {
         `strips it has stopped applying — check "next"'s resolved version against ` +
         `pnpm-workspace.yaml's patchedDependencies key and re-run "pnpm patch next@<version>".`,
     );
+  }
+}
+
+// §9.1 shipped-artifact checks: these assert what the build EMITTED, not what
+// the source intended. Each exists because intent and emission disagreed once:
+// next/image's `priority` prop emits no fetchpriority under `unoptimized`
+// static export, and a `next` bump can silently drop the patch that empties
+// the 112KB noModule legacy bundle.
+if (existsSync(homeHtmlPath)) {
+  const homeHtml = readFileSync(homeHtmlPath, 'utf8');
+
+  if (!/<img[^>]*fetchPriority="high"[^>]*profile-hero|<img[^>]*profile-hero[^>]*fetchPriority="high"/i.test(homeHtml)) {
+    errors.push(
+      'LCP priority lost: out/index.html has no fetchpriority="high" on the hero profile image — ' +
+        'the LCP image is queueing at default priority behind the async-script wave. ' +
+        'ProfileImage.tsx must pass fetchPriority explicitly (next/image `priority` alone does not emit it here).',
+    );
+  }
+
+  if (!/<script type="speculationrules">[^<]*"prefetch"/.test(homeHtml) || !/<script type="speculationrules">[^<]*"prerender"/.test(homeHtml)) {
+    errors.push(
+      'Speculation Rules missing from out/index.html — instant subpage navigation is off. ' +
+        'The root layout must render SPECULATION_RULES (src/data/metadata.ts) as a type="speculationrules" script.',
+    );
+  }
+
+  for (const tag of homeHtml.matchAll(/<script\b[^>]*>/gi)) {
+    if (!/\bnoModule\b/i.test(tag[0])) continue;
+    const srcMatch = /\bsrc="([^"]+)"/.exec(tag[0]);
+    if (!srcMatch) continue;
+    const noModulePath = resolve(outDir, srcMatch[1].replace(/^\//, ''));
+    if (existsSync(noModulePath) && statSync(noModulePath).size > 0) {
+      errors.push(
+        `noModule legacy bundle came back: ${srcMatch[1]} is ${statSync(noModulePath).size} bytes (expected 0). ` +
+          `The pnpm patch emptying polyfill-nomodule.js stopped applying — re-cut it for the installed next version.`,
+      );
+    }
   }
 }
 
