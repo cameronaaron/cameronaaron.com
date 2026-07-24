@@ -5,14 +5,24 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20260714.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20260714.1'
-  - '@cloudflare/workerd-linux-64@1.20260714.1'
-  - '@cloudflare/workerd-linux-arm64@1.20260714.1'
-  - '@cloudflare/workerd-windows-64@1.20260714.1'
-  - miniflare@4.20260714.0
-  - workerd@1.20260714.1
-  - wrangler@4.112.0
+  - '@cloudflare/workerd-darwin-64@1.20260721.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20260721.1'
+  - '@cloudflare/workerd-linux-64@1.20260721.1'
+  - '@cloudflare/workerd-linux-arm64@1.20260721.1'
+  - '@cloudflare/workerd-windows-64@1.20260721.1'
+  - miniflare@4.20260721.0
+  - workerd@1.20260721.1
+  - wrangler@4.113.0
+auditConfig:
+  ignoreGhsas:
+    # GHSA-f88m-g3jw-g9cj (high): sharp inherits libvips CVE-2026-33327/-33328/
+    # -35590/-35591 (malicious-image parsing). No fixed sharp release exists yet
+    # (we are on latest). sharp is a devDependency used only at build time by
+    # scripts/generate/generate-icons.mjs on images we author ourselves — no
+    # untrusted input ever reaches it and nothing ships to a visitor. Remove
+    # this entry the moment a patched sharp lands (the self-cleaning stale-audit
+    # sweep in dependency-freshness-contract will keep flagging drift).
+    - GHSA-f88m-g3jw-g9cj
 overrides:
   postcss: ">=8.5.20"
   "@opentelemetry/core": ">=2.8.0"
@@ -30,4 +40,4 @@ overrides:
   brace-expansion@1: ">=1.1.16"
   brace-expansion@2: ">=2.1.2"
 patchedDependencies:
-  next@16.2.10: patches/next@16.2.10.patch
+  next@16.2.11: patches/next@16.2.11.patch
