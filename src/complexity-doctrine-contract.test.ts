@@ -83,6 +83,46 @@ describe('complexity-doctrine-contract — repo-wide anti-pattern sweeps', () =>
     expect(hits, `delete-operator statement(s):\n${hits.join('\n')}`).toEqual([]);
   });
 
+  it('frame-stepping functions allocate nothing — the §2.8 zero-alloc law as a sweep, not a per-engine pin', () => {
+    // The 2026-07-23 Math.hypot finding exposed a gap in HOW rules are
+    // enforced here: the zero-alloc/optimal-primitive doctrine was pinned
+    // per-engine (algorithm contract sections 3, 23, 24), so a NEW frame
+    // loop — or an old one a pin never covered — could ship an allocation
+    // or slow primitive and nothing would fire until a human read the file.
+    // This sweep closes that class: in every *-logic.ts / *-engine.ts
+    // module, every exported function named like a frame/event stepper
+    // (step*/satisfy*/advance*/integrate*/forEach*/apply*) must contain no
+    // allocating or serializing calls. Allocation belongs in create*/build*
+    // init functions; steppers mutate persistent state (§2.8).
+    const FRAME_FN = /export function ((?:step|satisfy|advance|integrate|forEach|apply)[A-Z]\w*)/g;
+    const BANNED = ['.map(', '.filter(', '.concat(', '.slice(', '.reduce(', '.flatMap(', 'Array.from', 'JSON.', '[...', 'new Array('];
+    const hits: string[] = [];
+    for (const file of listProductionSources()) {
+      if (!/-(logic|engine)\.ts$/.test(file)) continue;
+      const rel = file.replace(`${ROOT}/`, '');
+      if (`${rel}::frame-allocation` in ALLOWED_COMPLEXITY_EXCEPTIONS) continue;
+      const src = readFileSync(file, 'utf8');
+      for (const match of src.matchAll(FRAME_FN)) {
+        const bodyEnd = src.indexOf('\nexport ', match.index + 1);
+        const body = src
+          .slice(match.index, bodyEnd === -1 ? src.length : bodyEnd)
+          // Strip comments so prose mentioning a banned call (e.g. "replaces
+          // the old concat().slice() double allocation") can't false-positive.
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/\/\/[^\n]*/g, '');
+        for (const token of BANNED) {
+          if (body.includes(token)) hits.push(`  ${rel} → ${match[1]}() contains "${token}"`);
+        }
+      }
+    }
+    expect(
+      hits,
+      `allocation/serialization in frame-stepping function(s) — move it to a create*/build* init function, ` +
+        `mutate persistent buffers instead (§2.8), or add a reasoned ALLOWED_COMPLEXITY_EXCEPTIONS ` +
+        `"<path>::frame-allocation" entry:\n${hits.join('\n')}`,
+    ).toEqual([]);
+  });
+
   it('every ALLOWED_COMPLEXITY_EXCEPTIONS entry has a real reason', () => {
     for (const [key, reason] of Object.entries(ALLOWED_COMPLEXITY_EXCEPTIONS)) {
       expect(reason.length, `ALLOWED_COMPLEXITY_EXCEPTIONS["${key}"] needs a real reason`).toBeGreaterThan(10);
