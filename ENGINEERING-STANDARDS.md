@@ -2254,8 +2254,12 @@ investigate that script before touching the config.
     per item 8, then reverted), with the standard exemption mechanism — so
     the next instance of the class is found by the commit gate, not by
     someone remembering to ask. The catalog locations: complexity-doctrine
-    contract (repo-wide algorithmic anti-patterns, including the
-    frame-stepping allocation sweep this incident produced),
+    contract (repo-wide algorithmic anti-patterns — the frame-stepping
+    allocation/scan sweep this incident produced, O(n·m) nested-scan and
+    `.filter().length` bans, AST sweeps for depless effect hooks and
+    per-call RegExp compilation, and the production-dependency ledger that
+    fails the gate on any runtime lib whose job and considered-alternative
+    aren't on record),
     algorithm-and-datastructure contract (engine-specific and
     primitive-level), animation-regression contract (motion/mobile),
     lifecycle-hygiene contract (resource cleanup). A finding that genuinely
