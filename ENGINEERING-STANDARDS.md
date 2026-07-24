@@ -2239,6 +2239,30 @@ investigate that script before touching the config.
     coverage but institutional memory, and nothing before §9.4 was watching
     for it going missing.
 
+22. **Audits become sweeps — a manual finding is a defect *class* entering
+    the catalog, never a one-off fix.** Origin (2026-07-23): the Math.hypot
+    finding (§2.9) was made by a human reading engine files on request. The
+    fix and even its ratchet (contract section 24) only closed *that*
+    pattern — the deeper defect was that the zero-alloc/optimal-primitive
+    law was enforced by per-engine *pins*, so a brand-new frame loop could
+    ship any not-yet-pinned slow pattern and nothing would fire until the
+    next human audit. Item 2 ("sweeps over pins") already named the
+    principle; this item makes it a closed loop: **whenever a manual audit,
+    review, or debugging session finds a performance/correctness defect,
+    the same commit must add a repo-wide sweep for the defect's class** —
+    scoped tightly enough to ship green (proven with an injected violation
+    per item 8, then reverted), with the standard exemption mechanism — so
+    the next instance of the class is found by the commit gate, not by
+    someone remembering to ask. The catalog locations: complexity-doctrine
+    contract (repo-wide algorithmic anti-patterns, including the
+    frame-stepping allocation sweep this incident produced),
+    algorithm-and-datastructure contract (engine-specific and
+    primitive-level), animation-regression contract (motion/mobile),
+    lifecycle-hygiene contract (resource cleanup). A finding that genuinely
+    can't be swept mechanically (a judgment call, a measurement) goes to
+    §9.4's registry with its trigger and watcher instead — the one place a
+    non-mechanical decision is allowed to live.
+
 ## 7. The engagement doctrine
 
 This site is not a static résumé — it's meant to feel like stepping into the

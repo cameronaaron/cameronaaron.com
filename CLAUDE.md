@@ -94,6 +94,11 @@ checks — same commit discipline as the ratchet rule, not a follow-up:
    prose. Routine work doesn't need a new paragraph — restating an
    already-covered rule is itself a §0 violation (a claim with no new ground
    truth behind it).
+3. **A manually-found defect becomes a repo-wide sweep for its class, same
+   commit** (§6 item 22) — fix + pin for the instance is not enough; the
+   commit gate, not a future human audit, must find the next instance.
+   Prove the new sweep can fail (inject a violation, watch it fire, revert)
+   before trusting it.
 
 ## Stack
 
