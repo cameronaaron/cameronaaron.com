@@ -152,7 +152,7 @@ src/
 
 ```text
 src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
-src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps + pre-commit gate wiring
+src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps (incl. frame-alloc, effect-deps, nested-scan ASTs) + production-dependency ledger + gate wiring
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
 src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (avif required on the render path)
