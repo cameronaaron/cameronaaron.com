@@ -53,7 +53,7 @@ const DEFER_MIN_BYTES = 10_000;
 
 const MIME = {
   '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
-  '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png',
+  '.json': 'application/json', '.webp': 'image/webp', '.avif': 'image/avif', '.png': 'image/png',
   '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.ico': 'image/x-icon',
   '.txt': 'text/plain', '.xml': 'application/xml', '.webmanifest': 'application/manifest+json',
 };

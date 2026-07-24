@@ -40,8 +40,8 @@
 # HTML files with smart caching and link prefetch
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
-  Link: </icons/icon-192x192.png>; rel=preload; as=image; type=image/png
-  Link: </images/profile-hero.webp>; rel=preload; as=image; type=image/webp
+  Link: </images/profile-hero.avif>; rel=preload; as=image; type=image/avif; media="(min-width: 640px)"
+  Link: </images/profile-hero-sm.avif>; rel=preload; as=image; type=image/avif; media="(max-width: 639px)"
 
 # Manifest with proper caching
 /manifest.json

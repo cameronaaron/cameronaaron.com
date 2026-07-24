@@ -122,7 +122,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
               The narrow-viewport slot is 192px (see the `sizes` hint below) — the
               384x384 desktop asset would ship 3x the needed pixels there. */}
           <picture>
-            <source media="(max-width: 639px)" srcSet="/images/profile-hero-sm.webp" />
+            <source media="(max-width: 639px)" srcSet="/images/profile-hero-sm.avif" type="image/avif" />
             <Image
               src={src}
               alt={alt}

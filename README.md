@@ -64,7 +64,7 @@ src/
 ├── data/            # Content (edit here!)
 └── utils/           # Helper functions
 
-public/              # Static assets (.webp images)
+public/              # Static assets (.avif images)
 ```
 
 ## 🛠️ Tech Stack
@@ -87,7 +87,7 @@ Update content in `src/data/` directory:
 - `testimonials.ts` - Recommendations
 - `faqs.ts` - FAQ section
 
-Images go in `public/` as `.webp` files.
+Images go in `public/` as `.avif` files (AVIF is the required render-path format; see the asset-weight contract).
 
 ## 🚀 Deployment
 
