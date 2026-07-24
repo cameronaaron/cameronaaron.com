@@ -105,6 +105,41 @@ describe('public-asset-weight-contract — mobile LCP budget', () => {
     ).toEqual([]);
   });
 
+  it('render-path content images ship as AVIF — webp only with a documented compat reason', () => {
+    // Ratchet (2026-07): AVIF measured 16–55% smaller than the webp files it
+    // replaced (sharp, quality 60–70, effort 9 — e.g. spacex logo 45KB→23KB,
+    // hero 15KB→9KB), with universal evergreen-browser support (Safari ≥16.4).
+    // Everything the page actually renders ships AVIF; webp survives only
+    // where a non-browser consumer still needs it, each with a reason on
+    // record (same policy as the PNG icon/social-card exemption above).
+    const AVIF_EXEMPT_WEBP: Record<string, string> = {
+      'images/profile.webp':
+        'Referenced by manifest.json icons and the structured-data/profile image URL — scraper/PWA-installer ' +
+        'compat (same reasoning as PNG social cards); also the sharp source generate-icons.mjs derives from.',
+      'logos/ba.webp':
+        'Generation source only (generate-icons.mjs derives ba-logo.avif from it) — never fetched by the page.',
+    };
+    const legacyWebp: string[] = [];
+    for (const file of files) {
+      if (!/\.webp$/i.test(file.rel)) continue;
+      if (file.rel in AVIF_EXEMPT_WEBP) continue;
+      legacyWebp.push(`  public/${file.rel}`);
+    }
+    expect(
+      legacyWebp,
+      `webp content image(s) on the render path — convert to avif (sharp is already a dependency) ` +
+        `or add a reasoned AVIF_EXEMPT_WEBP entry:\n${legacyWebp.join('\n')}`,
+    ).toEqual([]);
+    // Exemption hygiene: entries must name real files (no stale exemptions).
+    const byRel = new Set(files.map((file) => file.rel));
+    for (const [rel, reason] of Object.entries(AVIF_EXEMPT_WEBP)) {
+      expect(reason.length, `AVIF_EXEMPT_WEBP["${rel}"] needs a real reason`).toBeGreaterThan(10);
+      expect(byRel.has(rel), `AVIF_EXEMPT_WEBP["${rel}"] names a file that no longer exists — delete the entry`).toBe(
+        true,
+      );
+    }
+  });
+
   it('every WEIGHT_EXEMPT entry names a file that still exists and still needs the exemption', () => {
     const byRel = new Map(files.map((file) => [file.rel, file.bytes]));
     for (const [rel, reason] of Object.entries(WEIGHT_EXEMPT)) {

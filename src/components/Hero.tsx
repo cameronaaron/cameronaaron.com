@@ -231,7 +231,7 @@ export default function Hero() {
                  ))}
                </>
              ) : null}
-             <ProfileImage src="/images/profile-hero.webp" alt={profile.name} />
+             <ProfileImage src="/images/profile-hero.avif" alt={profile.name} />
             </div>
           </m.div>
         </div>

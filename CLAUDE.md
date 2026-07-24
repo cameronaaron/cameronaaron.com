@@ -118,7 +118,7 @@ src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
 src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps + pre-commit gate wiring
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
-src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (webp/avif)
+src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (avif required on the render path)
 src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
 src/dead-dependency-contract.test.ts         # every package.json dep has a real import/require somewhere
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
@@ -314,7 +314,7 @@ export default function Section() {
 
 **Staggered lists:** index-based delay, not a fixed duration: `transition={{ delay: i * 0.1 }}`.
 
-**Image handling:** `.webp` only, referenced with a leading slash (`/images/profile.webp`), via Next's `<Image>` with explicit `width`/`height`. Hero image gets `priority`; everything else lazy-loads by default.
+**Image handling:** `.avif` only for render-path images (measured 16–55% smaller than webp at equal quality; enforced by the asset-weight contract), referenced with a leading slash (`/images/profile-hero.avif`), via Next's `<Image>` with explicit `width`/`height`. Hero image gets `priority`; everything else lazy-loads by default.
 
 **Path alias:** `@/*` maps to `src/*` for all internal imports.
 
@@ -353,7 +353,7 @@ All security/caching headers live in `public/_headers` (there is no `middleware.
 
 - Missing `'use client'` — Framer Motion components crash without it.
 - Forgetting `viewport={{ once: true }}` — animations re-trigger on every scroll.
-- Image path without a leading slash — must be `/images/x.webp`, not `x.webp`.
+- Image path without a leading slash — must be `/images/x.avif`, not `x.avif`.
 - Gradient text missing `text-transparent` — the gradient won't show without it (and never nest a persistently-transformed element inside a `bg-clip-text` ancestor — constraint #15).
 - Static export can't use Next.js features needing a Node.js runtime (API routes, ISR, etc.).
 - Missing ARIA labels — every section needs `aria-label` or `aria-labelledby`.

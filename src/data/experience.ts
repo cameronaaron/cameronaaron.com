@@ -14,7 +14,7 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     company: "Bridges Academy",
-    logo: "/logos/ba-logo.webp",
+    logo: "/logos/ba-logo.avif",
     websiteUrl: "https://bridges.edu/",
     positions: [
       {
@@ -26,7 +26,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "4me (Xurrent)",
-    logo: "/logos/xurrent.webp",
+    logo: "/logos/xurrent.avif",
     websiteUrl: "https://www.xurrent.com/",
     positions: [
       {
@@ -50,7 +50,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Connecticut College",
-    logo: "/logos/conn.webp",
+    logo: "/logos/conn.avif",
     websiteUrl: "https://www.conncoll.edu/",
     positions: [
       {
@@ -72,7 +72,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "SpaceX",
-    logo: "/logos/spacex.webp",
+    logo: "/logos/spacex.avif",
     websiteUrl: "https://www.spacex.com/",
     positions: [
       {
@@ -84,7 +84,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "Helping Hands Community",
-    logo: "/logos/helping-hands.webp",
+    logo: "/logos/helping-hands.avif",
     websiteUrl: "https://www.helpinghands.community/",
     positions: [
       {
@@ -112,7 +112,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "BardoVR",
-    logo: "/logos/bardovr.webp",
+    logo: "/logos/bardovr.avif",
     websiteUrl: "https://www.bardovr.com/",
     positions: [
       {
@@ -124,7 +124,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "GitHub",
-    logo: "/logos/github.webp",
+    logo: "/logos/github.avif",
     websiteUrl: "https://github.com/",
     positions: [
       {
