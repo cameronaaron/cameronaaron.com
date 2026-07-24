@@ -14,11 +14,16 @@
 > genuinely-good optimization reverted; `serve-out-warmed.mjs` now *refuses* to
 > measure an occupied port or a non-production response, and a contract pins
 > both guards. If a local number disagrees sharply with PageSpeed Insights,
-> audit the instrument before theorizing about the site. §1–§7 are the
+> audit the instrument before theorizing about the site. §1–§9 are the
 > conclusions that method produced: the complexity
 > doctrine (per-event/per-render work is O(1); linear work runs exactly once),
 > the full algorithm/data-structure law, the React render-path law, the
-> mobile-first law, and the regression ratchet. Every rule there is enforced by
+> mobile-first law, the regression ratchet, and the shipped-artifact law
+> (§9 — verify every claim against `/out` and the wire, never against the
+> source that was supposed to produce it; §9.4's watched-levers registry is
+> where every measured rejection or upstream block records its reopen
+> condition and watcher, so parked optimizations resurface instead of
+> fossilizing into lore). Every rule there is enforced by
 > a contract test — when one fails, fix the source, not the test.
 
 ## Commands
