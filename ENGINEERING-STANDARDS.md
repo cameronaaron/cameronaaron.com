@@ -577,6 +577,24 @@ nothing. Both particle engines meet this contract:
   `copyWithin` + length truncation, replacing the old per-click
   `concat(...).slice(-max)` double allocation.
 
+### 2.9 sqrt of squares, never the hypot builtin (contract section 24)
+
+`Math.sqrt(dx * dx + dy * dy)`, never `Math.hypot(dx, dy)`. The hypot
+builtin buys overflow safety for magnitudes around 1e150 by taking a
+correctly-rounded slow path that costs several times a plain sqrt in V8 —
+and no coordinate, velocity, or force in this codebase can approach the
+range that safety defends. Found live in two frame-hot loops (2026-07-23):
+the verlet ribbon's constraint solver (segments ×
+`RIBBON_CONSTRAINT_ITERATIONS` × 60fps) and the skill-web velocity clamp.
+Both rewritten, and the clamps got the further §2 treatment while there:
+when the root only exists to compute a clamp scale, guard on the *squared*
+comparison first (`speedSq > MAX_NODE_SPEED_SQ`) so the common
+within-limit path pays zero roots — the settled steady state of a
+force-directed layout then runs root-free. Contract section 24 sweeps every
+production source for the builtin; a future call site that genuinely needs
+hypot's overflow behavior goes in `HYPOT_ALLOWED` with the magnitude
+analysis that justifies it (§6 item 18).
+
 ---
 
 ## 3. React render-path law

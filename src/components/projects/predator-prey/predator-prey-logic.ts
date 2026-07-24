@@ -153,9 +153,11 @@ export function applySeek(
 
   let steerX = desiredX - entity.vx;
   let steerY = desiredY - entity.vy;
-  const steerMagnitude = Math.sqrt(steerX * steerX + steerY * steerY);
-  if (steerMagnitude > maxForce) {
-    const scale = maxForce / steerMagnitude;
+  // Squared-comparison guard: the sqrt only exists to compute the clamp
+  // scale, so it runs only when the force actually exceeds the limit.
+  const steerMagnitudeSq = steerX * steerX + steerY * steerY;
+  if (steerMagnitudeSq > maxForce * maxForce) {
+    const scale = maxForce / Math.sqrt(steerMagnitudeSq);
     steerX *= scale;
     steerY *= scale;
   }
