@@ -82,4 +82,30 @@ describe('headers-integrity-contract — preload targets exist', () => {
       `preload Link header(s) point at files that do not exist in public/:\n${missing.join('\n')}`,
     ).toEqual([]);
   });
+
+  it('preload hygiene: image preloads are media-scoped and never favicon/manifest assets (§9.2)', () => {
+    // A preload is a spent budget competing with the LCP image. Two defects
+    // this sweep exists to keep out (both shipped until the 2026-07-23
+    // audit): an 18.8KB PWA icon preloaded on every page load despite never
+    // rendering in any page, and the desktop hero image preloaded on mobile
+    // viewports that paint the small variant — a guaranteed double-download.
+    // Rule: as=image preloads name a resource the current viewport actually
+    // paints, so each must carry a media= scope, and favicon/manifest assets
+    // (icons/, apple-touch-icon) are never preload targets.
+    const offenders: string[] = [];
+    for (const match of HEADERS.matchAll(/Link:\s*<([^>]+)>;([^\n]*)rel=preload([^\n]*)/g)) {
+      const [line, target] = [match[0], match[1]];
+      if (!/as=image/.test(line)) continue;
+      if (/^\/(icons\/|apple-touch-icon)/.test(target)) {
+        offenders.push(`  ${target} — favicon/manifest asset; browsers fetch these on their own schedule, never preload them`);
+      }
+      if (!/media="[^"]+"/.test(line)) {
+        offenders.push(`  ${target} — image preload without a media= scope; every viewport pays for it whether it paints it or not`);
+      }
+    }
+    expect(
+      offenders,
+      `preload-hygiene violation(s) in public/_headers:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
 });

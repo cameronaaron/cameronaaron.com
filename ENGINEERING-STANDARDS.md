@@ -66,7 +66,7 @@ Enforcing test files:
 ## 0. The first-principles doctrine — how every other rule is derived
 
 Everything below §0 is a *conclusion*. This section is the *method* that
-produced them and the method every future change must use. The rules in §1–§7
+produced them and the method every future change must use. The rules in §1–§9
 are not sacred because they are written down; they are correct because they were
 derived from ground truth, and the moment a better derivation appears, backed by
 measurement, the rule changes and the ratchet locks the new floor.
@@ -2382,3 +2382,104 @@ described above. Deliberate exceptions to either sweep go in a documented
 `Record<name, reason>` allowlist matching every other exemption list in this
 file, held to the same bar §6 item 18 already sets — no exemption without a
 concrete, checkable reason.
+
+## 9. The shipped-artifact law — what the visitor receives is the only truth
+
+Source code is a *claim* about what ships; `/out` is what actually ships.
+Every rule in this section exists because a claim and the artifact disagreed,
+and the artifact was right. The section's one-line summary: **when you assert
+anything about performance, verify the assertion against the built artifact
+and the wire — never against the source that was supposed to produce it.**
+This is §0.5's validate-the-ruler rule pointed at a different instrument: the
+build pipeline itself is a measurement device that can silently lie.
+
+### 9.1 Verify emission, not intent (the `fetchpriority` incident)
+
+Passing a prop is not shipping an attribute. `next/image`'s `priority` prop
+was assumed to emit `fetchpriority="high"` on the hero LCP image — it does
+not under `unoptimized` static export (found 2026-07-23 by grepping the
+actual `<img>` tag in `/out/index.html`; the image had been queueing at
+default priority behind the entire async-script wave for as long as the site
+had shipped). The polyfill patches (§9.2) and the AVIF migration were
+verified the same way: byte counts and tag attributes read from `/out`, not
+inferred from config.
+
+**Rule:** any change whose value depends on what the build emits — an
+attribute, a preload, a chunk, a header — lands only after the emitted
+artifact is inspected, and ships with a pin at whichever level can fail
+fastest (component render test for attributes, e.g.
+`profile-image-lcp.test.tsx`; post-build sweep in `performance-budgets.mjs`
+for chunk contents; `headers-integrity-contract` for headers). "The docs say
+the framework does X" is a hypothesis, not a verification.
+
+### 9.2 Bytes ship on merit — formats, preloads, and vendor code all ratchet
+
+Three applications of the same principle, all landed 2026-07-23, all with
+the measurement on record:
+
+- **Media formats are measured decisions with a ratchet.** AVIF replaced
+  webp on the render path only after sharp measured it 16–55% smaller per
+  asset at equal quality (~37% total). The asset-weight contract now fails
+  any render-path webp without a reasoned `AVIF_EXEMPT_WEBP` entry; the two
+  survivors (`profile.webp` scraper/manifest compat, `ba.webp` generation
+  source) each carry their reason. When a better format earns support
+  breadth (the way AVIF overtook webp), the same play runs again: measure,
+  swap, ratchet, exempt-with-reasons.
+- **A preload is a spent budget, not a hint.** Every preloaded byte competes
+  with the LCP image. The `_headers` audit found an 18.8KB PWA icon
+  preloaded on every page load (never rendered in any page — pure waste)
+  and the desktop hero image preloaded on mobile viewports that render the
+  small variant (a guaranteed double-download). Rule: a preload must name a
+  resource the *current viewport* actually paints — `as=image` preloads are
+  media-scoped, and favicon/manifest assets are never preloaded. Enforced by
+  `headers-integrity-contract`'s preload-hygiene sweep.
+- **Vendor bytes are patchable — "not fixable from `src/`" is not
+  "unfixable."** Next.js unconditionally ships two legacy-polyfill bundles;
+  both are now empty via `pnpm patch` (§4.7's `polyfill-module` entry and
+  the 112KB `polyfill-nomodule` extension). The doctrine: when dead vendor
+  bytes have no config opt-out, patch them out, document the safety argument
+  (which browsers are affected and what they'd experience), record the
+  honest magnitude (§0 — the nomodule patch buys deploy weight, not
+  modern-visitor latency, and says so), and pin the patch so a version bump
+  that silently drops it fails `npm test`.
+
+### 9.3 Latency budgets don't end at onload — navigation is a metric
+
+A static export makes every subpage navigation a cacheable, prefetchable
+document — so hover-to-tap latency can absorb the *entire* next-page load.
+Speculation Rules shipped 2026-07-23 (moderate hover-prefetch +
+conservative pointerdown-prerender, `/resume/*` excluded so a stray hover
+never pulls a multi-hundred-KB PDF), as progressive enhancement with zero
+cost to non-supporting browsers. The general rule: when a Web Platform
+capability can move a real user-felt latency to zero at ~zero risk
+(Speculation Rules, bfcache, Early Hints via the existing `Link` headers),
+adopt it deliberately, wire it through the data-catalog convention
+(`SPECULATION_RULES` in `src/data/metadata.ts`), and pin the wiring
+(`performance-regression-contract`). Cutting-edge is a posture only when
+each adoption is individually reasoned and individually revocable.
+
+### 9.4 The watched-levers registry — nothing is rejected without a tripwire
+
+A measured rejection or an upstream block is a *decision with a shelf life*.
+The failure mode this subsection exists to prevent: a lever is correctly
+rejected today, the world changes, and nobody re-pulls it because the
+rejection fossilized into lore. Every parked lever below carries (a) why it's
+parked, (b) the condition that reopens it, and (c) the watcher that fires —
+a probe test where machine-checkable, this registry where not. Adding a
+parked lever without all three is the same defect as an exemption without a
+reason (§6 item 18).
+
+| Lever | Parked because | Reopens when | Watcher |
+| --- | --- | --- | --- |
+| TypeScript 7 | typescript-eslint peers `<6.1.0` | typescript-eslint ships TS7 support | pin-probe test in `dependency-freshness-contract` (fails the day the peer range moves) |
+| sharp CVE ignore (GHSA-f88m-g3jw-g9cj) | no fixed sharp release exists | patched sharp publishes | self-cleaning audit sweep — the ignore entry must be deleted the release it stops matching |
+| JS deferral / code-splitting for mobile LCP | measured no-op: Turbopack force-preloads every chunk; Lantern sums the initial wave regardless (§4.7) | the bundler stops force-preloading, or framer-motion leaves the bundle | re-measure against clean `/out` per §0.5 before believing any new deferral result |
+| Removing framer-motion (the real mobile-TBT ceiling) | product decision — §7 engagement depends on it | the engagement doctrine changes, or React-native view transitions/scroll-driven animations can express §7 without it | owner call; revisit at each React/framer major |
+| `domAnimation` (smaller framer feature pack) | hero `drag` + nav/rail `layoutId` need `domMax` (documented in `motion-features.ts`) | those interactions are redesigned away | grep is the check: no `drag`/`layoutId` usage → swap the pack same commit |
+| `next` patch re-cuts | pnpm patches pin exact versions | every `next` version bump | contract test asserts patch version == lockfile version *and* installed polyfill files are 0 bytes |
+| Local Lighthouse numbers | §0.5 — the ruler lied twice (dev-build-on-port-3000 incident) | never fully; PSI/CI stay the arbiters | `serve-out-warmed.mjs` refuses occupied ports and non-production responses |
+
+**Rule for future entries:** the moment a measurement rejects an
+optimization or an upstream constraint blocks one, it enters this table in
+the same commit — with its reopen condition and watcher — or it doesn't
+count as "decided," it counts as "forgotten."
