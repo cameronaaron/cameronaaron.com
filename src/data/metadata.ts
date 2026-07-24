@@ -205,6 +205,29 @@ export function buildRootMetadata(): Metadata {
   };
 }
 
+/** Speculation Rules (rendered as a `type="speculationrules"` script by the
+ *  root layout): every page here is a static export, so a prefetched
+ *  navigation is the complete document — hover-to-tap latency becomes the
+ *  whole page load. `moderate` prefetches on link hover; `conservative`
+ *  prerenders on pointerdown (the click is already committed by then, so the
+ *  prerender never wastes work). Non-supporting browsers ignore the script
+ *  type entirely — pure progressive enhancement. `/resume/*` PDFs are
+ *  excluded: multi-hundred-KB downloads a stray hover should never trigger. */
+export const SPECULATION_RULES = {
+  prefetch: [
+    {
+      where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/resume/*' } }] },
+      eagerness: 'moderate',
+    },
+  ],
+  prerender: [
+    {
+      where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/resume/*' } }] },
+      eagerness: 'conservative',
+    },
+  ],
+} as const;
+
 /** Root layout's <meta name="viewport">-adjacent Next.js viewport export.
  *  Extracted alongside buildRootMetadata for the same reason — data, not
  *  inline component config. */
