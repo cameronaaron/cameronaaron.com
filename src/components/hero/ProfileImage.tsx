@@ -130,6 +130,11 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
               height={800}
               className="object-cover w-full h-full"
               priority
+              // `priority` alone does not emit the attribute under
+              // `unoptimized` static export (verified in /out) — without it
+              // the LCP image queues at default priority behind the async
+              // script wave. Explicit so the browser fetches it first.
+              fetchPriority="high"
               loading="eager"
               sizes="(max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
             />

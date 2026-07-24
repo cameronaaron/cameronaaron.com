@@ -5,7 +5,7 @@ import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import IframeTitleGuard from "@/components/ui/IframeTitleGuard";
 import MotionProvider from "@/components/ui/MotionProvider";
-import { buildRootMetadata, buildRootViewport } from "@/data/metadata";
+import { buildRootMetadata, buildRootViewport, SPECULATION_RULES } from "@/data/metadata";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -46,6 +46,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         
+        {/* Instant subpage navigation: hover-prefetch + pointerdown-prerender
+            of same-origin pages (see SPECULATION_RULES for the full why). */}
+        <script
+          type="speculationrules"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(SPECULATION_RULES) }}
+        />
+
         <StructuredData />
       </head>
       <body className={`${manrope.className} ${bricolage.variable} ${geistMono.variable}`} suppressHydrationWarning>

@@ -368,6 +368,26 @@ describe('performance regression contract', () => {
     expect(verifyScript).toContain('pnpm run test:performance');
   });
 
+  it('keeps Speculation Rules wired: layout renders them, and the rules cover prefetch + prerender', async () => {
+    // Static export means a prefetched navigation is the complete document —
+    // Speculation Rules turn hover-to-tap latency into the whole subpage
+    // load. The layout must render the script (the rules object alone does
+    // nothing), and the rules must keep both tiers: moderate hover-prefetch
+    // and conservative pointerdown-prerender, with /resume/* PDFs excluded
+    // so a stray hover never pulls a multi-hundred-KB download.
+    const layoutSource = read('src/app/layout.tsx');
+    expect(layoutSource).toContain('type="speculationrules"');
+    expect(layoutSource).toContain('JSON.stringify(SPECULATION_RULES)');
+
+    const { SPECULATION_RULES } = await import('@/data/metadata');
+    expect(SPECULATION_RULES.prefetch[0].eagerness).toBe('moderate');
+    expect(SPECULATION_RULES.prerender[0].eagerness).toBe('conservative');
+    for (const rule of [SPECULATION_RULES.prefetch[0], SPECULATION_RULES.prerender[0]]) {
+      expect(rule.where.and).toContainEqual({ href_matches: '/*' });
+      expect(rule.where.and).toContainEqual({ not: { href_matches: '/resume/*' } });
+    }
+  });
+
   it('keeps the next polyfill-module.js patch wired up and pinned to the installed next version', () => {
     // Regression guard for the legacy-javascript-insight fix above: pnpm
     // patches are keyed to an exact package version, so a `next` bump that
