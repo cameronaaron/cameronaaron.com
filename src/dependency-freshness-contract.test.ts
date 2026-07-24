@@ -180,8 +180,13 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
         `  [${a.severity.toUpperCase()}] ${a.module_name}: ${a.title}\n    ${a.url}`,
     );
 
-    const vulnCounts = report.metadata?.vulnerabilities ?? {};
-    const total = Object.values(vulnCounts).reduce((s, n) => s + n, 0);
+    // Count the advisories list, not metadata.vulnerabilities: pnpm's
+    // auditConfig.ignoreGhsas (the documented-override mechanism this test's
+    // own failure message points at) filters `advisories` but leaves the raw
+    // metadata counts untouched, so a reasoned ignore would never be able to
+    // pass on metadata. Undocumented advisories still appear in `advisories`
+    // and still fail here.
+    const total = advisories.length;
 
     expect(
       total,
@@ -252,7 +257,11 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
     const workspaceYaml = readFileSync(join(ROOT, 'pnpm-workspace.yaml'), 'utf8');
     const lockfile = readFileSync(join(ROOT, 'pnpm-lock.yaml'), 'utf8');
 
-    const excludeEntries = [...workspaceYaml.matchAll(/^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm)].map((m) => m[1]);
+    // Scope the parse to the minimumReleaseAgeExclude block — the file also
+    // holds other YAML lists (e.g. auditConfig.ignoreGhsas) whose entries are
+    // not package@version specs and must not enter this sweep.
+    const excludeBlock = /^minimumReleaseAgeExclude:\n((?:\s+-[^\n]*\n)+)/m.exec(workspaceYaml)?.[1] ?? '';
+    const excludeEntries = [...excludeBlock.matchAll(/^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm)].map((m) => m[1]);
     expect(excludeEntries.length, 'minimumReleaseAgeExclude sweep found nothing — check the parsing regex').toBeGreaterThan(0);
 
     const stale: string[] = [];
