@@ -942,6 +942,19 @@ History (2026-07, kept because the reasoning still applies):
    `pnpm patch next@<new-version>`, re-apply the same one-line edit, and
    `pnpm patch-commit`.
 
+   **Extended to `polyfill-nomodule.js` (2026-07-23), same patch file.** Next
+   also emits a 112KB legacy-polyfill bundle behind a `noModule` script tag.
+   Modern browsers never fetch `noModule` scripts, and the only browsers that
+   do (pre-ES-module: Chrome <61, Safari <10.1, Firefox <60) cannot parse
+   this site's ES2017+ classic-script chunks anyway — the polyfills defend a
+   runtime that already can't start there, and those visitors get the same
+   server-rendered static HTML either way. So this deletion buys deploy
+   weight (the emitted chunk went 112,594 bytes → 0, verified in `/out`), not
+   modern-visitor latency — recorded honestly per §0. Pinned by the same
+   contract test, which additionally asserts the *installed*
+   `polyfill-nomodule.js` is zero bytes so a silently-unapplied patch fails
+   fast.
+
    `render-blocking-insight` / `render-blocking-resources` — three distinct
    fixes were attempted and measured, not one:
    1. *Critical-CSS extraction* (`beasties` postbuild, inlining an

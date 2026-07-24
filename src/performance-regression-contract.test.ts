@@ -402,5 +402,17 @@ describe('performance regression contract', () => {
     const patchContent = read(patchRelativePath);
     expect(patchContent).toContain('dist/build/polyfills/polyfill-module.js');
     expect(patchContent).toContain('-"trimStart"in String.prototype');
+    // Same guard for polyfill-nomodule.js (2026-07): the 112KB legacy bundle
+    // Next emits behind a `noModule` script tag. Modern browsers never fetch
+    // noModule scripts, and the only browsers that do (pre-ES-module: Chrome
+    // <61, Safari <10.1) cannot parse this site's ES2017+ chunks anyway — the
+    // polyfills defend a runtime that already can't start there, so the patch
+    // empties the file (build cut 112,594 bytes → a 0-byte chunk, verified in
+    // /out). The patch must keep both deletions across next re-cuts.
+    expect(patchContent).toContain('dist/build/polyfills/polyfill-nomodule.js');
+    const emptiedNomodule = readFileSync(
+      resolve(process.cwd(), 'node_modules/next/dist/build/polyfills/polyfill-nomodule.js'),
+    );
+    expect(emptiedNomodule.length, 'installed polyfill-nomodule.js is not empty — the patch stopped applying').toBe(0);
   });
 });
