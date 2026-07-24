@@ -2194,6 +2194,33 @@ investigate that script before touching the config.
     truth, same as the code it governs, and gets corrected the same day if it
     doesn't hold up.**
 
+21. **A session that produces non-obvious wisdom writes it down before it
+    ends — same commit discipline as item 1, pointed at knowledge instead of
+    code.** "Non-obvious" means a measurement that contradicted the initial
+    guess, a rejected approach and *why* it lost, a framework/tool behavior
+    that silently diverged from its docs (§9.1's whole reason for existing),
+    or a decision with a reopen condition (§9.4). It does not mean routine
+    work — a straightforward bug fix or a config bump doesn't need a new
+    paragraph of doctrine, and padding this file with restatements of
+    already-covered rules is itself a violation of §0 (a claim without new
+    ground truth behind it). The bar: would a future session, hitting the
+    same wall, want to have read this first? If yes, it goes in
+    `ENGINEERING-STANDARDS.md` (a pattern, a law, a technique — reusable
+    beyond this one change) or `CLAUDE.md` (a project fact — a new file, a
+    new command, a new constraint on an existing one). If the wisdom is a
+    parked optimization or a measured rejection specifically, it goes in
+    §9.4's registry, not loose prose, so it carries a reopen condition and a
+    watcher instead of fossilizing into an anecdote nobody re-checks.
+    **Every new component or feature still ships with its test in the same
+    commit — no exception, no follow-up commit "adding tests later."** That
+    half of this rule already had teeth (item 10's checklist, and the
+    generic sweeps — `dead-logic-export-contract`,
+    `module-testability-contract` — that fail on an untested logic module
+    regardless of anyone remembering a checklist); this item's contribution
+    is closing the other half, where the compounding value isn't code
+    coverage but institutional memory, and nothing before §9.4 was watching
+    for it going missing.
+
 ## 7. The engagement doctrine
 
 This site is not a static résumé — it's meant to feel like stepping into the

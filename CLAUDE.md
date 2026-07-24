@@ -55,8 +55,9 @@ are **one** commit (the ratchet rule); unrelated changes are separate commits.
 Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS.md §6, ratchet item 12.
 
-Hook gate (simple-git-hooks): **pre-commit and pre-push both run the full
-gate** — lockfile sync, type-check, zero-warning lint, the entire test suite
+Hook gate (simple-git-hooks): **pre-commit runs the full gate, and pre-push
+runs that same gate as a strict prefix plus more** — lockfile sync,
+type-check, zero-warning lint, the entire test suite
 (every contract, including networked freshness checks), and mutation testing
 scoped to whichever changed files are logic modules (fails the commit if a
 changed logic module's mutation score drops below the threshold in
@@ -71,6 +72,28 @@ these local hooks are the only gate a change passes through; push after every
 commit (or at least before ending a session) anyway so work is backed up.
 `pnpm run test:complexity` is a fast, offline, manually-run subset for quick
 iteration — it is not the commit gate.
+
+## Session-end ritual (ENGINEERING-STANDARDS.md §6 item 21)
+
+Before ending a session that touched code or made a real decision, two
+checks — same commit discipline as the ratchet rule, not a follow-up:
+
+1. **Every new component or feature ships with its test in the same
+   commit.** No "add tests later." (§6 item 10's checklist; already
+   backstopped by `dead-logic-export-contract` and
+   `module-testability-contract`, which fail on an untested logic module
+   regardless of anyone remembering to check.)
+2. **Non-obvious wisdom gets written down, not just enacted.** A measurement
+   that contradicted the initial guess, a rejected approach and why it lost,
+   a framework behavior that silently diverged from its docs, a decision
+   with a reopen condition — if a future session hitting the same wall would
+   want to have read it first, it belongs in `ENGINEERING-STANDARDS.md` (a
+   reusable pattern/law) or here in `CLAUDE.md` (a project fact). A parked
+   optimization or measured rejection specifically goes in §9.4's
+   watched-levers registry, with its reopen condition and watcher, not loose
+   prose. Routine work doesn't need a new paragraph — restating an
+   already-covered rule is itself a §0 violation (a claim with no new ground
+   truth behind it).
 
 ## Stack
 
