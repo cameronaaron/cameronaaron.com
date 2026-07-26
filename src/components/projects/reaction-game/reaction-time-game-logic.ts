@@ -29,10 +29,28 @@
  * useEffect/event handlers, which only ever run client-side after mount.
  */
 
-/** Random pre-go delay lower bound, in milliseconds. */
-export const MIN_DELAY_MS = 1500;
-
-/** Random pre-go delay upper bound, in milliseconds. Wide range keeps the delay unlearnable. */
+/**
+ * Inter-stimulus interval bounds, in milliseconds — the PVT-B protocol's
+ * 1–4s range.
+ *
+ * The canonical instrument for sustained-attention lapses is the Psychomotor
+ * Vigilance Task (PVT), which runs 10 minutes with a 2–10s ISI and defines a
+ * lapse as RT ≥ 500ms. That protocol is correct for a lab and wrong for a
+ * portfolio widget: a visitor will not sit through ten-second waits. The
+ * published *brief* variant, PVT-B (Basner, Mollicone & Dinges, 2011,
+ * "Validity and sensitivity of a brief psychomotor vigilance test (PVT-B) to
+ * total and partial sleep deprivation," Acta Astronautica), is a validated
+ * 3-minute version built for exactly this constraint: ISI 1–4s, and — because
+ * the shorter ISI produces systematically faster responses — a correspondingly
+ * lower lapse threshold of 355ms rather than 500ms.
+ *
+ * So this game follows PVT-B, not because it is more convenient, but because
+ * it is the variant whose published parameters match the format. Taking
+ * PVT-B's ISI while keeping full-PVT's 500ms lapse cutoff would be the one
+ * genuinely wrong combination — the thresholds are calibrated to their own
+ * protocol and do not mix.
+ */
+export const MIN_DELAY_MS = 1000;
 export const MAX_DELAY_MS = 4000;
 
 /**
@@ -60,12 +78,15 @@ export const LAB_MEAN_SIMPLE_REACTION_TIME_MS = 250;
 export const BROWSER_MEASUREMENT_OVERHEAD_MS = 30;
 
 /**
- * Vigilance/attention-lapse research commonly flags a response as
- * lapse-like once it runs to roughly 1.5-2x a person's typical reaction
- * time — the same phenomenon this game's paired research project studied.
- * 1.6x sits inside that commonly-cited range.
+ * PVT-B's published lapse threshold, in milliseconds (Basner et al., 2011).
+ *
+ * This replaced a `1.6 × mean` heuristic. A multiplier of "roughly 1.5–2x
+ * typical" is a fair summary of the vigilance literature but is not a
+ * standard any specific instrument defines; 355ms is the actual cutoff the
+ * brief-PVT protocol this game now follows publishes for scoring a lapse.
+ * A named protocol constant beats a plausible-sounding coefficient.
  */
-export const ATTENTION_LAPSE_MULTIPLIER = 1.6;
+export const PVT_B_LAPSE_THRESHOLD_MS = 355;
 
 /**
  * Reaction times strictly below this are "elite" — the lab-measured
@@ -74,10 +95,15 @@ export const ATTENTION_LAPSE_MULTIPLIER = 1.6;
  */
 export const REACTION_ELITE_THRESHOLD_MS = LAB_MEAN_SIMPLE_REACTION_TIME_MS + BROWSER_MEASUREMENT_OVERHEAD_MS;
 
-/** Reaction times at or below this (and at/above the elite threshold) are "typical". Above it is "slow". */
-export const REACTION_SLOW_THRESHOLD_MS = Math.round(
-  LAB_MEAN_SIMPLE_REACTION_TIME_MS * ATTENTION_LAPSE_MULTIPLIER + BROWSER_MEASUREMENT_OVERHEAD_MS,
-);
+/**
+ * At or below this is "typical"; above it is scored as an attention lapse.
+ *
+ * PVT-B's 355ms is measured on dedicated lab hardware, so the same
+ * browser-overhead allowance applied to the elite threshold applies here —
+ * otherwise the browser's own ~30ms would push genuinely-attentive responses
+ * over a lab-calibrated line and report lapses that never happened.
+ */
+export const REACTION_SLOW_THRESHOLD_MS = PVT_B_LAPSE_THRESHOLD_MS + BROWSER_MEASUREMENT_OVERHEAD_MS;
 
 export type RoundPhase = 'waiting' | 'go' | 'result';
 
@@ -121,6 +147,35 @@ export function computeRandomDelayMs(randomValue: number): number {
 /** Elapsed time between the "go" signal and the click, in milliseconds. */
 export function computeReactionTimeMs(goTimestamp: number, clickTimestamp: number): number {
   return clickTimestamp - goTimestamp;
+}
+
+/**
+ * Choose the honest instant for "the player clicked".
+ *
+ * `event.timeStamp` is when the BROWSER created the event; `performance.now()`
+ * inside the handler is when our JS finally got scheduled to run. Between the
+ * two sits the input queue, and on a busy main thread that gap is real: on
+ * this page under 4x CPU throttling, trusted clicks measured 5.2-17.4ms of
+ * delay (2026-07-26), every millisecond of which was being added to the
+ * player's reported reaction time. Reading the event's own timestamp removes
+ * it — the same reasoning as §6 item 17's stimulus-onset fix, applied to the
+ * response side instead of the stimulus side.
+ *
+ * Both values share `performance.timeOrigin` for trusted events, so they are
+ * directly comparable to the rAF-derived `goTimestamp`. The fallback exists
+ * because a synthetic or replayed event can carry a `timeStamp` of 0 (jsdom
+ * does exactly this), and a zero would report a reaction of minus-the-whole-
+ * session. Anything non-positive, or implausibly in the future, is rejected in
+ * favour of the handler clock.
+ */
+export function resolveClickTimestamp(eventTimeStamp: number, handlerNow: number): number {
+  // Stryker disable next-line EqualityOperator: at eventTimeStamp exactly
+  // equal to handlerNow, a '<' mutant falls through to the fallback — but the
+  // fallback returns handlerNow, which is the same number eventTimeStamp
+  // already equals. Hand-verified 2026-07-26 per ENGINEERING-STANDARDS §6
+  // item 13.
+  if (eventTimeStamp > 0 && eventTimeStamp <= handlerNow) return eventTimeStamp;
+  return handlerNow;
 }
 
 /** Categorize a genuine reaction time against the named thresholds above. */
@@ -205,7 +260,7 @@ export function formatMs(ms: number): string {
 const REACTION_CATEGORY_LABELS: Record<ReactionCategory, string> = {
   elite: 'Elite reflexes',
   typical: 'Typical human reaction time',
-  slow: 'Slower than typical — attention may have lapsed',
+  slow: 'Lapse — over the PVT-B 355ms threshold',
 };
 
 /** Human-readable label for a reaction-time category. */

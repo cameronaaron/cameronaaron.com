@@ -15,9 +15,21 @@ import {
   PREY_START_MIN,
   PREY_START_RANGE,
   SIMULATION_ARIA_LABEL,
-  VELOCITY_DAMPING,
   applyArenaBoundary,
-  applySeek,
+  applyDifferentialDrive,
+  applySearchSweep,
+  canSenseTarget,
+  wrapAngleRad,
+  IR_SENSOR_RANGE,
+  IR_SENSOR_RANGE_SQ,
+  IR_SENSOR_HALF_ANGLE_RAD,
+  IR_SEARCH_SWEEP_RATE_RAD,
+  IR_SEARCH_ARRIVAL_RADIUS,
+  IR_SEARCH_ARRIVAL_RADIUS_SQ,
+  buildIrConePath,
+  getIrConeOpacity,
+  IR_CONE_FILL_CONTACT,
+  IR_CONE_FILL_IDLE,
   clampToArena,
   createInitialEntities,
   formatSurvivalSeconds,
@@ -33,7 +45,7 @@ import {
 } from './predator-prey-logic';
 
 function makeEntity(overrides: Partial<Entity> = {}): Entity {
-  return { x: 0, y: 0, vx: 0, vy: 0, ...overrides };
+  return { x: 0, y: 0, vx: 0, vy: 0, heading: 0, ...overrides };
 }
 
 describe('clampToArena', () => {
@@ -117,6 +129,26 @@ describe('createInitialEntities / getInitialSimulationState — deterministic la
     expect(state.bestSurvivalMs).toBe(0);
     expect(state.lastSurvivalMs).toBe(0);
     expect(state.target).toEqual({ x: INITIAL_TARGET.x, y: INITIAL_TARGET.y });
+    expect(state.predatorHasContact).toBe(false);
+  });
+
+  it('opens each robot facing the other exactly, via atan2(dy, dx)', () => {
+    // Exact-value pin: a sign-flip mutant on either atan2 argument (e.g.
+    // dy+predator.y instead of dy-predator.y) would point the initial heading
+    // somewhere else entirely — a loose "not NaN" check wouldn't catch it.
+    const { predator, prey } = createInitialEntities(INITIAL_SIM_SEED);
+    expect(predator.heading).toBeCloseTo(Math.atan2(prey.y - predator.y, prey.x - predator.x), 12);
+    expect(prey.heading).toBeCloseTo(Math.atan2(predator.y - prey.y, predator.x - prey.x), 12);
+  });
+
+  it('resets predatorHasContact to false on a fresh life after a catch', () => {
+    const state = getInitialSimulationState();
+    state.predatorHasContact = true;
+    state.predator.x = state.prey.x;
+    state.predator.y = state.prey.y;
+    stepSimulation(state, FRAME_MS);
+    expect(state.catches).toBe(1);
+    expect(state.predatorHasContact).toBe(false);
   });
 
   it('the initial target is exactly the arena center', () => {
@@ -130,106 +162,357 @@ describe('createInitialEntities / getInitialSimulationState — deterministic la
   });
 });
 
-describe('applySeek — steering math, exact values', () => {
-  it('accelerates directly toward a target on the +x axis, clamped by maxForce', () => {
-    // dx=10, dy=0 -> distance=10 -> desired=(2,0). steer=(2,0), magnitude 2 > maxForce 1,
-    // so steer scales to (1,0). vx = (0 + 1*1) * VELOCITY_DAMPING; x = 0 + vx*1.
-    const entity = makeEntity();
-    applySeek(entity, 10, 0, 2, 1, 1);
-
-    const expectedVx = 1 * VELOCITY_DAMPING;
-    expect(entity.vx).toBe(expectedVx);
-    expect(entity.vy).toBe(0);
-    expect(entity.x).toBe(expectedVx);
-    expect(entity.y).toBe(0);
+describe('wrapAngleRad', () => {
+  it('maps exactly +pi to -pi — the half-open end of the range', () => {
+    // Documented, deterministic choice at the 180-degree singularity, where
+    // turning either way is equally valid.
+    expect(wrapAngleRad(Math.PI)).toBeCloseTo(-Math.PI, 12);
   });
 
-  it('does not scale the steering force when already under maxForce', () => {
-    // dx=1, dy=0 -> distance=1 -> desired=(1,0) (maxSpeed=1). steer=(1,0), magnitude
-    // 1 === maxForce 2 -> no clamp needed (1 <= 2).
-    const entity = makeEntity();
-    applySeek(entity, 1, 0, 1, 2, 1);
-
-    const expectedVx = 1 * VELOCITY_DAMPING;
-    expect(entity.vx).toBe(expectedVx);
-    expect(entity.x).toBe(expectedVx);
+  it('leaves an angle already inside the principal range untouched', () => {
+    expect(wrapAngleRad(0)).toBe(0);
+    expect(wrapAngleRad(1)).toBeCloseTo(1, 12);
+    expect(wrapAngleRad(-1)).toBeCloseTo(-1, 12);
   });
 
-  it('produces zero desired velocity, and only damps existing velocity, once already at the target', () => {
-    const entity = makeEntity({ vx: 2, vy: -2 });
-    applySeek(entity, 0, 0, 5, 1, 1);
-
-    // distance < 1e-4 -> desired=(0,0). steer = -velocity, clamped to maxForce 1
-    // (magnitude of (-2,2) is ~2.83 > 1) -> scaled to unit length * 1.
-    const steerMagnitude = Math.sqrt(2 * 2 + 2 * 2);
-    const expectedVx = (2 + (-2 / steerMagnitude) * 1) * VELOCITY_DAMPING;
-    const expectedVy = (-2 + (2 / steerMagnitude) * 1) * VELOCITY_DAMPING;
-    expect(entity.vx).toBeCloseTo(expectedVx, 10);
-    expect(entity.vy).toBeCloseTo(expectedVy, 10);
+  it('wraps past +pi round to the negative side', () => {
+    expect(wrapAngleRad(Math.PI + 0.5)).toBeCloseTo(-Math.PI + 0.5, 12);
   });
 
-  it('scales work linearly with the step multiplier (double step, double integration distance for a settled velocity)', () => {
-    const entityStepOne = makeEntity();
-    applySeek(entityStepOne, 10, 0, 2, 1, 1);
-
-    const entityStepTwo = makeEntity();
-    applySeek(entityStepTwo, 10, 0, 2, 1, 2);
-
-    // Both are force-clamped to the same steer vector (1,0); step=2 applies twice the
-    // velocity delta and then integrates position over twice the step.
-    expect(entityStepTwo.vx).toBeCloseTo(entityStepOne.vx * 2, 10);
+  it('wraps past -pi round to the positive side', () => {
+    expect(wrapAngleRad(-Math.PI - 0.5)).toBeCloseTo(Math.PI - 0.5, 12);
   });
 
-  it('steers diagonally using a 3-4-5 triangle, exercising a nonzero dx, dy, AND a nonzero entity position', () => {
-    // Every other case in this block starts the entity at x=0 with dy=0, which
-    // cannot distinguish `targetX - entity.x` from `targetX + entity.x` (both
-    // equal targetX when entity.x is 0), nor the dy-only terms of the distance/
-    // desired-velocity formulas. entity=(7,6), target=(10,10): dx=3, dy=4,
-    // distance=5 exactly. maxSpeed=5 makes desired=(3,4) exactly; maxForce=100
-    // is large enough that the clamp branch never triggers, isolating just the
-    // seek-vector arithmetic.
-    const entity = makeEntity({ x: 7, y: 6 });
-    applySeek(entity, 10, 10, 5, 100, 1);
-
-    const expectedVx = 3 * VELOCITY_DAMPING;
-    const expectedVy = 4 * VELOCITY_DAMPING;
-    expect(entity.vx).toBe(expectedVx);
-    expect(entity.vy).toBe(expectedVy);
-    expect(entity.x).toBe(7 + expectedVx);
-    expect(entity.y).toBe(6 + expectedVy);
+  it('collapses whole turns to the same angle', () => {
+    expect(wrapAngleRad(2 * Math.PI)).toBeCloseTo(0, 12);
+    expect(wrapAngleRad(4 * Math.PI + 0.3)).toBeCloseTo(0.3, 12);
   });
 
-  it('treats a distance of exactly the divide-by-zero epsilon as still "at rest" (boundary is exclusive)', () => {
-    // 0.0001 * 0.0001 -> sqrt -> 0.0001 round-trips bit-exactly in IEEE754, so
-    // this lands precisely on the `distance > 1e-4` boundary: distance must NOT
-    // be treated as "far enough to compute a direction" here, or the entity
-    // would accelerate off a target it's already effectively standing on.
-    const entity = makeEntity({ x: 0, y: 0 });
-    applySeek(entity, 0.0001, 0, 5, 1, 1);
+  it('always returns a value within (-pi, pi]', () => {
+    for (let a = -20; a <= 20; a += 0.37) {
+      const wrapped = wrapAngleRad(a);
+      expect(wrapped).toBeGreaterThan(-Math.PI - 1e-9);
+      expect(wrapped).toBeLessThanOrEqual(Math.PI + 1e-9);
+    }
+  });
+});
+
+describe('canSenseTarget — the IR cone the real robots were limited by', () => {
+  it('sees a target dead ahead and inside range', () => {
+    const sensor = makeEntity({ x: 50, y: 50, heading: 0 });
+    expect(canSenseTarget(sensor, 50 + IR_SENSOR_RANGE / 2, 50)).toBe(true);
+  });
+
+  it('is blind to a target beyond IR range even when perfectly aligned', () => {
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    expect(canSenseTarget(sensor, IR_SENSOR_RANGE + 0.01, 0)).toBe(false);
+  });
+
+  it('treats exactly IR_SENSOR_RANGE as still in range (inclusive)', () => {
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    expect(canSenseTarget(sensor, IR_SENSOR_RANGE, 0)).toBe(true);
+  });
+
+  it('is blind to a target behind it — the whole point of a directional sensor', () => {
+    const sensor = makeEntity({ x: 50, y: 50, heading: 0 });
+    expect(canSenseTarget(sensor, 40, 50)).toBe(false);
+  });
+
+  it('treats exactly the cone half-angle as visible (inclusive edge)', () => {
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    const r = IR_SENSOR_RANGE / 2;
+    const onEdgeX = Math.cos(IR_SENSOR_HALF_ANGLE_RAD) * r;
+    const onEdgeY = Math.sin(IR_SENSOR_HALF_ANGLE_RAD) * r;
+    expect(canSenseTarget(sensor, onEdgeX, onEdgeY)).toBe(true);
+  });
+
+  it('computes distance as the SUM of squares, not the difference', () => {
+    // Distinguishes dx²+dy² from dx²-dy². At bearing===45° (the cone's own
+    // edge, already known from the test above to pass the angle check on its
+    // own), pick dx=dy=IR_SENSOR_RANGE: the real distance is
+    // RANGE*sqrt(2), well beyond sensor range, so the SUM formula correctly
+    // rejects it (2*RANGE² > RANGE²). The DIFFERENCE formula instead computes
+    // RANGE²-RANGE²=0, which is trivially <= RANGE_SQ — a mutant would let a
+    // target nearly 1.4x sensor range through because the terms cancelled.
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    expect(canSenseTarget(sensor, IR_SENSOR_RANGE, IR_SENSOR_RANGE)).toBe(false);
+  });
+
+  it('is blind just outside the cone half-angle', () => {
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    const r = IR_SENSOR_RANGE / 2;
+    const angle = IR_SENSOR_HALF_ANGLE_RAD + 0.02;
+    expect(canSenseTarget(sensor, Math.cos(angle) * r, Math.sin(angle) * r)).toBe(false);
+  });
+
+  it('is symmetric about the heading — both cone edges behave the same', () => {
+    const sensor = makeEntity({ x: 0, y: 0, heading: 0 });
+    const r = IR_SENSOR_RANGE / 2;
+    const angle = IR_SENSOR_HALF_ANGLE_RAD - 0.02;
+    expect(canSenseTarget(sensor, Math.cos(angle) * r, Math.sin(angle) * r)).toBe(true);
+    expect(canSenseTarget(sensor, Math.cos(-angle) * r, Math.sin(-angle) * r)).toBe(true);
+  });
+
+  it('follows the sensor heading rather than a fixed world direction', () => {
+    const facingUp = makeEntity({ x: 50, y: 50, heading: -Math.PI / 2 });
+    expect(canSenseTarget(facingUp, 50, 30)).toBe(true);
+    expect(canSenseTarget(facingUp, 50, 70)).toBe(false);
+  });
+
+  it('pins the squared range to the exact square of the range', () => {
+    expect(IR_SENSOR_RANGE_SQ).toBe(IR_SENSOR_RANGE * IR_SENSOR_RANGE);
+  });
+});
+
+describe('applyDifferentialDrive — nonholonomic MIP kinematics', () => {
+  it('drives straight ahead at full speed when already facing the target', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    applyDifferentialDrive(entity, 50, 0, 2, 0.5, 1);
+
+    expect(entity.heading).toBeCloseTo(0, 12);
+    expect(entity.x).toBeCloseTo(2, 12);
+    expect(entity.y).toBeCloseTo(0, 12);
+  });
+
+  it('never translates sideways — the constraint a point mass violated', () => {
+    // Target is exactly 90 degrees off the heading: a holonomic seek would
+    // slide straight toward it. A differential-drive robot must turn first,
+    // and makes zero forward progress while perpendicular.
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    applyDifferentialDrive(entity, 0, 50, 2, 0.1, 1);
+
+    expect(entity.heading).toBeCloseTo(0.1, 12);
+    // Position moved only along the NEW heading, which is still nearly +x —
+    // it did not jump toward +y the way a strafing point mass would.
+    expect(entity.y).toBeLessThan(0.3);
+    expect(entity.x).toBeGreaterThan(0);
+  });
+
+  it('clamps the turn to maxTurnRate * step', () => {
+    // Target at 135 degrees: well past the turn limit, and deliberately NOT
+    // at exactly 180, where either turn direction is equally valid.
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    applyDifferentialDrive(entity, -50, 50, 1, 0.2, 1);
+    expect(entity.heading).toBeCloseTo(0.2, 12);
+  });
+
+  it('scales the turn limit with the step', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    applyDifferentialDrive(entity, -50, 50, 1, 0.2, 2);
+    expect(entity.heading).toBeCloseTo(0.4, 12);
+  });
+
+  it('turns the short way round rather than the long way', () => {
+    // Target is slightly clockwise; the robot must turn negative, not +2pi.
+    const entity = makeEntity({ x: 0, y: 0, heading: 0.1 });
+    applyDifferentialDrive(entity, 50, 0, 1, 0.5, 1);
+    expect(entity.heading).toBeCloseTo(0, 12);
+  });
+
+  it('does not overshoot when the remaining turn is under the limit', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0.05 });
+    applyDifferentialDrive(entity, 50, 0, 1, 0.5, 1);
+    expect(entity.heading).toBeCloseTo(0, 12);
+  });
+
+  it('skips the turn entirely once distance-to-target is at the epsilon threshold', () => {
+    // Regression pin for the `dx*dx + dy*dy > 1e-8` guard: at EXACTLY 1e-8
+    // (dx=1e-4, dy=0), the guard must treat the entity as "already there" and
+    // leave heading untouched. A '>=' mutant would enter the turning branch
+    // instead — heading would visibly move even though distance is at the
+    // guard's own boundary.
+    const entity = makeEntity({ x: 0, y: 0, heading: 1.2 });
+    applyDifferentialDrive(entity, 1e-4, 0, 1, 0.5, 1);
+    expect(entity.heading).toBe(1.2);
+  });
+
+  it('clamps to the NEGATIVE limit (not a sign-flipped positive one) when overshooting the other way', () => {
+    // Regression pin for a real gap: the negative-clamp branch's constant is
+    // `-maxTurn`. A sign-flip mutant there (`+maxTurn`) would send the robot
+    // turning the WRONG WAY entirely on a large clockwise correction. Needs
+    // `error` to be strictly beyond -maxTurn (not merely equal to it — at
+    // exactly -maxTurn the boundary operator choice doesn't change the
+    // returned value, see the hand-verified equivalence in source).
+    const entity = makeEntity({ x: 0, y: 0, heading: 1.0 });
+    applyDifferentialDrive(entity, Math.cos(0), Math.sin(0), 1, 0.2, 1);
+    // bearing=0, heading=1.0, error=-1.0, well beyond -maxTurn=-0.2.
+    expect(entity.heading).toBeCloseTo(1.0 - 0.2, 12);
+  });
+
+  it('refuses to reverse toward a target directly behind it', () => {
+    // Facing +x with the target at -x and no ability to turn: forward speed
+    // must clamp to zero rather than going negative.
+    const entity = makeEntity({ x: 10, y: 0, heading: 0 });
+    applyDifferentialDrive(entity, 0, 0, 2, 0, 1);
 
     expect(entity.vx).toBe(0);
     expect(entity.vy).toBe(0);
-    expect(entity.x).toBe(0);
-    expect(entity.y).toBe(0);
+    expect(entity.x).toBe(10);
   });
 
-  // Not tested: `steerMagnitude > maxForce` at the exact boundary. Proven
-  // equivalent by construction — at steerMagnitude === maxForce, `scale =
-  // maxForce / steerMagnitude` is exactly 1, so `steerX *= scale` and
-  // `steerY *= scale` are no-ops whether or not the branch is entered. A
-  // Stryker `>` -> `>=` mutant here cannot produce a different result for any
-  // input (2026-07, hand-verified per ENGINEERING-STANDARDS.md §6 item 13).
+  it('scales forward speed by the cosine of the heading error', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    // 60 degrees off, no turning allowed -> cos(60 deg) = 0.5 of max speed.
+    const angle = Math.PI / 3;
+    applyDifferentialDrive(entity, Math.cos(angle) * 100, Math.sin(angle) * 100, 2, 0, 1);
+
+    expect(entity.vx).toBeCloseTo(2 * 0.5, 10);
+    expect(entity.vy).toBeCloseTo(0, 10);
+  });
+
+  it('leaves heading untouched when already sitting on the target', () => {
+    const entity = makeEntity({ x: 25, y: 25, heading: 1.2 });
+    applyDifferentialDrive(entity, 25, 25, 2, 0.5, 1);
+    expect(entity.heading).toBe(1.2);
+  });
+
+  it('mutates in place and allocates nothing', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    const before = entity;
+    applyDifferentialDrive(entity, 10, 10, 1, 0.2, 1);
+    expect(entity).toBe(before);
+  });
 });
+
+describe('applySearchSweep — the blind predator scan', () => {
+  it('rotates in place at the sweep rate without moving', () => {
+    const entity = makeEntity({ x: 30, y: 40, heading: 0, vx: 5, vy: 5 });
+    applySearchSweep(entity, 1);
+
+    expect(entity.heading).toBeCloseTo(IR_SEARCH_SWEEP_RATE_RAD, 12);
+    expect(entity.x).toBe(30);
+    expect(entity.y).toBe(40);
+    expect(entity.vx).toBe(0);
+    expect(entity.vy).toBe(0);
+  });
+
+  it('scales the sweep with the step', () => {
+    const entity = makeEntity({ heading: 0 });
+    applySearchSweep(entity, 3);
+    expect(entity.heading).toBeCloseTo(IR_SEARCH_SWEEP_RATE_RAD * 3, 12);
+  });
+
+  it('keeps the swept heading wrapped into the principal range', () => {
+    const entity = makeEntity({ heading: Math.PI - 0.01 });
+    applySearchSweep(entity, 10);
+    expect(entity.heading).toBeGreaterThan(-Math.PI - 1e-9);
+    expect(entity.heading).toBeLessThanOrEqual(Math.PI + 1e-9);
+  });
+});
+
+describe('predator IR behaviour inside stepSimulation', () => {
+  it('reports contact and refreshes its fix when the prey is in the cone', () => {
+    const state = getInitialSimulationState();
+    state.predator.x = 50;
+    state.predator.y = 50;
+    state.predator.heading = 0;
+    state.prey.x = 60;
+    state.prey.y = 50;
+    state.lastKnownPreyX = 0;
+    state.lastKnownPreyY = 0;
+
+    stepSimulation(state, FRAME_MS);
+
+    // The prey is stepped before the predator senses, so the recorded fix must
+    // match where the prey actually ended up — not where it started.
+    expect(state.predatorHasContact).toBe(true);
+    expect(state.lastKnownPreyX).toBe(state.prey.x);
+    expect(state.lastKnownPreyY).toBe(state.prey.y);
+    expect(state.lastKnownPreyX).toBeCloseTo(60, 0);
+  });
+
+  it('loses contact and keeps the STALE fix when the prey slips behind it', () => {
+    const state = getInitialSimulationState();
+    state.predator.x = 50;
+    state.predator.y = 50;
+    state.predator.heading = 0;
+    // Directly behind the predator, well outside the forward cone.
+    state.prey.x = 20;
+    state.prey.y = 50;
+    state.lastKnownPreyX = 70;
+    state.lastKnownPreyY = 50;
+
+    stepSimulation(state, FRAME_MS);
+
+    expect(state.predatorHasContact).toBe(false);
+    expect(state.lastKnownPreyX).toBe(70);
+    expect(state.lastKnownPreyY).toBe(50);
+  });
+
+  it('loses contact when the prey is in front but out of IR range', () => {
+    const state = getInitialSimulationState();
+    state.predator.x = 5;
+    state.predator.y = 50;
+    state.predator.heading = 0;
+    state.prey.x = 5 + IR_SENSOR_RANGE + 5;
+    state.prey.y = 50;
+
+    stepSimulation(state, FRAME_MS);
+
+    expect(state.predatorHasContact).toBe(false);
+  });
+
+  it('sweeps in place once it reaches a stale fix and still sees nothing', () => {
+    const state = getInitialSimulationState();
+    state.predator.x = 50;
+    state.predator.y = 50;
+    state.predator.heading = 0;
+    // Prey hidden behind the predator; the stale fix is where it already is.
+    state.prey.x = 10;
+    state.prey.y = 50;
+    state.lastKnownPreyX = 50;
+    state.lastKnownPreyY = 50;
+
+    const headingBefore = state.predator.heading;
+    stepSimulation(state, FRAME_MS);
+
+    expect(state.predatorHasContact).toBe(false);
+    expect(state.predator.heading).not.toBe(headingBefore);
+    expect(state.predator.x).toBe(50);
+    expect(state.predator.y).toBe(50);
+  });
+
+  it('sweeps rather than drives at exactly the arrival radius (inclusive boundary)', () => {
+    // Regression pin: a '<' mutant on the arrival-radius check would make the
+    // predator DRIVE toward its stale fix instead of sweeping at exactly
+    // IR_SEARCH_ARRIVAL_RADIUS. Position alone can't tell them apart here
+    // (facing directly away from the target gives the drive branch zero
+    // speed too — see the alignment<=0 equivalence in source) — but the two
+    // branches turn the heading at DIFFERENT rates (sweep: 0.05 rad/step,
+    // drive: clamped to up to 0.09 rad/step), so asserting the exact new
+    // heading distinguishes them.
+    const state = getInitialSimulationState();
+    state.predator.x = 50;
+    state.predator.y = 50;
+    state.predator.heading = Math.PI; // facing away, so it stays blind
+    state.prey.x = 5;
+    state.prey.y = 50;
+    state.lastKnownPreyX = 50 + IR_SEARCH_ARRIVAL_RADIUS;
+    state.lastKnownPreyY = 50;
+
+    stepSimulation(state, FRAME_MS);
+
+    expect(state.predatorHasContact).toBe(false);
+    expect(state.predator.x).toBe(50);
+    expect(state.predator.y).toBe(50);
+    expect(state.predator.heading).toBeCloseTo(wrapAngleRad(Math.PI + IR_SEARCH_SWEEP_RATE_RAD), 10);
+  });
+
+  it('pins the squared arrival radius to the exact square of the radius', () => {
+    expect(IR_SEARCH_ARRIVAL_RADIUS_SQ).toBe(IR_SEARCH_ARRIVAL_RADIUS * IR_SEARCH_ARRIVAL_RADIUS);
+  });
+});
+
 
 describe('applyArenaBoundary — exact bounce values', () => {
   it('leaves an entity exactly at the boundary untouched (strict > / < only)', () => {
     const atMax = makeEntity({ x: ARENA_SIZE, y: ARENA_SIZE, vx: 3, vy: 3 });
     applyArenaBoundary(atMax);
-    expect(atMax).toEqual({ x: ARENA_SIZE, y: ARENA_SIZE, vx: 3, vy: 3 });
+    expect(atMax).toEqual({ x: ARENA_SIZE, y: ARENA_SIZE, vx: 3, vy: 3, heading: 0 });
 
     const atZero = makeEntity({ x: 0, y: 0, vx: -3, vy: -3 });
     applyArenaBoundary(atZero);
-    expect(atZero).toEqual({ x: 0, y: 0, vx: -3, vy: -3 });
+    expect(atZero).toEqual({ x: 0, y: 0, vx: -3, vy: -3, heading: 0 });
   });
 
   it('clamps past the right/bottom edges and inverts velocity by BOUNDARY_BOUNCE_FACTOR', () => {
@@ -352,13 +635,17 @@ describe('stepSimulation — non-catch step', () => {
 
 describe('stepSimulation — catch handling', () => {
   function makeCaughtState(overrides: Partial<SimulationState> = {}): SimulationState {
-    // Predator, prey, and target all share one point with zero velocity: applySeek's
-    // distance-under-threshold branch yields zero desired velocity, so a step leaves
-    // positions unchanged and the entities remain caught after the move.
+    // Predator, prey, and target all share one point: the drive model's
+    // distance-under-epsilon branch leaves heading alone and produces zero
+    // forward speed, so a step leaves positions unchanged and the two remain
+    // caught after the move.
     return {
       predator: makeEntity({ x: 50, y: 50 }),
       prey: makeEntity({ x: 50, y: 50 }),
       target: { x: 50, y: 50 },
+      predatorHasContact: true,
+      lastKnownPreyX: 50,
+      lastKnownPreyY: 50,
       elapsedMs: 500,
       catches: 0,
       bestSurvivalMs: 200,
@@ -525,5 +812,71 @@ describe('PAUSED_CAPTION / SIMULATION_ARIA_LABEL — exact text', () => {
     expect(SIMULATION_ARIA_LABEL).toBe(
       'Predator-prey chase simulation. Move your cursor, drag on touch, or use the arrow keys once focused, to guide the prey away from the pursuing predator.',
     );
+  });
+});
+
+describe('buildIrConePath — making the sensor visible', () => {
+  it('starts the wedge at the robot and closes it', () => {
+    const entity = makeEntity({ x: 50, y: 50, heading: 0 });
+    const path = buildIrConePath(entity);
+
+    expect(path.startsWith('M 50.00 50.00 ')).toBe(true);
+    expect(path.endsWith(' Z')).toBe(true);
+  });
+
+  it('spans exactly the cone half-angle either side of the heading', () => {
+    const entity = makeEntity({ x: 0, y: 0, heading: 0 });
+    const path = buildIrConePath(entity);
+
+    // Both arc endpoints sit at IR_SENSOR_RANGE from the origin, at ±45°.
+    const expected = (IR_SENSOR_RANGE * Math.SQRT1_2).toFixed(2);
+    expect(path).toContain(`L ${expected} ${(-Number(expected)).toFixed(2)}`);
+    expect(path).toContain(`${expected} ${expected} Z`);
+  });
+
+  it('uses the sensor range as the arc radius', () => {
+    const path = buildIrConePath(makeEntity({ x: 10, y: 10, heading: 1 }));
+    expect(path).toContain(`A ${IR_SENSOR_RANGE} ${IR_SENSOR_RANGE} 0 0 1 `);
+  });
+
+  it('computes the second arc point with the correct sign at an asymmetric heading', () => {
+    // At heading=0 the two arc endpoints are at +/-45 degrees, whose cosines
+    // are EQUAL — a sign-flip mutant on x2's cosine term produces the same
+    // value the existing "spans exactly the cone half-angle" test checks,
+    // so it can't distinguish + from -. At heading=90 degrees the end angle
+    // is 135 degrees, whose cosine is NEGATIVE, so a sign flip produces a
+    // clearly different (and wrong) x2.
+    const entity = makeEntity({ x: 10, y: 20, heading: Math.PI / 2 });
+    const path = buildIrConePath(entity);
+    const end = entity.heading + IR_SENSOR_HALF_ANGLE_RAD;
+    const expectedX2 = (entity.x + Math.cos(end) * IR_SENSOR_RANGE).toFixed(2);
+    const expectedY2 = (entity.y + Math.sin(end) * IR_SENSOR_RANGE).toFixed(2);
+    expect(path).toContain(`${expectedX2} ${expectedY2} Z`);
+  });
+
+  it('rotates with the heading', () => {
+    const facingRight = buildIrConePath(makeEntity({ x: 50, y: 50, heading: 0 }));
+    const facingDown = buildIrConePath(makeEntity({ x: 50, y: 50, heading: Math.PI / 2 }));
+    expect(facingDown).not.toBe(facingRight);
+  });
+
+  it('tracks the robot position', () => {
+    const atOrigin = buildIrConePath(makeEntity({ x: 0, y: 0, heading: 0 }));
+    const moved = buildIrConePath(makeEntity({ x: 20, y: 0, heading: 0 }));
+    expect(moved).not.toBe(atOrigin);
+    expect(moved.startsWith('M 20.00 0.00 ')).toBe(true);
+  });
+});
+
+describe('getIrConeOpacity', () => {
+  it('brightens the cone the moment the predator has contact', () => {
+    expect(getIrConeOpacity(true)).toBe(IR_CONE_FILL_CONTACT);
+    expect(getIrConeOpacity(false)).toBe(IR_CONE_FILL_IDLE);
+  });
+
+  it('pins both opacities to exact values, contact strictly brighter', () => {
+    expect(IR_CONE_FILL_CONTACT).toBe(0.16);
+    expect(IR_CONE_FILL_IDLE).toBe(0.05);
+    expect(getIrConeOpacity(true)).toBeGreaterThan(getIrConeOpacity(false));
   });
 });

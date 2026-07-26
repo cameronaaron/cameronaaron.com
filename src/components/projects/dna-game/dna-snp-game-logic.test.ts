@@ -14,6 +14,10 @@ import {
   generateRound,
   getBaseColorClass,
   getRoundResultMessage,
+  chooseVariantBase,
+  TRANSITION_PARTNER,
+  TRANSITION_PROBABILITY,
+  TRANSITION_TRANSVERSION_RATIO,
   getTileAriaLabel,
   getTileClassName,
   getTileVisualState,
@@ -111,14 +115,105 @@ describe('generateRound', () => {
       expectedReference.push(BASES[Math.floor(random() * BASES.length)]);
     }
     const expectedSnpIndex = Math.floor(random() * length);
-    const originalIndex = BASES.indexOf(expectedReference[expectedSnpIndex]);
-    const offset = 1 + Math.floor(random() * (BASES.length - 1));
-    const expectedMutatedBase = BASES[(originalIndex + offset) % BASES.length];
+    // Same two draws, in the same order, that generateRound consumes for the
+    // transition/transversion decision.
+    const expectedVariant = chooseVariantBase(expectedReference[expectedSnpIndex], random(), random());
 
     const round = generateRound(seed, length);
     expect(round.reference).toEqual(expectedReference);
     expect(round.snpIndex).toBe(expectedSnpIndex);
-    expect(round.sample[expectedSnpIndex]).toBe(expectedMutatedBase);
+    expect(round.sample[expectedSnpIndex]).toBe(expectedVariant.base);
+    expect(round.substitutionKind).toBe(expectedVariant.kind);
+  });
+
+  it('always changes exactly one base, and changes it to a genuinely different one', () => {
+    for (let seed = 1; seed <= 40; seed += 1) {
+      const round = generateRound(seed, STRAND_LENGTH);
+      const differing: number[] = [];
+      for (let i = 0; i < STRAND_LENGTH; i += 1) {
+        if (round.reference[i] !== round.sample[i]) differing.push(i);
+      }
+      expect(differing).toEqual([round.snpIndex]);
+    }
+  });
+
+  it('reproduces the real transition/transversion bias across many rounds', () => {
+    // The scientific point of the fix: uniform choice among the 3 alternative
+    // bases would give Ti/Tv = 0.5 (2 transversion partners vs 1 transition
+    // partner). Real human variation runs ~2:1 the other way.
+    let transitions = 0;
+    let transversions = 0;
+    for (let seed = 1; seed <= 4000; seed += 1) {
+      const round = generateRound(seed, STRAND_LENGTH);
+      if (round.substitutionKind === 'transition') transitions += 1;
+      else transversions += 1;
+    }
+
+    const observedRatio = transitions / transversions;
+    expect(observedRatio).toBeGreaterThan(1.7);
+    expect(observedRatio).toBeLessThan(2.4);
+    // And decisively on the correct side of the uniform-draw value it replaced.
+    expect(observedRatio).toBeGreaterThan(1);
+  });
+
+  it('labels every generated substitution consistently with the bases it changed', () => {
+    for (let seed = 1; seed <= 60; seed += 1) {
+      const round = generateRound(seed, STRAND_LENGTH);
+      const from = round.reference[round.snpIndex];
+      const to = round.sample[round.snpIndex];
+      const expected = TRANSITION_PARTNER[from] === to ? 'transition' : 'transversion';
+      expect(round.substitutionKind).toBe(expected);
+    }
+  });
+});
+
+describe('chooseVariantBase', () => {
+  it('returns the same-class partner for a draw below the transition probability', () => {
+    expect(chooseVariantBase('A', 0, 0)).toEqual({ base: 'G', kind: 'transition' });
+    expect(chooseVariantBase('G', 0, 0)).toEqual({ base: 'A', kind: 'transition' });
+    expect(chooseVariantBase('C', 0, 0)).toEqual({ base: 'T', kind: 'transition' });
+    expect(chooseVariantBase('T', 0, 0)).toEqual({ base: 'C', kind: 'transition' });
+  });
+
+  it('crosses chemical class for a draw at or above the transition probability', () => {
+    expect(chooseVariantBase('A', 0.99, 0)).toEqual({ base: 'C', kind: 'transversion' });
+    expect(chooseVariantBase('A', 0.99, 0.99)).toEqual({ base: 'T', kind: 'transversion' });
+    expect(chooseVariantBase('C', 0.99, 0)).toEqual({ base: 'A', kind: 'transversion' });
+    expect(chooseVariantBase('C', 0.99, 0.99)).toEqual({ base: 'G', kind: 'transversion' });
+    // G and T weren't exercised above — each has its own TRANSVERSION_PARTNERS
+    // entry, and a mutation sweep found both were untested for the
+    // transversion branch (only their transition partner was covered).
+    expect(chooseVariantBase('G', 0.99, 0)).toEqual({ base: 'C', kind: 'transversion' });
+    expect(chooseVariantBase('G', 0.99, 0.99)).toEqual({ base: 'T', kind: 'transversion' });
+    expect(chooseVariantBase('T', 0.99, 0)).toEqual({ base: 'A', kind: 'transversion' });
+    expect(chooseVariantBase('T', 0.99, 0.99)).toEqual({ base: 'G', kind: 'transversion' });
+  });
+
+  it('treats the transition probability itself as the exclusive upper bound', () => {
+    // At exactly 2/3 the draw is NOT a transition — pins the boundary a
+    // '<' -> '<=' mutant would otherwise slip through.
+    expect(chooseVariantBase('A', TRANSITION_PROBABILITY, 0).kind).toBe('transversion');
+    expect(chooseVariantBase('A', TRANSITION_PROBABILITY - 1e-9, 0).kind).toBe('transition');
+  });
+
+  it('splits the two transversion partners at exactly one half', () => {
+    expect(chooseVariantBase('A', 0.99, 0.5)).toEqual({ base: 'T', kind: 'transversion' });
+    expect(chooseVariantBase('A', 0.99, 0.4999).base).toBe('C');
+  });
+
+  it('pins the ratio and the probability it implies', () => {
+    expect(TRANSITION_TRANSVERSION_RATIO).toBe(2);
+    expect(TRANSITION_PROBABILITY).toBeCloseTo(2 / 3, 12);
+  });
+
+  it('never returns the reference base itself', () => {
+    for (const base of BASES) {
+      for (const kindDraw of [0, 0.5, 0.66, 0.9]) {
+        for (const transversionDraw of [0, 0.5, 0.9]) {
+          expect(chooseVariantBase(base, kindDraw, transversionDraw).base).not.toBe(base);
+        }
+      }
+    }
   });
 });
 
@@ -165,11 +260,24 @@ describe('computeScoreUpdate', () => {
 
 describe('getRoundResultMessage', () => {
   it('produces an exact correct message with a 1-indexed position', () => {
-    expect(getRoundResultMessage(true, 4, 'T')).toBe('Correct — position 5 was the SNP.');
+    expect(getRoundResultMessage(true, 4, 'C', 'T', 'transition')).toBe(
+      'Correct — position 5 was the variant: T→C, a transition (purine↔purine or pyrimidine↔pyrimidine).'
+    );
   });
 
   it('produces an exact incorrect message naming position and base', () => {
-    expect(getRoundResultMessage(false, 0, 'G')).toBe('Not quite — the SNP was at position 1, base G.');
+    expect(getRoundResultMessage(false, 0, 'G', 'C', 'transversion')).toBe(
+      'Not quite — the variant was at position 1: C→G, a transversion (purine↔pyrimidine).'
+    );
+  });
+
+  it('names the reference base first and the variant base second', () => {
+    // Regression pin: the component used to pass the REFERENCE base where the
+    // variant belonged, so every result line named the unchanged base as the
+    // variant. Order is now load-bearing, so it is asserted directly.
+    const message = getRoundResultMessage(true, 2, 'G', 'A', 'transition');
+    expect(message).toContain('A→G');
+    expect(message).not.toContain('G→A');
   });
 });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { RoundResult, SessionStats } from './reaction-time-game-logic';
 import {
-  ATTENTION_LAPSE_MULTIPLIER,
+  PVT_B_LAPSE_THRESHOLD_MS,
   BROWSER_MEASUREMENT_OVERHEAD_MS,
   INITIAL_SESSION_STATS,
   LAB_MEAN_SIMPLE_REACTION_TIME_MS,
@@ -21,6 +21,7 @@ import {
   getTargetClassName,
   isNewBestReaction,
   resolveClick,
+  resolveClickTimestamp,
 } from './reaction-time-game-logic';
 
 describe('computeRandomDelayMs', () => {
@@ -202,7 +203,7 @@ describe('getReactionCategoryLabel', () => {
   it('produces a distinct exact label for every category', () => {
     expect(getReactionCategoryLabel('elite')).toBe('Elite reflexes');
     expect(getReactionCategoryLabel('typical')).toBe('Typical human reaction time');
-    expect(getReactionCategoryLabel('slow')).toBe('Slower than typical — attention may have lapsed');
+    expect(getReactionCategoryLabel('slow')).toBe('Lapse — over the PVT-B 355ms threshold');
   });
 });
 
@@ -221,7 +222,7 @@ describe('getResultMessage', () => {
       '220ms — Elite reflexes.',
     );
     expect(getResultMessage({ kind: 'reaction', reactionTimeMs: 500, category: 'slow' }, false)).toBe(
-      '500ms — Slower than typical — attention may have lapsed.',
+      '500ms — Lapse — over the PVT-B 355ms threshold.',
     );
   });
 
@@ -289,7 +290,7 @@ describe('named constants', () => {
 
   it('pins the reaction-time category thresholds to the realistic human range', () => {
     expect(REACTION_ELITE_THRESHOLD_MS).toBe(280);
-    expect(REACTION_SLOW_THRESHOLD_MS).toBe(430);
+    expect(REACTION_SLOW_THRESHOLD_MS).toBe(385);
     expect(REACTION_ELITE_THRESHOLD_MS).toBeLessThan(REACTION_SLOW_THRESHOLD_MS);
   });
 
@@ -297,9 +298,12 @@ describe('named constants', () => {
     expect(LAB_MEAN_SIMPLE_REACTION_TIME_MS).toBe(250);
     expect(BROWSER_MEASUREMENT_OVERHEAD_MS).toBeGreaterThan(0);
     expect(REACTION_ELITE_THRESHOLD_MS).toBe(LAB_MEAN_SIMPLE_REACTION_TIME_MS + BROWSER_MEASUREMENT_OVERHEAD_MS);
-    expect(REACTION_SLOW_THRESHOLD_MS).toBe(
-      Math.round(LAB_MEAN_SIMPLE_REACTION_TIME_MS * ATTENTION_LAPSE_MULTIPLIER + BROWSER_MEASUREMENT_OVERHEAD_MS),
-    );
+    expect(REACTION_SLOW_THRESHOLD_MS).toBe(PVT_B_LAPSE_THRESHOLD_MS + BROWSER_MEASUREMENT_OVERHEAD_MS);
+    // Pinned against hardcoded literals too, so a mutant that empties both the
+    // constant and its use cannot pass by self-consistency.
+    expect(PVT_B_LAPSE_THRESHOLD_MS).toBe(355);
+    expect(MIN_DELAY_MS).toBe(1000);
+    expect(MAX_DELAY_MS).toBe(4000);
   });
 
   it('pins the initial session stats to all-zero/null', () => {
@@ -310,5 +314,50 @@ describe('named constants', () => {
       bestMs: null,
       lastReactionMs: null,
     });
+  });
+});
+
+describe('resolveClickTimestamp — removing input-queue delay from the reading', () => {
+  it('prefers the browser event timestamp over the handler clock', () => {
+    // The whole point: the handler ran 12ms after the browser made the event,
+    // and those 12ms are queue delay, not the player being slow.
+    expect(resolveClickTimestamp(1000, 1012)).toBe(1000);
+  });
+
+  it('accepts an event timestamp equal to the handler clock', () => {
+    expect(resolveClickTimestamp(1000, 1000)).toBe(1000);
+  });
+
+  it('falls back when the event timestamp is zero — jsdom and replayed events', () => {
+    // Trusting a 0 here would report a reaction of minus the whole session.
+    expect(resolveClickTimestamp(0, 5000)).toBe(5000);
+  });
+
+  it('falls back on a negative timestamp', () => {
+    expect(resolveClickTimestamp(-1, 5000)).toBe(5000);
+  });
+
+  it('falls back when the event claims to be from the future', () => {
+    expect(resolveClickTimestamp(9999, 5000)).toBe(5000);
+  });
+
+  it('never reports a reaction earlier than the stimulus when falling back', () => {
+    const goTimestamp = 1000;
+    for (const eventTs of [0, -50, 999_999]) {
+      const clickTs = resolveClickTimestamp(eventTs, 1200);
+      expect(computeReactionTimeMs(goTimestamp, clickTs)).toBeGreaterThan(0);
+    }
+  });
+
+  it('shortens the reported reaction by exactly the queue delay it removes', () => {
+    const goTimestamp = 1000;
+    const browserMadeEventAt = 1250;
+    const handlerRanAt = 1267; // 17ms of queue delay, the measured worst case
+    const withFix = computeReactionTimeMs(goTimestamp, resolveClickTimestamp(browserMadeEventAt, handlerRanAt));
+    const withoutFix = computeReactionTimeMs(goTimestamp, handlerRanAt);
+
+    expect(withFix).toBe(250);
+    expect(withoutFix).toBe(267);
+    expect(withoutFix - withFix).toBe(17);
   });
 });

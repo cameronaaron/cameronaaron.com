@@ -94,7 +94,13 @@ describe('DnaSnpGame — correct guess', () => {
     expect(screen.getByTestId('dna-game-streak').textContent).toBe('1');
     expect(screen.getByTestId('dna-game-best-streak').textContent).toBe('1');
     expect(screen.getByTestId('dna-game-message').textContent).toBe(
-      getRoundResultMessage(true, firstRound.snpIndex, firstRound.reference[firstRound.snpIndex]),
+      getRoundResultMessage(
+        true,
+        firstRound.snpIndex,
+        firstRound.sample[firstRound.snpIndex],
+        firstRound.reference[firstRound.snpIndex],
+        firstRound.substitutionKind
+      ),
     );
 
     // Every tile is disabled once a round has resolved.
