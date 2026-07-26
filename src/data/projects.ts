@@ -43,7 +43,7 @@ export const projects: Project[] = [
   },
   {
     title: "Predatory and Prey Behavior Modifying MIP Robots",
-    description: "Research project developing robotic systems that simulate predator-prey interactions using modified MIP (Magnetic Insect Platform) robots with custom Arduino controllers and IR communication.",
+    description: "Research project developing robotic systems that simulate predator-prey interactions using modified MIP (Mobile Inverted Pendulum) robots with custom Arduino controllers and IR communication.",
     link: "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/",
     tags: ["Robotics", "Behavioral AI", "Arduino", "Research"],
     period: "2021",

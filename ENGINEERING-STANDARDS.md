@@ -2106,6 +2106,30 @@ investigate that script before touching the config.
     named, cited constants (lab-measured mean simple reaction time plus a
     documented browser-measurement-overhead allowance) instead of the
     original bare numbers — see `reaction-time-game-logic.ts`.
+
+    **The same defect exists on the RESPONSE side, and it was still there
+    (2026-07-26).** The fix above aligned the *stimulus* timestamp with paint.
+    The *click* timestamp was still `performance.now()` read inside the
+    handler — which is when the handler got SCHEDULED, not when the browser
+    created the event. Between those two sits the input queue, and on a busy
+    main thread it is not noise: measured on this page under 4x CPU throttling
+    with real trusted clicks, the gap ran **5.2–18.3ms**, every millisecond of
+    it added to the player's reported reaction time. Reading `event.timeStamp`
+    instead (same time origin as `performance.now()` for trusted events, so
+    directly comparable to the rAF-derived stimulus stamp) removes it: residual
+    inflation against an independent clock went from that 5–18ms band to
+    **−0.3ms**. A fallback guards a non-positive or future `timeStamp`, because
+    jsdom reports 0 and trusting it would report a reaction of
+    minus-the-whole-session.
+
+    **The generalised rule, now stated for both ends:** a user-perceived
+    duration is bounded by the render pipeline at the stimulus end and by the
+    input pipeline at the response end. Measure the stimulus from the frame
+    that *paints* it, and the response from the moment the browser *created*
+    the event — never from whenever your JS happened to run at either end.
+    Diagnosing this needs real trusted input under throttling; a synthetic
+    `element.click()` bypasses the input queue entirely and reported a
+    flattering 0.2ms error for code that was really losing up to 18ms.
 18. **An exemption from a gate needs a reason as specific as the gate itself
     — a blanket excuse, or no enforced reason at all, is the gate quietly
     turning itself off.** Every "allow-list" pattern in this codebase

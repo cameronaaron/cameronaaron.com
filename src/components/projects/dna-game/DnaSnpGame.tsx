@@ -67,7 +67,19 @@ export default function DnaSnpGame() {
     setSelectedIndex(index);
     setRoundState(correct ? 'correct' : 'incorrect');
     setScoreState((current) => computeScoreUpdate(current, correct));
-    setMessage(getRoundResultMessage(correct, round.snpIndex, round.reference[round.snpIndex]));
+    // The variant base is the SAMPLE's base at the SNP index. This used to
+    // pass the REFERENCE base, so every result line named the unchanged base
+    // as though it were the variant — wrong on the one fact the game exists to
+    // teach. Both are passed explicitly now so the pair can't be swapped again.
+    setMessage(
+      getRoundResultMessage(
+        correct,
+        round.snpIndex,
+        round.sample[round.snpIndex],
+        round.reference[round.snpIndex],
+        round.substitutionKind
+      )
+    );
   };
 
   return (

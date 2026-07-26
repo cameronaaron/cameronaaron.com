@@ -7,6 +7,8 @@ import {
   ARENA_SIZE,
   PAUSED_CAPTION,
   PREDATOR_VISUAL_RADIUS,
+  buildIrConePath,
+  getIrConeOpacity,
   PREY_VISUAL_RADIUS,
   SIMULATION_ARIA_LABEL,
   formatSurvivalSeconds,
@@ -23,10 +25,11 @@ import {
 /**
  * "Don't get caught" — a playable predator/prey chase paired with the
  * "Predatory and Prey Behavior Modifying MIP Robots" project. The PREY (cyan)
- * seeks the player's pointer with inertia; the PREDATOR (rose) autonomously
- * pursues the prey. All steering physics, boundary handling, and catch
- * detection lives in ./predator-prey-logic; this component only wires that
- * state to the DOM.
+ * follows the player's steering; the PREDATOR (rose) hunts it using only what
+ * its infrared cone can see. Both drive as nonholonomic two-wheeled robots,
+ * matching the real MIP hardware. All drive physics, IR sensing, boundary
+ * handling, and catch detection lives in ./predator-prey-logic; this component
+ * only wires that state to the DOM.
  *
  * Position updates run at animation-frame rate but never touch React state
  * (ENGINEERING-STANDARDS §3.1) — the simulation lives in a ref and every
@@ -67,6 +70,7 @@ export default function PredatorPreyChase() {
 
   const preyElRef = useRef<SVGCircleElement>(null);
   const predatorElRef = useRef<SVGCircleElement>(null);
+  const irConeElRef = useRef<SVGPathElement>(null);
   const timerElRef = useRef<HTMLSpanElement>(null);
 
   const [catches, setCatches] = useState(0);
@@ -111,6 +115,10 @@ export default function PredatorPreyChase() {
       // is guaranteed populated — no defensive null-check branch to leave untested.
       predatorElRef.current!.setAttribute('cx', String(state.predator.x));
       predatorElRef.current!.setAttribute('cy', String(state.predator.y));
+      // The IR cone is written straight to the DOM each frame, same channel as
+      // the entity positions — no React state, no re-render (§3.1).
+      irConeElRef.current!.setAttribute('d', buildIrConePath(state.predator));
+      irConeElRef.current!.setAttribute('fill-opacity', String(getIrConeOpacity(state.predatorHasContact)));
       preyElRef.current!.setAttribute('cx', String(state.prey.x));
       preyElRef.current!.setAttribute('cy', String(state.prey.y));
       timerElRef.current!.textContent = formatSurvivalSeconds(state.elapsedMs);
@@ -156,9 +164,15 @@ export default function PredatorPreyChase() {
         </div>
       </div>
 
+      <p className="mb-2 text-sm text-muted-foreground">
+        Move your cursor over the arena (or drag on touch) to steer the prey. Both robots are modelled on the real
+        MIP hardware: two wheels, no sideways motion, so they have to turn before they can go. Keyboard: focus the
+        arena and use the arrow keys.
+      </p>
       <p className="mb-4 text-sm text-muted-foreground">
-        Move your cursor over the arena (or drag on touch) to steer the prey — it follows with a little lag, so lead
-        it away from the predator. Keyboard: focus the arena and use the arrow keys.
+        The rose wedge is the predator&rsquo;s <strong className="text-rose-300">infrared cone</strong> — the only way
+        it can see. It brightens on contact. Slip outside the cone and it loses you, drives to your last known
+        position, then sweeps to search. It turns at half your rate, so out-turning it is how you escape.
       </p>
 
       {animationEnabled ? (
@@ -172,6 +186,18 @@ export default function PredatorPreyChase() {
           onKeyDown={handleKeyDown}
           data-testid="pp-arena"
         >
+          {/* IR detection cone — drawn first so it sits behind both robots. */}
+          <path
+            ref={irConeElRef}
+            data-testid="pp-ir-cone"
+            aria-hidden="true"
+            d={buildIrConePath(initialSim.predator)}
+            fill="#f87171"
+            fillOpacity={getIrConeOpacity(initialSim.predatorHasContact)}
+            stroke="#f87171"
+            strokeOpacity={0.25}
+            strokeWidth={0.4}
+          />
           <circle
             ref={predatorElRef}
             data-testid="pp-predator"

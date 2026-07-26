@@ -14,6 +14,7 @@ import {
   getTargetClassName,
   isNewBestReaction,
   resolveClick,
+  resolveClickTimestamp,
   type RoundPhase,
   type RoundResult,
   type SessionStats,
@@ -96,8 +97,12 @@ export default function ReactionTimeGame() {
   // attribute below is the single source of truth once a round has
   // resolved, and disabled buttons never dispatch click events. A click
   // while still 'waiting' is a legitimate false start, not a bug.
-  const handleTargetClick = useCallback(() => {
-    const clickTimestamp = performance.now();
+  const handleTargetClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    // event.timeStamp, not performance.now(): the former is when the browser
+    // created the click, the latter is when this handler got scheduled. The
+    // gap is input-queue delay and it inflated every reported reaction (see
+    // resolveClickTimestamp).
+    const clickTimestamp = resolveClickTimestamp(event.timeStamp, performance.now());
     const result = resolveClick(phase, goTimestamp, clickTimestamp);
 
     setLastResult(result);
