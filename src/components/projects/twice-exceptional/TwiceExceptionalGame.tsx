@@ -3,6 +3,8 @@
 import { useCallback, useState } from 'react';
 
 import {
+  AVERAGE_COMPOSITE_MAX,
+  AVERAGE_COMPOSITE_MIN,
   IDENTIFICATION_ARIA_LABEL,
   INITIAL_SCORE_STATE,
   NOTABLE_SCATTER_THRESHOLD,
@@ -89,27 +91,37 @@ export default function TwiceExceptionalGame() {
       <div className="mb-5 grid gap-4 rounded-xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
         <div>
           <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Composite score</span>
-          <span data-testid="te-composite" className="mt-1 block font-display text-3xl text-white">
+          <span className="mt-1 block text-xs text-muted-foreground/80">
+            One overall test score, like an IQ score. Typical range: {AVERAGE_COMPOSITE_MIN}&ndash;
+            {AVERAGE_COMPOSITE_MAX}.
+          </span>
+          <span data-testid="te-composite" className="mt-2 block font-display text-3xl text-white">
             {studentCase.composite}
           </span>
-          <span className="mt-1 block text-xs text-muted-foreground">
-            {isAverageComposite(studentCase.composite) ? 'Within the average band' : 'Outside the average band'}
+          <span className="mt-1 block text-sm font-medium text-white/90">
+            {isAverageComposite(studentCase.composite)
+              ? 'This student: within the typical range'
+              : 'This student: outside the typical range'}
           </span>
         </div>
         <div>
           <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Subtest scatter</span>
+          <span className="mt-1 block text-xs text-muted-foreground/80">
+            The gap between this student&rsquo;s strongest and weakest subject scores. A gap of{' '}
+            {NOTABLE_SCATTER_THRESHOLD}+ points is wide enough to be worth a second look.
+          </span>
           <span
             data-testid="te-scatter"
-            className={`mt-1 block font-display text-3xl ${
+            className={`mt-2 block font-display text-3xl ${
               isNotableScatter(studentCase.scatter) ? 'text-amber-300' : 'text-white'
             }`}
           >
             {studentCase.scatter}
           </span>
-          <span className="mt-1 block text-xs text-muted-foreground">
+          <span className="mt-1 block text-sm font-medium text-white/90">
             {isNotableScatter(studentCase.scatter)
-              ? `At or above the ${NOTABLE_SCATTER_THRESHOLD}-point notable threshold`
-              : 'Ordinary variation'}
+              ? 'This student: unusually wide gap'
+              : 'This student: ordinary variation'}
           </span>
         </div>
       </div>
