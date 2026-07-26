@@ -2584,6 +2584,26 @@ optimization or an upstream constraint blocks one, it enters this table in
 the same commit — with its reopen condition and watcher — or it doesn't
 count as "decided," it counts as "forgotten."
 
+### 9.4b Lenis makes `scrollIntoView` a lie in verification harnesses (2026-07-26)
+
+A real-browser check of the `useInView`-gated ephemeral-room widget reported
+its decay clock frozen at 0.0s and its bar stuck at `scaleX(1)` — a convincing
+"the simulation never starts" bug. It wasn't. Instrumenting the element's
+actual geometry showed `visibleRatio: 0` *after* `scrollIntoView()`: on desktop,
+**Lenis owns the scroll position and quietly discards a programmatic
+`scrollIntoView`**, so the element never entered the viewport and §3.7's
+visibility gate was correctly refusing to run. Driving `page.mouse.wheel`
+instead — what Lenis is built to consume, and what a real visitor produces —
+put the card at `visibleRatio: 1` and the clock advanced 0.6 → 2.1 → 3.6s with
+the bar decaying 0.95 → 0.83 → 0.70 exactly as designed.
+
+**Rule:** any headless check of a visibility-gated widget on this site must
+scroll by wheel and then *assert the element is actually visible* before
+asserting anything about its behaviour. A harness that trusts `scrollIntoView`
+here will invent gate failures — and the tempting "fix" is to weaken or remove
+the gate that §3.7 exists to enforce. Same family as §0.5: the instrument was
+pointed at something other than what it claimed.
+
 ### 9.5 Measure the metric the change actually targets (the scroll-velocity port, 2026-07-25)
 
 The page built the same scroll-velocity spring **eight times** — once per

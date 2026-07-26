@@ -1,7 +1,16 @@
 import { getPageUrl } from './site';
 
 /** Names an interactive mini-game to render alongside a project's featured card. */
-export type InteractiveDemo = 'dna-snp-game' | 'reaction-time-game' | 'predator-prey-chase';
+export type InteractiveDemo =
+  | 'dna-snp-game'
+  | 'reaction-time-game'
+  | 'predator-prey-chase'
+  | 'toxoplasma-maze'
+  | 'tohoku-dialect-game'
+  | 'collective-intelligence-game'
+  | 'ephemeral-room-game'
+  | 'twice-exceptional-game'
+  | 'divergent-thinking-game';
 
 export interface Project {
   title: string;
@@ -75,6 +84,7 @@ export const projects: Project[] = [
     tags: ["Publication", "Twice-Exceptional", "Workplace"],
     period: "Spring 2019",
     cta: "Visit Publication",
+    interactiveDemo: "twice-exceptional-game",
   },
   {
     title: "Bridges 2e Center Vision & Leadership Symposium",
@@ -91,6 +101,7 @@ export const projects: Project[] = [
     tags: ["Cloudflare Workers", "Ephemeral Chat", "Social Art", "Anonymous"],
     period: "2025 - Present",
     cta: "Visit Site",
+    interactiveDemo: "ephemeral-room-game",
   },
   {
     title: "4me Welcomes Cameron Aaron",
@@ -131,6 +142,7 @@ export const projects: Project[] = [
     tags: ["Publication", "Neurodiversity", "ADHD"],
     period: "Feb 2021",
     cta: "Read Article",
+    interactiveDemo: "divergent-thinking-game",
   },
   {
     title: "My Journey in Integrating Art and Technology to Enhance the Human Experience",
@@ -155,6 +167,7 @@ export const projects: Project[] = [
     tags: ["Publication", "Leadership", "Team Dynamics"],
     period: "2020",
     cta: "Read Article",
+    interactiveDemo: "collective-intelligence-game",
   },
   {
     title: "Differences Between Standard Japanese & Tohoku Dialects",
@@ -163,6 +176,7 @@ export const projects: Project[] = [
     tags: ["Publication", "Linguistics", "Cultural Studies"],
     period: "2020",
     cta: "Read Article",
+    interactiveDemo: "tohoku-dialect-game",
   },
   {
     title: "Toxoplasma Gondii Modifies Personality",
@@ -171,6 +185,7 @@ export const projects: Project[] = [
     tags: ["Publication", "Psychology", "Research"],
     period: "Oct 2020",
     cta: "Read Article",
+    interactiveDemo: "toxoplasma-maze",
   },
   {
     title: "EAS 101 Essay",

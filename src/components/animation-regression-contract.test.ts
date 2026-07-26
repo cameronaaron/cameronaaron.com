@@ -584,10 +584,54 @@ describe('animation regression contract', () => {
   });
 
   it('below-fold non-content widgets are code-split — ENGINEERING-STANDARDS §3.8', () => {
-    // Split (measured +0.03 mobile, desktop flat — §4.7 item 8):
-    const projects = read('src/components/Projects.tsx');
-    for (const widget of ['dna-game/DnaSnpGame', 'reaction-game/ReactionTimeGame', 'predator-prey/PredatorPreyChase']) {
-      expect(projects).toMatch(new RegExp(`dynamic\\(\\(\\) => import\\('@/components/projects/${widget.replace('/', '\\/')}'\\), \\{ ssr: false \\}\\)`));
+    // Split (measured +0.03 mobile, desktop flat — §4.7 item 8).
+    //
+    // Swept across every production source rather than pinned to
+    // Projects.tsx (2026-07-25). The requirement is "this widget is not in the
+    // initial bundle", which is a property of the widget, not of whichever
+    // file happens to hold its import — and the old file-pin proved that:
+    // moving the games behind an InteractiveDemoSlot dispatch table (§2.2)
+    // failed this check while the code-split it protects was fully intact.
+    // Same lesson as RibbonBandLazy below, and the same "sweeps over pins"
+    // rule as §6 item 2. As a sweep it also covers every FUTURE game
+    // automatically, which the enumerated pin never did.
+    const splitFiles: string[] = [];
+    const walkSplit = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walkSplit(full);
+        else if (/\.tsx?$/.test(entry.name) && !/\.test\.|\.d\.ts$/.test(entry.name)) splitFiles.push(full);
+      }
+    };
+    walkSplit(resolve(process.cwd(), 'src'));
+    const productionSources = splitFiles.map((file) => readFileSync(file, 'utf8'));
+    const splitWidgets = [
+      'dna-game/DnaSnpGame',
+      'reaction-game/ReactionTimeGame',
+      'predator-prey/PredatorPreyChase',
+      'toxoplasma/ToxoplasmaMaze',
+      'tohoku/TohokuDialectGame',
+      'collective-intelligence/CollectiveIntelligenceGame',
+      'ephemeral-room/EphemeralRoomGame',
+      'twice-exceptional/TwiceExceptionalGame',
+      'divergent-thinking/DivergentThinkingGame',
+    ];
+    for (const widget of splitWidgets) {
+      // Whitespace-tolerant on purpose: a longer module path wraps across
+      // lines under Prettier, and a contract that fails on line-wrapping is
+      // testing formatting, not the code-split it exists to protect. The
+      // load-bearing parts — this exact module path, and `ssr: false` — are
+      // still required exactly.
+      const pattern = new RegExp(
+        `dynamic\\(\\s*\\(\\)\\s*=>\\s*import\\(\\s*'@/components/projects/${widget.replace(
+          '/',
+          '\\/'
+        )}'\\s*\\)\\s*,\\s*\\{\\s*ssr:\\s*false\\s*,?\\s*\\}\\s*\\)`
+      );
+      expect(
+        productionSources.some((source) => pattern.test(source)),
+        `${widget} must be dynamically imported with ssr:false somewhere in production (§3.8)`
+      ).toBe(true);
     }
     expect(read('src/components/Skills.tsx')).toContain("dynamic(() => import('@/components/skills/SkillWeb'), { ssr: false })");
     // RibbonBand's ssr:false dynamic moved to the RibbonBandLazy client island

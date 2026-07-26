@@ -27,6 +27,27 @@ function listProductionComponentFiles(): string[] {
   return files;
 }
 
+/** Absolute production path -> repo-relative, for exemption-list keys. */
+function relativeSrcPath(file: string): string {
+  return file.replace(`${resolve(process.cwd())}/`, '');
+}
+
+/**
+ * Files allowed to declare a module-level object literal, each with the
+ * concrete reason it cannot live in a logic module — the same
+ * `Record<name, reason>` shape every other exemption list in this repo uses,
+ * held to the same bar (ENGINEERING-STANDARDS §6 item 18: a reason names a
+ * checkable fact, never "it's hard").
+ */
+const ALLOWED_COMPONENT_CATALOGS: Record<string, string> = {
+  'src/components/projects/InteractiveDemoSlot.tsx':
+    'Dispatch table of next/dynamic-imported game components, which §2.2 mandates over the ' +
+    'if-chain it replaced. It cannot move to a *-logic.ts module: the values are dynamic() ' +
+    'calls returning React components, and next/dynamic needs a STATIC import specifier at ' +
+    'the call site for the bundler to emit a chunk — a logic module could only hold path ' +
+    'strings, which would silently defeat the §3.8 code-split this table exists to preserve.',
+};
+
 describe('modularization contract', () => {
   it('keeps InteractiveParticles wired to extracted simulation engine', () => {
     const source = read('src/components/hero/InteractiveParticles.tsx');
@@ -529,11 +550,23 @@ describe('modularization sweeps — every production .tsx, present and future', 
     // `[` or `{` immediately after `=` counts as an inline catalog.
     const catalogPattern = /^(?:export\s+)?const \w+(?::[^=]+)? = [[{]/m;
     for (const file of listProductionComponentFiles()) {
+      if (relativeSrcPath(file) in ALLOWED_COMPONENT_CATALOGS) continue;
       const src = readFileSync(file, 'utf8');
       expect(
         catalogPattern.test(src),
         `${file} declares a module-level array/object catalog — move it to a logic module or src/data`
       ).toBe(false);
+    }
+  });
+
+  it('every ALLOWED_COMPONENT_CATALOGS entry names a real file and gives a real reason', () => {
+    // Same guard-the-guard shape every other exemption list in this repo
+    // carries (ENGINEERING-STANDARDS §6 item 18): a reason must be a real
+    // sentence, and a stale entry must be deleted rather than left to rot.
+    const componentFiles = new Set(listProductionComponentFiles().map(relativeSrcPath));
+    for (const [file, reason] of Object.entries(ALLOWED_COMPONENT_CATALOGS)) {
+      expect(componentFiles.has(file), `${file} is exempted but is not a production component file`).toBe(true);
+      expect(reason.length, `${file}'s exemption reason is too short to be a real reason`).toBeGreaterThan(10);
     }
   });
 

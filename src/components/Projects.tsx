@@ -6,28 +6,14 @@ import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
 import FeaturedProject from '@/components/projects/FeaturedProject';
 import ProjectCard from '@/components/projects/ProjectCard';
-import dynamic from 'next/dynamic';
+import ProjectDemoDisclosure from '@/components/projects/ProjectDemoDisclosure';
 import { buildProjectCollections } from '@/components/projects/projects-logic';
 
-// Code-split (2026-07-19, measured — see ENGINEERING-STANDARDS §4.7 item 8):
-// the games are interactive-only widgets deep below the fold, already gated
-// on useInView; their code has no business in the initial bundle that every
-// visitor parses on a 4x-throttled phone CPU. ssr:false is safe here because
-// nothing inside them is indexable content — the surrounding project cards
-// (which ARE content) stay statically rendered.
-const DnaSnpGame = dynamic(() => import('@/components/projects/dna-game/DnaSnpGame'), { ssr: false });
-const ReactionTimeGame = dynamic(() => import('@/components/projects/reaction-game/ReactionTimeGame'), { ssr: false });
-const PredatorPreyChase = dynamic(() => import('@/components/projects/predator-prey/PredatorPreyChase'), { ssr: false });
-
 export default function Projects() {
-  const { featuredProjects, otherProjects, researchSignals } = useMemo(
+  const { featuredProjects, playableProjects, otherProjects, researchSignals } = useMemo(
     () => buildProjectCollections(projects),
     [],
   );
-  // otherProjects renders as a multi-column grid tile, too narrow for a full
-  // simulation widget — its paired demo (if any) renders full-width below the
-  // whole grid instead, same idea as the featured section's inline demos.
-  const otherProjectWithDemo = otherProjects.find((project) => project.interactiveDemo === 'predator-prey-chase');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -135,11 +121,28 @@ export default function Projects() {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <FeaturedProject project={project} index={index} />
-              {project.interactiveDemo === 'dna-snp-game' && <DnaSnpGame />}
-              {project.interactiveDemo === 'reaction-time-game' && <ReactionTimeGame />}
+              {project.interactiveDemo ? (
+                <ProjectDemoDisclosure demo={project.interactiveDemo} projectTitle={project.title} defaultOpen />
+              ) : null}
             </m.div>
           ))}
         </m.div>
+
+        {/* Projects that ship a playable companion, each paired with its own
+            game rather than pointing at one stacked further down the page. */}
+        <div className="mb-20 max-w-6xl mx-auto space-y-8" data-testid="playable-projects">
+          <h3 className="text-sm uppercase tracking-[0.18em] text-cyan-300/80">Play the research</h3>
+          {playableProjects.map((project, index) => (
+            <div
+              key={project.title}
+              data-testid={`playable-project-${index}`}
+              className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 md:p-6"
+            >
+              <ProjectCard project={project} index={index} />
+              <ProjectDemoDisclosure demo={project.interactiveDemo!} projectTitle={project.title} />
+            </div>
+          ))}
+        </div>
 
         <m.div 
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
@@ -170,14 +173,6 @@ export default function Projects() {
           ))}
         </m.div>
 
-        {otherProjectWithDemo ? (
-          <div className="max-w-6xl mx-auto">
-            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              Try it — paired with &ldquo;{otherProjectWithDemo.title}&rdquo;
-            </p>
-            <PredatorPreyChase />
-          </div>
-        ) : null}
       </div>
     </section>
   );

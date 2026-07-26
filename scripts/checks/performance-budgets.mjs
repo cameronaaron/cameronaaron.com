@@ -56,10 +56,24 @@ const budgets = {
   singleJsGzipBytes: 95_000,
   totalJsBytes: 1_200_000,
   totalJsGzipBytes: 370_000,
-  singleCssBytes: 130_000,
-  singleCssGzipBytes: 20_000,
-  totalCssBytes: 150_000,
-  totalCssGzipBytes: 30_000,
+  // CSS recalibrated 2026-07-26, measured not guessed (same discipline as the
+  // dom-size and HTML recalibrations above). Six new project mini-games plus
+  // the demo-disclosure took the largest stylesheet 129,123B -> 131,844B:
+  // +2,721B total, ~450B per new interactive component, which is the distinct
+  // state styling each one genuinely needs (option correct/wrong/missed bands,
+  // decay bar, sensor cone) and not accidental bloat. Checked before moving
+  // the number: the new components reuse the established `min-h-[44px]` and
+  // `tracking-[0.14em]` arbitrary values rather than minting their own, so
+  // there was no meaningful trimming available.
+  //
+  // The real finding is that the old 130,000 ceiling sat only 877B above the
+  // then-current 129,123B — no headroom at all, so ANY new feature was going
+  // to trip it. New ceilings carry ~14% over the measured baseline, matching
+  // the headroom the HTML and dom-size recalibrations settled on.
+  singleCssBytes: 150_000,
+  singleCssGzipBytes: 23_000,
+  totalCssBytes: 170_000,
+  totalCssGzipBytes: 33_000,
   singleImageBytes: 300_000,
   totalImageBytes: 800_000,
   serviceWorkerBytes: 12_000,
