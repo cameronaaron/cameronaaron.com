@@ -118,10 +118,26 @@ describe('dead-component-contract — every component is used by production code
       if (decl.name in ALLOWED_UNUSED_COMPONENTS) continue;
 
       const tagPattern = new RegExp(`<${decl.name}[\\s/>]`);
-      const usedElsewhere = files.some((f) => f !== decl.file && tagPattern.test(sources.get(f)!));
+      // A lazily-imported component is a real production caller even though it
+      // never appears as a literal JSX tag at the import site: the tag is
+      // `<Demo />` on a variable holding the dynamic() result. Added 2026-07-25
+      // when the project games moved behind an InteractiveDemoSlot dispatch
+      // table (§2.2) — the sweep reported four live, rendered games as dead.
+      // This was a pre-existing blind spot in the *pattern*, not a consequence
+      // of that refactor (§6 item 7: ask a sweep what it would miss); it would
+      // have false-flagged ANY next/dynamic-imported component. Matching the
+      // module path keeps the check honest — an import alone still isn't
+      // usage unless it is a real dynamic() render path.
+      const modulePath = decl.file.replace(`${ROOT}/src/`, '@/').replace(/\.tsx?$/, '');
+      const lazyPattern = new RegExp(`dynamic\\(\\s*\\(\\)\\s*=>\\s*import\\(['"]${modulePath.replace(/[/.]/g, '\\$&')}['"]`);
+      const usedElsewhere = files.some(
+        (f) => f !== decl.file && (tagPattern.test(sources.get(f)!) || lazyPattern.test(sources.get(f)!))
+      );
 
       if (!usedElsewhere) {
-        dead.push(`  ${decl.name} (${decl.file.replace(`${ROOT}/`, '')}) — no JSX usage outside its own file`);
+        dead.push(
+          `  ${decl.name} (${decl.file.replace(`${ROOT}/`, '')}) — no JSX usage or dynamic import outside its own file`
+        );
       }
     }
 

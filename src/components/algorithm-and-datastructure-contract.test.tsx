@@ -1022,11 +1022,27 @@ describe('projects logic — early-exit tag scan and single-pass partition', () 
     expect(src).not.toContain('.slice(0, limit)');
   });
 
-  it('buildProjectCollections partitions featured/other in one pass — no double filter', () => {
+  it('buildProjectCollections partitions in one pass — no repeat traversal', () => {
     const src = read('src/components/projects/projects-logic.ts');
-    expect(src).not.toContain('items.filter((project) => project.featured)');
-    expect(src).not.toContain('items.filter((project) => !project.featured)');
-    expect(src).toContain('project.featured ? featured : other');
+
+    // Asserted structurally rather than by pinning one expression's literal
+    // text. The old pin required the exact string `project.featured ? featured
+    // : other`, so widening the partition from two buckets to three
+    // (2026-07-26, to pair each game with its project) failed this check while
+    // the single-pass property it protects was fully intact — a pin standing in
+    // for a requirement (§6 item 2). What actually matters is: no .filter()
+    // traversals of the input, and exactly ONE loop over it however the
+    // branching is written.
+    expect(src).not.toContain('items.filter(');
+
+    const body = src.slice(src.indexOf('export function buildProjectCollections'));
+    const traversals = body.match(/for \(const \w+ of items\)/g) ?? [];
+    expect(traversals).toHaveLength(1);
+
+    // And every bucket is filled from inside that one loop.
+    for (const bucket of ['featured', 'playable', 'other']) {
+      expect(body).toContain(`${bucket}.push(project)`);
+    }
   });
 
   it('runtime: getResearchSignals stops after `limit` unique tags and dedupes', async () => {

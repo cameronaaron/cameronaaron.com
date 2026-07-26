@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { sortByDateDesc } from '@/data/dateOrdering';
 import type { Project } from '@/data/projects';
 import { projects } from '@/data/projects';
 import { buildProjectCollections, getResearchSignals } from '@/components/projects/projects-logic';
@@ -9,10 +10,15 @@ function makeProject(overrides: Partial<Project>): Project {
 
 describe('projects logic', () => {
   it('builds featured and non-featured collections sorted by recency', () => {
-    const { featuredProjects, otherProjects } = buildProjectCollections(projects);
+    const { featuredProjects, playableProjects, otherProjects } = buildProjectCollections(projects);
 
     expect(featuredProjects[0]?.title).toContain('Bridging Transitions');
-    expect(otherProjects[0]?.title).toContain('thehellisthis.com');
+    // thehellisthis.com is the most recent non-featured project AND ships a
+    // playable companion, so it now leads playableProjects rather than the
+    // compact grid — the three-way partition (2026-07-26) exists precisely so
+    // a demo-bearing project never sits in the grid away from its game.
+    expect(playableProjects[0]?.title).toContain('thehellisthis.com');
+    expect(otherProjects[0]?.title).toContain('Stanford Neurodiversity Summit');
   });
 
   it('actually reorders featured projects by period, not by input order', () => {
@@ -55,5 +61,51 @@ describe('projects logic', () => {
 
     expect(researchSignals.length).toBeLessThanOrEqual(10);
     expect(researchSignals.length).toBeGreaterThan(0);
+  });
+});
+
+describe('buildProjectCollections — three-way partition for game pairing', () => {
+  it('routes every project into exactly one bucket', () => {
+    const { featuredProjects, playableProjects, otherProjects } = buildProjectCollections(projects);
+    const total = featuredProjects.length + playableProjects.length + otherProjects.length;
+    expect(total).toBe(projects.length);
+
+    const titles = [...featuredProjects, ...playableProjects, ...otherProjects].map((p) => p.title);
+    expect(new Set(titles).size).toBe(projects.length);
+  });
+
+  it('puts every non-featured project that has a demo in playableProjects', () => {
+    const { playableProjects } = buildProjectCollections(projects);
+    const expected = projects.filter((p) => !p.featured && p.interactiveDemo !== undefined);
+    expect(playableProjects).toHaveLength(expected.length);
+    expect(playableProjects.length).toBeGreaterThan(0);
+    for (const project of playableProjects) {
+      expect(project.interactiveDemo).toBeDefined();
+      expect(project.featured).not.toBe(true);
+    }
+  });
+
+  it('leaves otherProjects free of demos, so the compact grid never orphans a game', () => {
+    // The defect this partition fixes: a demo-bearing project sitting in the
+    // grid while its game rendered in a stack far below it.
+    const { otherProjects } = buildProjectCollections(projects);
+    for (const project of otherProjects) {
+      expect(project.interactiveDemo).toBeUndefined();
+    }
+  });
+
+  it('keeps featured projects in featuredProjects even when they have a demo', () => {
+    const { featuredProjects, playableProjects } = buildProjectCollections(projects);
+    const featuredWithDemo = featuredProjects.filter((p) => p.interactiveDemo !== undefined);
+    expect(featuredWithDemo.length).toBeGreaterThan(0);
+    for (const project of featuredWithDemo) {
+      expect(playableProjects).not.toContain(project);
+    }
+  });
+
+  it('sorts playableProjects newest-first like the other buckets', () => {
+    const { playableProjects } = buildProjectCollections(projects);
+    const sorted = sortByDateDesc([...playableProjects], (p) => p.period);
+    expect(playableProjects.map((p) => p.title)).toEqual(sorted.map((p) => p.title));
   });
 });
