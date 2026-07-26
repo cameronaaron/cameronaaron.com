@@ -65,7 +65,8 @@
     "prebuild": "node scripts/generate/generate-icons.mjs && node scripts/generate/generate-ai-discovery.mjs",
     "lighthouse": "pnpm run lighthouse:desktop",
     "lighthouse:desktop": "lighthouse http://localhost:3000 --preset=desktop --view",
-    "lighthouse:mobile": "lighthouse http://localhost:3000 --form-factor=mobile --screenEmulation.mobile --view"
+    "lighthouse:mobile": "lighthouse http://localhost:3000 --form-factor=mobile --screenEmulation.mobile --view",
+    "measure:scroll-cost": "node scripts/checks/measure-scroll-cost.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
