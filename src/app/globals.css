@@ -270,6 +270,28 @@
     animation-direction: reverse;
   }
 
+  /* Scroll-velocity lean. `.velocity-lean-band`, `.velocity-lean-band-reverse`
+     and `.velocity-lean-title` are deliberately NOT styled here — they are
+     marker classes ScrollVelocityDriver resolves once on mount, and it writes
+     the lean as an inline `transform`.
+
+     They *were* styled here, declaratively, off three inherited registered
+     custom properties written on :root — which reads much better and measured
+     much worse. Changing an inherited custom property at the document root
+     invalidates style for every element below it; probed against the built page
+     (3,424 elements, 300 frames per strategy): root custom property 3.65ms of
+     style recalc per frame, direct transform on the 8 consumers 0.58ms, no
+     writes at all 0.54ms. The pretty version spent ~19% of a 60fps frame
+     budget invalidating elements that never change. Do not "tidy" this back
+     into CSS without re-running scripts/checks/measure-scroll-cost.mjs.
+
+     What the driver replaced: 8 independent framer-motion
+     useScroll→useVelocity→useSpring→useTransform graphs (2 marquee bands + one
+     per SectionHeader), each subscribing to scroll and stepping its own spring
+     on the main thread, and each built unconditionally under Rules of Hooks
+     even on the mobile tiers that never attached the result. Now one
+     subscriber, one spring, and a loop that parks itself at rest. */
+
   /* Decorative section-transition ambience — glows, a rotating ring, bobbing
      dots. Every one of these was a framer-motion `repeat: Infinity` animation
      (2026-07): ~43 of them ran simultaneously on mobile from page load (8

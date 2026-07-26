@@ -1,15 +1,11 @@
 'use client';
 
-import { m, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { useMemo } from 'react';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   MARQUEE_TRACK_DURATION_S,
   buildMarqueeItems,
-  clampMarqueeVelocity,
   getMarqueeMotionConfig,
-  marqueeVelocityToShiftPx,
-  marqueeVelocityToSkewDeg,
   type MarqueeDirection,
 } from './velocity-marquee-logic';
 
@@ -33,21 +29,8 @@ export default function VelocityMarquee({
   // Self-read the tier so a Server Component page can render this island
   // without threading a client-only value down as a prop (RSC islands, 2026-07).
   const { performanceTier } = usePerformanceProfile();
-  const { animateTrack, velocityReactive } = getMarqueeMotionConfig(performanceTier);
+  const { animateTrack } = getMarqueeMotionConfig(performanceTier);
   const items = useMemo(() => buildMarqueeItems(phrases), [phrases]);
-
-  // Scroll velocity → skew/shift, entirely through motion values: zero React
-  // re-renders at scroll rate (ENGINEERING-STANDARDS §3.1). The graph is built
-  // unconditionally (Rules of Hooks) but only attached on the full tier.
-  const { scrollY } = useScroll();
-  const rawVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(rawVelocity, { stiffness: 260, damping: 44, mass: 0.5 });
-  const skewX = useTransform(smoothVelocity, (velocity: number) =>
-    marqueeVelocityToSkewDeg(clampMarqueeVelocity(velocity))
-  );
-  const x = useTransform(smoothVelocity, (velocity: number) =>
-    marqueeVelocityToShiftPx(clampMarqueeVelocity(velocity), direction)
-  );
 
   return (
     <div
@@ -55,7 +38,16 @@ export default function VelocityMarquee({
       data-testid="velocity-marquee"
       className={`pointer-events-none relative select-none overflow-hidden border-y border-white/5 bg-white/[0.015] py-8 md:py-12 ${className}`}
     >
-      <m.div style={velocityReactive ? { skewX, x } : undefined} className="will-change-transform">
+      {/* The scroll-velocity lean arrives through inherited CSS custom
+          properties written once per frame by ScrollVelocityDriver — no framer
+          spring graph here, and on every tier below 'full' the driver never
+          runs, so the registered initial values leave this at identity. */}
+      <div
+        data-testid="marquee-velocity-lean"
+        className={`will-change-transform ${
+          direction === -1 ? 'velocity-lean-band-reverse' : 'velocity-lean-band'
+        }`}
+      >
         <div
           data-testid="marquee-track"
           className={`flex w-max items-center gap-6 md:gap-10 pr-6 md:pr-10 ${
@@ -78,7 +70,7 @@ export default function VelocityMarquee({
             </span>
           ))}
         </div>
-      </m.div>
+      </div>
     </div>
   );
 }

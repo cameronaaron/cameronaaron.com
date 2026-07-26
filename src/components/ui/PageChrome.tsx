@@ -7,6 +7,7 @@ import IntroCurtain from '@/components/ui/IntroCurtain';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import CommandPalette from '@/components/ui/CommandPalette';
 import BackToTop from '@/components/ui/BackToTop';
+import ScrollVelocityDriver from '@/components/ui/ScrollVelocityDriver';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 
 const AmbientBackground = dynamic(() => import('@/components/ui/AmbientBackground'), { ssr: false });
@@ -58,6 +59,10 @@ export default function PageChrome() {
   return (
     <>
       <IntroCurtain />
+      {/* Renders nothing — publishes scroll velocity as CSS custom properties
+          for the marquee bands and every section title, replacing the ~10
+          duplicated framer spring graphs those consumers each used to build. */}
+      <ScrollVelocityDriver />
       <div className="grain-overlay" aria-hidden="true" />
       {/* Mount only once the real tier is known — mounting under the optimistic
           'full' default and then re-rendering as 'balanced' flashed 7 orbs → 4

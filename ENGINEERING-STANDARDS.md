@@ -2552,8 +2552,78 @@ reason (§6 item 18).
 | `next` patch re-cuts | pnpm patches pin exact versions | every `next` version bump | contract test asserts patch version == lockfile version *and* installed polyfill files are 0 bytes |
 | Local Lighthouse numbers | §0.5 — the ruler lied twice (dev-build-on-port-3000 incident) | never fully; PSI/CI stay the arbiters | `serve-out-warmed.mjs` refuses occupied ports and non-production responses |
 | JSON-LD flight duplication (~33KB raw in home HTML) | structural to RSC: a Server Component's rendered script content rides the flight stream too, so the structured-data block ships once as `ld+json` and once flight-escaped | Next ships JSON-LD support in the Metadata API, or flight-payload exclusion for opaque script content | the home-HTML budget recalibration note in `performance-budgets.mjs` names this slack; re-measure before any future HTML-budget bump |
+| Incremental framer removal as a *load-time* win | measured no-op: removing 8 of the page's framer graphs moved mobile Lighthouse 0.86 → 0.86, every metric inside run-to-run spread (§9.5). The load floor is bundle *evaluation* + 3,301-element hydration, and neither falls until the last framer import does | framer-motion is fully removed, or the client tree shrinks materially (more RSC conversions per §5) | re-measure load with LHCI *and* scroll with `pnpm run measure:scroll-cost` per §9.5 — a load-metric no-op does not mean a no-op |
+| Declarative CSS custom properties for per-frame values | measured 6.3× worse: an *inherited* registered property on `:root` invalidates the whole document every frame (3.65ms/frame at 3,424 elements vs 0.58ms writing 8 elements directly) | the element count collapses, or browsers gain per-element custom-property invalidation | the comment block above `.velocity-lean-*` in `globals.css`; re-run the recalc probe before moving any per-frame value back into CSS |
 
 **Rule for future entries:** the moment a measurement rejects an
 optimization or an upstream constraint blocks one, it enters this table in
 the same commit — with its reopen condition and watcher — or it doesn't
 count as "decided," it counts as "forgotten."
+
+### 9.5 Measure the metric the change actually targets (the scroll-velocity port, 2026-07-25)
+
+The page built the same scroll-velocity spring **eight times** — once per
+`SectionHeader` (6) plus both `VelocityMarquee` bands — each a framer
+`useScroll → useVelocity → useSpring → useTransform` chain with its own scroll
+subscription, and each built unconditionally under Rules of Hooks *even on the
+mobile tiers that never attach the resulting transform*. They are now one
+`ScrollVelocityDriver` (`src/components/ui/`): one subscriber, one spring,
+written straight to the 8 consumer elements, parking itself at rest.
+
+**Result, stated with its conditions.** Mobile scroll-time JS
+(412×823 coarse-pointer, 7 interleaved A/B pairs, 240-step wheel gesture):
+**278ms → 238ms, −14.4%, with non-overlapping ranges** (baseline 274–284,
+candidate 234–241) — the clean part of the win, and unsurprising in hindsight:
+on mobile the baseline computed a lean it then threw away. Desktop scroll:
+neutral (everything inside spread; layout −10%). Mobile Lighthouse:
+**0.86 → 0.86, nothing outside run-to-run spread.** Shipped for the mobile
+scroll win and the simplification, *not* as a load-time optimization.
+
+Four lessons, each of which cost a real defect to learn:
+
+1. **A load-time instrument cannot see a scroll-time change.** Judged only by
+   Lighthouse this was a flat no-op and would have been reverted — the exact
+   shape of the LazyMotion mistake in §0.3/§0.4, which was rejected on LCP and
+   later found to be the TBT win. Before believing a null result, ask whether
+   the harness ever exercises the thing that changed. `scripts/checks/measure-scroll-cost.mjs`
+   (`pnpm run measure:scroll-cost --baseline <old-out>`) exists because the
+   answer here was no: it drives real Chromium over a scripted wheel gesture
+   and reads CDP `Performance.getMetrics`. It measures the two builds in
+   **interleaved pairs** — sequential blocks let background load contaminate
+   one arm only — and labels each metric SIGNAL or NOISE by whether the two
+   arms' raw ranges are disjoint, because a median delta between overlapping
+   ranges is not a result.
+2. **The prettier version was 6.3× slower, and only a probe said so.**
+   Publishing through an *inherited* registered custom property on `:root` —
+   declarative, three `@property` blocks, transforms in CSS, genuinely nicer
+   code — invalidates style for every element beneath the root on every frame:
+   **3.65ms/frame** across 3,424 elements versus **0.58ms** writing the 8
+   consumers directly, against **0.54ms** for doing nothing at all. ~19% of a
+   60fps frame budget spent invalidating elements that never change. Worse, its
+   first measurement *looked like a 55% JS win* — style recalc was so expensive
+   it dropped frames, so the rAF loop simply ran fewer times. **A drop in
+   per-frame JS can mean fewer frames, not cheaper ones; always read the
+   companion counters.**
+3. **A hand-rolled spring needs its stability bound checked, not assumed.**
+   Explicit Euler on this spring is stable only while
+   `(damping / mass) · dt < 2` — here `dt < 22.7ms`, i.e. ~44fps. Clamping long
+   frames at 1/30s (33ms) put it *past* the bound, multiplying velocity by
+   1.93× per step: the shipped build was caught mid-scroll holding
+   `value = 1.03e7, velocity = -6.5e7`. It was invisible on screen because the
+   published value is clamped to the saturation window — the only symptom was
+   the lean taking ~2.5s to fall back instead of the ~1.5s its physics call
+   for. Fixed by integrating in fixed `1/120s` sub-steps. framer's solver
+   handles this; a replacement inherits the obligation.
+4. **jsdom cannot see any of the above.** All three defects — a first frame
+   with no delta-t parking the loop before it ever leaned, the recalc storm,
+   and the divergence — were found by driving the built page in real Chromium and
+   asserting the behaviour end to end — the lean appears during a scroll,
+   clears once it stops, never appears on a coarse pointer, and the
+   gradient-clipped headings still paint (constraint #15). None of the three
+   reproduce in jsdom, which has no compositor, no style engine, and no smooth
+   scrolling. Each is now pinned by a unit test **proven to fail against the defect
+   before being trusted** (§6 items 8 and 22) — including one that had to be
+   rewritten after the first version passed against the bug it claimed to
+   catch: a *geometric* easing tail underflows to an exactly-zero delta, which
+   satisfies the very `=== 0` park condition being pinned. It takes a
+   *harmonic* tail to reproduce the real failure.
