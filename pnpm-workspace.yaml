@@ -5,14 +5,14 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20260721.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20260721.1'
-  - '@cloudflare/workerd-linux-64@1.20260721.1'
-  - '@cloudflare/workerd-linux-arm64@1.20260721.1'
-  - '@cloudflare/workerd-windows-64@1.20260721.1'
-  - miniflare@4.20260721.0
-  - workerd@1.20260721.1
-  - wrangler@4.113.0
+  - '@cloudflare/workerd-darwin-64@1.20260722.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20260722.1'
+  - '@cloudflare/workerd-linux-64@1.20260722.1'
+  - '@cloudflare/workerd-linux-arm64@1.20260722.1'
+  - '@cloudflare/workerd-windows-64@1.20260722.1'
+  - miniflare@4.20260722.0
+  - workerd@1.20260722.1
+  - wrangler@4.114.0
 auditConfig:
   ignoreGhsas:
     # GHSA-f88m-g3jw-g9cj (high): sharp inherits libvips CVE-2026-33327/-33328/
@@ -39,5 +39,13 @@ overrides:
   # Both are devDependencies, so nothing vulnerable ever shipped to a visitor.
   brace-expansion@1: ">=1.1.16"
   brace-expansion@2: ">=2.1.2"
+  # GHSA-mh99-v99m-4gvg (high, distinct from GHSA-3jxr-9vmj-r5cp above):
+  # unbounded-expansion-length DoS, fixed >=5.0.8. minimatch@10.2.5 (pulled in
+  # via eslint's own dependency chain) moved onto a THIRD brace-expansion major
+  # the two floors above don't cover. Same devDependency-only exposure.
+  brace-expansion@5: ">=5.0.8"
+  # GHSA-pm4m-ph32-ghv5 (high): js-yaml exponential-time parsing of flow
+  # collections, fixed >=5.2.2. Pulled in via markdownlint-cli2, build-time only.
+  js-yaml: ">=5.2.2"
 patchedDependencies:
   next@16.2.11: patches/next@16.2.11.patch
