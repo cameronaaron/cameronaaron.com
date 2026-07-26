@@ -13,19 +13,17 @@ minimumReleaseAgeExclude:
   - miniflare@4.20260722.0
   - workerd@1.20260722.1
   - wrangler@4.114.0
-auditConfig:
-  ignoreGhsas:
-    # GHSA-f88m-g3jw-g9cj (high): sharp inherits libvips CVE-2026-33327/-33328/
-    # -35590/-35591 (malicious-image parsing). No fixed sharp release exists yet
-    # (we are on latest). sharp is a devDependency used only at build time by
-    # scripts/generate/generate-icons.mjs on images we author ourselves — no
-    # untrusted input ever reaches it and nothing ships to a visitor. Remove
-    # this entry the moment a patched sharp lands (the self-cleaning stale-audit
-    # sweep in dependency-freshness-contract will keep flagging drift).
-    - GHSA-f88m-g3jw-g9cj
 overrides:
   postcss: ">=8.5.20"
   "@opentelemetry/core": ">=2.8.0"
+  # GHSA-f88m-g3jw-g9cj (high): sharp inherits libvips CVE-2026-33327/-33328/
+  # -35590/-35591 (malicious-image parsing), fixed >=0.35.0. Our own direct
+  # dependency was already on 0.35.3, but next@16.2.11 declares its own
+  # OPTIONAL sharp as "^0.34.5" (a 0.x caret, so it caps below 0.35.0) and
+  # miniflare pins an exact 0.35.2 — two separate, undeduped copies pnpm
+  # resolved alongside ours. This forces every resolution in the tree onto
+  # our already-patched version instead of ignoring the advisory.
+  sharp: ">=0.35.3"
   # GHSA-q8mj-m7cp-5q26 (moderate): qs.stringify DoS, fixed >=6.15.2.
   # Pulled in transitively via @stryker-mutator/core > typed-rest-client > qs.
   qs: ">=6.15.2"
