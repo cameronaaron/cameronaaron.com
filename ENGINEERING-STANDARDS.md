@@ -2604,6 +2604,43 @@ here will invent gate failures — and the tempting "fix" is to weaken or remove
 the gate that §3.7 exists to enforce. Same family as §0.5: the instrument was
 pointed at something other than what it claimed.
 
+### 9.4c A single wheel scroll can undershoot a `.cv-section` target — poll, don't sample once (2026-07-26)
+
+Extending §3.7's mount-gating from animation loops to component mounting
+itself (`ProjectDemoDisclosure`, all 9 project games) surfaced a second way
+the *correct* fix in §9.4b — drive real `mouse.wheel` events — can still
+report a false gate failure. A single wheel gesture (or even 40 small ones)
+aimed at a featured game's card, using its bounding box measured *before* the
+scroll, sometimes left `aria-expanded` stuck at `false` even though the widget
+was genuinely wheel-scrolled and genuinely never mounted from a click either.
+
+The card sits inside a `.cv-section` (`content-visibility: auto`,
+`contain-intrinsic-size: auto 1200px` — §4.7 item 17). Off-screen, that
+placeholder height stands in for the section's real height. As the section
+approaches the viewport and the browser starts laying out its real content —
+nine disclosure cards, each with its own teaser copy and (for the two
+featured ones) a mounted game — the section's true height turns out taller
+than the placeholder guessed, and everything below it shifts. A target whose
+bounding box read `y: 467` (safely mid-viewport) the instant after
+`scrollIntoViewIfNeeded()` can read `y: -130` (scrolled back out, upward) one
+frame later, as content above it resolves to its real, larger size. This is a
+real, reproducible layout shift — not a test artifact — and it can repeat
+for several iterations before the page settles, because resolving one
+section's placeholder can itself trigger the next one's.
+
+The gate itself was never broken: polling the target's bounding box and
+continuing to scroll toward it — rather than scrolling once and asserting —
+reached `aria-expanded: true` every time, typically within 40–60 short wheel
+steps. A natural human scroll, which doesn't stop moving after one gesture,
+never encounters this as a bug; only a harness that samples once does.
+
+**Rule:** a headless check of ANY visibility-gated widget below a
+`.cv-section` boundary must poll the target's bounding box and keep scrolling
+toward it (not away, using the sign of its current offset) until it actually
+settles inside the viewport, rather than issuing one scroll and asserting.
+Same family as §9.4b and §0.5 — before concluding a gate has a real defect,
+confirm the harness gave the page's own layout time to stop moving.
+
 ### 9.5 Measure the metric the change actually targets (the scroll-velocity port, 2026-07-25)
 
 The page built the same scroll-velocity spring **eight times** — once per
