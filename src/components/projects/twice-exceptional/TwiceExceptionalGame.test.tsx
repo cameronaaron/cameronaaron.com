@@ -5,6 +5,15 @@ import TwiceExceptionalGame from './TwiceExceptionalGame';
 import { AVERAGE_COMPOSITE_MAX, AVERAGE_COMPOSITE_MIN, NOTABLE_SCATTER_THRESHOLD } from './twice-exceptional-logic';
 
 /**
+ * These tests also pin the Susan Baum strength-first framing: an earlier
+ * version of this widget handed the player only composite and scatter, which
+ * quietly re-taught the score-mining, deficit-first model her talent-focused
+ * approach argues against. The signature strength must render, must be named
+ * as the real starting point, and must appear before the two numbers in
+ * document order — not as a footnote bolted on after them.
+ */
+
+/**
  * These tests exist to pin the plain-language framing a non-expert player
  * needs — bare numbers like "Composite 103" and jargon like "average band" /
  * "notable threshold" meant nothing without a scale or a definition. Every
@@ -49,5 +58,33 @@ describe('TwiceExceptionalGame — non-expert comprehension', () => {
     fireEvent.click(screen.getByTestId('te-option-gifted'));
 
     expect(screen.getByTestId('te-message').textContent).toMatch(/Correct\.|Missed\./);
+  });
+
+  it('renders the signature strength, in quotes, as its own callout', () => {
+    render(<TwiceExceptionalGame />);
+    const text = screen.getByTestId('te-strength').textContent ?? '';
+
+    expect(text.startsWith('“')).toBe(true);
+    expect(text.length).toBeGreaterThan(10);
+  });
+
+  it('names Baum and frames the strength as the real starting point, not the numbers', () => {
+    render(<TwiceExceptionalGame />);
+    const text = screen.getByTestId('twice-exceptional-game').textContent ?? '';
+
+    expect(text).toContain('Susan Baum');
+    expect(text).toContain('starts from the student');
+    expect(text).toContain('start here');
+  });
+
+  it('renders the strength callout before the composite/scatter numbers in document order', () => {
+    render(<TwiceExceptionalGame />);
+    const container = screen.getByTestId('twice-exceptional-game');
+    const strengthIndex = container.innerHTML.indexOf('data-testid="te-strength"');
+    const compositeIndex = container.innerHTML.indexOf('data-testid="te-composite"');
+
+    expect(strengthIndex).toBeGreaterThan(-1);
+    expect(compositeIndex).toBeGreaterThan(-1);
+    expect(strengthIndex).toBeLessThan(compositeIndex);
   });
 });

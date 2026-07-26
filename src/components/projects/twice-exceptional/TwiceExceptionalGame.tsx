@@ -86,7 +86,23 @@ export default function TwiceExceptionalGame() {
       <p className="mb-5 text-sm text-muted-foreground">
         Classify the student from their assessment summary. A gifted student with a co-occurring disability can post a
         perfectly ordinary composite, because the two mask each other — so the composite alone will not save you.
+        Psychologist Susan Baum, whose work this is modeled on, goes further: real identification does not start by
+        mining a score profile at all. It starts from the student&rsquo;s strength, below, and asks what is
+        suppressing it.
       </p>
+
+      <div className="mb-5 rounded-xl border border-white/10 bg-white/5 p-5">
+        <span className="block text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+          Signature strength &mdash; start here
+        </span>
+        <span className="mt-1 block text-xs text-muted-foreground/80">
+          What this student does exceptionally well. Baum&rsquo;s model treats this as the real starting point for
+          identification, not a detail to notice after the numbers.
+        </span>
+        <span data-testid="te-strength" className="mt-2 block text-base font-medium text-white">
+          &ldquo;{studentCase.signatureStrength}&rdquo;
+        </span>
+      </div>
 
       <div className="mb-5 grid gap-4 rounded-xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
         <div>
@@ -108,7 +124,8 @@ export default function TwiceExceptionalGame() {
           <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Subtest scatter</span>
           <span className="mt-1 block text-xs text-muted-foreground/80">
             The gap between this student&rsquo;s strongest and weakest subject scores. A gap of{' '}
-            {NOTABLE_SCATTER_THRESHOLD}+ points is wide enough to be worth a second look.
+            {NOTABLE_SCATTER_THRESHOLD}+ points is wide enough to be worth a second look &mdash; but it is still just
+            another number, not where a real evaluation would start.
           </span>
           <span
             data-testid="te-scatter"

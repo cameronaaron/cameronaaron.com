@@ -28,6 +28,19 @@ import { createSeededRandom } from '@/components/hero/interactive-particles/inte
  * framing adds a third compounding layer, race, which pushes identification
  * rates lower again.
  *
+ * An earlier version of this widget stopped at that masking story: composite
+ * hides the student, scatter reveals them. That is Baum's diagnosis of WHY 2e
+ * students go unidentified, but it is not her prescription for finding them —
+ * and a widget that hands the player two numbers and asks them to mine a
+ * discrepancy out of a score profile quietly re-teaches exactly the
+ * deficit-first, testing-first model her talent-focused / dual-differentiation
+ * approach argues against. Her model identifies 2e students by their STRENGTH
+ * first — what a child does exceptionally well, often visible well before any
+ * formal testing — and only then asks what is suppressing it. So every case
+ * here now carries a `signatureStrength` vignette, shown first, with the
+ * explanation naming it as the real entry point rather than a flavour detail
+ * bolted onto the score pair.
+ *
  * All profile generation and classification live here (modularization
  * contract). Rounds are a pure function of a seed so the first one is
  * identical on the server and the client's first paint (CLAUDE.md #10).
@@ -103,6 +116,37 @@ export const NOTABLE_SCATTER_THRESHOLD = 30;
 export const AVERAGE_COMPOSITE_MIN = 90;
 export const AVERAGE_COMPOSITE_MAX = 110;
 
+/**
+ * Signature-strength vignettes per profile — Baum's actual starting point.
+ * Every profile gets one, not just twice-exceptional: a strength-first model
+ * looks for talent in every student, and the point of showing these side by
+ * side is that a 2e vignette pairs an equally real strength with a visible,
+ * specific struggle, rather than reading as uniformly capable (gifted) or
+ * uniformly effortful (disabled).
+ */
+export const STRENGTH_CATALOG: Record<StudentProfile, readonly string[]> = {
+  typical: [
+    'Reads at grade level, finishes assignments independently, asks for help when stuck.',
+    'Solid, steady work across every subject — no single area stands out.',
+    'Organized and reliable; turns in complete work on time.',
+  ],
+  gifted: [
+    'Redesigned the class recycling system unprompted, cost breakdown included.',
+    'Explains orbital mechanics to classmates at recess, entirely unasked.',
+    'Wrote and illustrated a 40-page fantasy novella over one summer, for fun.',
+  ],
+  disabled: [
+    'Can retell a story in vivid detail out loud but freezes trying to write it down.',
+    'Understands every concept discussed in class, then blanks on the written test.',
+    'Reads people and rooms with real sensitivity, but decoding a page of text is a wall.',
+  ],
+  'twice-exceptional': [
+    'Debates constitutional law with the teacher, then cannot finish a worksheet.',
+    'Builds working catapults from rubber bands and pencils, but loses every homework sheet.',
+    'Memorized every dinosaur genus by age six, still cannot copy a spelling list.',
+  ],
+};
+
 /** Jitter applied to each generated value so rounds are not identical. */
 export const COMPOSITE_JITTER = 6;
 export const SCATTER_JITTER = 5;
@@ -122,6 +166,8 @@ export interface StudentCase {
   profile: StudentProfile;
   composite: number;
   scatter: number;
+  /** Baum's actual starting point — what this student does exceptionally well. */
+  signatureStrength: string;
 }
 
 export interface ScoreState {
@@ -146,6 +192,12 @@ export function applyJitter(base: number, draw: number, spread: number): number 
   return Math.round(base + (draw * 2 - 1) * spread);
 }
 
+/** Pick one signature-strength vignette for a profile from a [0, 1) draw. */
+export function pickSignatureStrength(profile: StudentProfile, draw: number): string {
+  const strengths = STRENGTH_CATALOG[profile];
+  return strengths[Math.floor(draw * strengths.length)];
+}
+
 /** Generate one deterministic student case from a seed. */
 export function generateCase(seed: number): StudentCase {
   const random = createSeededRandom(seed);
@@ -154,8 +206,9 @@ export function generateCase(seed: number): StudentCase {
   const profile = STUDENT_PROFILES[Math.floor(random() * STUDENT_PROFILES.length)];
   const composite = applyJitter(PROFILE_COMPOSITE[profile], random(), COMPOSITE_JITTER);
   const scatter = applyJitter(PROFILE_SCATTER[profile], random(), SCATTER_JITTER);
+  const signatureStrength = pickSignatureStrength(profile, random());
 
-  return { profile, composite, scatter };
+  return { profile, composite, scatter, signatureStrength };
 }
 
 export function getInitialCase(): StudentCase {
@@ -195,21 +248,23 @@ export function computeScoreUpdate(current: ScoreState, studentCase: StudentCase
 
 /**
  * The explanation for a resolved case. The twice-exceptional branch names the
- * masking explicitly, and the "typical" branch names the contrast, because
- * those two are the pair the player has to learn to separate.
+ * masking explicitly and points back to the signature strength as the real
+ * starting point (Baum's model, not a score-mining exercise); the "typical"
+ * branch names the composite/scatter contrast, because those two are the pair
+ * the player has to learn to separate on the numbers alone.
  */
 export function getCaseExplanation(studentCase: StudentCase): string {
   const descriptor = PROFILE_DESCRIPTORS[studentCase.profile];
 
   if (studentCase.profile === 'twice-exceptional') {
-    return `${descriptor.truth} Composite ${studentCase.composite} looks unremarkable — but a ${studentCase.scatter}-point spread between strongest and weakest subtests does not. Scatter is the tell.`;
+    return `${descriptor.truth} Composite ${studentCase.composite} looks unremarkable, and even the ${studentCase.scatter}-point scatter is a symptom you'd have to go looking for. Baum's model starts somewhere else: "${studentCase.signatureStrength}" That strength is the real entry point — not a score to mine for a discrepancy, but a demonstrated talent worth asking what is suppressing it.`;
   }
 
   if (studentCase.profile === 'typical' && isAverageComposite(studentCase.composite)) {
-    return `${descriptor.truth} Same average composite as a twice-exceptional student, and that is exactly the problem — only the low ${studentCase.scatter}-point scatter separates them.`;
+    return `${descriptor.truth} Same average composite as a twice-exceptional student, and that is exactly the problem — only the low ${studentCase.scatter}-point scatter, or a strength vignette like "${studentCase.signatureStrength}" with no matching struggle, separates them.`;
   }
 
-  return `${descriptor.truth} Composite ${studentCase.composite}, scatter ${studentCase.scatter}.`;
+  return `${descriptor.truth} Composite ${studentCase.composite}, scatter ${studentCase.scatter}. Strength: "${studentCase.signatureStrength}".`;
 }
 
 export function getCaseResultMessage(studentCase: StudentCase, correct: boolean): string {
@@ -263,4 +318,4 @@ export function getOptionClassName(state: OptionVisualState): string {
 }
 
 export const IDENTIFICATION_ARIA_LABEL =
-  'Twice-exceptional identification task. Read the student assessment summary and classify the student, then see what the scores actually indicated.';
+  'Twice-exceptional identification task. Read the student assessment summary — signature strength, composite score, and subtest scatter — and classify the student, then see what actually distinguished them.';

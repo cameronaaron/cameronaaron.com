@@ -14,6 +14,7 @@ import {
   PROFILE_DESCRIPTORS,
   PROFILE_SCATTER,
   SCATTER_JITTER,
+  STRENGTH_CATALOG,
   STUDENT_PROFILES,
   applyJitter,
   checkClassification,
@@ -28,6 +29,7 @@ import {
   getOptionVisualState,
   isAverageComposite,
   isNotableScatter,
+  pickSignatureStrength,
   type StudentCase,
 } from './twice-exceptional-logic';
 
@@ -187,8 +189,9 @@ describe('generateCase', () => {
     const profile = STUDENT_PROFILES[Math.floor(random() * STUDENT_PROFILES.length)];
     const composite = applyJitter(PROFILE_COMPOSITE[profile], random(), COMPOSITE_JITTER);
     const scatter = applyJitter(PROFILE_SCATTER[profile], random(), SCATTER_JITTER);
+    const signatureStrength = pickSignatureStrength(profile, random());
 
-    expect(generateCase(seed)).toEqual({ profile, composite, scatter });
+    expect(generateCase(seed)).toEqual({ profile, composite, scatter, signatureStrength });
   });
 
   it('warms the PRNG past the seed-correlated opening draws', () => {
@@ -204,9 +207,92 @@ describe('generateCase', () => {
   });
 });
 
+describe('pickSignatureStrength', () => {
+  it('matches every catalog vignette exactly', () => {
+    // Every vignette is rendered verbatim in the game and quoted back in the
+    // explanation copy — load-bearing content, not filler. One exact fixture
+    // closes every string-literal mutant across the whole catalog at once,
+    // same pattern as the PROFILE_DESCRIPTORS fixture above.
+    expect(STRENGTH_CATALOG).toEqual({
+      typical: [
+        'Reads at grade level, finishes assignments independently, asks for help when stuck.',
+        'Solid, steady work across every subject — no single area stands out.',
+        'Organized and reliable; turns in complete work on time.',
+      ],
+      gifted: [
+        'Redesigned the class recycling system unprompted, cost breakdown included.',
+        'Explains orbital mechanics to classmates at recess, entirely unasked.',
+        'Wrote and illustrated a 40-page fantasy novella over one summer, for fun.',
+      ],
+      disabled: [
+        'Can retell a story in vivid detail out loud but freezes trying to write it down.',
+        'Understands every concept discussed in class, then blanks on the written test.',
+        'Reads people and rooms with real sensitivity, but decoding a page of text is a wall.',
+      ],
+      'twice-exceptional': [
+        'Debates constitutional law with the teacher, then cannot finish a worksheet.',
+        'Builds working catapults from rubber bands and pencils, but loses every homework sheet.',
+        'Memorized every dinosaur genus by age six, still cannot copy a spelling list.',
+      ],
+    });
+  });
+
+  it('gives every profile at least one vignette', () => {
+    for (const profile of STUDENT_PROFILES) {
+      expect(STRENGTH_CATALOG[profile].length).toBeGreaterThan(0);
+    }
+  });
+
+  it('is a pure lookup: same profile and draw always returns the same vignette', () => {
+    for (const profile of STUDENT_PROFILES) {
+      expect(pickSignatureStrength(profile, 0.4)).toBe(pickSignatureStrength(profile, 0.4));
+    }
+  });
+
+  it('never leaves the catalog, at either draw edge', () => {
+    for (const profile of STUDENT_PROFILES) {
+      const strengths = STRENGTH_CATALOG[profile];
+      expect(strengths).toContain(pickSignatureStrength(profile, 0));
+      expect(strengths).toContain(pickSignatureStrength(profile, 0.999));
+    }
+  });
+
+  it('maps each third of the draw range to a distinct index, not always the first', () => {
+    // Every catalog currently holds exactly 3 vignettes. A draw*length bug
+    // (e.g. draw/length instead) still returns a value FROM the catalog —
+    // "never leaves the catalog" above cannot tell them apart — but it always
+    // lands on index 0. Pinning the exact index per draw closes that gap.
+    for (const profile of STUDENT_PROFILES) {
+      const strengths = STRENGTH_CATALOG[profile];
+      expect(strengths.length).toBe(3);
+      expect(pickSignatureStrength(profile, 0.1)).toBe(strengths[0]);
+      expect(pickSignatureStrength(profile, 0.4)).toBe(strengths[1]);
+      expect(pickSignatureStrength(profile, 0.9)).toBe(strengths[2]);
+    }
+  });
+
+  it('pairs a twice-exceptional strength with a visible struggle, not uniform capability', () => {
+    // Baum's point: a 2e vignette must read as talent-AND-struggle, or the
+    // strength-first framing collapses back into "just gifted."
+    for (const vignette of STRENGTH_CATALOG['twice-exceptional']) {
+      expect(/but|then|still/.test(vignette)).toBe(true);
+    }
+  });
+});
+
 describe('checkClassification and scoring', () => {
-  const twoE: StudentCase = { profile: 'twice-exceptional', composite: 103, scatter: 44 };
-  const typical: StudentCase = { profile: 'typical', composite: 101, scatter: 11 };
+  const twoE: StudentCase = {
+    profile: 'twice-exceptional',
+    composite: 103,
+    scatter: 44,
+    signatureStrength: STRENGTH_CATALOG['twice-exceptional'][0],
+  };
+  const typical: StudentCase = {
+    profile: 'typical',
+    composite: 101,
+    scatter: 11,
+    signatureStrength: STRENGTH_CATALOG.typical[0],
+  };
 
   it('accepts only the true profile', () => {
     expect(checkClassification(twoE, 'twice-exceptional')).toBe(true);
@@ -255,20 +341,32 @@ describe('checkClassification and scoring', () => {
 });
 
 describe('explanations', () => {
-  it('names scatter as the tell for a twice-exceptional case', () => {
-    const text = getCaseExplanation({ profile: 'twice-exceptional', composite: 103, scatter: 44 });
-    expect(text).toContain('Scatter is the tell');
-    expect(text).toContain('44-point spread');
+  const strengthFor = (profile: StudentCase['profile']) => STRENGTH_CATALOG[profile][0];
+
+  it('names the signature strength as the real entry point for a twice-exceptional case, not just scatter', () => {
+    const strength = strengthFor('twice-exceptional');
+    const text = getCaseExplanation({ profile: 'twice-exceptional', composite: 103, scatter: 44, signatureStrength: strength });
+    expect(text).toContain('44-point scatter');
+    expect(text).toContain(strength);
+    expect(text).toContain('real entry point');
+    expect(text).not.toContain('Scatter is the tell');
   });
 
   it('names the collision explicitly for an average typical case', () => {
-    const text = getCaseExplanation({ profile: 'typical', composite: 100, scatter: 11 });
+    const text = getCaseExplanation({
+      profile: 'typical',
+      composite: 100,
+      scatter: 11,
+      signatureStrength: strengthFor('typical'),
+    });
     expect(text).toContain('Same average composite as a twice-exceptional student');
   });
 
-  it('falls back to a plain summary for the separable profiles', () => {
-    const text = getCaseExplanation({ profile: 'gifted', composite: 132, scatter: 16 });
+  it('falls back to a plain summary with the strength named for the separable profiles', () => {
+    const strength = strengthFor('gifted');
+    const text = getCaseExplanation({ profile: 'gifted', composite: 132, scatter: 16, signatureStrength: strength });
     expect(text).toContain('Composite 132, scatter 16');
+    expect(text).toContain(strength);
   });
 
   it('requires BOTH profile===typical AND an average composite for the collision branch', () => {
@@ -276,16 +374,30 @@ describe('explanations', () => {
     // to `true`): a typical profile with a non-average composite, and a
     // non-typical profile with an average composite, must both fall through
     // to the plain summary rather than claiming the collision.
-    const typicalButNotAverage = getCaseExplanation({ profile: 'typical', composite: 200, scatter: 11 });
+    const typicalButNotAverage = getCaseExplanation({
+      profile: 'typical',
+      composite: 200,
+      scatter: 11,
+      signatureStrength: strengthFor('typical'),
+    });
     expect(typicalButNotAverage).not.toContain('Same average composite');
-    expect(typicalButNotAverage).toBe('No identified giftedness and no disability. Subtests cluster tightly around the mean. Composite 200, scatter 11.');
 
-    const averageButNotTypical = getCaseExplanation({ profile: 'gifted', composite: 100, scatter: 16 });
+    const averageButNotTypical = getCaseExplanation({
+      profile: 'gifted',
+      composite: 100,
+      scatter: 16,
+      signatureStrength: strengthFor('gifted'),
+    });
     expect(averageButNotTypical).not.toContain('Same average composite');
   });
 
   it('prefixes an exact verdict, using "Missed" rather than a scold', () => {
-    const studentCase: StudentCase = { profile: 'gifted', composite: 132, scatter: 16 };
+    const studentCase: StudentCase = {
+      profile: 'gifted',
+      composite: 132,
+      scatter: 16,
+      signatureStrength: strengthFor('gifted'),
+    };
     expect(getCaseResultMessage(studentCase, true)).toBe(`Correct. ${getCaseExplanation(studentCase)}`);
     expect(getCaseResultMessage(studentCase, false)).toBe(`Missed. ${getCaseExplanation(studentCase)}`);
   });
@@ -296,6 +408,7 @@ describe('explanations', () => {
         profile,
         composite: PROFILE_COMPOSITE[profile],
         scatter: PROFILE_SCATTER[profile],
+        signatureStrength: strengthFor(profile),
       });
       expect(text.length).toBeGreaterThan(40);
     }
@@ -339,7 +452,12 @@ describe('getMaskingSummary', () => {
 });
 
 describe('labels and visual state', () => {
-  const studentCase: StudentCase = { profile: 'twice-exceptional', composite: 103, scatter: 44 };
+  const studentCase: StudentCase = {
+    profile: 'twice-exceptional',
+    composite: 103,
+    scatter: 44,
+    signatureStrength: STRENGTH_CATALOG['twice-exceptional'][0],
+  };
 
   it('names the classification in the option label', () => {
     expect(getOptionAriaLabel('twice-exceptional')).toBe('Classify this student as Twice-exceptional');
@@ -366,7 +484,7 @@ describe('labels and visual state', () => {
 
   it('pins the widget aria-label', () => {
     expect(IDENTIFICATION_ARIA_LABEL).toBe(
-      'Twice-exceptional identification task. Read the student assessment summary and classify the student, then see what the scores actually indicated.'
+      'Twice-exceptional identification task. Read the student assessment summary — signature strength, composite score, and subtest scatter — and classify the student, then see what actually distinguished them.'
     );
   });
 });
