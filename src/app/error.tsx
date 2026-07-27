@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+import { CHUNK_RELOAD_GUARD_KEY, shouldAutoReloadForChunkError } from '@/app/error-boundary-logic';
+
 export default function Error({
   error,
   reset,
@@ -11,6 +13,17 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error(error);
+
+    // A stale tab whose HTML references a chunk hash that no longer exists
+    // after a newer deploy — reset() can't fix this (the module registry
+    // entry is poisoned, not the render tree), only a fresh navigation can.
+    // Guarded to at most once per tab session so a genuinely broken deploy
+    // doesn't reload forever.
+    const alreadyAttempted = window.sessionStorage.getItem(CHUNK_RELOAD_GUARD_KEY) === 'true';
+    if (shouldAutoReloadForChunkError(error, alreadyAttempted)) {
+      window.sessionStorage.setItem(CHUNK_RELOAD_GUARD_KEY, 'true');
+      window.location.reload();
+    }
   }, [error]);
 
   return (
