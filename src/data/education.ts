@@ -61,7 +61,7 @@ export const educationItems: EducationItem[] = [
     details: [
       "Degree Completed: Jun 25, 2026 | Conferred: Aug 1, 2026",
       "Cumulative GPA: 3.85 | Credits Earned: 30.00",
-      "Term Honors: Dean's List (2023 FALL), Provost's List (2024 SPRING, 2024 SUMMER)",
+      "Term Honors: Dean's List (2023 FALL), Provost's List (2024 SPRING, 2024 SUMMER, 2026 SUMMER)",
       "Capstone Action Research Project (Spring 2026, Pass)",
       "Capstone: Bridging Transitions video-based educational series on thrice-exceptional Black male students",
     ],
