@@ -1453,16 +1453,15 @@ investigate that script before touching the config.
    headers-integrity) for quick iteration — it is a convenience command now,
    not the commit gate.
 
-   **GitHub-hosted CI is disabled** (2026-07, owner request — cost, once the
-   local hooks above already ran the full gate on every commit anyway).
-   `.github/workflows/ci.yml` still exists, unmodified apart from its trigger,
-   runnable by hand via `workflow_dispatch` from the Actions tab, or fully
-   restored by reverting that trigger back to `pull_request`/`push`. Until
-   then, the pre-commit/pre-push gate above is the *only* verification a
-   change passes through — which is exactly why mutation testing moved from
-   "occasional manual sweep" to "runs on every commit" in the same change:
-   with no second, independent CI pass as a backstop, the local gate has to
-   carry the full weight by itself.
+   **GitHub-hosted CI is enabled** (re-enabled 2026-08 when the repo went
+   public — GitHub Actions minutes are free for public repos on standard
+   runners, so the 2026-07 cost concern that disabled it no longer applies).
+   `.github/workflows/ci.yml` runs on every push to `master` and every pull
+   request, as a second, independent pass behind the pre-commit/pre-push gate
+   above. Mutation testing stayed wired into the local gate ("runs on every
+   commit," not just an occasional manual sweep) even after CI came back —
+   catching a regression at commit time is still cheaper than catching it in
+   CI a push later.
 
    **Warnings are failures.** `pnpm run lint` runs eslint with
    `--max-warnings=0` and markdownlint over every root `*.md`

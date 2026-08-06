@@ -1,12 +1,14 @@
 name: CI
 
-# Disabled 2026-07 (owner request — GitHub-hosted CI minutes were an
-# unnecessary cost while local pre-commit/pre-push hooks already run
-# type-check + lint + the full test suite, and mutation testing moved into
-# that local gate too). This workflow still exists and can be run by hand
-# from the Actions tab (workflow_dispatch), or fully restored by reverting
-# this trigger block to `pull_request`/`push`.
+# Re-enabled 2026-08 (repo went public — GitHub Actions minutes are free for
+# public repos on standard runners, so the 2026-07 cost concern that disabled
+# this no longer applies). Runs on every push and pull request in addition to
+# the local pre-commit/pre-push hooks, which stay as the fast local gate.
 on:
+  push:
+    branches:
+      - master
+  pull_request:
   workflow_dispatch:
 
 concurrency:

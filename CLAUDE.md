@@ -66,10 +66,13 @@ the commit itself. Pre-push runs the same gate **plus a production build and
 `scripts/checks/performance-budgets.mjs`** (added 2026-07-23 after the RSC
 migration's HTML growth sat unflagged for five days — pushes auto-deploy, so
 the artifact-level budgets must gate the push, not just the manual
-`deploy:prod` path). GitHub-hosted CI is currently **disabled** (2026-07, cost —
-`.github/workflows/ci.yml` only runs on manual `workflow_dispatch` now), so
-these local hooks are the only gate a change passes through; push after every
-commit (or at least before ending a session) anyway so work is backed up.
+`deploy:prod` path). GitHub-hosted CI is **enabled** (re-enabled 2026-08 when
+the repo went public — Actions minutes are free for public repos, so the
+2026-07 cost concern that disabled it no longer applies; `.github/workflows/ci.yml`
+runs on every push to `master` and every pull request, in addition to the
+local hooks). Push after every commit (or at least before ending a session)
+anyway so work is backed up and CI gets a chance to run as a second,
+independent check.
 `pnpm run test:complexity` is a fast, offline, manually-run subset for quick
 iteration — it is not the commit gate.
 
