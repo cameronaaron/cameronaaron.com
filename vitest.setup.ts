@@ -202,6 +202,24 @@ beforeAll(() => {
     value: matchMedia,
   });
 
+  // usePerformanceProfile's low-hardware check falls back to jsdom's
+  // navigator.hardwareConcurrency/deviceMemory, which (unlike matchMedia
+  // above) jsdom mirrors from the real host — deterministic per-machine, but
+  // not across machines. That let a test pass on a >4-core dev box and fail
+  // on a CI runner with fewer cores (rendered nothing — see
+  // section-transitions.test.tsx's history). Pin both to comfortably above
+  // every LOW_HARDWARE_* threshold so every test defaults to 'full' tier
+  // unless it explicitly overrides these via Object.defineProperty, the way
+  // use-performance-profile.test.tsx already does for its own assertions.
+  Object.defineProperty(navigator, 'hardwareConcurrency', {
+    configurable: true,
+    value: 8,
+  });
+  Object.defineProperty(navigator, 'deviceMemory', {
+    configurable: true,
+    value: 8,
+  });
+
   const requestAnimationFrameMock = vi.fn(() => 1);
   const cancelAnimationFrameMock = vi.fn();
 
