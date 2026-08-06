@@ -11,6 +11,7 @@ const EXPECTED_ROOT_FILES = [
   '.nvmrc',
   'CLAUDE.md',
   'ENGINEERING-STANDARDS.md',
+  'LICENSE',
   'README.md',
   'eslint.config.mjs',
   'lighthouserc.json',

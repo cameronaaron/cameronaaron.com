@@ -159,8 +159,9 @@ Dashboard-level items that are not code-configured in this repo:
 
 ## 📄 License
 
-Copyright © 2025 Cameron Aaron. All rights reserved.
+Copyright © 2026 Cameron Aaron. All rights reserved. See [LICENSE](./LICENSE)
+for terms.
 
 ---
 
-**Status:** ✅ Production Ready | **Last Updated:** October 2025
+**Status:** ✅ Production Ready | **Last Updated:** August 2026

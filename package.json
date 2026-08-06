@@ -1,6 +1,14 @@
 {
   "name": "cameron-aaron-portfolio",
   "version": "0.1.0",
+  "description": "Cameron Aaron's personal portfolio site — Next.js, React, TypeScript, Tailwind CSS, deployed on Cloudflare Pages.",
+  "author": "Cameron Aaron",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cameronaaron/cameronaaron.com.git"
+  },
+  "homepage": "https://cameronaaron.com",
   "private": true,
   "packageManager": "pnpm@11.20.0",
   "engines": {
