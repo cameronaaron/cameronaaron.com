@@ -18,6 +18,16 @@ export const experiences: Experience[] = [
     websiteUrl: "https://bridges.edu/",
     positions: [
       {
+        title: "Director of Information Technology Engineering",
+        period: "Nov 2022 - Jul 2024",
+        description: "Solely established and managed school IT infrastructure and security protocols, and designed the web platforms supporting community communication and accessibility.",
+      },
+      {
+        title: "Engineering Instructor",
+        period: "Nov 2022 - Jul 2024",
+        description: "Created a software engineering curriculum and ran interactive coding workshops, preparing students for advanced study and engineering careers.",
+      },
+      {
         title: "Biopsychology Instructor",
         period: "Nov 2022 - Jul 2024",
         description: "Developed and delivered advanced biopsychology curriculum, mentored student research, and applied evidence-based strategies for complex neurological learning outcomes.",
@@ -43,8 +53,23 @@ export const experiences: Experience[] = [
     positions: [
       {
         title: "Systems Administrator",
-        period: "Jul 2021 - Nov 2022",
-        description: "Progressed across support and systems roles, led SaaS operations, documentation, and security-focused systems improvements.",
+        period: "Aug 2022 - Nov 2022",
+        description: "Diagnosed and resolved technical issues through root-cause analysis, translated requirements into technical specifications, and administered SaaS systems as primary admin.",
+      },
+      {
+        title: "Support Systems Analyst",
+        period: "Feb 2022 - Aug 2022",
+        description: "Delivered data-driven systems projects and migrations, tracked support-team trends to set prioritized goals, and reported systems status to leadership.",
+      },
+      {
+        title: "Project Manager",
+        period: "Aug 2021 - Feb 2022",
+        description: "Analyzed team data to set prioritized goals, managed project schedules and stakeholder communication, and kept deliverables on scope and budget.",
+      },
+      {
+        title: "Product Support Specialist (Tier II), Customer Success",
+        period: "Jul 2021 - Aug 2021",
+        description: "Guided customers through workflows and product configuration, triaged and documented bugs with engineering, and coordinated incident communication during outages.",
       },
     ],
   },
@@ -59,14 +84,34 @@ export const experiences: Experience[] = [
         description: "Built Apache Spark SNP analysis pipelines, DICOM imaging analysis tools, and applications integrating digital medical records with biometric and genomic data.",
       },
       {
-        title: "Cybersecurity Researcher",
-        period: "Aug 2019 - May 2021",
-        description: "Performed ethical penetration testing and vulnerability assessments to support proactive institutional risk mitigation.",
-      },
-      {
         title: "CameLAB Neuroscience Lab Research Assistant",
         period: "Aug 2017 - May 2021",
         description: "Conducted EEG, 3D Reach Tracker, and eye-tracking research with MATLAB analysis; co-authored sustained attention and motor behavior findings.",
+      },
+      {
+        title: "BIO 298 and Software Engineering TA",
+        period: "Aug 2020 - Dec 2020",
+        description: "Served as teaching assistant for BIO 298 and software engineering coursework, supporting student learning across interdisciplinary biology and CS topics.",
+      },
+      {
+        title: "Summer Science Research Institute Bioinformatics and Computational Biology Researcher",
+        period: "May 2020 - Jun 2020",
+        description: "Built Apache Spark SNP analysis pipelines and DICOM imaging tools, and engineered an application unifying digital medical records, wearable biometrics, and genomic data.",
+      },
+      {
+        title: "Cybersecurity Researcher",
+        period: "Aug 2019 - Dec 2019",
+        description: "Performed ethical penetration testing and vulnerability assessments to support proactive institutional risk mitigation.",
+      },
+      {
+        title: "Robotics and Artificial Intelligence Lab Manager",
+        period: "Aug 2018 - May 2019",
+        description: "Managed day-to-day operations of the robotics and AI lab, maintained and repaired lab robots, and supported students and faculty using lab resources.",
+      },
+      {
+        title: "Artificial Intelligence Research Associate",
+        period: "Jul 2018 - May 2019",
+        description: "Contributed to Double Robot telepresence, hardware neural network, and autonomous MIP research projects in the Computer Science department's AI lab.",
       },
     ],
   },
@@ -129,8 +174,13 @@ export const experiences: Experience[] = [
     positions: [
       {
         title: "Software Engineer, Support Operations",
-        period: "May 2019 - Jan 2020",
-        description: "Developed support tooling and collaborated across operations, product, engineering, and legal on customer-facing launches.",
+        period: "Aug 2019 - Jan 2020",
+        description: "Developed and managed support tooling, advised support leadership on aligning strategy with product goals, and streamlined complex support workflows.",
+      },
+      {
+        title: "Community Support and Customer Success Engineering",
+        period: "May 2019 - Aug 2019",
+        description: "Supported cross-functional product launches across operations, product, engineering, and legal in an interdisciplinary role touching machine learning workflows.",
       },
     ],
   },
