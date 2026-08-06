@@ -30,6 +30,18 @@ Optional scanner env flags:
 - `A11Y_NU_STRICT=1` fail the scanner suite on Nu validator HTML errors
 - `A11Y_EXTERNAL_URL=https://cameronaaron.com` target URL for `test:a11y:external`
 
+## 🔒 Leak Detection
+
+```bash
+npm run security:leaks:staged   # fast — scans staged changes (pre-commit)
+npm run security:leaks:history  # scans full git history (pre-push)
+```
+
+Both run locally via git hooks; CI runs a third, independent pass with
+[gitleaks/gitleaks-action](https://github.com/gitleaks/gitleaks-action) on
+every push and pull request. Requires the `gitleaks` CLI (`brew install
+gitleaks`) for the local scripts.
+
 ## ✅ Pages Parity Guard
 
 ```bash

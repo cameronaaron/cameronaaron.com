@@ -56,17 +56,27 @@ Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS.md §6, ratchet item 12.
 
 Hook gate (simple-git-hooks): **pre-commit runs the full gate, and pre-push
-runs that same gate as a strict prefix plus more** — lockfile sync,
-type-check, zero-warning lint, the entire test suite
-(every contract, including networked freshness checks), and mutation testing
-scoped to whichever changed files are logic modules (fails the commit if a
-changed logic module's mutation score drops below the threshold in
-`stryker.config.mjs`). A red gate blocks
-the commit itself. Pre-push runs the same gate **plus a production build and
-`scripts/checks/performance-budgets.mjs`** (added 2026-07-23 after the RSC
-migration's HTML growth sat unflagged for five days — pushes auto-deploy, so
-the artifact-level budgets must gate the push, not just the manual
-`deploy:prod` path). GitHub-hosted CI is **enabled** (re-enabled 2026-08 when
+runs that same gate as a strict prefix plus more** — lockfile sync, a
+gitleaks staged-diff scan, type-check, zero-warning lint, the entire test
+suite (every contract, including networked freshness checks), and mutation
+testing scoped to whichever changed files are logic modules (fails the
+commit if a changed logic module's mutation score drops below the threshold
+in `stryker.config.mjs`). A red gate blocks the commit itself. Pre-push runs
+the same gate **plus a full-history gitleaks scan, a production build, and
+`scripts/checks/performance-budgets.mjs`** (the build+budgets step was added
+2026-07-23 after the RSC migration's HTML growth sat unflagged for five days
+— pushes auto-deploy, so the artifact-level budgets must gate the push, not
+just the manual `deploy:prod` path; the gitleaks steps were added 2026-08
+after real PII — academic transcripts with student ID numbers, a personal
+phone number — was found in git history predating this gate, requiring a
+`git filter-repo` rewrite plus a GitHub Support ticket to purge cached PR
+diffs before the repo could go public. `scripts/checks/gitleaks-scan.mjs`
+wraps the `gitleaks` CLI — `security:leaks:staged` for the fast pre-commit
+pass, `security:leaks:history` for the full-history pre-push pass — pinned by
+`standards-enforcement-contract.test.ts`). CI runs a third, independent
+gitleaks pass via `gitleaks/gitleaks-action` on every push and PR — the same
+defense-in-depth rationale as the local/CI split everywhere else in this
+gate. GitHub-hosted CI is **enabled** (re-enabled 2026-08 when
 the repo went public — Actions minutes are free for public repos, so the
 2026-07 cost concern that disabled it no longer applies; `.github/workflows/ci.yml`
 runs on every push to `master` and every pull request, in addition to the
