@@ -30,9 +30,12 @@
 import React from 'react';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
+
+import { SectionHandoff } from '@/components/ui/SectionTransitions';
+import { LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD } from '@/hooks/usePerformanceProfile';
 
 const SRC = resolve(process.cwd(), 'src');
 
@@ -155,6 +158,29 @@ describe('test-quality-contract — the shared motion mock stays faithful', () =
   it('vitest.setup.ts builds its mock from the unit-tested motion-mock module', () => {
     const setup = readFileSync(resolve(process.cwd(), 'vitest.setup.ts'), 'utf8');
     expect(setup).toContain("from './src/test-utils/motion-mock'");
+  });
+
+  it('the default test environment reports hardware above the low-hardware thresholds', () => {
+    // Regression: jsdom mirrors the REAL host's navigator.hardwareConcurrency
+    // (unlike matchMedia, which vitest.setup.ts fully mocks), so this value is
+    // deterministic per-machine but not across machines. A >4-core dev box
+    // and a CI runner with fewer cores computed different performance tiers
+    // for the exact same test, and section-transitions.test.tsx passed
+    // locally while rendering nothing (an empty tree) in CI. vitest.setup.ts
+    // now pins both navigator properties globally so every test gets the
+    // same 'full'-tier default regardless of the host it runs on.
+    expect(navigator.hardwareConcurrency).toBeGreaterThan(LOW_HARDWARE_CORES_THRESHOLD);
+    expect((navigator as Navigator & { deviceMemory?: number }).deviceMemory).toBeGreaterThan(
+      LOW_HARDWARE_MEMORY_GB_THRESHOLD,
+    );
+  });
+
+  it('a tier-gated component renders under the default test environment (end-to-end pin)', () => {
+    // Exercises the real usePerformanceProfile hook (no per-test mock) through
+    // a real tier-gated component, reproducing the exact CI failure this
+    // guards: SectionHandoff returns null outside 'full'/'balanced'.
+    render(<SectionHandoff label="Projects" cue="transition cue" index={0} targetId="projects" />);
+    expect(screen.getByRole('link', { name: /projects/i })).toBeTruthy();
   });
 
   it('useTransform range form interpolates LIVE input — never a frozen snapshot', () => {
