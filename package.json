@@ -29,8 +29,8 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed",
-    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed && pnpm run build && node scripts/checks/performance-budgets.mjs"
+    "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run security:leaks:staged && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed",
+    "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run security:leaks:staged && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed && pnpm run security:leaks:history && pnpm run build && node scripts/checks/performance-budgets.mjs"
   },
   "scripts": {
     "prepare": "simple-git-hooks",
@@ -40,6 +40,8 @@
     "deploy:prod": "pnpm run deploy:pages:prod",
     "deploy:pages:prod": "pnpm run test:freshness && pnpm run test:performance && pnpm run test:interaction-latency && wrangler pages deploy out --project-name cameronaaronsite --branch=master",
     "test:freshness": "vitest run src/dependency-freshness-contract.test.ts src/github-actions-freshness-contract.test.ts",
+    "security:leaks:staged": "node scripts/checks/gitleaks-scan.mjs --staged",
+    "security:leaks:history": "node scripts/checks/gitleaks-scan.mjs --full",
     "check:links": "node scripts/checks/check-external-links.mjs",
     "check:links:stale": "node scripts/checks/check-external-links.mjs --stale-only",
     "lint": "eslint . --max-warnings=0 && pnpm run lint:md",

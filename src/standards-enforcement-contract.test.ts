@@ -135,4 +135,29 @@ describe('standards-enforcement-contract — the standards themselves stay wired
     expect(prePush, 'pre-push hook must run a production build before the artifact budgets').toContain('run build');
     expect(prePush).toContain('performance-budgets.mjs');
   });
+
+  it('leak detection is wired into both the local gate and CI (defense in depth)', () => {
+    // A secret/PII leak caught at commit time never reaches a push; one
+    // caught at push time never reaches GitHub; CI is the last independent
+    // backstop if a hook was ever bypassed with --no-verify. All three tiers
+    // matter — this repo went public in 2026-08 after finding real leaked
+    // PII in history that predated this gate (see git log around that date).
+    const packageJson = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as {
+      'simple-git-hooks'?: Record<string, string>;
+      scripts?: Record<string, string>;
+    };
+    const preCommit = packageJson['simple-git-hooks']?.['pre-commit'] ?? '';
+    const prePush = packageJson['simple-git-hooks']?.['pre-push'] ?? '';
+    expect(preCommit, 'pre-commit must scan staged changes for leaks before they ever get committed').toContain(
+      'security:leaks:staged',
+    );
+    expect(prePush, 'pre-push must scan full history for leaks before anything reaches the remote').toContain(
+      'security:leaks:history',
+    );
+    expect(packageJson.scripts?.['security:leaks:staged']).toBeTruthy();
+    expect(packageJson.scripts?.['security:leaks:history']).toBeTruthy();
+
+    const ciWorkflow = readFileSync(join(ROOT, '.github/workflows/ci.yml'), 'utf8');
+    expect(ciWorkflow, 'CI must run gitleaks as an independent second pass').toContain('gitleaks/gitleaks-action');
+  });
 });
