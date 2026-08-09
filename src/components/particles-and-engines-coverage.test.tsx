@@ -49,6 +49,7 @@ const mockCtx = {
   setTransform: vi.fn(),
   createRadialGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
   save: vi.fn(), restore: vi.fn(), translate: vi.fn(), scale: vi.fn(),
+  drawImage: vi.fn(),
   globalAlpha: 1, strokeStyle: '', fillStyle: '', lineWidth: 1,
 };
 
@@ -261,5 +262,91 @@ describe('InteractiveParticles coverage (line 125)', () => {
     const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
     const { container } = render(<InteractiveParticles quality="balanced" />);
     expect(container.firstChild).not.toBeNull();
+  });
+});
+
+// startLoop's `if (!animationFrameId) draw()` guard against a double-start is
+// structurally unreachable through the real gateLoopOnVisibility: its own
+// `sync()` only calls onResume on a paused→running transition, by which
+// point stopLoop() has already zeroed animationFrameId. Mock the gate so the
+// test — not the collaborator's own de-dup logic — controls when onResume
+// fires, directly exercising both branches of the component's own guard.
+describe('particle loops guard against a redundant onResume (BackgroundParticles line 153, InteractiveParticles line 233)', () => {
+  afterEach(() => {
+    vi.doUnmock('@/components/hero/visibility-gate');
+    vi.resetModules();
+  });
+
+  it('BackgroundParticles: a second onResume while already running does not redraw', async () => {
+    vi.resetModules();
+    mockCtx.clearRect.mockClear();
+    let capturedResume: (() => void) | null = null;
+    vi.doMock('@/components/hero/visibility-gate', () => ({
+      gateLoopOnVisibility: (_el: Element, handlers: { onResume: () => void }) => {
+        capturedResume = handlers.onResume;
+        return () => {};
+      },
+    }));
+
+    const { default: BackgroundParticles } = await import('@/components/hero/BackgroundParticles');
+    render(<BackgroundParticles quality="full" />);
+
+    const clearRectCallsAfterMount = mockCtx.clearRect.mock.calls.length;
+    expect(clearRectCallsAfterMount).toBeGreaterThan(0);
+    expect(capturedResume).not.toBeNull();
+
+    (capturedResume as unknown as () => void)();
+
+    // Already running (animationFrameId still set from the mount draw), so
+    // the guard must skip a second draw() — no new clearRect calls.
+    expect(mockCtx.clearRect.mock.calls.length).toBe(clearRectCallsAfterMount);
+  });
+
+  it('InteractiveParticles: a second onResume while already running does not restart the loop', async () => {
+    vi.resetModules();
+    mockCtx.clearRect.mockClear();
+
+    // InteractiveParticles' animate() skips drawing on its first frame (it
+    // only records lastTick, matching the "first frame has delta 0" pattern
+    // elsewhere in this codebase — see EphemeralRoomGame). The file's shared
+    // one-shot rAF mock only delivers that first, non-drawing frame, so this
+    // test needs its own queue-based rAF stub to advance a second frame.
+    let queue: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      queue.push(cb);
+      return queue.length;
+    });
+
+    let capturedResume: (() => void) | null = null;
+    vi.doMock('@/components/hero/visibility-gate', () => ({
+      gateLoopOnVisibility: (_el: Element, handlers: { onResume: () => void }) => {
+        capturedResume = handlers.onResume;
+        return () => {};
+      },
+    }));
+
+    const { default: InteractiveParticles } = await import('@/components/hero/InteractiveParticles');
+    render(<InteractiveParticles quality="full" />);
+
+    // Frame 1: lastTick gets set, delta=0<16, no draw, but re-schedules.
+    // (time must start nonzero — 0 is falsy, which would defeat animate's
+    // own `if (!lastTick)` check on every subsequent frame too.)
+    let time = 1000;
+    let ran = queue;
+    queue = [];
+    for (const cb of ran) cb(time);
+    // Frame 2: delta >= 16, actually draws.
+    time += 20;
+    ran = queue;
+    queue = [];
+    for (const cb of ran) cb(time);
+
+    const clearRectCallsAfterMount = mockCtx.clearRect.mock.calls.length;
+    expect(clearRectCallsAfterMount).toBeGreaterThan(0);
+    expect(capturedResume).not.toBeNull();
+
+    (capturedResume as unknown as () => void)();
+
+    expect(mockCtx.clearRect.mock.calls.length).toBe(clearRectCallsAfterMount);
   });
 });

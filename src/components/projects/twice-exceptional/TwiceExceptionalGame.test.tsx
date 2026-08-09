@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import TwiceExceptionalGame from './TwiceExceptionalGame';
 import { AVERAGE_COMPOSITE_MAX, AVERAGE_COMPOSITE_MIN, NOTABLE_SCATTER_THRESHOLD } from './twice-exceptional-logic';
@@ -75,6 +75,33 @@ describe('TwiceExceptionalGame — non-expert comprehension', () => {
     expect(text).toContain('Susan Baum');
     expect(text).toContain('starts from the student');
     expect(text).toContain('start here');
+  });
+
+  it('tells the player when the next case falls outside the typical range and has ordinary scatter', () => {
+    // Seed 1 (verified via twice-exceptional-logic.generateCase(1)) produces
+    // a case with composite=79 (outside 90-110) and scatter=18 (below
+    // NOTABLE_SCATTER_THRESHOLD) — the opposite branch from the fixed-seed
+    // initial case, which this file's other tests already exercise.
+    const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(1);
+    render(<TwiceExceptionalGame />);
+    fireEvent.click(screen.getByTestId('te-option-gifted'));
+    fireEvent.click(screen.getByTestId('te-next'));
+    dateNowSpy.mockRestore();
+
+    const text = screen.getByTestId('twice-exceptional-game').textContent ?? '';
+    expect(text).toContain('This student: outside the typical range');
+    expect(text).toContain('This student: ordinary variation');
+  });
+
+  it('advances to a new case and resets the result state when "Next student" is clicked', () => {
+    render(<TwiceExceptionalGame />);
+    fireEvent.click(screen.getByTestId('te-option-gifted'));
+    expect(screen.getByTestId('te-message').textContent).toMatch(/Correct\.|Missed\./);
+
+    fireEvent.click(screen.getByTestId('te-next'));
+
+    expect(screen.getByTestId('te-message').textContent).toBe('');
+    expect(screen.queryByTestId('te-next')).toBeNull();
   });
 
   it('renders the strength callout before the composite/scatter numbers in document order', () => {
