@@ -59,6 +59,15 @@ describe('assessReadiness', () => {
     expect(result.rationale).toContain('no graded prerequisites yet');
   });
 
+  it('treats a null GPA as 0 once percent-complete alone clears a threshold', () => {
+    // 100% complete clears every band's minPercent, so with a null GPA this
+    // only exercises the `gpa ?? 0` fallback (strong/competitive still fail
+    // on GPA; developing's minGpa is 0, so 0 >= 0 lets it land there).
+    const matches = Array.from({ length: 5 }, () => match('completed'));
+    const result = assessReadiness(matches, gpa(null));
+    expect(result.band).toBe('developing');
+  });
+
   it('reports 0% for a program with zero prerequisites rather than dividing by zero', () => {
     const result = assessReadiness([], gpa(null));
     expect(result.percentComplete).toBe(0);

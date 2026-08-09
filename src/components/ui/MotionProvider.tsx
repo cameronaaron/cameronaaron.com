@@ -3,8 +3,10 @@
 import { LazyMotion } from 'framer-motion';
 
 // Load the DOM feature pack as its own chunk, fetched after mount rather than
-// evaluated during hydration. See ./motion-features.
-const loadMotionFeatures = () => import('./motion-features').then((mod) => mod.default);
+// evaluated during hydration. See ./motion-features. Exported for testing —
+// the mocked LazyMotion in vitest.setup.ts ignores the `features` prop
+// entirely, so a MotionProvider render alone never invokes this.
+export const loadMotionFeatures = () => import('./motion-features').then((mod) => mod.default);
 
 /**
  * App-wide Framer Motion runtime. Every `m.*` component in the tree resolves
