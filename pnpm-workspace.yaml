@@ -5,14 +5,14 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20260730.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20260730.1'
-  - '@cloudflare/workerd-linux-64@1.20260730.1'
-  - '@cloudflare/workerd-linux-arm64@1.20260730.1'
-  - '@cloudflare/workerd-windows-64@1.20260730.1'
-  - miniflare@5.20260730.0-alpha
-  - workerd@1.20260730.1
-  - wrangler@4.118.0
+  - '@cloudflare/workerd-darwin-64@1.20260801.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20260801.1'
+  - '@cloudflare/workerd-linux-64@1.20260801.1'
+  - '@cloudflare/workerd-linux-arm64@1.20260801.1'
+  - '@cloudflare/workerd-windows-64@1.20260801.1'
+  - miniflare@5.20260801.1-alpha
+  - workerd@1.20260801.1
+  - wrangler@4.120.0
 overrides:
   postcss: ">=8.5.20"
   "@opentelemetry/core": ">=2.8.0"
@@ -45,6 +45,11 @@ overrides:
   # GHSA-pm4m-ph32-ghv5 (high): js-yaml exponential-time parsing of flow
   # collections, fixed >=5.2.2. Pulled in via markdownlint-cli2, build-time only.
   js-yaml: ">=5.2.2"
+  # GHSA-2v37-7h3g-55p8 (high): nanoid custom generators loop indefinitely
+  # when size is zero, fixed >=3.3.17. Pulled in transitively via postcss
+  # (both our own pin and vitest/vite's independent copy) — build-time only,
+  # nothing vulnerable ever ships to a visitor.
+  nanoid: ">=3.3.17"
   # GHSA-8xcm-r25x-g524 / GHSA-4cwx-7wf7-3272 / GHSA-m8rv-5g2x-5cg5 /
   # GHSA-jr45-8vmc-qm54 / GHSA-v3r7-h72x-cjcm: undici response desync, cache
   # info-leak, CRLF injection, and cookie-attribute-injection bugs, all fixed
