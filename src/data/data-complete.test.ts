@@ -92,9 +92,18 @@ describe('data module coverage', () => {
     expect(springHonor).toBeDefined();
     expect(springHonor?.label).toContain("Dean's Honor List");
     expect(springHonor?.label).toContain('LACCD');
+  });
+
+  it('includes the NREMT EMT Item Review Panel recognition as the most recent honor', () => {
+    const panelHonor = honorsAndAffiliations.find((h) => h.label.includes('Item Review Panel'));
+
+    expect(panelHonor).toBeDefined();
+    expect(panelHonor?.label).toContain('National Registry of EMTs');
+    expect(panelHonor?.label).toContain('Jul 2026');
+    expect(panelHonor?.url).toBe('https://www.nremt.org/verify-credentials');
 
     const sortedHonors = sortByDateDesc(honorsAndAffiliations, (h) => h.label);
-    expect(sortedHonors[0].label).toContain('Jun 2026');
+    expect(sortedHonors[0].label).toContain('Item Review Panel');
   });
 
   it('preserves testimonial source links for externally referenced recommendations', () => {
