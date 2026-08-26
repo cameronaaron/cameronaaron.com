@@ -361,6 +361,10 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
 
 export const honorsAndAffiliations: HonorItem[] = [
   {
+    label: "NREMT EMT Item Review Panel, National Registry of EMTs (Jul 2026)",
+    url: "https://www.nremt.org/verify-credentials",
+  },
+  {
     label: "Full Time Dean's Honor List, LACCD (Jun 2026)",
   },
   {
