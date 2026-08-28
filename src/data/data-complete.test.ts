@@ -62,16 +62,35 @@ describe('data module coverage', () => {
     );
 
     expect(laccd).toBeDefined();
-    expect(laccd?.period).toBe('Sep 2025 - Aug 2026');
-    expect(laccd?.details.some((d) => d.includes('3.69'))).toBe(true);
+    expect(laccd?.period).toBe('Sep 2025 - Dec 2026');
+    // Aug 28, 2026 LACCD transcript: cum GPA 3.72, 40.00 units earned.
+    expect(laccd?.details.some((d) => d.includes('3.72'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('40.00'))).toBe(true);
     expect(laccd?.details.some((d) => d.includes("Dean's Honor List"))).toBe(true);
     expect(laccd?.details.some((d) => d.includes('CHEM 051'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('EKG'))).toBe(true);
 
     const sortedByDate = sortByDateDesc(educationItems, (item) => item.period);
     expect(sortedByDate[0].institution).toContain('Los Angeles Community College District');
   });
 
-  it('marks both CHEM 051 prerequisite entries as in-progress for the current summer term', () => {
+  it('records the Summer 2026 STAT 101 statistics course as completed with an A', () => {
+    const stat101 = prerequisiteCourses.find((c) => c.course.includes('STAT 101'));
+
+    expect(stat101).toBeDefined();
+    expect(stat101?.requirement).toBe('Statistics');
+    expect(stat101?.units).toBe('4.00');
+    expect(stat101?.grade).toBe('A');
+    expect(stat101?.gpa).toBe('4.00');
+    expect(stat101?.status).toBe('Completed');
+
+    // STAT 101 REPLACES the Connecticut College statistics course (PSY 201,
+    // C) rather than sitting alongside it — exactly one statistics row.
+    expect(prerequisiteCourses.filter((c) => c.requirement.startsWith('Statistics'))).toHaveLength(1);
+    expect(prerequisiteCourses.some((c) => c.course.includes('PSY 201'))).toBe(false);
+  });
+
+  it('marks both CHEM 051 prerequisite entries as in-progress for the current fall term', () => {
     const chem051Entries = prerequisiteCourses.filter((c) => c.course.includes('CHEM 051'));
 
     expect(chem051Entries.length).toBeGreaterThanOrEqual(2);

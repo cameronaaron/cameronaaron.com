@@ -16,7 +16,7 @@ export interface TranscriptCourse {
 
 /**
  * Cameron's actual coursework, sourced from College_data/LAC_SR_TSRPT (LACCD
- * unofficial transcript, printed Jul 2026) and the Connecticut College /
+ * unofficial transcript, printed Aug 2026) and the Connecticut College /
  * UMass Amherst transcripts. Each course is tagged with the generic
  * requirement category it satisfies so it can be matched against any
  * program's prerequisite list (see matching-logic.ts). Courses that don't
@@ -129,11 +129,11 @@ export const transcriptCourses: TranscriptCourse[] = [
   },
   {
     category: 'statistics',
-    course: 'PSY 201 — Psychological Statistics (Connecticut College)',
-    institution: 'Connecticut College',
+    course: 'STAT 101 — Statistics for the Social Sciences (LAVC)',
+    institution: 'Los Angeles Valley College',
     units: 4,
-    grade: 'C',
-    gradePoints: 2.0,
+    grade: 'A',
+    gradePoints: 4.0,
     status: 'completed',
   },
   {

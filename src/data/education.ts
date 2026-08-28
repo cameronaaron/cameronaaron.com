@@ -31,13 +31,14 @@ export const educationItems: EducationItem[] = [
   {
     institution: "Los Angeles Community College District",
     credential: "Nursing Prerequisite Coursework",
-    period: "Sep 2025 - Aug 2026",
+    period: "Sep 2025 - Dec 2026",
     details: [
-      "Cumulative GPA: 3.69 | Units Earned: 36.00 (LACCD credit record)",
+      "Cumulative GPA: 3.72 | Units Earned: 40.00 (LACCD credit record)",
       "Spring 2026: 4.0 GPA — Full Time Dean's Honor List (Anatomy, Child Dev, Microbiology, Physiology, Sociology — all A's)",
-      "Certificates of Completion: Certified Nursing Assistant (CNA) & Community Health Worker (CHW) — Dec 2025",
-      "Current enrollment: CHEM 051 – Fundamentals of Chemistry I (Summer 2026)",
-      "Non-credit completions: EKG Technician, Behavioral Tech Prep, Hardware & OS Networking, Digital Video Production",
+      "Summer 2026: 4.0 GPA — STAT 101 Statistics for the Social Sciences (A)",
+      "Certificates of Completion: Certified Nursing Assistant (CNA) & Community Health Worker (CHW) — Dec 2025; Electrocardiography (EKG) Technician — Jun 2026",
+      "Current enrollment: CHEM 051 – Fundamentals of Chemistry I (Fall 2026, LAVC)",
+      "Non-credit completions: Behavioral Tech Prep, Hardware & OS Networking, Digital Board Operations",
     ],
     verificationLinks: [
       {
@@ -207,12 +208,12 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
   },
   {
     requirement: "Statistics",
-    course: "PSY 201 - Psychological Statistics (Connecticut College)",
+    course: "STAT 101 - Statistics for the Social Sciences (LAVC)",
     units: "4.00",
-    grade: "C",
-    gpa: "2.00",
+    grade: "A",
+    gpa: "4.00",
     status: "Completed",
-    url: "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-201",
+    url: "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=250",
   },
   {
     requirement: "Research Methods",

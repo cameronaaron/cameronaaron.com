@@ -13,7 +13,7 @@ describe('education ordering contract', () => {
     const cards = Array.from(container.querySelectorAll('[data-testid^="education-card-"]'));
     const periods = cards.map((card) => card.getAttribute('data-period'));
 
-    expect(periods[0]).toBe('Sep 2025 - Aug 2026');
+    expect(periods[0]).toBe('Sep 2025 - Dec 2026');
     expect(periods[1]).toBe('May 2023 - Jun 2026');
     expect(periods[2]).toBe('Aug 2023 - Jun 2024');
     expect(periods[3]).toBe('Aug 2017 - May 2021');

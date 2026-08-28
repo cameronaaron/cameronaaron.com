@@ -76,6 +76,22 @@ describe('nursing data completeness', () => {
     }
   });
 
+  it('carries the Summer 2026 STAT 101 A as the strongest statistics course on the transcript', () => {
+    const statistics = transcriptCourses.filter((c) => c.category === 'statistics');
+    const stat101 = statistics.find((c) => c.course.includes('STAT 101'));
+
+    expect(stat101).toMatchObject({
+      institution: 'Los Angeles Valley College',
+      units: 4,
+      grade: 'A',
+      gradePoints: 4.0,
+      status: 'completed',
+    });
+    // It replaces PSY 201 (C) rather than joining it — one statistics course.
+    expect(statistics).toHaveLength(1);
+    expect(transcriptCourses.some((c) => c.course.includes('PSY 201'))).toBe(false);
+  });
+
   it('the MSMU program (Cameron\'s CHEM 051-independent option) does not require chemistry', () => {
     const msmu = nursingPrograms.find((p) => p.id === 'msmu-absn');
     expect(msmu?.requiresChemistry).toBe(false);
