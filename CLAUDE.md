@@ -243,7 +243,7 @@ style={{ y: backgroundY }}
 
 ### 7. Education grid is 4-column (xl) / 2-column (sm) — not 3-column
 
-`Education.tsx` uses `sm:grid-cols-2 xl:grid-cols-4` because there are now **4** education items (LACCD, Elmbridge M.Ed., Elmbridge Certificate, Connecticut College). If the count changes, update the grid class accordingly. Contract tests assert the sorted order: LACCD first (`Sep 2025 - Aug 2026`), then Elmbridge M.Ed. (`May 2023 - Jun 2026`).
+`Education.tsx` uses `sm:grid-cols-2 xl:grid-cols-4` because there are now **4** education items (LACCD, Elmbridge M.Ed., Elmbridge Certificate, Connecticut College). If the count changes, update the grid class accordingly. Contract tests assert the sorted order: LACCD first (`Sep 2025 - Dec 2026`), then Elmbridge M.Ed. (`May 2023 - Jun 2026`).
 
 ### 8. In-progress prerequisite courses show a pulsing cyan dot
 
