@@ -231,8 +231,8 @@ export const testimonials: Testimonial[] = [
   {
     name: "Amy Peck",
     role: "CEO - EndeavorXR",
+    // No companyUrl — endeavorxr.com went dark (404, verified 2026-08).
     company: "EndeavorXR",
-    companyUrl: "https://www.endeavorxr.com/",
     profileUrl: "https://www.linkedin.com/in/amypeckxr",
     relationship: "Industry Connection",
     date: "August 2020",

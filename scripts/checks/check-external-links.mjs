@@ -17,12 +17,26 @@
  * drifted stale, but never touches the network itself.
  *
  * A non-200 response isn't automatically "dead": major platforms
- * (LinkedIn, ResearchGate, Facebook, dutchie.com, doi.org's redirect
- * target) block scripted requests with 403/429/400/999 even though the
- * page is genuinely live in a real browser. BOT_BLOCKING_HOSTS lists hosts
- * where a non-200 is classified 'blocked' (assumed live, flagged for a
- * human to spot-check occasionally) rather than 'dead'. Only 404/410/5xx/
- * DNS-failure/timeout counts as 'dead'.
+ * (LinkedIn, ResearchGate, Facebook, Medium, dutchie.com, doi.org's
+ * redirect target) block scripted requests with 403/429/400/999 even
+ * though the page is genuinely live in a real browser. BOT_BLOCKING_HOSTS
+ * lists hosts where a non-200 is classified 'blocked' (assumed live,
+ * flagged for a human to spot-check occasionally) rather than 'dead'.
+ * Only 404/410/5xx/DNS-failure/timeout counts as 'dead'.
+ *
+ * Nor is a failed connection automatically "dead" (2026-08, §0.5 — validate
+ * the instrument): kulturecity.org came back dead with an
+ * ERR_SSL_WRONG_VERSION_NUMBER, and the site was fine — the ISP on the
+ * checking machine (Charter/Spectrum's CUJO filter) was intercepting the
+ * connection, proven by the plaintext http:// probe landing on
+ * block.charter-prod.hosted.cujo.io. A dead domain fails at DNS
+ * (ENOTFOUND) or answers with a 404/5xx; it does not fail mid-TLS-record.
+ * TRANSPORT_ERROR_CODES lists those interception/reset signatures. A URL
+ * that hits one is recorded 'unverifiable' — but ONLY if the ledger
+ * already had it reachable, so a newly-added bogus URL can't slip in that
+ * way, and its lastChecked is deliberately NOT refreshed, so the contract's
+ * 45-day staleness gate still fires and forces a human re-check from a
+ * clean network. The escape hatch expires; it doesn't accumulate.
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -45,8 +59,24 @@ const BOT_BLOCKING_HOSTS = [
   'facebook.com',
   'researchgate.net',
   'dutchie.com',
+  'medium.com', // 403s every scripted request, including subdomain blogs
   'arvojournals.org', // doi.org/10.1167/... redirects here
 ];
+
+/** Transport-level failures that mean "this connection was interfered with",
+ *  not "this host is gone" — see the header comment. A genuinely dead
+ *  domain fails at DNS or answers with an HTTP error instead. */
+const TRANSPORT_ERROR_CODES = [
+  'ERR_SSL_WRONG_VERSION_NUMBER',
+  'EPROTO',
+  'ECONNRESET',
+];
+
+function isTransportInterference(error) {
+  const code = error?.cause?.code ?? error?.code ?? '';
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return TRANSPORT_ERROR_CODES.some((needle) => code === needle || message.includes(needle));
+}
 
 function extractExternalUrls() {
   const urls = new Map(); // url -> Set<relative file path>
@@ -84,6 +114,7 @@ function classify(status, hostname) {
 
 async function checkUrl(url, { retries = 2, timeoutMs = 15_000 } = {}) {
   let lastError = 'unknown error';
+  let lastWasInterference = false;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const controller = new AbortController();
@@ -109,10 +140,42 @@ async function checkUrl(url, { retries = 2, timeoutMs = 15_000 } = {}) {
     } catch (error) {
       clearTimeout(timer);
       lastError = error instanceof Error ? error.message : String(error);
+      lastWasInterference = isTransportInterference(error);
     }
   }
 
-  return { status: 'dead', httpCode: 0, finalUrl: url, error: lastError };
+  return {
+    status: lastWasInterference ? 'transport-error' : 'dead',
+    httpCode: 0,
+    finalUrl: url,
+    error: lastError,
+  };
+}
+
+/**
+ * Turns a check outcome into the ledger entry to record. A transport-level
+ * interference (see TRANSPORT_ERROR_CODES) downgrades to 'unverifiable'
+ * only when the URL was already reachable in the ledger — otherwise it's
+ * indistinguishable from a bad URL and stays 'dead'. An 'unverifiable'
+ * entry keeps its ORIGINAL lastChecked so the contract's staleness gate
+ * still expires it.
+ */
+function resolveEntry(outcome, existing, now, files) {
+  if (outcome.status === 'transport-error') {
+    const wasReachable = existing && existing.status !== 'dead';
+    if (wasReachable) {
+      return {
+        status: 'unverifiable',
+        httpCode: existing.httpCode,
+        lastChecked: existing.lastChecked,
+        note: `connection interfered with from the checking network (${outcome.error}); last verified as '${existing.status}'`,
+        files,
+      };
+    }
+    return { status: 'dead', httpCode: 0, lastChecked: now, files };
+  }
+
+  return { status: outcome.status, httpCode: outcome.httpCode, lastChecked: now, files };
 }
 
 function loadLedger() {
@@ -133,6 +196,7 @@ async function main() {
   const now = new Date().toISOString();
   const results = {};
   const deadNow = [];
+  const unverifiableNow = [];
 
   const urlList = [...found.keys()].sort();
   console.log(`Checking ${urlList.length} external URL(s) referenced from src/data/...`);
@@ -149,18 +213,21 @@ async function main() {
 
     checked += 1;
     const outcome = await checkUrl(url);
-    results[url] = {
-      status: outcome.status,
-      httpCode: outcome.httpCode,
-      lastChecked: now,
-      files: [...found.get(url)].sort(),
-    };
-    if (outcome.status === 'dead') deadNow.push(`  ${url}  (${outcome.httpCode || outcome.error})\n    in: ${[...found.get(url)].join(', ')}`);
-    console.log(`  ${outcome.status.padEnd(7)} ${outcome.httpCode || '---'}  ${url}`);
+    results[url] = resolveEntry(outcome, existing, now, [...found.get(url)].sort());
+    if (results[url].status === 'dead') deadNow.push(`  ${url}  (${outcome.httpCode || outcome.error})\n    in: ${[...found.get(url)].join(', ')}`);
+    if (results[url].status === 'unverifiable') unverifiableNow.push(`  ${url}  (${outcome.error})\n    last verified ${existing.lastChecked} as '${existing.status}'`);
+    console.log(`  ${results[url].status.padEnd(12)} ${outcome.httpCode || '---'}  ${url}`);
   }
 
   writeFileSync(LEDGER_PATH, `${JSON.stringify(results, null, 2)}\n`);
   console.log(`\nChecked ${checked}/${urlList.length} URL(s) (${urlList.length - checked} skipped, within ${staleDays}d). Ledger written to ${LEDGER_PATH.replace(`${ROOT}/`, '')}.`);
+
+  if (unverifiableNow.length > 0) {
+    console.warn(
+      `\n${unverifiableNow.length} link(s) could not be verified from this network (connection interfered with, not a dead host).` +
+        ` Their lastChecked was left untouched, so the 45-day staleness gate still applies:\n${unverifiableNow.join('\n')}`
+    );
+  }
 
   if (deadNow.length > 0) {
     console.error(`\n${deadNow.length} dead link(s) found:\n${deadNow.join('\n')}`);
