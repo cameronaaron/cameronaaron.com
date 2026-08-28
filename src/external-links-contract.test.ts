@@ -26,9 +26,17 @@
  * Third-party sites are far less reliable than the npm/GitHub APIs the
  * dependency-freshness contracts hit, so unlike those, this doesn't run on
  * every commit; it runs on a ledger cadence instead. Bot-blocking platforms
- * (LinkedIn, ResearchGate, Facebook, dutchie.com, arXiv/DOI redirect
- * targets) are classified 'blocked', not 'dead' — a non-200 there doesn't
- * fail the gate, but IS worth an occasional human glance.
+ * (LinkedIn, ResearchGate, Facebook, Medium, dutchie.com, arXiv/DOI
+ * redirect targets) are classified 'blocked', not 'dead' — a non-200 there
+ * doesn't fail the gate, but IS worth an occasional human glance.
+ *
+ * 2026-08 adds a third non-dead status, 'unverifiable': the checking
+ * machine's ISP was intercepting kulturecity.org's TLS connection, which
+ * the checker had reported as a dead link on a site that was fine. Those
+ * entries keep their ORIGINAL lastChecked, so the staleness gate below
+ * still expires them and forces a re-check from a clean network — the
+ * escape hatch cannot accumulate. Every one must carry a 'note' explaining
+ * what interfered.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -45,10 +53,12 @@ const URL_PATTERN = /https?:\/\/[A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]+/g;
 const MAX_LEDGER_AGE_DAYS = 45;
 
 interface LedgerEntry {
-  status: 'live' | 'blocked' | 'dead';
+  status: 'live' | 'blocked' | 'dead' | 'unverifiable';
   httpCode: number;
   lastChecked: string;
   files: string[];
+  /** Required on 'unverifiable' entries: what interfered with the check. */
+  note?: string;
 }
 
 function extractExternalUrls(): Map<string, Set<string>> {
@@ -110,6 +120,25 @@ describe('external-links-contract — every external URL is verified live', () =
     expect(
       dead,
       `${dead.length} dead external link(s) — fix the URL in its source file, then re-run "pnpm run check:links":\n${dead.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it("every 'unverifiable' entry explains what interfered and keeps an unrefreshed lastChecked", () => {
+    // The escape hatch for ISP/TLS interference must expire: if the checker
+    // stamped these with a fresh lastChecked they'd never be re-verified,
+    // and a genuinely dead link could hide behind a transport error forever.
+    const now = Date.now();
+    const undocumented = Object.entries(ledger)
+      .filter(([, entry]) => entry.status === 'unverifiable')
+      .filter(([, entry]) => {
+        const ageDays = (now - new Date(entry.lastChecked).getTime()) / 86_400_000;
+        return !entry.note?.trim() || ageDays < 1;
+      })
+      .map(([url, entry]) => `  ${url} (note: ${entry.note ?? 'none'}, lastChecked ${entry.lastChecked})`);
+
+    expect(
+      undocumented,
+      `${undocumented.length} 'unverifiable' entr(y/ies) lack a note or carry a refreshed lastChecked — see scripts/checks/check-external-links.mjs resolveEntry():\n${undocumented.join('\n')}`,
     ).toEqual([]);
   });
 
