@@ -138,15 +138,28 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
     const { container } = render(<Experience />);
 
     const navButtons = document.querySelectorAll('[data-testid^="experience-nav-"]');
-    if (navButtons.length > 0) {
-      await act(async () => { fireEvent.click(navButtons[0]); });
-      await act(async () => { fireEvent.mouseEnter(navButtons[0]); });
-      await act(async () => { fireEvent.focus(navButtons[0]); });
+    // Was `if (navButtons.length > 0) { ... }` — a guard that silently turned
+    // this whole interaction into a no-op if the directory ever stopped
+    // rendering, which is exactly when it should fail. Assert instead.
+    expect(navButtons.length, 'no experience nav buttons rendered to jump with').toBeGreaterThan(0);
+
+    const scrollSpy = vi.fn();
+    for (const el of document.querySelectorAll('[data-testid^="experience-item-"]')) {
+      (el as HTMLElement).scrollIntoView = scrollSpy;
     }
+
+    await act(async () => { fireEvent.click(navButtons[0]); });
+    await act(async () => { fireEvent.mouseEnter(navButtons[0]); });
+    await act(async () => { fireEvent.focus(navButtons[0]); });
+
+    // The full tier animates the jump; the lite tier below must not.
+    expect(scrollSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ behavior: 'smooth', block: 'start' }),
+    );
     expect(container.firstChild).not.toBeNull();
   });
 
-  it('renders in lite tier (isLiteMotion=true)', async () => {
+  it('jumps without smooth-scrolling on the lite tier (isLiteMotion=true)', async () => {
     vi.doMock('@/hooks/usePerformanceProfile', () => ({
       usePerformanceProfile: () => ({
         performanceTier: 'lite',
@@ -160,6 +173,25 @@ describe('Experience coverage (branches 92-94, 167-173)', () => {
     const { default: Experience } = await import('@/components/Experience');
     const { container } = render(<Experience />);
     expect(container.firstChild).not.toBeNull();
+
+    // The lite tier must hand scrollIntoView `behavior: 'auto'`. Smooth
+    // scrolling is an animation, and the whole point of the lite tier is that
+    // a low-spec device does not run one. Only the 'smooth' side of that
+    // ternary was exercised (by the full-tier test above), so the lite branch
+    // shipped uncovered — caught by CI's 100% branch gate, not the local hook.
+    const scrollSpy = vi.fn();
+    const navButtons = document.querySelectorAll('[data-testid^="experience-nav-"]');
+    expect(navButtons.length, 'no experience nav buttons rendered to jump with').toBeGreaterThan(0);
+
+    for (const el of document.querySelectorAll('[data-testid^="experience-item-"]')) {
+      (el as HTMLElement).scrollIntoView = scrollSpy;
+    }
+
+    await act(async () => { fireEvent.click(navButtons[0]); });
+
+    expect(scrollSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ behavior: 'auto', block: 'start' }),
+    );
   });
 
   it('fires mouseEnter on experience item div and card (lines 167-173)', async () => {
