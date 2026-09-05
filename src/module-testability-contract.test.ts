@@ -95,7 +95,6 @@ describe('module testability contract', () => {
   it('requires extracted visual helper components to keep dedicated tests', () => {
     const requiredPairs: Array<[string, string]> = [
       ['src/components/ui/SectionTransitions.tsx', 'src/components/ui/section-transitions.test.tsx'],
-      ['src/components/ui/FloatingBadgeIcon.tsx', 'src/components/ui/FloatingBadgeIcon.test.tsx'],
       ['src/components/projects/FeaturedIcon.tsx', 'src/components/projects/FeaturedIcon.test.tsx'],
       ['src/components/contact/SocialPlatformIcon.tsx', 'src/components/contact/SocialPlatformIcon.test.tsx'],
     ];
@@ -115,7 +114,7 @@ describe('module testability contract', () => {
 
     expect(modularizationScript).toContain('src/modularization-contract.test.ts');
     expect(modularizationScript).toContain('src/module-testability-contract.test.ts');
-    expect(modularizationScript).toContain('FloatingBadgeIcon.test.tsx');
+    expect(modularizationScript).toContain('FeaturedIcon.test.tsx');
 
     const repoHygieneScript = packageJson.scripts?.['test:repo:hygiene'] ?? '';
     expect(repoHygieneScript).toContain('src/repo-hygiene-contract.test.ts');

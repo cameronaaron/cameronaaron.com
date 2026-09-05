@@ -11,6 +11,12 @@ describe('TextReveal contrast regression', () => {
 
     expect(characterSpans.length).toBeGreaterThan(0);
 
+    // Moving glyphs stay inside their reserved line box, so an entrance
+    // never paints over the next paragraph (caught in the mobile browser).
+    for (const word of container.querySelectorAll('.whitespace-nowrap')) {
+      expect(word.classList.contains('overflow-hidden')).toBe(true);
+    }
+
     for (const span of characterSpans) {
       const style = (span.getAttribute('style') ?? '').toLowerCase();
       expect(style).not.toContain('opacity');

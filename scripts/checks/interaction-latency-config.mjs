@@ -20,6 +20,14 @@ export const RUNS_PER_INTERACTION = 3;
 
 export const INTERACTIONS = [
   {
+    name: 'Hero world switch',
+    file: 'src/components/Hero.tsx',
+    viewport: { width: 1400, height: 1000 },
+    run: async (page) => {
+      await page.getByRole('tab', { name: 'Security', exact: false }).click();
+    },
+  },
+  {
     name: 'Mobile menu toggle',
     file: 'src/components/Navigation.tsx',
     viewport: { width: 390, height: 844 },

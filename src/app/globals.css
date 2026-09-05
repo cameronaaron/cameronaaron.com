@@ -6,14 +6,14 @@
      cyan-* and emerald-* scale overrides below repaint every existing
      `cyan-300`-style utility class in one place — components keep their
      class names; this block is the single source of hue truth. */
-  --color-background: #050b1a;
+  --color-background: #080e18;
   --color-foreground: #eaf4ff;
   --color-primary: #0cbdf2;
   --color-primary-foreground: #ffffff;
   --color-secondary: #10d492;
   --color-secondary-foreground: #ffffff;
-  --color-muted: #0e1d36;
-  --color-muted-foreground: #a6c0d9;
+  --color-muted: #131e2c;
+  --color-muted-foreground: #aebdce;
   --color-accent: #38d6ff;
   --color-accent-foreground: #ffffff;
 
@@ -72,11 +72,20 @@
   body {
     @apply bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-white;
     /* Aurora wash: three-hue ambient gradients (ice / mint / periwinkle) so
-       the palette reads instantly instead of hiding in accents. */
+       the palette reads instantly instead of hiding in accents.
+       Alphas were cut to 0.08/0.05/0.04 during the editorial pass, which read
+       as a flat void; restored 2026-09-05. Atmosphere here is FREE at runtime
+       and the intuition that it costs performance is wrong for this property:
+       a static background-image on <body> is painted once and composited
+       thereafter. Verified, not assumed — 7-run interleaved A/B via
+       `measure-scroll-cost.mjs` (this change + the .glass-card blur below):
+       script -2.2%, recalc +0.2%, layout +0.8%, task -1.1%, all four inside
+       run-to-run spread. Judge any future change here the same way (§9.5); do
+       not dim it on an unmeasured perf hunch. */
     background-image:
-      radial-gradient(circle at 15% 8%, rgba(12, 189, 242, 0.24), transparent 44%),
-      radial-gradient(circle at 85% 78%, rgba(16, 212, 146, 0.17), transparent 40%),
-      radial-gradient(circle at 72% 18%, rgba(129, 140, 248, 0.16), transparent 46%);
+      radial-gradient(circle at 15% 8%, rgba(12, 189, 242, 0.2), transparent 46%),
+      radial-gradient(circle at 85% 78%, rgba(16, 212, 146, 0.14), transparent 42%),
+      radial-gradient(circle at 72% 18%, rgba(129, 140, 248, 0.12), transparent 48%);
     background-attachment: fixed;
     /* Honour iOS notch & home-indicator */
     padding-left: env(safe-area-inset-left);
@@ -231,7 +240,7 @@
   }
   
   .glass-card {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10 hover:border-primary/50 transition-colors duration-300;
+    @apply bg-muted/70 backdrop-blur-lg border border-white/10 hover:border-primary/50 transition-colors duration-300;
   }
 
   /* IntroCurtain self-dismissal: pure CSS so the viewport unblocks even before
@@ -517,4 +526,154 @@
       transform: scale(1);
     }
   }
+}
+
+/* The hero's atmosphere changes only on deliberate world selection. Pointer
+   movement changes one transform, never a full-surface gradient or root token. */
+.hero-editorial {
+  --hero-accent: #7ee7ff;
+  --hero-halo: rgb(56 214 255 / 0.3);
+  isolation: isolate;
+}
+.hero-editorial[data-world="violet"] { --hero-accent: #c1acff; --hero-halo: rgb(166 118 255 / 0.34); }
+.hero-editorial[data-world="mint"] { --hero-accent: #8bf0c4; --hero-halo: rgb(52 232 171 / 0.3); }
+.hero-editorial[data-world="amber"] { --hero-accent: #ffcf95; --hero-halo: rgb(255 178 87 / 0.3); }
+.hero-editorial > .container { max-width: 1320px; }
+.hero-layout { column-gap: clamp(2rem, 6vw, 6rem); }
+.hero-copy { min-width: 0; }
+.hero-name {
+  max-width: 12ch;
+  font-size: clamp(2.75rem, 6.3vw, 6.25rem);
+  letter-spacing: -0.075em;
+  text-wrap: balance;
+}
+.hero-name > span:last-child { color: var(--hero-accent); }
+.hero-surname { display: inline-flex; align-items: baseline; gap: 0.18em; white-space: nowrap; }
+.hero-credentials { font-size: 0.22em; letter-spacing: -0.025em; color: var(--color-muted-foreground); }
+.hero-title { max-width: 35ch; font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.6; }
+.hero-availability { max-width: 100%; padding: 0.6rem 0; border: 0; background: transparent; }
+.hero-availability > span:last-child { font-size: 0.8125rem; line-height: 1.7; color: var(--color-muted-foreground); }
+.hero-actions a { border-radius: 0.75rem; }
+.hero-pointer-light {
+  width: 640px;
+  height: 640px;
+  background: radial-gradient(circle, var(--hero-halo), transparent 68%);
+}
+.hero-light { position: absolute; width: 100%; height: 800px; pointer-events: none; }
+.hero-light-top { top: -250px; right: -25%; background: radial-gradient(ellipse, var(--hero-halo), transparent 65%); }
+.hero-light-bottom { bottom: -500px; left: -30%; background: radial-gradient(ellipse, rgb(126 231 255 / 0.19), transparent 65%); }
+.hero-portrait { padding: 2rem 1rem; }
+.hero-stage { position: relative; }
+.hero-stage .profile-photo { border-radius: 2rem 2rem 8rem 2rem; }
+.hero-stage [data-badge="Future NP"] { left: auto; right: 1rem; bottom: -1.5rem; }
+/* The world word sits IN FLOW under the portrait, never absolutely positioned
+   over it. Measured 2026-09-05 against /out: as an absolute child of .hero-stage
+   it painted a 246x93px slab of type across the subject's chin on desktop and
+   114x45px across the lower face on mobile. Tucking it behind the portrait only
+   traded that for clipped-looking text ("Bui"), and the geometry says there is no
+   absolute offset that clears BOTH the portrait and the (content-full) left
+   column at every viewport width — the copy column's buttons and world tabs
+   occupy the only gutter. In flow, collision is impossible by construction.
+   `hero-portrait-collision.test` pins that it stays out of the portrait's box. */
+.hero-stage-word {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.75rem, 5.2vw, 4.75rem);
+  font-weight: 700;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  color: var(--hero-accent);
+  pointer-events: none;
+  animation: world-arrive 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.hero-orbits {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  transform: perspective(800px) rotateX(22deg) rotateZ(-20deg);
+}
+.hero-orbits > span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-top-color: var(--hero-accent);
+  border-radius: 50%;
+  animation: orbit-turn 22s linear infinite;
+  animation-play-state: paused;
+}
+.hero-orbits > span:nth-child(2) { inset: -7%; animation-duration: 31s; animation-direction: reverse; border-top-color: transparent; border-bottom-color: var(--hero-accent); }
+.hero-orbits > span:nth-child(3) { inset: 7%; animation-duration: 17s; border-style: dashed; opacity: 0.35; }
+.hero-editorial[data-motion="full"] .hero-orbits > span,
+.hero-editorial[data-motion="full"] .hero-badge-float { animation-play-state: running; }
+.hero-badge-float { animation: badge-drift 5s ease-in-out infinite; animation-delay: var(--badge-delay, 0s); animation-play-state: paused; }
+.hero-portrait-caption { display: flex; justify-content: space-between; gap: 1rem; margin: 3rem 0 0; padding-top: 1rem; border-top: 1px solid rgb(255 255 255 / 0.15); color: var(--color-muted-foreground); font-size: 0.75rem; }
+.hero-explorer { margin-top: 2rem; max-width: 40rem; }
+.hero-explorer-label { margin-bottom: 0.875rem; color: var(--color-muted-foreground); font-size: 0.8125rem; }
+.hero-signals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid rgb(255 255 255 / 0.16); }
+.hero-world-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 48px;
+  border-bottom: 2px solid transparent;
+  color: var(--color-muted-foreground);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: color 180ms, border-color 180ms, background-color 180ms;
+}
+.hero-world-tab:hover { background: rgb(255 255 255 / 0.04); color: white; }
+.hero-world-tab[aria-selected="true"] { color: var(--hero-accent); border-bottom-color: var(--hero-accent); }
+.hero-tab-number { font-family: var(--font-mono-accent), monospace; font-size: 0.75rem; opacity: 0.65; }
+#hero-world-panel { min-height: 164px; padding-top: 1.25rem; }
+.hero-world-copy { animation: world-arrive 360ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.hero-world-copy h2 { font-family: var(--font-display), sans-serif; font-size: 1.25rem; letter-spacing: -0.025em; }
+.hero-world-copy p { margin: 0.375rem 0 0.5rem; max-width: 52ch; color: var(--color-muted-foreground); font-size: 1rem; line-height: 1.6; }
+.hero-world-copy a { display: inline-flex; align-items: center; gap: 0.75rem; min-height: 44px; color: var(--hero-accent); font-size: 0.875rem; }
+.hero-world-copy a span { transition: transform 200ms; }
+.hero-world-copy a:hover span { transform: translate(3px, -3px); }
+.hero-stats > div > div { height: 100%; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; text-align: left; }
+.hero-stats .stat-value-anim { font-size: clamp(2rem, 3vw, 2.75rem); color: var(--color-foreground); animation: none; }
+.hero-stats .stat-sheen-anim, .hero-stats .stat-underline-anim { display: none; }
+.experience-entry { scroll-margin-top: 7rem; }
+.experience-phases { border: 0; background: transparent; padding: 0; justify-content: flex-start; backdrop-filter: none; }
+.experience-links { justify-content: flex-start; gap: 0.5rem; }
+.experience-links button { min-height: 44px; font-size: 0.8125rem; letter-spacing: 0; text-transform: none; border-radius: 0.75rem; }
+.experience-story { border-radius: 1.5rem; }
+.research-playground { display: grid; gap: 1.5rem; }
+.research-playground-title { grid-column: 1 / -1; margin: 1rem 0; }
+.research-playground > div { min-width: 0; background: linear-gradient(145deg, rgb(126 231 255 / 0.045), transparent); }
+.research-playground > div > a { height: auto; }
+.text-reveal[data-revealed="true"] .text-reveal-letter { animation: letter-arrive 400ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) backwards; }
+@keyframes letter-arrive { from { transform: translateY(0.3em); } to { transform: translateY(0); } }
+@keyframes orbit-turn { to { transform: rotate(360deg); } }
+@keyframes badge-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes world-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 768px) {
+  .hero-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
+  .hero-stats > div + div { border-left: 1px solid rgb(255 255 255 / 0.1); }
+  .experience-journey { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 3rem; align-items: start; }
+  .experience-directory { position: sticky; top: 7rem; }
+  .experience-links { display: flex; flex-direction: column; align-items: stretch; }
+  .experience-links button { text-align: left; width: 100%; }
+  .experience-phases > div { font-size: 0.75rem; letter-spacing: 0.02em; }
+  .research-playground { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+@media (max-width: 767px) {
+  .hero-portrait { padding: 1rem 1.5rem 2rem; }
+  .hero-stage-word { margin-top: 1rem; font-size: 2.5rem; }
+  .hero-portrait-caption { display: none; }
+  .hero-name { max-width: 13ch; }
+  .hero-title { font-size: 1rem; }
+  .hero-actions { gap: 0.625rem; }
+  .hero-actions a { padding: 0.875rem 1.125rem; font-size: 0.875rem; }
+  .hero-stats { gap: 1rem 0.5rem; margin-top: 1.5rem; }
+  .hero-stats > div:last-child { grid-column: span 2; }
+  .hero-tab-number { display: none; }
+  .hero-world-tab { font-size: 0.75rem; }
+  .experience-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage-word, .hero-world-copy, .text-reveal .text-reveal-letter { animation: none; }
+  .hero-orbits > span, .hero-badge-float { animation: none; }
 }

@@ -4,7 +4,6 @@ import { m } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 import ScrambleText from '@/components/ui/ScrambleText';
-import TextReveal from '@/components/ui/TextReveal';
 
 interface SectionHeaderProps {
   title: string;
@@ -57,7 +56,10 @@ export default function SectionHeader({ title, subtitle, className = '', heading
           id={headingId}
           className="relative z-10 mb-4 overflow-hidden pb-2 font-display text-4xl font-bold tracking-tight text-transparent md:text-6xl bg-gradient-to-br from-white via-cyan-50 to-cyan-200/80 bg-clip-text"
         >
-          <TextReveal text={title} />
+          {/* The complete heading enters with its parent. Independently
+              transformed letters lose the ancestor's gradient paint until
+              their animation ends, making headings unreadable in motion. */}
+          {title}
         </h2>
       </div>
       {subtitle ? (

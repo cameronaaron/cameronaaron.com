@@ -65,7 +65,7 @@ export default function StatCard({ value, label }: StatCardProps) {
         {value}
       </div>
 
-      <div className="font-mono-accent relative mt-1 break-words text-[10px] font-medium uppercase leading-relaxed tracking-[0.08em] text-foreground/80">
+      <div className="font-mono-accent relative mt-1 break-words text-xs font-medium leading-relaxed tracking-normal text-foreground/80">
         {label}
       </div>
 

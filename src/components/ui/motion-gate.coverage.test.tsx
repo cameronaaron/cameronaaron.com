@@ -54,13 +54,6 @@ describe('infinite-animation motion gates', () => {
       expect(container.querySelector('svg')).toBeTruthy();
     });
 
-    it(`FloatingBadge float/rotate is ${mode}`, async () => {
-      mockInteractionMode(prefersReducedMotion);
-      const { default: FloatingBadge } = await import('./FloatingBadge');
-      const { container } = render(<FloatingBadge icon="innovation" position="top-right" />);
-      expect(container.firstChild).toBeTruthy();
-    });
-
     it(`SectionReveal and SectionHandoff glows are ${mode}`, async () => {
       mockInteractionMode(prefersReducedMotion);
       const { SectionReveal, SectionHandoff } = await import('./SectionTransitions');

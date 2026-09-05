@@ -1782,6 +1782,14 @@ investigate that script before touching the config.
     the source, run the affected test file directly) to confirm it's real
     before trusting the count.
 
+    Reproduced September 2026 with Stryker 10 / Vitest 5: the hero navigation
+    mutation `key === 'ArrowLeft'` → `key !== 'ArrowLeft'` was reported as
+    surviving, but applying that exact mutation directly caused three tests
+    in `hero-logic.test.ts` to fail. The scoped harness score (20.97%) is
+    therefore not a reliable verdict on this change; changing coverage mode
+    and restarting workers did not resolve the discrepancy. The source was
+    restored and the full suite passed. Do not lower the mutation threshold.
+
     **2026-07 sweep across the logic-heavy files** pushed five files from
     partial scores to at-or-near 100%, using the hand-verification protocol
     above for every ignore: `skill-web-logic.ts` (32 real gaps closed with
@@ -2710,3 +2718,26 @@ Four lessons, each of which cost a real defect to learn:
    catch: a *geometric* easing tail underflows to an exactly-zero delta, which
    satisfies the very `=== 0` park condition being pinned. It takes a
    *harmonic* tail to reproduce the real failure.
+
+**September 2026 browser follow-up:** the gradient-paint constraint applies
+to temporary entrance transforms too. `SectionHeader` now animates the whole
+heading from its ancestor, with literal text inside the clipped gradient;
+per-letter transforms made parts of the heading disappear until they settled.
+The solid-color hero `TextReveal` uses a short CSS entrance and clips each
+word to its reserved line box. Text remains readable before the lazy motion
+runtime loads, and entering letters cannot paint over the following paragraph. Reduced-motion
+browser testing also exposed Framer's `useReducedMotion()` reading media state
+before hydration: `usePerformanceProfile` must gate that value with
+`isProfileReady`, just like its pointer and hardware readings. The first client
+render stays identical to SSR, then the effect applies the real preference.
+The UI paint/contrast tests and `use-performance-profile.test.tsx` pin these
+cases; production Chromium verification covers desktop, touch, and reduced
+motion.
+
+Explicit activation must outrank a decorative visibility observer. On a
+390px viewport, a playable companion's button can be visible before 20% of
+its taller container intersects. Toggling its raw `defaultOpen` state then
+closed an unmounted game, despite the button advertising "Play". The shared
+`ProjectDemoDisclosure` now toggles its rendered state and records explicit
+activation; unactivated games still wait for visibility. Its test covers
+both default-open and default-closed games with the observer still false.

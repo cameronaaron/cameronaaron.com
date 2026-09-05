@@ -76,9 +76,12 @@ describe('ui coverage hardening', () => {
     // text-transparent title renders invisible. The skew must wrap the h2.
     render(<SectionHeader title="Paint Contract" headingId="paint-heading" />);
 
-    // TextReveal renders word-gaps as margins, so the accessible name has no space.
     const heading = screen.getByRole('heading', { name: /paint\s*contract/i });
     expect(heading.className).toContain('bg-clip-text');
+    // The gradient must paint the actual glyphs throughout the entrance,
+    // with no separately composited letter layers inside the heading.
+    expect(heading.textContent).toBe('Paint Contract');
+    expect(heading.querySelector('span')).toBeNull();
 
     const skewCarrier = screen.getByTestId('section-title-motion');
     expect(skewCarrier.contains(heading)).toBe(true);

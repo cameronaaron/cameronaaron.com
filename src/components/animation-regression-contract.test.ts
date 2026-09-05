@@ -53,9 +53,25 @@
  *    Fix: setTimeout only flips the phase; a separate effect keyed on phase === 'go'
  *    waits for the next requestAnimationFrame and uses THAT frame's own timestamp as
  *    goTimestamp — aligned with the frame the browser is about to paint.
+ *
+ * 9. Hero world-word painted across the subject's face (2026-09)
+ *    The per-world display word ("Build"/"Question"/"Care"/"Grow") was an absolutely
+ *    positioned child of .hero-stage at z-index 25 — i.e. stacked ON TOP of the
+ *    portrait. Measured against /out at 1440x900 and 390x844: a 246x93px slab of type
+ *    across the subject's chin on desktop, 114x45px across the lower face on mobile.
+ *    Pushing it behind the portrait (z-index 0) only traded that for clipped-looking
+ *    text, and the geometry showed no absolute offset clears BOTH the portrait and the
+ *    content-full left column at every width — the copy column's buttons and world tabs
+ *    occupy the only gutter. Two decorative FloatingBadge icons inside ProfileImage were
+ *    also colliding with the meaningful EMT/Security/Research/Future NP pills; they were
+ *    deleted outright rather than repositioned.
+ *    Fix: the word lives IN FLOW as a sibling after .hero-stage, never absolutely
+ *    positioned. Collision becomes impossible by construction rather than tuned per
+ *    breakpoint, which is what this contract pins: the word must not be a descendant of
+ *    the portrait stage, and its rule must not re-acquire absolute/fixed positioning.
  */
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
@@ -84,7 +100,80 @@ function stripComments(src: string): string {
   return out;
 }
 
+/** The className string literal of a JSX opening element, or '' when it is not
+ * a plain literal (template/expression classNames are not what this pins). */
+function classNameOf(node: ts.JsxOpeningLikeElement): string {
+  for (const prop of node.attributes.properties) {
+    if (!ts.isJsxAttribute(prop) || prop.name.getText() !== 'className') continue;
+    const init = prop.initializer;
+    if (init && ts.isStringLiteral(init)) return init.text;
+  }
+  return '';
+}
+
+/** Body of a single top-level CSS rule, matched on its exact selector. */
+function cssRuleBody(css: string, selector: string): string {
+  const start = css.indexOf(`\n${selector} {`);
+  if (start === -1) throw new Error(`CSS rule not found: ${selector}`);
+  const open = css.indexOf('{', start);
+  const close = css.indexOf('}', open);
+  return css.slice(open + 1, close);
+}
+
 describe('animation regression contract', () => {
+  it('hero world word is not a descendant of the portrait stage (2026-09 face-collision)', () => {
+    const source = read('src/components/Hero.tsx');
+    const file = ts.createSourceFile('Hero.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    // Locate the portrait stage element, then prove the world word is nowhere
+    // inside it. Inside .hero-stage there is no offset that clears the portrait
+    // at every viewport width, so containment itself is the regression.
+    let stage: ts.Node | undefined;
+    const findStage = (node: ts.Node): void => {
+      if (ts.isJsxElement(node) && /(^|\s)hero-stage(\s|$)/.test(classNameOf(node.openingElement))) {
+        stage = node;
+      }
+      ts.forEachChild(node, findStage);
+    };
+    findStage(file);
+    expect(stage, 'Hero.tsx has no .hero-stage element').toBeDefined();
+
+    let wordInsideStage = false;
+    const findWord = (node: ts.Node): void => {
+      const cls =
+        ts.isJsxSelfClosingElement(node) ? classNameOf(node)
+        : ts.isJsxElement(node) ? classNameOf(node.openingElement)
+        : '';
+      if (cls.includes('hero-stage-word')) wordInsideStage = true;
+      ts.forEachChild(node, findWord);
+    };
+    findWord(stage!);
+
+    expect(
+      wordInsideStage,
+      'The hero world word is inside .hero-stage again — it will paint over the portrait. Keep it a sibling AFTER the stage.',
+    ).toBe(false);
+
+    // ...and it must still exist somewhere in the hero, or the pin is vacuous.
+    expect(source).toContain('hero-stage-word');
+  });
+
+  it('hero world word stays in flow — never absolutely positioned over the portrait (2026-09)', () => {
+    const body = cssRuleBody(read('src/app/globals.css'), '.hero-stage-word');
+
+    expect(/position:\s*(absolute|fixed)/.test(body), '.hero-stage-word re-acquired absolute/fixed positioning').toBe(false);
+    expect(/(^|[^-])z-index:/.test(body), '.hero-stage-word re-acquired a z-index').toBe(false);
+  });
+
+  it('the portrait carries no decorative FloatingBadge icons overlapping its meaning pills (2026-09)', () => {
+    const source = read('src/components/hero/ProfileImage.tsx');
+
+    expect(source).not.toContain('FloatingBadge');
+    // The deleted module must stay deleted, not linger as dead code.
+    expect(existsSync(resolve(process.cwd(), 'src/components/ui/FloatingBadge.tsx'))).toBe(false);
+    expect(existsSync(resolve(process.cwd(), 'src/components/ui/floating-badge-logic.ts'))).toBe(false);
+  });
+
   it('ExperienceCard has no standalone whileInView on its card root element', () => {
     const source = read('src/components/experience/ExperienceCard.tsx');
     // The SpotlightCard (root element) must not own its entry animation — the parent

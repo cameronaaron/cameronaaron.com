@@ -173,6 +173,30 @@ describe('usePerformanceProfile', () => {
     expect(result.current.shouldRenderHeavyEffects).toBe(false);
   });
 
+  it('keeps the first client render identical to SSR even with reduced motion enabled', async () => {
+    const fm = await import('framer-motion');
+    vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
+    installMatchMedia(true);
+    setHardware(16, 16);
+    const renders: ReturnType<typeof usePerformanceProfile>[] = [];
+    const { result } = renderHook(() => {
+      const profile = usePerformanceProfile();
+      renders.push(profile);
+      return profile;
+    });
+    expect(renders[0]).toMatchObject({
+      isProfileReady: false,
+      prefersReducedMotion: false,
+      performanceTier: 'full',
+      shouldRenderHeavyEffects: false,
+    });
+    expect(result.current).toMatchObject({
+      isProfileReady: true,
+      prefersReducedMotion: true,
+      performanceTier: 'reduced',
+    });
+  });
+
   it('transitions tiers when the pointer media-query flips', () => {
     const handle = installMatchMedia(false);
     setHardware(16, 16);

@@ -74,7 +74,7 @@ export default function Projects() {
           headingId="projects-heading"
           index="04"
           title="Research & Publications"
-          subtitle="Selected publications, conference presentations, and research projects"
+          subtitle="Read the work. Play with the ideas. Follow your curiosity."
           className="[&>h2]:font-display"
         />
 
@@ -130,8 +130,8 @@ export default function Projects() {
 
         {/* Projects that ship a playable companion, each paired with its own
             game rather than pointing at one stacked further down the page. */}
-        <div className="mb-20 max-w-6xl mx-auto space-y-8" data-testid="playable-projects">
-          <h3 className="text-sm uppercase tracking-[0.18em] text-cyan-300/80">Play the research</h3>
+        <div className="research-playground mb-20 max-w-6xl mx-auto" data-testid="playable-projects">
+          <h3 className="research-playground-title font-display text-3xl md:text-5xl font-semibold tracking-tight text-foreground">Play the research</h3>
           {playableProjects.map((project, index) => (
             <div
               key={project.title}

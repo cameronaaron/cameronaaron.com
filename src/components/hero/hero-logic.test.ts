@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   HERO_FLOATING_BADGES,
   HERO_SIGNAL_CHIPS,
+  HERO_WORLDS,
+  getNextHeroWorld,
   getHeroMotionConfig,
 } from './hero-logic';
 
@@ -37,5 +39,21 @@ describe('hero logic', () => {
       { label: 'Research', className: '-right-8 bottom-24' },
       { label: 'Future NP', className: 'left-2 -bottom-4' },
     ]);
+  });
+});
+
+describe('hero world navigation', () => {
+  it.each([
+    [0, 'ArrowRight', 1], [3, 'ArrowRight', 0],
+    [0, 'ArrowLeft', 3], [2, 'ArrowLeft', 1],
+    [2, 'Home', 0], [0, 'End', 3], [2, 'Tab', 2],
+  ])('moves from %i with %s to %i', (current, key, next) => {
+    expect(getNextHeroWorld(current, key)).toBe(next);
+  });
+
+  it('gives every world an existing destination and a distinct atmosphere', () => {
+    expect(HERO_WORLDS).toHaveLength(HERO_SIGNAL_CHIPS.length);
+    expect(HERO_WORLDS.map((world) => world.href)).toEqual(['#experience', '#projects', '#certifications', '#education']);
+    expect(new Set(HERO_WORLDS.map((world) => world.tone)).size).toBe(4);
   });
 });

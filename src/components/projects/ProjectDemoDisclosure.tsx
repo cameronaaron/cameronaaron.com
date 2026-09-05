@@ -51,9 +51,10 @@ export default function ProjectDemoDisclosure({
   defaultOpen = false,
 }: ProjectDemoDisclosureProps) {
   const [open, setOpen] = useState(defaultOpen);
+  const [hasBeenActivated, setHasBeenActivated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasBeenSeen = useInView(containerRef, { amount: 0.2, once: true });
-  const shouldMount = open && hasBeenSeen;
+  const shouldMount = open && (hasBeenSeen || hasBeenActivated);
   const descriptor = getDemoDescriptor(demo);
   // A button reporting aria-expanded MUST name the region it expands, or a
   // screen-reader user is told something opened with no way to find it
@@ -64,8 +65,12 @@ export default function ProjectDemoDisclosure({
   const panelId = `demo-panel-${demo}`;
 
   const handleToggle = useCallback(() => {
-    setOpen((current) => !current);
-  }, []);
+    // An explicit click outranks the observer. On a small screen the button
+    // can be visible before its container meets the intersection threshold;
+    // toggling defaultOpen then would close the still-unmounted game.
+    setHasBeenActivated(true);
+    setOpen(!shouldMount);
+  }, [shouldMount]);
 
   return (
     <div ref={containerRef} className="mt-6" data-testid={`demo-disclosure-${demo}`}>

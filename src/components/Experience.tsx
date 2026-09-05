@@ -35,7 +35,7 @@ export default function Experience() {
   const handleJumpToExperience = (index: number) => {
     setActiveExperienceIndex(index);
     const target = document.getElementById(getExperienceItemId(index));
-    target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+    target?.scrollIntoView?.({ behavior: isLiteMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
   // Stable identity so the memoized ExperienceCard never re-renders from a
@@ -43,7 +43,7 @@ export default function Experience() {
   const handleActivate = useCallback((index: number) => setActiveExperienceIndex(index), []);
 
   return (
-    <section id="experience" className="py-20 bg-background relative overflow-hidden" aria-labelledby="experience-heading">
+    <section id="experience" className="experience-editorial py-20 bg-background relative" aria-labelledby="experience-heading">
       <div className="container mx-auto px-6 relative z-10" ref={containerRef}>
         <SectionHeader
           headingId="experience-heading"
@@ -53,12 +53,14 @@ export default function Experience() {
           className="[&>h2]:font-display"
         />
 
+        <div className="experience-journey">
+        <aside className="experience-directory">
         <m.div
           initial={{ opacity: 0, y: entryYOffset }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.42 : 0.65, ease: 'easeOut' }}
-          className="mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          className="experience-phases mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
           role="group"
           aria-label="Experience flow phases"
         >
@@ -82,7 +84,7 @@ export default function Experience() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.42 : 0.6, ease: 'easeOut' }}
-          className="mx-auto mb-10 flex max-w-5xl flex-wrap justify-center gap-3"
+          className="experience-links mx-auto mb-10 flex max-w-5xl flex-wrap justify-center gap-3"
           role="group"
           aria-label="Experience quick navigation"
         >
@@ -117,8 +119,9 @@ export default function Experience() {
           })}
         </m.div>
 
-        <div className="max-w-5xl mx-auto relative">
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
+        </aside>
+        <div className="experience-timeline relative">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
             <m.div 
               style={{ scaleY, transformOrigin: "top" }}
               className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-400 via-emerald-400 to-cyan-400"
@@ -126,7 +129,7 @@ export default function Experience() {
           </div>
 
           <m.div
-            className="space-y-12 md:space-y-24"
+            className="space-y-8 md:space-y-12"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
@@ -161,16 +164,16 @@ export default function Experience() {
                     },
                   },
                 }}
-                className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                className="experience-entry relative flex items-center"
               >
 
                 <m.div
-                  className="absolute left-8 md:left-1/2 z-20 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-background md:block"
+                  className="absolute left-0 top-10 z-20 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-background md:block"
                   animate={getTimelineDotAnimation(isLiteMotion, activeExperienceIndex === index)}
                   transition={getTimelineDotTransition(isLiteMotion)}
                 />
 
-                <div className="w-full pl-20 md:w-[calc(50%-2rem)] md:pl-0">
+                <div className="w-full md:pl-8">
                   <ExperienceCard
                     experience={exp}
                     index={index}
@@ -181,6 +184,7 @@ export default function Experience() {
               </m.div>
             ))}
           </m.div>
+        </div>
         </div>
       </div>
     </section>

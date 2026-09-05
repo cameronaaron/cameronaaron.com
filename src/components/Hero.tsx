@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { m, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
-import { useEffect } from 'react';
+import { m, useInView, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
 import StatCard from '@/components/ui/StatCard';
@@ -14,13 +14,19 @@ import Magnetic from '@/components/ui/Magnetic';
 import ScrambleText from '@/components/ui/ScrambleText';
 import LocalTimeStatus from '@/components/ui/LocalTimeStatus';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
-import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, getHeroMotionConfig } from '@/components/hero/hero-logic';
+import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, HERO_WORLDS, getNextHeroWorld, getHeroMotionConfig } from '@/components/hero/hero-logic';
 
 const BackgroundParticles = dynamic(() => import('@/components/hero/BackgroundParticles'), { ssr: false });
 const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), { ssr: false });
 
+const [givenName, familyName, ...credentials] = profile.name.split(' ');
+
 export default function Hero() {
-  const { performanceTier, shouldRenderHeavyEffects } = usePerformanceProfile();
+  const [activeWorld, setActiveWorld] = useState(0);
+  const world = HERO_WORLDS[activeWorld];
+  const heroRef = useRef<HTMLElement>(null);
+  const isHeroInView = useInView(heroRef, { margin: '80px' });
+  const { performanceTier, shouldRenderHeavyEffects, shouldRenderParticles } = usePerformanceProfile();
   const { shouldUseParallax, showFloatingBadges, parallaxDepth, scaleFloor } = getHeroMotionConfig(performanceTier);
   const { scrollY, scrollYProgress } = useScroll();
   const rawPointerX = useMotionValue(0);
@@ -40,6 +46,8 @@ export default function Hero() {
   // Track the pointer by writing straight into the motion values from the event
   // handler — no React state, no re-render of this (large) tree on every mousemove.
   useEffect(() => {
+    if (!shouldRenderHeavyEffects || !isHeroInView) return;
+
     const handlePointerMove = (event: MouseEvent) => {
       rawPointerX.set(event.clientX);
       rawPointerY.set(event.clientY);
@@ -47,25 +55,21 @@ export default function Hero() {
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     return () => window.removeEventListener('mousemove', handlePointerMove);
-  }, [rawPointerX, rawPointerY]);
+  }, [rawPointerX, rawPointerY, shouldRenderHeavyEffects, isHeroInView]);
 
-  const pointerVelocityX = useVelocity(rawPointerX);
-  const pointerVelocityY = useVelocity(rawPointerY);
-  const pointerSpeed = useTransform([pointerVelocityX, pointerVelocityY], ([vx, vy]: number[]) => {
-    const speed = Math.sqrt(vx * vx + vy * vy);
-    return Math.min(speed / 1100, 1);
-  });
-  const auraSize = useTransform(pointerSpeed, [0, 1], [460, 650]);
-  const auraCoreAlpha = useTransform(pointerSpeed, [0, 1], [0.14, 0.28]);
-  const auraEdgeAlpha = useTransform(pointerSpeed, [0, 1], [0.08, 0.16]);
-  const dynamicAuraOpacity = useTransform([auraOpacity, pointerSpeed], ([base, speed]: number[]) => Math.min(0.5, base + speed * 0.14));
-  const pointerAura = useMotionTemplate`radial-gradient(${auraSize}px circle at ${auraX}px ${auraY}px, rgba(56, 214, 255, ${auraCoreAlpha}), rgba(16, 212, 146, ${auraEdgeAlpha}) 34%, transparent 76%)`;
+  // A fixed-size light moves via transform. Rebuilding a radial-gradient on
+  // every pointer frame repaints the entire hero even when its content is still.
+  const lightX = useTransform(auraX, (x: number) => x - 320);
+  const lightY = useTransform(auraY, (y: number) => y - 320);
 
   return (
-    <section 
+    <section
       id="home"
-      className="min-h-svh flex items-center justify-center relative overflow-hidden bg-background"
+      ref={heroRef}
+      className="hero-editorial min-h-svh flex items-center justify-center relative overflow-hidden bg-background"
       aria-label="Hero section"
+      data-world={world.tone}
+      data-motion={shouldRenderHeavyEffects && isHeroInView ? 'full' : 'quiet'}
     >
       <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/5" aria-hidden="true">
         <m.div
@@ -76,48 +80,45 @@ export default function Hero() {
 
       {shouldRenderHeavyEffects ? (
         <m.div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: pointerAura, opacity: dynamicAuraOpacity }}
+          className="hero-pointer-light pointer-events-none absolute left-0 top-0"
+          style={{ x: lightX, y: lightY, opacity: auraOpacity }}
           aria-hidden="true"
         />
       ) : null}
 
-      <m.div 
-        className="absolute inset-0 bg-hero-glow opacity-40" 
-        style={shouldUseParallax ? { y: yParallax, opacity: opacityFade } : { opacity: 0.32 }}
-        aria-hidden="true" 
-      />
-      <m.div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" 
-        style={shouldUseParallax ? { y: topGlowY } : { y: 0 }}
-        aria-hidden="true" 
-      />
-      <m.div 
-        className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none" 
-        style={shouldUseParallax ? { y: bottomGlowY } : { y: 0 }}
-        aria-hidden="true" 
-      />
-      
-      {shouldUseParallax ? <BackgroundParticles quality={performanceTier} /> : null}
-      {shouldUseParallax ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
-
       <m.div
-        className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10"
-        style={shouldUseParallax ? { y: yParallax, scale: scaleDown } : { y: 0, scale: 1 }}
-      >
-        <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
+        className="absolute inset-0 bg-hero-glow opacity-40"
+        style={shouldUseParallax ? { y: yParallax, opacity: opacityFade, scale: scaleDown } : { opacity: 0.32 }}
+        aria-hidden="true"
+      />
+      <m.div
+        className="hero-light hero-light-top pointer-events-none"
+        style={shouldUseParallax ? { y: topGlowY } : { y: 0 }}
+        aria-hidden="true"
+      />
+      <m.div
+        className="hero-light hero-light-bottom pointer-events-none"
+        style={shouldUseParallax ? { y: bottomGlowY } : { y: 0 }}
+        aria-hidden="true"
+      />
+
+      {shouldRenderParticles && activeWorld === 2 ? <BackgroundParticles quality={performanceTier} /> : null}
+      {shouldRenderParticles && activeWorld !== 2 ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
+
+      <div className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10">
+        <div className="hero-layout grid md:grid-cols-2 gap-6 md:gap-12 items-center">
           {/* Pure-entrance motion.* here were all initial={false} — framer
               rendered them already-visible with no animation, so they were
               framer mount cost on the LCP-critical hero for zero visual effect.
               Converted to plain elements (§5 render-path law); the ones with a
               real whileHover stay motion. */}
-          <div className="text-foreground order-2 md:order-1">
+          <div className="hero-copy text-foreground order-2 md:order-1">
             <m.div
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20 backdrop-blur-sm cursor-default"
+              className="hero-availability inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20 cursor-default"
             >
               <span className="relative flex h-2 w-2">
                 {shouldRenderHeavyEffects ? (
@@ -133,24 +134,26 @@ export default function Hero() {
             </m.div>
 
             <h1
-              className="text-3xl sm:text-4xl md:text-[2rem] lg:text-[2.6rem] xl:text-[3.4rem] 2xl:text-[4rem] md:whitespace-nowrap font-extrabold leading-[0.95] mb-4 md:mb-6 tracking-tight font-display"
+              aria-label={profile.name}
+              className="text-3xl sm:text-4xl md:text-[3.5rem] hero-name font-bold leading-[1.02] mb-4 md:mb-6 tracking-tight font-display"
             >
-              <GlyphDissolveName
-                text={profile.name}
-                typingSpeed={80}
-                className="bg-gradient-to-br from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent"
-              />
+              <GlyphDissolveName text={givenName} typingSpeed={80} className="text-foreground" />
+              <br />
+              <span className="hero-surname">
+                <GlyphDissolveName text={familyName.replace(',', '')} typingSpeed={80} className="text-current" />
+                <span className="hero-credentials">{credentials.join(' ')}</span>
+              </span>
             </h1>
 
-            <div className="text-lg sm:text-2xl md:text-3xl font-light mb-6 md:mb-8 text-muted-foreground leading-tight">
+            <div className="hero-title text-lg sm:text-2xl font-medium mb-6 text-cyan-100 leading-snug">
               <TextReveal text={profile.title} delay={0.25} />
             </div>
 
-            <p className="text-base md:text-lg text-foreground/90 mb-6 md:mb-10 leading-relaxed max-w-xl">
+            <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-10 leading-relaxed max-w-xl">
               {profile.tagline}
             </p>
 
-            <div className="flex flex-wrap gap-3 md:gap-4">
+            <div className="hero-actions flex flex-wrap gap-3 md:gap-4">
               <Magnetic strength={0.15}>
                 <Button href="#certifications" variant="primary" size="lg">
                   View Credentials
@@ -168,47 +171,56 @@ export default function Hero() {
               </Magnetic>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {HERO_SIGNAL_CHIPS.map((chip, index) => (
-                <m.span
-                  key={chip}
-                  initial={false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.75 + index * 0.08 }}
-                  whileHover={shouldRenderHeavyEffects ? { y: -2, scale: 1.04 } : undefined}
-                  className="font-mono-accent rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100/90 whitespace-nowrap"
-                >
-                  <ScrambleText text={chip} />
-                </m.span>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/5 pt-6 md:pt-8">
-              {profile.stats.map((stat, index) => (
-                <m.div
-                  key={stat.label}
-                  initial={false}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                  whileHover={shouldRenderHeavyEffects ? { scale: 1.1, y: -5 } : undefined}
-                >
-                  <StatCard value={stat.value} label={stat.label} />
-                </m.div>
-              ))}
+            <div className="hero-explorer">
+              <p className="hero-explorer-label">One curious mind. Four connected worlds.</p>
+              <div className="hero-signals" role="tablist" aria-label="Explore my worlds">
+                {HERO_SIGNAL_CHIPS.map((chip, index) => (
+                  <button
+                    key={chip}
+                    id={`hero-world-${index}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeWorld === index}
+                    aria-controls="hero-world-panel"
+                    tabIndex={activeWorld === index ? 0 : -1}
+                    className="hero-world-tab whitespace-nowrap"
+                    onClick={() => setActiveWorld(index)}
+                    onKeyDown={(event) => {
+                      const next = getNextHeroWorld(index, event.key);
+                      if (next === index) return;
+                      event.preventDefault();
+                      setActiveWorld(next);
+                      document.getElementById(`hero-world-${next}`)?.focus();
+                    }}
+                  >
+                    <span className="hero-tab-number" aria-hidden="true">0{index + 1}</span>
+                    <ScrambleText text={chip} />
+                  </button>
+                ))}
+              </div>
+              <div id="hero-world-panel" role="tabpanel" tabIndex={0} aria-labelledby={`hero-world-${activeWorld}`}>
+                <div key={world.tone} className="hero-world-copy">
+                  <h2>{world.title}</h2>
+                  <p>{world.description}</p>
+                  <a href={world.href}>{world.action}<span aria-hidden="true"> ↗</span></a>
+                </div>
+              </div>
             </div>
           </div>
 
           <m.div
-            className="relative order-1 md:order-2 flex justify-center md:block"
+            className="hero-portrait relative order-1 md:order-2 flex flex-col items-center md:block"
             style={shouldUseParallax ? { y: imageParallaxY } : { y: 0 }}
           >
-            <div className="w-full max-w-[200px] sm:max-w-xs md:max-w-none">
+            <div className="hero-stage w-full max-w-[200px] sm:max-w-xs md:max-w-none">
+             <div className="hero-orbits" aria-hidden="true"><span /><span /><span /></div>
              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl -z-10" />
              {showFloatingBadges ? (
                <>
                  {HERO_FLOATING_BADGES.map((badge, index) => (
                    <m.span
                      key={badge.label}
+                     data-badge={badge.label}
                      className={`absolute z-20 inline-block cursor-grab active:cursor-grabbing ${badge.className}`}
                      drag
                      dragSnapToOrigin
@@ -220,22 +232,39 @@ export default function Hero() {
                    >
                      {/* The idle bob lives on an inner span so dragging and the
                          infinite float never fight over the same transform. */}
-                     <m.span
-                       className="font-mono-accent block rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs sm:text-[11px] font-medium uppercase tracking-[0.14em] text-cyan-100 backdrop-blur-md"
-                       animate={{ y: [0, -6, 0], rotate: [0, index % 2 === 0 ? 1.5 : -1.5, 0] }}
-                       transition={{ duration: 2.4 + index * 0.35, repeat: Infinity, ease: 'easeInOut' }}
+                     <span
+                       className="hero-badge-float font-mono-accent block rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-cyan-100"
+                       style={{ '--badge-delay': `${index * -0.8}s` } as CSSProperties}
                      >
                        {badge.label}
-                     </m.span>
+                     </span>
                    </m.span>
                  ))}
                </>
              ) : null}
              <ProfileImage src="/images/profile-hero.avif" alt={profile.name} />
             </div>
+            <p className="hero-stage-word" aria-hidden="true" key={world.word}>{world.word}</p>
+            <div className="hero-portrait-caption">
+              <span>{profile.location}</span>
+              <span>Move, explore, discover <span aria-hidden="true">↗</span></span>
+            </div>
           </m.div>
         </div>
-      </m.div>
+        <div className="hero-stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 md:mt-16 border-t border-white/10 pt-6 md:pt-8">
+          {profile.stats.map((stat, index) => (
+            <m.div
+              key={stat.label}
+              initial={false}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 + index * 0.1 }}
+              whileHover={shouldRenderHeavyEffects ? { scale: 1.02, y: -2 } : undefined}
+            >
+              <StatCard value={stat.value} label={stat.label} />
+            </m.div>
+          ))}
+        </div>
+      </div>
 
       {shouldUseParallax ? <ScrollIndicator /> : null}
     </section>
