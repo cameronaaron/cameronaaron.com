@@ -66,6 +66,23 @@ const PINNED_WITH_REASON: Record<string, string> = {
   // on TS 7's removed ts.ModuleKind API, which breaks `npm run lint` entirely.
   // Unpin when typescript-eslint ships TypeScript 7 support.
   typescript: 'typescript-eslint peers typescript <6.1.0; TS 7 breaks eslint',
+  // 2026-09: Vitest 5 silently destroys mutation testing. Stryker's
+  // @stryker-mutator/vitest-runner@10.0.0 (latest) activates a RUNTIME mutant
+  // by assigning `ns.activeMutant` inside a `beforeAll` registered at the top
+  // level of its injected setup file. Under Vitest 5 that hook never fires and
+  // the setup file's globalThis is not the one the instrumented module reads,
+  // so no runtime mutant is ever switched on and EVERY function-body mutant is
+  // reported "Survived". Only module-level (static) mutants still die, via the
+  // instrumented `__STRYKER_ACTIVE_MUTANT__` env fallback read at import.
+  // Measured on identical source and tests (src/components/hero/hero-logic.ts):
+  //   vitest 4.1.11 → 100.00% (62 killed / 0 survived)
+  //   vitest 5.0.0  →  20.97% (13 killed / 49 survived)
+  // The failure is silent — it produces a plausible low score, not an error —
+  // so it reads as "your tests are weak" and invites exactly the wrong fix.
+  // Unpin when the vitest-runner supports Vitest 5 (see the probe below).
+  vitest: 'stryker vitest-runner cannot activate runtime mutants on Vitest 5',
+  '@vitest/coverage-istanbul': 'must match the pinned vitest major',
+  '@vitest/coverage-v8': 'must match the pinned vitest major',
 };
 
 describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
@@ -134,6 +151,36 @@ describe('dependency-freshness-contract — bleeding edge, zero CVEs', () => {
       stillBlocked,
       `typescript-eslint now supports typescript@${latestTs} (peer range "${peerRange}") — ` +
         'remove the typescript PINNED_WITH_REASON entry, delete this probe, and run "pnpm update --latest typescript"',
+    ).toBe(true);
+  }, 30_000);
+
+  it('vitest pin: fails the moment a new stryker vitest-runner ships, forcing a Vitest 5 re-test', () => {
+    // The pin exists ONLY because @stryker-mutator/vitest-runner cannot activate
+    // runtime mutants under Vitest 5. Unlike the typescript pin, the blocking
+    // condition is NOT expressible as a peer range — the runner already declares
+    // `vitest: >=2.0.0`, which nominally allows 5 and is precisely why the
+    // breakage is silent. So the tripwire is the runner's own version: any
+    // release past the one this diagnosis was made against is a reason to
+    // re-run the A/B before trusting a single mutation score again.
+    expect(
+      'vitest' in PINNED_WITH_REASON,
+      'the vitest pin was removed — delete this probe in the same commit',
+    ).toBe(true);
+
+    const DIAGNOSED_AGAINST = [10, 0, 0] as const;
+
+    const latestRunner = run(['view', '@stryker-mutator/vitest-runner', 'version']).stdout.trim();
+    expect(latestRunner, 'could not read latest vitest-runner version from the registry').toMatch(/^\d+\.\d+\.\d+/);
+
+    expect(
+      compareVersions(latestRunner, DIAGNOSED_AGAINST) <= 0,
+      `@stryker-mutator/vitest-runner@${latestRunner} is newer than the ` +
+        `${DIAGNOSED_AGAINST.join('.')} this pin was diagnosed against. Re-run the A/B before trusting any ` +
+        'mutation score: `pnpm add -D vitest@latest @vitest/coverage-istanbul@latest @vitest/coverage-v8@latest` ' +
+        'then `pnpm exec stryker run --mutate src/components/hero/hero-logic.ts` (expect 100%, 62 killed — ' +
+        'anything near 20% means runtime mutants still are not activating). If it passes, drop the vitest, ' +
+        '@vitest/coverage-istanbul and @vitest/coverage-v8 entries from PINNED_WITH_REASON, delete this probe, ' +
+        'and remove the ENGINEERING-STANDARDS.md §9.4 registry row in the same commit.',
     ).toBe(true);
   }, 30_000);
 
