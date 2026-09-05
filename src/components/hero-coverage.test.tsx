@@ -128,6 +128,25 @@ describe('Hero coverage (lines 70-221, 242)', () => {
     expect(container.firstChild).not.toBeNull();
   });
 
+  it('does not track the pointer when heavy effects are disabled', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({
+        performanceTier: 'balanced',
+        shouldRenderParticles: false,
+        shouldRenderHeavyEffects: false,
+        prefersReducedMotion: false,
+        isCoarsePointer: true,
+      }),
+    }));
+
+    const { default: Hero } = await import('@/components/Hero');
+    render(<Hero />);
+    const [rawPointerX, rawPointerY] = motionValueInstances;
+    fireEvent.mouseMove(window, { clientX: 123, clientY: 456 });
+    expect(rawPointerX.set).not.toHaveBeenCalled();
+    expect(rawPointerY.set).not.toHaveBeenCalled();
+  });
+
   it('writes pointer coordinates into motion values on mousemove, not React state', async () => {
     vi.doMock('@/hooks/usePerformanceProfile', () => ({
       usePerformanceProfile: () => ({
@@ -150,5 +169,49 @@ describe('Hero coverage (lines 70-221, 242)', () => {
 
     expect(rawPointerX.set).toHaveBeenCalledWith(123);
     expect(rawPointerY.set).toHaveBeenCalledWith(456);
+  });
+});
+
+describe('hero worlds interaction', () => {
+  it('switches the atmosphere and destination with mouse and keyboard', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({
+        performanceTier: 'full', shouldRenderHeavyEffects: true,
+        shouldRenderParticles: true, prefersReducedMotion: false, isCoarsePointer: false,
+      }),
+    }));
+    const { default: Hero } = await import('@/components/Hero');
+    const { getByRole, container } = render(<Hero />);
+    const clinical = getByRole('tab', { name: 'Clinical Care' });
+    fireEvent.click(clinical);
+    expect(clinical.getAttribute('aria-selected')).toBe('true');
+    expect(container.querySelector('#home')?.getAttribute('data-world')).toBe('mint');
+    expect(getByRole('link', { name: /view clinical credentials/i }).getAttribute('href')).toBe('#certifications');
+    expect(container.querySelectorAll('[data-testid="dynamic-mock"]')).toHaveLength(1);
+
+    fireEvent.keyDown(clinical, { key: 'End' });
+    const nursing = getByRole('tab', { name: 'NP Path' });
+    expect(document.activeElement).toBe(nursing);
+    expect(nursing.getAttribute('tabindex')).toBe('0');
+    fireEvent.keyDown(nursing, { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(getByRole('tab', { name: 'Engineering' }));
+    expect(getByRole('tabpanel').getAttribute('aria-labelledby')).toBe('hero-world-0');
+    fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
+    expect(getByRole('tab', { name: 'Engineering' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('keeps world discovery usable without continuous motion', async () => {
+    vi.doMock('@/hooks/usePerformanceProfile', () => ({
+      usePerformanceProfile: () => ({
+        performanceTier: 'reduced', shouldRenderHeavyEffects: false,
+        shouldRenderParticles: false, prefersReducedMotion: true, isCoarsePointer: true,
+      }),
+    }));
+    const { default: Hero } = await import('@/components/Hero');
+    const { getByRole, container } = render(<Hero />);
+    fireEvent.click(getByRole('tab', { name: 'Security' }));
+    expect(container.querySelector('#home')?.getAttribute('data-motion')).toBe('quiet');
+    expect(getByRole('link', { name: /explore the research/i }).getAttribute('href')).toBe('#projects');
+    expect(container.querySelectorAll('[data-testid="dynamic-mock"]')).toHaveLength(0);
   });
 });

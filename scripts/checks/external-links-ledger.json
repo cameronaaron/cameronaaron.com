@@ -557,10 +557,9 @@
     ]
   },
   "https://www.kulturecity.org/training/": {
-    "status": "unverifiable",
+    "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-07-19T04:01:56.255Z",
-    "note": "connection interfered with from the checking network (fetch failed); last verified as 'live'",
+    "lastChecked": "2026-09-05T17:15:33.879Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]

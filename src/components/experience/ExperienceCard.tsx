@@ -46,8 +46,8 @@ function ExperienceCard({
       whileHover={
         enableHoverMotion
           ? {
-              scale: 1.03,
-              y: -10,
+              scale: 1.01,
+              y: -4,
               boxShadow: "0 25px 50px rgba(99, 102, 241, 0.3)",
               transition: { duration: 0.3 }
             }
@@ -67,7 +67,7 @@ function ExperienceCard({
         rotateY: isHovering && enableHoverMotion ? springRotateY : 0,
         transformStyle: 'preserve-3d',
       }}
-      className={`relative h-full overflow-hidden p-8 group ${
+      className={`experience-story relative h-full overflow-hidden p-6 md:p-8 group ${
         isActive ? 'ring-1 ring-cyan-300/35 shadow-[0_20px_60px_rgba(56,214,255,0.16)]' : ''
       }`}
       animate={isActive ? { y: -4 } : { y: 0 }}
@@ -91,7 +91,7 @@ function ExperienceCard({
         initial={false}
       />
       
-      <div className="flex items-start gap-6 relative z-10">
+      <div className="flex items-start gap-4 md:gap-6 relative z-10">
         <m.div 
           className="flex-shrink-0"
           whileHover={enableHoverMotion ? { scale: 1.15, rotate: 5 } : undefined}
@@ -123,7 +123,7 @@ function ExperienceCard({
           </div>
         </m.div>
 
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
             {experience.websiteUrl ? (
               <a

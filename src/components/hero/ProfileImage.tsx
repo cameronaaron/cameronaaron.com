@@ -3,7 +3,6 @@
 import { m, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
-import FloatingBadge from '@/components/ui/FloatingBadge';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
@@ -61,15 +60,15 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
     <m.div
       id={PROFILE_CONTAINER_ID}
       ref={containerRef}
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={false}
       animate={{ 
         opacity: 1, 
         scale: 1,
         y: getProfileFloatAnimation(reducedMotion)
       }}
       transition={{ 
-        opacity: { duration: 0.8, delay: 0.4 },
-        scale: { duration: 0.8, delay: 0.4 },
+        opacity: { duration: 0 },
+        scale: { duration: 0 },
         y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
       }}
       style={{
@@ -107,7 +106,7 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
         
         {/* Image container with 3D depth */}
         <m.div 
-          className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
+          className="profile-photo relative w-full h-full rounded-[2rem] overflow-hidden border border-white/20 shadow-2xl"
           style={{ transform: 'translateZ(20px)' }}
           whileHover={
             enableHoverMotion
@@ -148,12 +147,6 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
             transition={{ duration: 0.8 }}
           />
         </m.div>
-
-        {/* Floating badges with depth */}
-        <div style={{ transform: 'translateZ(40px)' }}>
-          <FloatingBadge icon="innovation" position="top-right" />
-          <FloatingBadge icon="neuro" position="bottom-left" delay={0.5} />
-        </div>
       </m.div>
     </m.div>
   );

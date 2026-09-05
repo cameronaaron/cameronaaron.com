@@ -232,15 +232,6 @@ describe('modularization contract', () => {
     expect(source).not.toContain('const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);');
   });
 
-  it('keeps FloatingBadge position and icon helpers extracted', () => {
-    const source = read('src/components/ui/FloatingBadge.tsx');
-
-    expect(source).toContain("from '@/components/ui/floating-badge-logic'");
-    expect(source).toContain("from '@/components/ui/FloatingBadgeIcon'");
-    expect(source).not.toContain('const positionStyles = {');
-    expect(source).not.toContain('function BadgeIcon(');
-  });
-
   it('keeps IframeTitleGuard title inference logic extracted', () => {
     const source = read('src/components/ui/IframeTitleGuard.tsx');
 

@@ -81,7 +81,7 @@ export default function TypewriterEffect({
       {/* Always-present invisible spacer — reserves the exact dimensions the full text needs */}
       <span aria-hidden="true" className={className} style={{ visibility: 'hidden' }}>{text}</span>
       {/* Visible typed text + cursor overlaid at the same origin as the spacer */}
-      <span aria-hidden="true" className={className} style={{ position: 'absolute', left: 0, top: 0 }}>
+      <span aria-hidden="true" className={`w-full ${className}`} style={{ position: 'absolute', left: 0, top: 0 }}>
         {getVisibleTypedText(displayedText, text)}
         <m.span
           initial={{ opacity: 0 }}

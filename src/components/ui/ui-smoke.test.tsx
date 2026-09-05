@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest';
 
 import AmbientBackground from './AmbientBackground';
 import Button from './Button';
-import FloatingBadge from './FloatingBadge';
 import Magnetic from './Magnetic';
 import SectionHeader from './SectionHeader';
 import SkillBar from './SkillBar';
@@ -22,8 +21,6 @@ describe('ui component smoke coverage', () => {
         <AmbientBackground />
         <Button onClick={() => undefined}>Action</Button>
         <Button href="#contact" variant="secondary">Link</Button>
-        <FloatingBadge icon="innovation" position="top-right" />
-        <FloatingBadge icon="neuro" position="bottom-left" delay={0.2} />
         <Magnetic><span>Magnetic</span></Magnetic>
         <SectionHeader title="Section" subtitle="Subtitle" />
         <SkillBar name="TypeScript" level={95} index={0} />

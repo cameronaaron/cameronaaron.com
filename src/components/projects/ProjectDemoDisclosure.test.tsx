@@ -48,15 +48,22 @@ describe('ProjectDemoDisclosure — viewport-gated mounting', () => {
     expect(screen.getByTestId('stub-game')).not.toBeNull();
   });
 
-  it('does not mount a non-featured game on click if it has never been seen', () => {
-    // Defensive case: clicking cannot substitute for visibility. In real
-    // browser usage this is nearly unreachable (a click implies visibility),
-    // but the gate must hold even if a click somehow lands off-screen.
+  it.each([false, true])('opens on explicit activation before the observer fires (defaultOpen=%s)', (defaultOpen) => {
+    // Reproduced on a 390px phone: the button is visible while its taller
+    // container has not met the observer threshold. Activation must open
+    // the advertised panel, including keyboard and screen-reader clicks.
     vi.mocked(useInView).mockReturnValue(false);
-    render(<ProjectDemoDisclosure demo="toxoplasma-maze" projectTitle="Toxoplasma Gondii" />);
+    render(<ProjectDemoDisclosure demo="toxoplasma-maze" projectTitle="Toxoplasma Gondii" defaultOpen={defaultOpen} />);
 
-    fireEvent.click(screen.getByRole('button'));
     expect(screen.queryByTestId('stub-game')).toBeNull();
+    const button = screen.getByRole('button');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(button);
+    expect(screen.getByTestId('stub-game')).not.toBeNull();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(button);
+    expect(screen.queryByTestId('stub-game')).toBeNull();
+    expect(button.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('lets the user hide and reopen an already-seen game', () => {

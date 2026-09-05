@@ -37,7 +37,7 @@ function readLowHardware(): boolean {
 }
 
 export function usePerformanceProfile() {
-  const prefersReducedMotion = useReducedMotion();
+  const detectedReducedMotion = useReducedMotion();
 
   // Initial state is always false to match the SSR/build-time output.
   // Reading real browser values (matchMedia, hardwareConcurrency) in a lazy useState initializer
@@ -56,6 +56,9 @@ export function usePerformanceProfile() {
   // on "no decorations yet" (hydration-safe), and the effects mount exactly
   // once, under the correct tier.
   const [isProfileReady, setIsProfileReady] = useState(false);
+  // Framer reads matchMedia before the first client render. Like pointer and
+  // hardware detection, its result must wait until hydration has completed.
+  const prefersReducedMotion = isProfileReady && Boolean(detectedReducedMotion);
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: coarse)');

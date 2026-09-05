@@ -1,7 +1,7 @@
 'use client';
 
-import { m, useInView } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useInView } from 'framer-motion';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { readInitialReveal, splitRevealWords } from '@/components/ui/text-reveal-logic';
 
 interface TextRevealProps {
@@ -49,23 +49,17 @@ export default function TextReveal({ text, className = "", delay = 0 }: TextReve
   const words = splitRevealWords(text);
 
   return (
-    <span ref={ref} className={`inline-block ${className}`}>
+    <span ref={ref} data-revealed={shouldReveal} className={`text-reveal inline-block ${className}`}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block whitespace-nowrap mr-[0.25em]">
+        <span key={i} className="inline-block whitespace-nowrap mr-[0.25em] overflow-hidden align-bottom">
           {word.split("").map((char, j) => (
-            <m.span
+            <span
               key={j}
-              initial={{ y: "100%" }}
-              animate={shouldReveal ? { y: 0 } : {}}
-              transition={{
-                duration: 0.5,
-                delay: delay + i * 0.1 + j * 0.02,
-                ease: [0.2, 0.65, 0.3, 0.9],
-              }}
-              className="inline-block"
+              style={{ '--reveal-delay': `${delay + i * 0.04 + j * 0.012}s` } as CSSProperties}
+              className="text-reveal-letter inline-block"
             >
               {char}
-            </m.span>
+            </span>
           ))}
         </span>
       ))}
