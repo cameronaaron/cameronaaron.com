@@ -10,5 +10,12 @@
     "MD033": false
   },
   "globs": ["*.md"],
-  "ignores": ["node_modules", "out", ".next"]
+  // AGENTS.md is machine-generated: `next dev` appends a <!-- nextjs-agent-rules -->
+  // block to it on every boot (node_modules/next/dist/server/lib/generate-agent-files.js),
+  // and that block carries its own H1, which trips MD025/single-title. Linting
+  // generated output buys nothing and the fix would be overwritten on the next
+  // boot, so the file is tracked but not linted. It exists specifically so Next
+  // has a target other than CLAUDE.md — delete it and the next `next dev` appends
+  // the same block to CLAUDE.md instead, dirtying a hand-written file.
+  "ignores": ["node_modules", "out", ".next", "AGENTS.md"]
 }
