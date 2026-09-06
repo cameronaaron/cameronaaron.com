@@ -5,6 +5,7 @@ import {
   MAX_TRAIL_SPARKS,
   SPARK_LIFE_DECAY,
   SURGE_SPARK_COUNT,
+  WORLD_CHANGE_SPARK_COUNT,
   TRAIL_EMIT_CAP_PER_FRAME,
   TRAIL_EMIT_SPACING_PX,
   TRAIL_SPARK_MIN_SPEED,
@@ -139,6 +140,39 @@ describe('emitSurgeBurst', () => {
 
   it('keeps the surge storm inside the pool cap', () => {
     expect(SURGE_SPARK_COUNT).toBeLessThanOrEqual(MAX_TRAIL_SPARKS);
+    expect(WORLD_CHANGE_SPARK_COUNT).toBeLessThan(SURGE_SPARK_COUNT);
+    expect(WORLD_CHANGE_SPARK_COUNT).toBeLessThanOrEqual(MAX_TRAIL_SPARKS);
+  });
+
+  it('paints trail and surge sparks from a caller palette', () => {
+    const palette = ['rgba(9, 9, 9, 1)'];
+    const trail = createSparkPool(2);
+    emitTrailSparks(trail, {
+      baseX: 0,
+      baseY: 0,
+      dirX: 1,
+      dirY: 0,
+      count: 1,
+      random: fixedRandom,
+      colors: palette,
+    });
+    expect(trail.sparks[0].color).toBe(palette[0]);
+
+    const surge = createSparkPool(2);
+    emitSurgeBurst(surge, { width: 100, height: 100, count: 1, random: fixedRandom, colors: palette });
+    expect(surge.sparks[0].color).toBe(palette[0]);
+
+    const fallback = createSparkPool(2);
+    emitTrailSparks(fallback, {
+      baseX: 0,
+      baseY: 0,
+      dirX: 1,
+      dirY: 0,
+      count: 1,
+      random: fixedRandom,
+      colors: [],
+    });
+    expect(PARTICLE_COLORS).toContain(fallback.sparks[0].color);
   });
 
   it('computes the exact position, velocity, size, and colour from a non-constant random sequence', () => {

@@ -1158,11 +1158,16 @@ describe('interactive-particles engine — zero-allocation frame loop', () => {
     expect(src).not.toContain('.slice(');
   });
 
-  it('connection stroke styles are precomputed at module level, never built per frame', () => {
+  it('connection stroke styles are cached, never built per frame', () => {
     const engine = read('src/components/hero/interactive-particles/interactive-particles-engine.ts');
     expect(engine).toContain('export const CONNECTION_TIER_STYLES');
+    expect(engine).toContain('export function getConnectionTierStyles');
     const component = read('src/components/hero/InteractiveParticles.tsx');
-    expect(component).toContain('CONNECTION_TIER_STYLES[tier]');
+    // Ice default is the module-level table; world changes rebuild once via
+    // getConnectionTierStyles and then read the cached array in the rAF loop.
+    expect(component).toContain('CONNECTION_TIER_STYLES');
+    expect(component).toContain('getConnectionTierStyles');
+    expect(component).toContain('connectionStyles[tier]');
     // The old pattern: a template-literal strokeStyle allocated 3× per frame
     expect(component).not.toMatch(/strokeStyle = `rgba/);
   });

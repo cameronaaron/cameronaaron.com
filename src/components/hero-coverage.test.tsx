@@ -181,9 +181,12 @@ describe('hero worlds interaction', () => {
       }),
     }));
     const { default: Hero } = await import('@/components/Hero');
+    const worldListener = vi.fn();
+    window.addEventListener('hero-world-change', worldListener);
     const { getByRole, container } = render(<Hero />);
     const clinical = getByRole('tab', { name: 'Clinical Care' });
     fireEvent.click(clinical);
+    expect(worldListener).toHaveBeenCalledTimes(1);
     expect(clinical.getAttribute('aria-selected')).toBe('true');
     expect(container.querySelector('#home')?.getAttribute('data-world')).toBe('mint');
     expect(getByRole('link', { name: /view clinical credentials/i }).getAttribute('href')).toBe('#certifications');
@@ -198,6 +201,7 @@ describe('hero worlds interaction', () => {
     expect(getByRole('tabpanel').getAttribute('aria-labelledby')).toBe('hero-world-0');
     fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
     expect(getByRole('tab', { name: 'Engineering' }).getAttribute('aria-selected')).toBe('true');
+    window.removeEventListener('hero-world-change', worldListener);
   });
 
   it('keeps world discovery usable without continuous motion', async () => {

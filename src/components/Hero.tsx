@@ -13,7 +13,15 @@ import Magnetic from '@/components/ui/Magnetic';
 import ScrambleText from '@/components/ui/ScrambleText';
 import LocalTimeStatus from '@/components/ui/LocalTimeStatus';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
-import { HERO_FLOATING_BADGES, HERO_SIGNAL_CHIPS, HERO_WORLDS, getNextHeroWorld, getHeroMotionConfig } from '@/components/hero/hero-logic';
+import {
+  HERO_FLOATING_BADGES,
+  HERO_SIGNAL_CHIPS,
+  HERO_WORLDS,
+  buildHeroWorldChangeEvent,
+  getHeroMotionConfig,
+  getHeroWorldAtmosphere,
+  getNextHeroWorld,
+} from '@/components/hero/hero-logic';
 
 const BackgroundParticles = dynamic(() => import('@/components/hero/BackgroundParticles'), { ssr: false });
 const InteractiveParticles = dynamic(() => import('@/components/hero/InteractiveParticles'), { ssr: false });
@@ -23,6 +31,13 @@ const [givenName, familyName, ...credentials] = profile.name.split(' ');
 export default function Hero() {
   const [activeWorld, setActiveWorld] = useState(0);
   const world = HERO_WORLDS[activeWorld];
+  const atmosphere = getHeroWorldAtmosphere(world.tone);
+
+  const selectWorld = (index: number) => {
+    if (index === activeWorld) return;
+    setActiveWorld(index);
+    window.dispatchEvent(buildHeroWorldChangeEvent(HERO_WORLDS[index].tone));
+  };
   const heroRef = useRef<HTMLElement>(null);
   const isHeroInView = useInView(heroRef, { margin: '80px' });
   const { performanceTier, shouldRenderHeavyEffects, shouldRenderParticles } = usePerformanceProfile();
@@ -68,7 +83,18 @@ export default function Hero() {
       aria-label="Hero section"
       data-world={world.tone}
       data-motion={shouldRenderHeavyEffects && isHeroInView ? 'full' : 'quiet'}
+      style={
+        {
+          '--hero-accent': atmosphere.accent,
+          '--hero-halo': atmosphere.halo,
+          '--hero-wash': atmosphere.wash,
+          '--hero-bloom': atmosphere.bloom,
+        } as CSSProperties
+      }
     >
+      <div className="hero-vignette" aria-hidden="true" />
+      <div className="hero-world-wash" aria-hidden="true" />
+      <div key={world.tone} className="hero-world-bloom" aria-hidden="true" />
       {shouldRenderHeavyEffects ? (
         <m.div
           className="hero-pointer-light pointer-events-none absolute left-0 top-0"
@@ -94,7 +120,14 @@ export default function Hero() {
       />
 
       {shouldRenderParticles && activeWorld === 2 ? <BackgroundParticles quality={performanceTier} /> : null}
-      {shouldRenderParticles && activeWorld !== 2 ? <InteractiveParticles key={performanceTier} quality={performanceTier} /> : null}
+      {shouldRenderParticles && activeWorld !== 2 ? (
+        <InteractiveParticles
+          key={performanceTier}
+          quality={performanceTier}
+          colors={atmosphere.particleColors}
+          connectionRgb={atmosphere.connectionRgb}
+        />
+      ) : null}
 
       <div className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10">
         <div className="hero-layout grid md:grid-cols-2 gap-6 md:gap-12 items-center">
@@ -145,7 +178,7 @@ export default function Hero() {
             </p>
 
             <div className="hero-actions flex flex-wrap gap-3 md:gap-4">
-              <Button href="#selected-work" variant="primary" size="lg">
+              <Button href="#selected-work" variant="primary" size="lg" className="hero-primary-cta">
                 Explore My Work <span aria-hidden="true">↗</span>
               </Button>
               <Magnetic strength={0.1}>
@@ -173,12 +206,12 @@ export default function Hero() {
                     aria-controls="hero-world-panel"
                     tabIndex={activeWorld === index ? 0 : -1}
                     className="hero-world-tab whitespace-nowrap"
-                    onClick={() => setActiveWorld(index)}
+                    onClick={() => selectWorld(index)}
                     onKeyDown={(event) => {
                       const next = getNextHeroWorld(index, event.key);
                       if (next === index) return;
                       event.preventDefault();
-                      setActiveWorld(next);
+                      selectWorld(next);
                       document.getElementById(`hero-world-${next}`)?.focus();
                     }}
                   >

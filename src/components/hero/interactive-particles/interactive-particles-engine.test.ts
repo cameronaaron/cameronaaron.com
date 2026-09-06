@@ -30,12 +30,15 @@ import {
   knnOffer,
   resetKnnHeap,
   getConnectionOpacityTier,
+  getConnectionTierStyles,
   getGlowGradientStops,
+  getKnnLinkStyle,
   getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
   PARTICLE_COLORS,
   percentToPx,
+  recolorParticles,
   stepBursts,
   stepParticles,
   type BurstParticle,
@@ -395,6 +398,51 @@ describe('interactive particle engine', () => {
     CONNECTION_OPACITY_TIERS.forEach((opacity, index) => {
       expect(CONNECTION_TIER_STYLES[index]).toBe(`rgba(126, 231, 255, ${opacity})`);
     });
+  });
+
+  it('rebuilds connection and knn strokes for a world RGB without allocating per frame', () => {
+    const styles = getConnectionTierStyles('193, 172, 255');
+    expect(styles).toHaveLength(CONNECTION_OPACITY_TIERS.length);
+    expect(styles[0]).toBe('rgba(193, 172, 255, 0.08)');
+    expect(getKnnLinkStyle('193, 172, 255')).toBe('rgba(193, 172, 255, 0.32)');
+    expect(getConnectionTierStyles()).toEqual(CONNECTION_TIER_STYLES);
+    expect(getKnnLinkStyle()).toBe(KNN_LINK_STYLE);
+  });
+
+  it('recolors an existing field in place and leaves an empty palette untouched', () => {
+    const particles = createInitialParticles(4, 2024);
+    const same = particles;
+    const palette = ['rgba(1, 2, 3, 1)', 'rgba(4, 5, 6, 1)'];
+    expect(recolorParticles(particles, palette)).toBe(same);
+    expect(particles.map((particle) => particle.color)).toEqual([
+      palette[0],
+      palette[1],
+      palette[0],
+      palette[1],
+    ]);
+    const before = particles[0].color;
+    expect(recolorParticles(particles, [])).toBe(particles);
+    expect(particles[0].color).toBe(before);
+  });
+
+  it('creates particles and bursts from a caller palette, falling back when empty', () => {
+    const custom = ['rgba(9, 9, 9, 1)'];
+    const particles = createInitialParticles(2, 2024, custom);
+    expect(particles.every((particle) => particle.color === custom[0])).toBe(true);
+    expect(createInitialParticles(1, 2024, []).length).toBe(1);
+
+    const bursts = createBurstParticles({
+      baseX: 1,
+      baseY: 2,
+      count: 2,
+      startId: 0,
+      random: () => 0,
+      colors: custom,
+    });
+    expect(bursts[0].color).toBe(custom[0]);
+    expect(
+      createBurstParticles({ baseX: 0, baseY: 0, count: 1, startId: 0, random: () => 0, colors: [] })[0].color
+    ).toBe(PARTICLE_COLORS[0]);
   });
 
   it('getParticlePulse staggers periods by particle id so neighbours stay out of phase', () => {

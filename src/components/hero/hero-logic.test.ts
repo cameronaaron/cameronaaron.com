@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
+import { PARTICLE_COLORS } from '@/components/hero/interactive-particles/interactive-particles-engine';
+
 import {
   HERO_FLOATING_BADGES,
   HERO_SIGNAL_CHIPS,
+  HERO_WORLD_CHANGE_EVENT,
   HERO_WORLDS,
-  getNextHeroWorld,
+  buildHeroWorldChangeEvent,
+  collectHeroWorldParticleColors,
   getHeroMotionConfig,
+  getHeroWorldAtmosphere,
+  getNextHeroWorld,
 } from './hero-logic';
 
 describe('hero logic', () => {
@@ -55,5 +61,48 @@ describe('hero world navigation', () => {
     expect(HERO_WORLDS).toHaveLength(HERO_SIGNAL_CHIPS.length);
     expect(HERO_WORLDS.map((world) => world.href)).toEqual(['#experience', '#projects', '#certifications', '#education']);
     expect(new Set(HERO_WORLDS.map((world) => world.tone)).size).toBe(4);
+  });
+});
+
+describe('hero world atmospheres', () => {
+  it('gives every world tone a complete, distinct palette', () => {
+    const tones = HERO_WORLDS.map((world) => world.tone);
+    const accents = new Set<string>();
+    const rgbs = new Set<string>();
+    for (const tone of tones) {
+      const atmosphere = getHeroWorldAtmosphere(tone);
+      expect(atmosphere.accent).toMatch(/^#/);
+      expect(atmosphere.halo).toContain('rgb');
+      expect(atmosphere.wash).toContain('radial-gradient');
+      expect(atmosphere.bloom).toContain('rgba');
+      expect(atmosphere.connectionRgb).toMatch(/^\d+, \d+, \d+$/);
+      expect(atmosphere.particleColors.length).toBe(4);
+      accents.add(atmosphere.accent);
+      rgbs.add(atmosphere.connectionRgb);
+    }
+    expect(accents.size).toBe(tones.length);
+    expect(rgbs.size).toBe(tones.length);
+  });
+
+  it('keeps the ice particle catalog identical to the engine default', () => {
+    expect([...getHeroWorldAtmosphere('ice').particleColors]).toEqual([...PARTICLE_COLORS]);
+  });
+
+  it('builds a window event that carries the chosen world palette', () => {
+    const event = buildHeroWorldChangeEvent('violet');
+    expect(event.type).toBe(HERO_WORLD_CHANGE_EVENT);
+    expect(event.detail.tone).toBe('violet');
+    expect(event.detail.colors).toBe(getHeroWorldAtmosphere('violet').particleColors);
+  });
+
+  it('collects unique particle colours across every world', () => {
+    const colors = collectHeroWorldParticleColors();
+    expect(new Set(colors).size).toBe(colors.length);
+    expect(colors.length).toBeGreaterThanOrEqual(4);
+    for (const world of HERO_WORLDS) {
+      for (const color of getHeroWorldAtmosphere(world.tone).particleColors) {
+        expect(colors).toContain(color);
+      }
+    }
   });
 });

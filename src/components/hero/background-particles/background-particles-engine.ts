@@ -121,9 +121,9 @@ export interface OpacityTier {
  * range that advanceBackgroundParticle oscillates within.
  */
 export const BACKGROUND_OPACITY_TIERS: readonly OpacityTier[] = [
-  { threshold: 0.3, style: 'rgba(129, 140, 248, 0.2)' },
-  { threshold: 0.45, style: 'rgba(129, 140, 248, 0.38)' },
-  { threshold: Infinity, style: 'rgba(129, 140, 248, 0.55)' },
+  { threshold: 0.3, style: 'rgba(52, 232, 171, 0.2)' },
+  { threshold: 0.45, style: 'rgba(52, 232, 171, 0.38)' },
+  { threshold: Infinity, style: 'rgba(52, 232, 171, 0.55)' },
 ];
 
 // ── Spatial grid (typed-array backed, zero GC per frame) ────────────────────

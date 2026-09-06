@@ -6,6 +6,7 @@ import AuroraSurge from '@/components/ui/AuroraSurge';
 import CursorComet from '@/components/ui/CursorComet';
 import PointerRipple from '@/components/ui/PointerRipple';
 import ScrambleText from '@/components/ui/ScrambleText';
+import { HERO_WORLD_CHANGE_EVENT } from '@/components/hero/hero-logic';
 import {
   KONAMI_SEQUENCE,
   AURORA_SURGE_EVENT,
@@ -278,6 +279,22 @@ describe('CursorComet', () => {
     expect(rafQueue).toHaveLength(0);
   });
 
+  it('answers a hero world change with a smaller spark storm', () => {
+    render(<CursorComet />);
+
+    fireEvent(
+      window,
+      new CustomEvent(HERO_WORLD_CHANGE_EVENT, {
+        detail: { tone: 'amber', colors: ['rgba(255, 178, 87, 0.7)'] },
+      })
+    );
+    expect(rafQueue.length).toBeGreaterThan(0);
+
+    flushFrames(400);
+    expect(mockCtx.drawImage).toHaveBeenCalled();
+    expect(rafQueue).toHaveLength(0);
+  });
+
   it('cleans up listeners and frames on unmount', () => {
     const { unmount } = render(<CursorComet />);
     fireEvent.mouseMove(window, { clientX: 100, clientY: 100 });
@@ -287,6 +304,7 @@ describe('CursorComet', () => {
     rafQueue = [];
     fireEvent.mouseMove(window, { clientX: 200, clientY: 200 });
     fireEvent(window, new CustomEvent(AURORA_SURGE_EVENT));
+    fireEvent(window, new CustomEvent(HERO_WORLD_CHANGE_EVENT));
     expect(rafQueue).toHaveLength(0);
   });
 

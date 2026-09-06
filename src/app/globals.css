@@ -478,6 +478,28 @@
     animation-delay: var(--curtain-dot-delay, 0s);
   }
 
+  @keyframes curtain-aperture-ring {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.62); }
+    45% { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); }
+  }
+
+  .curtain-aperture {
+    pointer-events: none;
+  }
+
+  .curtain-aperture-ring-anim {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--curtain-ring-size, 12rem);
+    height: var(--curtain-ring-size, 12rem);
+    border: 1px solid rgb(126 231 255 / 0.35);
+    border-radius: 9999px;
+    box-shadow: 0 0 32px rgb(56 214 255 / 0.18);
+    animation: curtain-aperture-ring 900ms cubic-bezier(0.22, 1, 0.36, 1) var(--curtain-ring-delay, 0s) both;
+  }
+
   /* Film-grain texture: a static SVG turbulence tile composited once over the
      page. Pure CSS, no animation, no JS. Hidden on touch devices — blend
      modes cost real GPU on mobile and the texture is a desktop nicety. */
@@ -532,12 +554,70 @@
    movement changes one transform, never a full-surface gradient or root token. */
 .hero-editorial {
   --hero-accent: #7ee7ff;
-  --hero-halo: rgb(56 214 255 / 0.3);
+  --hero-halo: rgb(56 214 255 / 0.38);
+  --hero-wash: radial-gradient(circle at 72% 28%, rgba(56,214,255,0.22), transparent 52%);
+  --hero-bloom: rgba(56, 214, 255, 0.42);
   isolation: isolate;
 }
-.hero-editorial[data-world="violet"] { --hero-accent: #c1acff; --hero-halo: rgb(166 118 255 / 0.34); }
-.hero-editorial[data-world="mint"] { --hero-accent: #8bf0c4; --hero-halo: rgb(52 232 171 / 0.3); }
-.hero-editorial[data-world="amber"] { --hero-accent: #ffcf95; --hero-halo: rgb(255 178 87 / 0.3); }
+.hero-editorial[data-world="violet"] {
+  --hero-accent: #c1acff;
+  --hero-halo: rgb(166 118 255 / 0.4);
+  --hero-wash: radial-gradient(circle at 72% 28%, rgba(166,118,255,0.26), transparent 52%);
+  --hero-bloom: rgba(166, 118, 255, 0.45);
+}
+.hero-editorial[data-world="mint"] {
+  --hero-accent: #8bf0c4;
+  --hero-halo: rgb(52 232 171 / 0.38);
+  --hero-wash: radial-gradient(circle at 72% 28%, rgba(52,232,171,0.24), transparent 52%);
+  --hero-bloom: rgba(52, 232, 171, 0.42);
+}
+.hero-editorial[data-world="amber"] {
+  --hero-accent: #ffcf95;
+  --hero-halo: rgb(255 178 87 / 0.38);
+  --hero-wash: radial-gradient(circle at 72% 28%, rgba(255,178,87,0.24), transparent 52%);
+  --hero-bloom: rgba(255, 178, 87, 0.42);
+}
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgb(4 9 20 / 0.5) 100%);
+}
+.hero-world-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--hero-wash);
+  transition: opacity 420ms ease;
+}
+.hero-world-bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 70% 34%, var(--hero-bloom), transparent 58%);
+  animation: hero-world-bloom 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hero-world-bloom {
+  0% { opacity: 0; transform: scale(0.78); }
+  28% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.18); }
+}
+.hero-particle-core-anim {
+  background: radial-gradient(circle, var(--hero-halo), transparent 72%);
+  animation: hero-particle-core 3.6s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.hero-editorial[data-motion="full"] .hero-particle-core-anim {
+  animation-play-state: running;
+}
+@keyframes hero-particle-core {
+  0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.12); }
+}
+.hero-primary-cta {
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--hero-accent) 38%, transparent);
+}
 .hero-editorial > .container { max-width: 1320px; }
 .hero-layout { column-gap: clamp(2rem, 6vw, 6rem); }
 .hero-copy { min-width: 0; }
@@ -547,7 +627,10 @@
   letter-spacing: -0.075em;
   text-wrap: balance;
 }
-.hero-name > span:last-child { color: var(--hero-accent); }
+.hero-name > span:last-child {
+  color: var(--hero-accent);
+  text-shadow: 0 0 48px color-mix(in srgb, var(--hero-accent) 38%, transparent);
+}
 .hero-surname { display: inline-flex; align-items: baseline; gap: 0.18em; white-space: nowrap; }
 .hero-credentials { font-size: 0.22em; letter-spacing: -0.025em; color: var(--color-muted-foreground); }
 .hero-title { max-width: 35ch; font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.6; }
@@ -583,6 +666,7 @@
   letter-spacing: -0.07em;
   line-height: 1;
   color: var(--hero-accent);
+  text-shadow: 0 0 64px color-mix(in srgb, var(--hero-accent) 45%, transparent);
   pointer-events: none;
   animation: world-arrive 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -595,9 +679,10 @@
 .hero-orbits > span {
   position: absolute;
   inset: 0;
-  border: 1px solid rgb(255 255 255 / 0.1);
+  border: 1px solid rgb(255 255 255 / 0.14);
   border-top-color: var(--hero-accent);
   border-radius: 50%;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--hero-accent) 22%, transparent);
   animation: orbit-turn 22s linear infinite;
   animation-play-state: paused;
 }
@@ -623,7 +708,11 @@
   transition: color 180ms, border-color 180ms, background-color 180ms;
 }
 .hero-world-tab:hover { background: rgb(255 255 255 / 0.04); color: white; }
-.hero-world-tab[aria-selected="true"] { color: var(--hero-accent); border-bottom-color: var(--hero-accent); }
+.hero-world-tab[aria-selected="true"] {
+  color: var(--hero-accent);
+  border-bottom-color: var(--hero-accent);
+  background: color-mix(in srgb, var(--hero-accent) 8%, transparent);
+}
 .hero-tab-number { font-family: var(--font-mono-accent), monospace; font-size: 0.75rem; opacity: 0.65; }
 #hero-world-panel { min-height: 164px; padding-top: 1.25rem; }
 .hero-world-copy { animation: world-arrive 360ms cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -672,7 +761,7 @@
   .experience-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-stage-word, .hero-world-copy { animation: none; }
+  .hero-stage-word, .hero-world-copy, .hero-world-bloom, .hero-particle-core-anim { animation: none; }
   .hero-orbits > span, .hero-badge-float { animation: none; }
 }
 
