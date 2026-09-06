@@ -10,6 +10,23 @@ export const EMBED_ORIGIN = 'https://www.youtube-nocookie.com';
  *  below reads as arithmetic rather than as two magic numbers. */
 export const SECONDS_PER_MINUTE = 60;
 
+/** Small numbers spelled out, because the rail heading is prose and `19` reads
+ *  as a data point beside "Five videos". Stops at twenty: past that the numeral
+ *  is what a reader wants anyway, and every entry here is pinned by a test, so
+ *  entries nothing can reach are entries nothing justifies. */
+const NUMBER_WORDS: readonly string[] = [
+  'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight',
+  'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen',
+  'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty',
+];
+
+/** `19` → `nineteen`, `90` → `90`. Outside the table the numeral is returned
+ *  rather than a wrong word, so an unexpectedly long series degrades to
+ *  "about 90 minutes" instead of to nonsense. */
+export function numberWord(value: number): string {
+  return NUMBER_WORDS[value] ?? String(value);
+}
+
 /** `PT2M30S` → `{ minutes: 2, seconds: 30 }`. Anchored and fully matched, so a
  *  duration in any other shape returns undefined rather than a partial parse.
  *
@@ -111,6 +128,40 @@ export function toEpisodeView(video: CapstoneVideo, index: number): EpisodeView 
     runtime: formatRuntime(video.duration) ?? '',
     url: video.url,
   };
+}
+
+/** Total seconds across the series. Returns 0 for an empty list, and skips any
+ *  duration `formatRuntime` cannot parse rather than counting it as zero-length
+ *  — an unparseable entry is an unknown, not a nothing. */
+export function totalRuntimeSeconds(videos: readonly CapstoneVideo[]): number {
+  let seconds = 0;
+  for (let i = 0; i < videos.length; i += 1) {
+    const match = ISO_DURATION.exec(videos[i].duration);
+    if (!match) continue;
+    seconds += Number(match[1] ?? 0) * SECONDS_PER_MINUTE + Number(match[2] ?? 0);
+  }
+  return seconds;
+}
+
+/** `Five videos, about nineteen minutes` — the rail heading, DERIVED.
+ *
+ *  This used to be a hand-typed "about twelve minutes" and it was wrong by
+ *  seven: the five videos were entered at their planned 2–3 minute lengths and
+ *  never updated to what actually got published (2:33 to 5:00, 19:08 in all).
+ *  A total that is written down separately from the durations it totals will
+ *  drift away from them, so it is no longer written down. Rounds to nearest,
+ *  because "about" is doing real work here — the exact figure is on each row.
+ */
+export function seriesSummary(videos: readonly CapstoneVideo[]): string {
+  const count = numberWord(videos.length);
+  const wholeMinutes = Math.round(totalRuntimeSeconds(videos) / SECONDS_PER_MINUTE);
+  const videoWord = videos.length === 1 ? 'video' : 'videos';
+  const minuteWord = wholeMinutes === 1 ? 'minute' : 'minutes';
+
+  return (
+    `${count.charAt(0).toUpperCase()}${count.slice(1)} ${videoWord}, ` +
+    `about ${numberWord(wholeMinutes)} ${minuteWord}`
+  );
 }
 
 /** Whole series, in playlist order. One linear pass, run once per render of a

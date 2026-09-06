@@ -45,6 +45,7 @@
     "check:links": "node scripts/checks/check-external-links.mjs",
     "check:links:stale": "node scripts/checks/check-external-links.mjs --stale-only",
     "check:poster": "node scripts/checks/verify-poster-artifacts.mjs",
+    "check:video-durations": "node scripts/checks/verify-video-durations.mjs",
     "lint": "eslint . --max-warnings=0 && pnpm run lint:md",
     "lint:fix": "eslint . --fix && markdownlint-cli2 --fix \"*.md\"",
     "lint:md": "markdownlint-cli2 \"*.md\"",

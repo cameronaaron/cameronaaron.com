@@ -179,6 +179,7 @@ src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cl
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
 src/poster-artifact-contract.test.ts         # served poster PDFs byte-pinned; their QR resolves to their own page
+src/video-duration-contract.test.ts          # declared video runtimes match what YouTube actually reports
 src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
@@ -382,6 +383,30 @@ changes its sha and fails the commit until `pnpm run check:poster` re-decodes
 the QR (needs `pdftoppm` + `zbarimg`; do not hand-edit the ledger). Text
 extraction cannot substitute — Typst subsets its fonts, so the URL is not
 present as plain text in the PDF.
+
+### 20a. Editing a video duration means re-running `pnpm run check:video-durations`
+
+Every `duration` in `src/data/capstone.ts` was once the video's **planned**
+length, typed while the series was being scripted and never reconciled with
+what got published. All five were wrong, by up to two minutes each, and a
+hand-typed rail heading — "Five videos, about twelve minutes" — summed the plan
+rather than the series, understating a 19:08 total by seven minutes.
+`/bridging-transitions` is the target of a QR code printed on a conference
+poster, so the first thing a stranger did with the page was press play and find
+the number under the title wrong.
+
+Two joins failed and neither was watched. **Total vs parts** is now closed by
+construction: `seriesSummary` derives the heading from the durations, so there
+is no second number to drift. **Parts vs reality** is `video-duration-contract`,
+which pins each declared duration to
+`scripts/checks/video-duration-ledger.json`. Editing a duration by hand fails
+the commit until `pnpm run check:video-durations` re-asks YouTube. Same
+network-split posture as items 20 and the external-links ledger: the script
+needs the wire, the contract does not.
+
+The general form, which is the reusable part: **a number written down beside
+the thing it describes has no relationship to that thing.** Derive it, or pin
+it to a ledger something re-derives.
 
 ### 21. The playlist player is a facade, deliberately
 

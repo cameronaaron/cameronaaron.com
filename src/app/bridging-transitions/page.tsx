@@ -128,7 +128,7 @@ export default function BridgingTransitionsPage() {
             Watch the series
           </h2>
           <p className="mb-8 max-w-3xl text-gray-300">
-            Five short videos, two to three minutes each, on how thrice-exceptional Black male
+            Five short videos, two to five minutes each, on how thrice-exceptional Black male
             students are identified, what happens to their support at the transition into college,
             and what institutions can do about it.
           </p>

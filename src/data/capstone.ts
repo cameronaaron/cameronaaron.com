@@ -45,7 +45,7 @@ export const capstone = {
     'intersectionality in education',
   ],
   objectives: [
-    'Produce five research-grounded educational videos (2 to 3 minutes each).',
+    'Produce five research-grounded educational videos (2 to 5 minutes each).',
     'Address identification challenges, transition barriers, strength-based approaches, social-emotional experiences, and institutional recommendations.',
     'Incorporate iterative expert review for content quality, cultural authenticity, and production quality.',
   ],
@@ -56,7 +56,7 @@ export const capstone = {
       title: 'Video 1: Intro - How identification systems fail to see thrice-exceptional Black males',
       description:
         'Explains under-identification patterns and how traditional gifted-identification systems miss intersecting profiles.',
-      duration: 'PT2M30S',
+      duration: 'PT3M12S',
       focusArea: 'Identification challenges',
       url: 'https://youtu.be/zVz1OpLugZo',
     },
@@ -66,7 +66,7 @@ export const capstone = {
       title: 'Video 2: Transition Barriers - The cliff between K-12 support and higher education',
       description:
         'Examines the legal and operational shift from IDEA support models to ADA self-advocacy burden in college.',
-      duration: 'PT2M40S',
+      duration: 'PT2M33S',
       focusArea: 'Higher-education transition barriers',
       url: 'https://youtu.be/3to4vDHLO_4',
     },
@@ -76,7 +76,7 @@ export const capstone = {
       title: 'Video 3: Strength-Based Approaches - Reframing from deficits to assets',
       description:
         'Applies culturally responsive and strength-based frameworks to support complex learner profiles.',
-      duration: 'PT2M35S',
+      duration: 'PT4M42S',
       focusArea: 'Strength-based educational practice',
       url: 'https://youtu.be/i4SgPsfrms0',
     },
@@ -86,7 +86,7 @@ export const capstone = {
       title: 'Video 4: Social-Emotional Experiences - The hidden cognitive and emotional costs',
       description:
         'Highlights social-emotional load, stereotype threat, and identity navigation in campus environments.',
-      duration: 'PT2M40S',
+      duration: 'PT3M41S',
       focusArea: 'Social-emotional experience',
       url: 'https://youtu.be/u_hXunweL1Q',
     },
@@ -96,7 +96,7 @@ export const capstone = {
       title: 'Video 5: Institutional Recommendations - Concrete actions for systemic change',
       description:
         'Provides practical institutional actions: coordinated supports, ongoing training, family partnership, funding supports, and self-advocacy development.',
-      duration: 'PT2M50S',
+      duration: 'PT5M0S',
       focusArea: 'Institutional change recommendations',
       url: 'https://youtu.be/m21bBd5EqK0',
     },

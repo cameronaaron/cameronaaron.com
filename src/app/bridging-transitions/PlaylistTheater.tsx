@@ -2,7 +2,12 @@
 
 import { memo, useCallback, useMemo, useState } from 'react';
 import type { CapstoneVideo } from '@/data/capstone';
-import { buildEmbedSrc, buildEpisodeViews, type EpisodeView } from './playlist-theater-logic';
+import {
+  buildEmbedSrc,
+  buildEpisodeViews,
+  seriesSummary,
+  type EpisodeView,
+} from './playlist-theater-logic';
 
 interface EpisodeButtonProps {
   episode: EpisodeView;
@@ -71,6 +76,7 @@ interface PlaylistTheaterProps {
  */
 export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterProps) {
   const episodes = useMemo(() => buildEpisodeViews(videos), [videos]);
+  const summary = useMemo(() => seriesSummary(videos), [videos]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -133,7 +139,7 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
 
       <div className="lg:col-span-2">
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
-          Five videos, about twelve minutes
+          {summary}
         </h3>
         <ul aria-label="Episodes in the Bridging Transitions series" className="flex flex-col gap-2">
           {episodes.map((episode, index) => (
