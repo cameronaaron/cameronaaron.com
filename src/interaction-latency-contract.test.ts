@@ -18,12 +18,28 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { INP_BUDGET_MS, INTERACTIONS, LONG_TASK_THRESHOLD_MS } from '../scripts/checks/interaction-latency-config.mjs';
+import { partitionLongTasks } from '../scripts/checks/interaction-latency-analysis.mjs';
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), 'utf8');
 }
 
 describe('interaction-latency budgets', () => {
+  it('separates startup from interaction work without discarding crossing tasks', () => {
+    const startup = { startTime: 190, duration: 57 };
+    const endingAtInput = { startTime: 940, duration: 60 };
+    const crossingInput = { startTime: 970, duration: 65 };
+    const startingAtInput = { startTime: 1000, duration: 51 };
+    const duringInput = { startTime: 1020, duration: 90 };
+    const tasks = [startup, endingAtInput, crossingInput, startingAtInput, duringInput];
+    expect(partitionLongTasks(tasks, 1000)).toEqual({
+      startupLongTasks: [startup, endingAtInput],
+      interactionLongTasks: [crossingInput, startingAtInput, duringInput],
+    });
+    expect(tasks).toHaveLength(5);
+    expect(partitionLongTasks([], 1000)).toEqual({ startupLongTasks: [], interactionLongTasks: [] });
+  });
+
   it('pins the documented INP and long-task budgets', () => {
     // Core Web Vitals' "good" INP threshold is <200ms; 100ms is the low
     // half of that range, where interactions read as instant.

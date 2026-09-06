@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve as resolvePath } from 'node:path';
 
 import { chromium } from 'playwright';
+import { partitionLongTasks } from './interaction-latency-analysis.mjs';
 
 import { INP_BUDGET_MS, INTERACTIONS, LONG_TASK_THRESHOLD_MS, RUNS_PER_INTERACTION } from './interaction-latency-config.mjs';
 
@@ -124,6 +125,9 @@ async function measureOnce(browser, interaction) {
   await page.bringToFront();
   await page.waitForTimeout(SETTLE_MS);
 
+  // Same browser time origin as PerformanceEntry.startTime. Start before the
+  // driver acts, including any scroll/focus it needs to reach its control.
+  const interactionStart = await page.evaluate(() => performance.now());
   await interaction.run(page);
   await page.waitForTimeout(PRE_FLUSH_WAIT_MS);
   // Nudges web-vitals' internal presentation-time estimation (its own
@@ -136,7 +140,7 @@ async function measureOnce(browser, interaction) {
   const longTasks = await page.evaluate(() => window.__longTasks);
 
   await context.close();
-  return { inp, longTasks };
+  return { inp, ...partitionLongTasks(longTasks, interactionStart) };
 }
 
 async function measureInteraction(browser, interaction) {
@@ -149,7 +153,8 @@ async function measureInteraction(browser, interaction) {
   // A long task in even one run out of several is a real event that
   // happened on this machine running this build — union, don't average it
   // away the way a scalar median would.
-  const longTasks = runs.flatMap((r) => r.longTasks);
+  const longTasks = runs.flatMap((r) => r.interactionLongTasks);
+  const startupLongTasks = runs.flatMap((r) => r.startupLongTasks);
 
   return {
     ...interaction,
@@ -157,6 +162,7 @@ async function measureInteraction(browser, interaction) {
     reportedRunCount: reportedInps.length,
     totalRunCount: RUNS_PER_INTERACTION,
     longTasks,
+    startupLongTasks,
   };
 }
 
@@ -206,8 +212,9 @@ async function main() {
       console.log(`  [${status}] ${result.name} (${result.file})`);
       console.log(`         INP: ${inpText}${inpFail ? '  <-- exceeds budget, missing, or unreliable' : ''}`);
       console.log(
-        `         Long tasks: ${result.longTasks.length}${longTaskFail ? `  <-- ${result.longTasks.map((t) => `${t.duration.toFixed(1)}ms`).join(', ')}` : ''}`
+        `         Interaction long tasks: ${result.longTasks.length}${longTaskFail ? `  <-- ${result.longTasks.map((t) => `${t.duration.toFixed(1)}ms`).join(', ')}` : ''}`
       );
+      console.log(`         Startup long tasks (load cost, reported separately): ${result.startupLongTasks.length}`);
       if (inpFail || longTaskFail) exitCode = 1;
     }
     console.log();
