@@ -65,7 +65,7 @@ in `stryker.config.mjs`). A red gate blocks the commit itself. Pre-push runs
 the same gate **plus a full-history gitleaks scan, a production build, and
 `scripts/checks/performance-budgets.mjs`** (the build+budgets step was added
 2026-07-23 after the RSC migration's HTML growth sat unflagged for five days
-— pushes auto-deploy, so the artifact-level budgets must gate the push, not
+— pushes auto-deploy, so the artifact-integrity checks must gate the push, not
 just the manual `deploy:prod` path; the gitleaks steps were added 2026-08
 after real PII — academic transcripts with student ID numbers, a personal
 phone number — was found in git history predating this gate, requiring a
@@ -168,7 +168,7 @@ src/repo-hygiene-contract.test.ts      # root-file whitelist, path conventions
 src/complexity-doctrine-contract.test.ts     # O(1) doctrine sweeps (incl. frame-alloc, effect-deps, nested-scan ASTs) + production-dependency ledger + gate wiring
 src/modularization-contract.test.ts    # logic extraction enforced per component
 src/performance-regression-contract.test.ts  # Lighthouse score thresholds
-src/public-asset-weight-contract.test.ts     # weight budgets + modern image formats (avif required on the render path)
+src/public-asset-weight-contract.test.ts     # modern image formats (avif required; byte sizes are informational)
 src/dead-logic-export-contract.test.ts       # every exported logic fn has a production caller
 src/dead-dependency-contract.test.ts         # every package.json dep has a real import/require somewhere
 src/config-integrity-contract.test.ts        # pins the gates' own config (strict, 100%, export, Node major)
