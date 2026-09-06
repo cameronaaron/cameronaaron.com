@@ -369,8 +369,11 @@ as immutable; `metadata.test.ts` says so with an assertion.
 ### 20. The playlist player is a facade, deliberately
 
 `PlaylistTheater` renders a designed play card and mounts the real
-`youtube-nocookie` iframe only after the visitor presses play — measured zero
-third-party requests before that click. A printed QR code hands this page to
+`youtube-nocookie` iframe only after the visitor presses play — measured on the
+live site: **zero requests to YouTube** before that click (the one third-party
+request that does fire pre-play is `static.cloudflareinsights.com/beacon.min.js`,
+which Cloudflare Pages injects at the edge on every page of this site and which
+this page neither adds nor can remove from here). A printed QR code hands this page to
 strangers who never opted into third-party tracking by walking past a poster,
 and conference wifi is the worst case for loading a ~500KB player nobody asked
 for. Don't "simplify" it into a bare iframe.
