@@ -72,7 +72,7 @@ describe('remaining line coverage', () => {
       });
     }
 
-    fireEvent.mouseMove(window, { clientX: 180, clientY: 210 });
+    fireEvent.mouseMove(profileContainer!, { clientX: 180, clientY: 210 });
     expect(screen.getByAltText(profile.name)).toBeTruthy();
   });
 

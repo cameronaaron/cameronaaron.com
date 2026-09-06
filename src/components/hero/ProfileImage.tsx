@@ -2,12 +2,10 @@
 
 import { m, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
-import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { memo, useEffect, useRef } from 'react';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import {
   calculateProfilePointerTargets,
-  getProfileFloatAnimation,
   PROFILE_CONTAINER_ID,
   PROFILE_SPRING_CONFIG,
 } from '@/components/hero/profile-image-logic';
@@ -17,11 +15,8 @@ interface ProfileImageProps {
   alt: string;
 }
 
-export default function ProfileImage({ src, alt }: ProfileImageProps) {
-  const { enableHoverMotion, prefersReducedMotion } = useInteractionMode();
-  const { isCoarsePointer } = usePerformanceProfile();
-  // Treat touch devices as reduced-motion to skip expensive infinite animations
-  const reducedMotion = Boolean(prefersReducedMotion) || isCoarsePointer;
+function ProfileImage({ src, alt }: ProfileImageProps) {
+  const { shouldRenderHeavyEffects: enableHoverMotion } = usePerformanceProfile();
 
   // Mouse position tracking for 3D tilt effect
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,79 +38,50 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
       return;
     }
 
+    const container = containerRef.current!;
     const handleMouseMove = (e: MouseEvent) => {
       // Ref read instead of a per-event document.getElementById DOM query.
       // The listener only exists after mount, so the ref is always attached.
-      const rect = containerRef.current!.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       const target = calculateProfilePointerTargets(rect, e.clientX, e.clientY);
       mouseX.set(target.x);
       mouseY.set(target.y);
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    const handleMouseLeave = () => {
+      mouseX.set(0);
+      mouseY.set(0);
+    };
+
+    // A tab click elsewhere in the hero must not also tilt/re-rasterize this
+    // large portrait. Its depth responds only to the pointer over the image.
+    container.addEventListener('mousemove', handleMouseMove, { passive: true });
+    container.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    return () => {
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+    };
   }, [enableHoverMotion, mouseX, mouseY]);
 
   return (
-    <m.div
+    <div
       id={PROFILE_CONTAINER_ID}
       ref={containerRef}
-      initial={false}
-      animate={{ 
-        opacity: 1, 
-        scale: 1,
-        y: getProfileFloatAnimation(reducedMotion)
-      }}
-      transition={{ 
-        opacity: { duration: 0 },
-        scale: { duration: 0 },
-        y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
-      }}
-      style={{
-        perspective: 1000,
-      }}
-      className="relative"
+      data-interactive={enableHoverMotion}
+      style={{ perspective: 1000 }}
+      className="profile-portrait relative"
     >
+      <div className="profile-halo" aria-hidden="true" />
       <m.div 
         style={{
           rotateX: rotateXSpring,
           rotateY: rotateYSpring,
-          transformStyle: 'preserve-3d',
         }}
         className="relative w-full aspect-square max-w-md mx-auto"
         whileHover={enableHoverMotion ? { scale: 1.05 } : undefined}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        {/* Glowing background with depth */}
-        <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full blur-3xl opacity-30 ${reducedMotion ? '' : 'animate-pulse'}`} style={{ transform: 'translateZ(-50px)' }} />
-        
-        {/* Secondary glow layer */}
-        <m.div 
-          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-full blur-2xl"
-          animate={{
-            scale: reducedMotion ? 1 : [1, 1.2, 1],
-            opacity: reducedMotion ? 0.3 : [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{ transform: 'translateZ(-30px)' }}
-        />
-        
-        {/* Image container with 3D depth */}
-        <m.div 
-          className="profile-photo relative w-full h-full rounded-[2rem] overflow-hidden border border-white/20 shadow-2xl"
-          style={{ transform: 'translateZ(20px)' }}
-          whileHover={
-            enableHoverMotion
-              ? {
-                  boxShadow: '0 25px 50px -12px rgba(129, 140, 248, 0.5)',
-                }
-              : undefined
-          }
-        >
+        <div className="profile-photo relative w-full h-full rounded-[2rem] overflow-hidden border border-white/20">
           {/* Static export disables next/image's automatic srcset (unoptimized: true),
               so the smaller mobile source is served by hand via <picture><source>.
               The narrow-viewport slot is 192px (see the `sizes` hint below) — the
@@ -139,15 +105,10 @@ export default function ProfileImage({ src, alt }: ProfileImageProps) {
             />
           </picture>
           
-          {/* Shine effect on hover */}
-          <m.div
-            className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0"
-            initial={{ x: '-100%', y: '-100%' }}
-            whileHover={enableHoverMotion ? { x: '100%', y: '100%' } : undefined}
-            transition={{ duration: 0.8 }}
-          />
-        </m.div>
+        </div>
       </m.div>
-    </m.div>
+    </div>
   );
 }
+
+export default memo(ProfileImage);
