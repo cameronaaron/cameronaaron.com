@@ -630,9 +630,9 @@ describe('BACKGROUND_OPACITY_TIERS — batched draw table', () => {
   });
 
   it('has the exact rgba draw style string for every tier', () => {
-    expect(BACKGROUND_OPACITY_TIERS[0].style).toBe('rgba(129, 140, 248, 0.2)');
-    expect(BACKGROUND_OPACITY_TIERS[1].style).toBe('rgba(129, 140, 248, 0.38)');
-    expect(BACKGROUND_OPACITY_TIERS[2].style).toBe('rgba(129, 140, 248, 0.55)');
+    expect(BACKGROUND_OPACITY_TIERS[0].style).toBe('rgba(52, 232, 171, 0.2)');
+    expect(BACKGROUND_OPACITY_TIERS[1].style).toBe('rgba(52, 232, 171, 0.38)');
+    expect(BACKGROUND_OPACITY_TIERS[2].style).toBe('rgba(52, 232, 171, 0.55)');
   });
 });
 

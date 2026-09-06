@@ -1,6 +1,6 @@
 'use client';
 
-import { m, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import {
   type BurstParticle,
@@ -22,11 +22,14 @@ import {
   createInitialParticles,
   createKnnHeap,
   getConnectionOpacityTier,
+  getConnectionTierStyles,
   getGlowGradientStops,
+  getKnnLinkStyle,
   getParticlePulse,
   getQualityConfig,
   normalizePointerToPercent,
   percentToPx,
+  recolorParticles,
   stepBursts,
   stepParticles,
 } from './interactive-particles/interactive-particles-engine';
@@ -34,6 +37,8 @@ import { gateLoopOnVisibility } from '@/components/hero/visibility-gate';
 
 interface InteractiveParticlesProps {
   quality?: ParticleQuality;
+  colors?: readonly string[];
+  connectionRgb?: string;
 }
 
 /**
@@ -67,9 +72,16 @@ function createGlowSprite(color: string): HTMLCanvasElement {
  * implementation drove ~130 absolutely-positioned DOM nodes through
  * setState + left/top at 60fps, forcing reconciliation and layout every frame.
  */
-export default function InteractiveParticles({ quality = 'full' }: InteractiveParticlesProps) {
+export default function InteractiveParticles({
+  quality = 'full',
+  colors = PARTICLE_COLORS,
+  connectionRgb = '126, 231, 255',
+}: InteractiveParticlesProps) {
   const prefersReducedMotion = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const colorsRef = useRef(colors);
+  const connectionRgbRef = useRef(connectionRgb);
+  const applyPaletteRef = useRef<((nextColors: readonly string[], rgb: string) => void) | null>(null);
 
   useEffect(() => {
     if (prefersReducedMotion || quality === 'reduced' || quality === 'lite') return;
@@ -79,7 +91,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     if (!ctx) return;
 
     const config = getQualityConfig(quality);
-    const particles = createInitialParticles(config.count, quality === 'balanced' ? 2024 : 1337);
+    const particles = createInitialParticles(config.count, quality === 'balanced' ? 2024 : 1337, colorsRef.current);
     const bursts: BurstParticle[] = [];
     const pointer: PointerState = { x: 50, y: 50, active: false };
 
@@ -96,12 +108,26 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     let height = 0;
     let frameId = 0;
     let lastTick = 0;
+    let connectionStyles: readonly string[] = CONNECTION_TIER_STYLES;
+    let knnStyle = KNN_LINK_STYLE;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const sprites = new Map<string, HTMLCanvasElement>();
-    for (const color of PARTICLE_COLORS) {
-      sprites.set(color, createGlowSprite(color));
-    }
+    const ensureSprites = (palette: readonly string[]) => {
+      for (const color of palette) {
+        if (!sprites.has(color)) sprites.set(color, createGlowSprite(color));
+      }
+    };
+    ensureSprites(colorsRef.current);
+
+    const applyPalette = (nextColors: readonly string[], rgb: string) => {
+      recolorParticles(particles, nextColors);
+      ensureSprites(nextColors);
+      connectionStyles = getConnectionTierStyles(rgb);
+      knnStyle = getKnnLinkStyle(rgb);
+    };
+    applyPalette(colorsRef.current, connectionRgbRef.current);
+    applyPaletteRef.current = applyPalette;
 
     const resize = () => {
       width = window.innerWidth;
@@ -131,13 +157,14 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
         baseY,
         count: config.burstCount,
         startId: burstId,
+        colors: colorsRef.current,
       });
       burstId += nextBursts.length;
       appendBursts(bursts, nextBursts, config.maxBursts);
     };
 
     const drawGlow = (colorKey: string, xPercent: number, yPercent: number, diameter: number, alpha: number) => {
-      // Every particle/burst colour comes from PARTICLE_COLORS, so the sprite always exists.
+      // Every particle/burst colour comes from the active palette, so the sprite always exists.
       const sprite = sprites.get(colorKey)!;
       const x = percentToPx(xPercent, width);
       const y = percentToPx(yPercent, height);
@@ -174,7 +201,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
       ctx.globalAlpha = 1;
       for (let tier = 0; tier < CONNECTION_OPACITY_TIERS.length; tier += 1) {
         ctx.beginPath();
-        ctx.strokeStyle = CONNECTION_TIER_STYLES[tier];
+        ctx.strokeStyle = connectionStyles[tier];
         for (let k = 0; k < lines.length; k += 1) {
           if (tierScratch[k] !== tier) continue;
           const line = lines[k];
@@ -195,7 +222,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
         const pointerPy = percentToPx(pointer.y, height);
         ctx.globalAlpha = 1;
         ctx.lineWidth = 1;
-        ctx.strokeStyle = KNN_LINK_STYLE;
+        ctx.strokeStyle = knnStyle;
         ctx.beginPath();
         for (let k = 0; k < knnHeap.size; k += 1) {
           const near = particles[knnHeap.index[k]];
@@ -249,6 +276,7 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     const releaseGate = gateLoopOnVisibility(canvas, { onResume: startLoop, onPause: stopLoop });
 
     return () => {
+      applyPaletteRef.current = null;
       releaseGate();
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handlePointerMove);
@@ -258,6 +286,12 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     };
   }, [prefersReducedMotion, quality]);
 
+  useEffect(() => {
+    colorsRef.current = colors;
+    connectionRgbRef.current = connectionRgb;
+    applyPaletteRef.current?.(colors, connectionRgb);
+  }, [colors, connectionRgb]);
+
   if (quality === 'reduced' || quality === 'lite') {
     return null;
   }
@@ -266,16 +300,9 @@ export default function InteractiveParticles({ quality = 'full' }: InteractivePa
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />
 
-      <m.div
+      <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(56,214,255,0.12) 0%, rgba(16,212,146,0.08) 36%, rgba(4,7,15,0) 72%)',
-          filter: 'blur(10px)',
-        }}
-        animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0.9, 0.6] }}
-        transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+        className="hero-particle-core-anim absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
       />
     </div>
   );

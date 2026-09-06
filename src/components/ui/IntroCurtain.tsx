@@ -82,13 +82,25 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
             className="absolute inset-0"
             style={{
               background:
-                'radial-gradient(circle at 50% 50%, rgba(12,189,242,0.18) 0%, rgba(129,140,248,0.12) 40%, transparent 70%)',
+                'radial-gradient(circle at 50% 50%, rgba(12,189,242,0.28) 0%, rgba(129,140,248,0.16) 38%, transparent 68%)',
             }}
             initial={{ opacity: 0, scale: 1.2 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.08 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
           />
+
+          <div className="curtain-aperture pointer-events-none absolute inset-0" aria-hidden="true">
+            <span className="curtain-aperture-ring-anim" />
+            <span
+              className="curtain-aperture-ring-anim"
+              style={{ '--curtain-ring-delay': '0.1s', '--curtain-ring-size': '19rem' } as React.CSSProperties}
+            />
+            <span
+              className="curtain-aperture-ring-anim"
+              style={{ '--curtain-ring-delay': '0.2s', '--curtain-ring-size': '26rem' } as React.CSSProperties}
+            />
+          </div>
 
           {/* Top sweep line */}
           <m.div
@@ -120,7 +132,7 @@ export default function IntroCurtain({ holdMs = 400 }: IntroCurtainProps) {
           {/* Name lockup */}
           <div className="relative z-10 flex flex-col items-center gap-3 select-none">
             <m.span
-              className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.5em] text-cyan-100/80"
+              className="inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.5em] text-cyan-100 sm:text-sm"
               initial={{ opacity: 0, y: 10, letterSpacing: '0.15em' }}
               animate={{ opacity: 1, y: 0, letterSpacing: '0.5em' }}
               exit={{ opacity: 0, y: -8, letterSpacing: '0.6em' }}

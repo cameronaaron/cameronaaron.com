@@ -80,10 +80,16 @@ export function getQualityConfig(quality: ParticleQuality): ParticleQualityConfi
 export const CONNECTION_MAX_OPACITY = 0.28;
 export const CONNECTION_OPACITY_TIERS = [0.08, 0.17, 0.26] as const;
 
+/** Ice-default RGB for connection strokes — world palettes pass their own. */
+const CONNECTION_RGB = '126, 231, 255';
+
+/** Stroke styles for one RGB triple — called on world change, never per frame. */
+export function getConnectionTierStyles(rgb = CONNECTION_RGB): readonly string[] {
+  return CONNECTION_OPACITY_TIERS.map((opacity) => `rgba(${rgb}, ${opacity})`);
+}
+
 /** One precomputed strokeStyle per opacity tier — no per-frame string building. */
-export const CONNECTION_TIER_STYLES: readonly string[] = CONNECTION_OPACITY_TIERS.map(
-  (opacity) => `rgba(126, 231, 255, ${opacity})`
-);
+export const CONNECTION_TIER_STYLES: readonly string[] = getConnectionTierStyles();
 
 /** Map a connection opacity (0 … CONNECTION_MAX_OPACITY) to a tier index. */
 export function getConnectionOpacityTier(opacity: number): number {
@@ -100,15 +106,20 @@ export function createSeededRandom(seed: number): () => number {
   };
 }
 
-export function createInitialParticles(count = 42, seed = 1337): Particle[] {
+export function createInitialParticles(
+  count = 42,
+  seed = 1337,
+  colors: readonly string[] = PARTICLE_COLORS
+): Particle[] {
   const random = createSeededRandom(seed);
+  const palette = colors.length > 0 ? colors : PARTICLE_COLORS;
 
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     x: random() * 100,
     y: random() * 100,
     size: random() * 3.2 + 1.8,
-    color: PARTICLE_COLORS[Math.floor(random() * PARTICLE_COLORS.length)],
+    color: palette[Math.floor(random() * palette.length)],
     velocity: {
       x: (random() - 0.5) * 0.08,
       y: (random() - 0.5) * 0.08,
@@ -186,8 +197,10 @@ export function createBurstParticles(args: {
   count: number;
   startId: number;
   random?: () => number;
+  colors?: readonly string[];
 }): BurstParticle[] {
   const random = args.random ?? Math.random;
+  const palette = args.colors && args.colors.length > 0 ? args.colors : PARTICLE_COLORS;
 
   return Array.from({ length: args.count }, (_, i) => {
     const angle = (Math.PI * 2 * i) / args.count + random() * 0.45;
@@ -201,9 +214,18 @@ export function createBurstParticles(args: {
       vy: Math.sin(angle) * speed,
       life: 1,
       size: 2.2 + random() * 2.1,
-      color: PARTICLE_COLORS[Math.floor(random() * PARTICLE_COLORS.length)],
+      color: palette[Math.floor(random() * palette.length)],
     };
   });
+}
+
+/** Recolor an existing field in place — O(n) once on world change, zero allocation. */
+export function recolorParticles(particles: Particle[], colors: readonly string[]): Particle[] {
+  if (colors.length === 0) return particles;
+  for (let i = 0; i < particles.length; i += 1) {
+    particles[i].color = colors[i % colors.length];
+  }
+  return particles;
 }
 
 /**
@@ -380,8 +402,13 @@ export const KNN_LINK_COUNT = 6;
 /** Link radius in simulation-percent units; only particles inside it qualify. */
 export const KNN_LINK_RADIUS = 26;
 export const KNN_LINK_RADIUS_SQ = KNN_LINK_RADIUS * KNN_LINK_RADIUS;
+/** Stroke for the cursor's K-nearest links — recomputed on world change, not per frame. */
+export function getKnnLinkStyle(rgb = CONNECTION_RGB): string {
+  return `rgba(${rgb}, 0.32)`;
+}
+
 /** Precomputed stroke for the cursor links — one string, never built per frame. */
-export const KNN_LINK_STYLE = 'rgba(126, 231, 255, 0.32)';
+export const KNN_LINK_STYLE = getKnnLinkStyle();
 
 export interface KnnHeap {
   /** Squared distance to the pointer, max-ordered (worst kept at index 0). */

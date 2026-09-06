@@ -102,7 +102,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       if (activeConfig.useConnections) {
         rebuildSpatialGrid(spatialGrid, particles, gridCellSize);
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(99, 102, 241, 0.12)';
+        ctx.strokeStyle = 'rgba(52, 232, 171, 0.16)';
         ctx.lineWidth = 0.5;
         forEachConnectedPair(spatialGrid, particles, gridCellSize, connectDist2, (_i, _j, pi, pj) => {
           ctx.moveTo(pi.x, pi.y);
@@ -114,7 +114,7 @@ export default function BackgroundParticles({ quality = 'full' }: BackgroundPart
       // ── Batch mouse-pull lines — one path, one stroke() ──────────────────
       if (activeConfig.useMousePull && mouse.x > MOUSE_ACTIVE_THRESHOLD) {
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(99, 102, 241, 0.55)';
+        ctx.strokeStyle = 'rgba(52, 232, 171, 0.55)';
         ctx.lineWidth = 1;
         for (const p of particles) {
           const dx = mouse.x - p.x;

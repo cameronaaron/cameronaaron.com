@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import { HERO_WORLD_CHANGE_EVENT, collectHeroWorldParticleColors } from '@/components/hero/hero-logic';
 import {
   GLOW_DIAMETER_MULTIPLIER,
   GLOW_SPRITE_SIZE,
@@ -11,6 +12,7 @@ import {
 import { AURORA_SURGE_EVENT } from '@/components/ui/aurora-surge-logic';
 import {
   SURGE_SPARK_COUNT,
+  WORLD_CHANGE_SPARK_COUNT,
   createSparkPool,
   emitSurgeBurst,
   emitTrailSparks,
@@ -67,9 +69,11 @@ export default function CursorComet() {
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const sprites = new Map<string, HTMLCanvasElement>();
-    for (const color of PARTICLE_COLORS) {
+    const worldColors = collectHeroWorldParticleColors();
+    for (const color of worldColors) {
       sprites.set(color, createGlowSprite(color));
     }
+    let trailColors: readonly string[] = PARTICLE_COLORS;
 
     const resize = () => {
       width = window.innerWidth;
@@ -105,6 +109,7 @@ export default function CursorComet() {
           dirX: pointerX - lastEmitX,
           dirY: pointerY - lastEmitY,
           count: emitCount,
+          colors: trailColors,
         });
         lastEmitX = pointerX;
         lastEmitY = pointerY;
@@ -152,7 +157,19 @@ export default function CursorComet() {
     };
 
     const handleSurge = () => {
-      emitSurgeBurst(pool, { width, height, count: SURGE_SPARK_COUNT });
+      emitSurgeBurst(pool, { width, height, count: SURGE_SPARK_COUNT, colors: trailColors });
+      wake();
+    };
+
+    const handleWorldChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ colors?: readonly string[] }>).detail;
+      if (detail?.colors && detail.colors.length > 0) {
+        trailColors = detail.colors;
+        for (const color of trailColors) {
+          if (!sprites.has(color)) sprites.set(color, createGlowSprite(color));
+        }
+      }
+      emitSurgeBurst(pool, { width, height, count: WORLD_CHANGE_SPARK_COUNT, colors: trailColors });
       wake();
     };
 
@@ -160,11 +177,13 @@ export default function CursorComet() {
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     window.addEventListener(AURORA_SURGE_EVENT, handleSurge, { passive: true });
+    window.addEventListener(HERO_WORLD_CHANGE_EVENT, handleWorldChange, { passive: true });
 
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener(AURORA_SURGE_EVENT, handleSurge);
+      window.removeEventListener(HERO_WORLD_CHANGE_EVENT, handleWorldChange);
       cancelAnimationFrame(frameId);
     };
   }, []);

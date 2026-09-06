@@ -17,7 +17,7 @@ export const BUTTON_SIZE_STYLES = {
 
 export const BUTTON_VARIANT_STYLES = {
   primary:
-    'bg-gradient-to-b from-cyan-300 to-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/45 hover:from-cyan-200 hover:to-cyan-400',
+    'bg-gradient-to-b from-cyan-300 to-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/35 hover:shadow-cyan-400/55 hover:from-cyan-200 hover:to-cyan-400',
   secondary:
     'bg-white/[0.06] backdrop-blur-sm text-white border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:border-cyan-300/40 hover:bg-white/[0.1]',
   outline: 'border border-cyan-300/60 text-cyan-200 hover:bg-cyan-300/10 hover:border-cyan-200',

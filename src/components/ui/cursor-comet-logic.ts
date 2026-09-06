@@ -19,6 +19,8 @@ export const TRAIL_SPARK_SPREAD_RAD = 1.2;
 
 /** Sparks emitted across the viewport when an aurora surge fires. */
 export const SURGE_SPARK_COUNT = 130;
+/** Smaller storm when the hero switches worlds — enough to feel, not a Konami blast. */
+export const WORLD_CHANGE_SPARK_COUNT = 48;
 export const SURGE_SPARK_MIN_SPEED = 0.8;
 export const SURGE_SPARK_SPEED_JITTER = 2.6;
 export const SURGE_SPARK_SIZE_MIN = 1.8;
@@ -89,29 +91,39 @@ function writeSpark(
  */
 export function emitTrailSparks(
   pool: SparkPool,
-  args: { baseX: number; baseY: number; dirX: number; dirY: number; count: number; random?: () => number }
+  args: {
+    baseX: number;
+    baseY: number;
+    dirX: number;
+    dirY: number;
+    count: number;
+    random?: () => number;
+    colors?: readonly string[];
+  }
 ): void {
   const random = args.random ?? Math.random;
+  const palette = args.colors && args.colors.length > 0 ? args.colors : PARTICLE_COLORS;
   const baseAngle = Math.atan2(-args.dirY, -args.dirX);
   for (let i = 0; i < args.count; i += 1) {
     const angle = baseAngle + (random() - 0.5) * TRAIL_SPARK_SPREAD_RAD;
     const speed = TRAIL_SPARK_MIN_SPEED + random() * TRAIL_SPARK_SPEED_JITTER;
     const size = TRAIL_SPARK_SIZE_MIN + random() * TRAIL_SPARK_SIZE_JITTER;
-    writeSpark(pool, args.baseX, args.baseY, angle, speed, size, PARTICLE_COLORS[Math.floor(random() * PARTICLE_COLORS.length)]);
+    writeSpark(pool, args.baseX, args.baseY, angle, speed, size, palette[Math.floor(random() * palette.length)]);
   }
 }
 
 /** Aurora-surge storm: sparks at random viewport positions, radial velocity. */
 export function emitSurgeBurst(
   pool: SparkPool,
-  args: { width: number; height: number; count: number; random?: () => number }
+  args: { width: number; height: number; count: number; random?: () => number; colors?: readonly string[] }
 ): void {
   const random = args.random ?? Math.random;
+  const palette = args.colors && args.colors.length > 0 ? args.colors : PARTICLE_COLORS;
   for (let i = 0; i < args.count; i += 1) {
     const angle = random() * Math.PI * 2;
     const speed = SURGE_SPARK_MIN_SPEED + random() * SURGE_SPARK_SPEED_JITTER;
     const size = SURGE_SPARK_SIZE_MIN + random() * SURGE_SPARK_SIZE_JITTER;
-    writeSpark(pool, random() * args.width, random() * args.height, angle, speed, size, PARTICLE_COLORS[Math.floor(random() * PARTICLE_COLORS.length)]);
+    writeSpark(pool, random() * args.width, random() * args.height, angle, speed, size, palette[Math.floor(random() * palette.length)]);
   }
 }
 
