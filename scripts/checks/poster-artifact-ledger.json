@@ -1,0 +1,18 @@
+{
+  "bridging-transitions-handout-11x17.pdf": {
+    "sha256": "e10eb0772fc7c58ba75af4f5445835809c3f948f6e3c24681941b199e0c86f2d",
+    "bytes": 74258,
+    "qrTargets": [
+      "https://cameronaaron.com/bridging-transitions"
+    ],
+    "lastVerified": "2026-09-06"
+  },
+  "bridging-transitions-poster-48x36.pdf": {
+    "sha256": "4a2172eec6942f4f335787db17a346d6a48be326039da8c3b5bb489820970abc",
+    "bytes": 96672,
+    "qrTargets": [
+      "https://cameronaaron.com/bridging-transitions"
+    ],
+    "lastVerified": "2026-09-06"
+  }
+}
