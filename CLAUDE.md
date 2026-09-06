@@ -384,6 +384,15 @@ the QR (needs `pdftoppm` + `zbarimg`; do not hand-edit the ledger). Text
 extraction cannot substitute — Typst subsets its fonts, so the URL is not
 present as plain text in the PDF.
 
+These PDFs are also **not** `immutable`, and `public/_headers` must not say
+they are. Their filenames carry no content hash and they are rewritten in
+place. They shipped as `max-age=31536000, immutable` for a few hours and it
+bit immediately: the rebuilt poster deployed, the edge kept serving the
+year-cached old file, and recovering it took a Cloudflare zone purge —
+which cannot reach the browser caches of anyone who had already downloaded
+it. `headers-integrity-contract` now sweeps every `immutable` rule and fails
+on any whose URLs are not content-addressed.
+
 ### 20a. Editing a video duration means re-running `pnpm run check:video-durations`
 
 Every `duration` in `src/data/capstone.ts` was once the video's **planned**

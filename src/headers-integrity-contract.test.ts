@@ -88,7 +88,7 @@ describe('headers-integrity-contract — security headers on every page', () => 
     it('serves the poster PDFs the page links to', () => {
       const poster = blockFor('/poster/*');
       expect(poster).toContain('Content-Type: application/pdf');
-      expect(poster).toContain('immutable');
+      expect(poster).toContain('must-revalidate');
     });
   });
 });
@@ -152,5 +152,91 @@ describe('headers-integrity-contract — preload targets exist', () => {
       offenders,
       `preload-hygiene violation(s) in public/_headers:\n${offenders.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+/**
+ * `immutable` is a promise that a URL's bytes will NEVER change. It is only
+ * true for a filename carrying a content hash; on any other path it is a lie
+ * the edge believes for as long as max-age says.
+ *
+ * Origin (2026-09-06): public/poster/*.pdf shipped as
+ * `max-age=31536000, immutable` under a comment asserting the files were
+ * "content-addressed by name". They were not. The poster was rebuilt hours
+ * later to repoint its QR code, the new bytes deployed, and Cloudflare went
+ * on serving the year-cached old file — a poster whose printed code led back
+ * to the site root. It took an explicit zone purge to recover, and any
+ * visitor who had already fetched it would have held the wrong poster in
+ * their own browser cache for a year, where no purge can reach.
+ *
+ * So every `immutable` rule must name why its URLs can never change.
+ */
+const IMMUTABLE_PATHS_WITH_CONTENT_HASHED_NAMES: Record<string, string> = {
+  '/_next/static/*':
+    'Next.js emits these with a content hash in the filename (chunk/build id), so a changed ' +
+    'file is a different URL by construction — the one place `immutable` is literally true here.',
+  '/:all*(js|css|svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|ttf|eot)':
+    'PRE-EXISTING and NOT content-hashed (e.g. /images/profile-hero.avif). Left as-is ' +
+    'deliberately rather than widened into a site-wide caching change on the way past: these ' +
+    'assets are replaced by a rename in practice, and loosening them touches the LCP preload ' +
+    'path and the performance budgets. Reopen condition: the first time an image or font is ' +
+    'edited in place under its existing name, this rule must move to a hashed filename scheme ' +
+    'or drop `immutable`, and the edge must be purged for that file.',
+};
+
+describe('headers-integrity-contract — immutable is only claimed where it is true', () => {
+  /** Every "/path" rule in _headers paired with its indented header lines. */
+  function ruleBlocks(): Array<{ path: string; block: string }> {
+    const rules: Array<{ path: string; block: string }> = [];
+    let current: { path: string; block: string } | undefined;
+
+    for (const line of HEADERS.split('\n')) {
+      if (/^\s*#/.test(line) || line.trim() === '') continue;
+      if (/^\S/.test(line)) {
+        if (current) rules.push(current);
+        current = { path: line.trim(), block: '' };
+      } else if (current) {
+        current.block += `${line.trim()}\n`;
+      }
+    }
+    if (current) rules.push(current);
+    return rules;
+  }
+
+  it('finds the rules it is meant to sweep', () => {
+    // Guard the guard (§6 item 8): a parser that returned nothing would make
+    // the sweep below pass while checking nothing at all.
+    const rules = ruleBlocks();
+    expect(rules.length, 'parsed no rules out of public/_headers').toBeGreaterThan(4);
+    expect(rules.some((r) => r.block.includes('immutable')), 'parsed no immutable rule').toBe(true);
+  });
+
+  it('no path claims immutable without content-hashed filenames on record', () => {
+    const offenders = ruleBlocks()
+      .filter((rule) => rule.block.includes('immutable'))
+      .map((rule) => rule.path)
+      .filter((path) => !(path in IMMUTABLE_PATHS_WITH_CONTENT_HASHED_NAMES));
+
+    expect(
+      offenders,
+      `${offenders.length} path rule(s) claim "immutable" without their URLs being content-addressed:\n` +
+        `${offenders.map((p) => `  ${p}`).join('\n')}\n` +
+        'A file rewritten in place under an immutable URL is served stale by the edge AND by every ' +
+        'browser that already fetched it, for the full max-age. Either put a content hash in the ' +
+        'filename or drop immutable.',
+    ).toEqual([]);
+  });
+
+  it('every immutable exemption names a real rule and gives a real reason', () => {
+    const paths = new Set(ruleBlocks().map((rule) => rule.path));
+    for (const [path, reason] of Object.entries(IMMUTABLE_PATHS_WITH_CONTENT_HASHED_NAMES)) {
+      expect(paths.has(path), `${path} is exempted but is not a rule in public/_headers`).toBe(true);
+      expect(reason.length, `${path}'s exemption reason is too short to be a real reason`).toBeGreaterThan(40);
+    }
+  });
+
+  it('the poster PDFs are not among them', () => {
+    // The specific regression: this is the rule that shipped wrong.
+    expect(blockFor('/poster/*')).not.toContain('immutable');
   });
 });
