@@ -7,7 +7,6 @@ import IframeTitleGuard from '@/components/ui/IframeTitleGuard';
 import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import SectionHeader from '@/components/ui/SectionHeader';
 import SmoothScroll from '@/components/ui/SmoothScroll';
-import TextReveal from '@/components/ui/TextReveal';
 import TypewriterEffect from '@/components/ui/TypewriterEffect';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 
@@ -131,16 +130,6 @@ describe('ui coverage hardening', () => {
     } finally {
       vi.useRealTimers();
     }
-  });
-
-  it('covers text reveal pageshow persistence handling', () => {
-    render(<TextReveal text="Coverage Matters" delay={0.1} />);
-
-    const pageShow = new Event('pageshow');
-    Object.defineProperty(pageShow, 'persisted', { value: true });
-    window.dispatchEvent(pageShow);
-
-    expect(window.sessionStorage.getItem('text-reveal-complete:Coverage Matters')).toBe('1');
   });
 
   it('covers smooth-scroll hash and pageshow branches with Lenis resize/scrollTo hooks', async () => {

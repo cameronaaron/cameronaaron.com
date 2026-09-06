@@ -129,7 +129,6 @@ describe('test-quality-contract — no assertion that cannot fail', () => {
       'src/components/hero-coverage.test.tsx': 'captures useMotionValue instances in call order to assert which value a mousemove wrote — needs its own factory',
       'src/components/particles-and-engines-coverage.test.tsx': 'pre-dates the shared mock; canvas-focused shim',
       'src/components/sections-coverage.test.tsx': 'pre-dates the shared mock; bespoke shim for section-level branch coverage',
-      'src/components/ui/TextReveal.coverage.test.tsx': 'pre-dates the shared mock; minimal shim for reveal-state branches',
     };
 
     // Skip self: this file MENTIONS the declaration string (registry docs,

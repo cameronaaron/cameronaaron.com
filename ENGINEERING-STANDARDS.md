@@ -2723,9 +2723,9 @@ Four lessons, each of which cost a real defect to learn:
 to temporary entrance transforms too. `SectionHeader` now animates the whole
 heading from its ancestor, with literal text inside the clipped gradient;
 per-letter transforms made parts of the heading disappear until they settled.
-The solid-color hero `TextReveal` uses a short CSS entrance and clips each
-word to its reserved line box. Text remains readable before the lazy motion
-runtime loads, and entering letters cannot paint over the following paragraph. Reduced-motion
+The occupational hero introduction now renders as one text node; its former
+per-letter `TextReveal` and unused persistence helpers were removed in the
+selected-work redesign. The interactive name treatment remains. Reduced-motion
 browser testing also exposed Framer's `useReducedMotion()` reading media state
 before hydration: `usePerformanceProfile` must gate that value with
 `isProfileReady`, just like its pointer and hardware readings. The first client
@@ -2741,3 +2741,32 @@ closed an unmounted game, despite the button advertising "Play". The shared
 `ProjectDemoDisclosure` now toggles its rendered state and records explicit
 activation; unactivated games still wait for visibility. Its test covers
 both default-open and default-closed games with the observer still false.
+
+**Selected-work entry points (September 2026):** the gallery is a Server
+Component with finite CSS transform transitions on hover and keyboard focus.
+Its illustrations need no images, canvas, timers, or client component. Motion
+is disabled for reduced-motion preferences and hover transforms require a
+fine pointer. The primary hero button already owns magnetic motion, so it
+must not also sit inside a `Magnetic` wrapper. The duplicate hero and Projects chapter progress panels were removed;
+research topic tags appear once in a wrapping list instead of a repeating
+marquee. The global navigation progress remains.
+`selected-work.test.tsx` pins the exported link markup, decorative artwork,
+real playground destination, and single-node occupational introduction;
+`rsc-boundary-contract.test.ts` pins the gallery’s server boundary.
+
+A Server Component is not, by itself, proof of no-JavaScript visibility.
+The September 2026 production-browser check found the home page inside
+Next’s hidden `S:0` streaming container with JavaScript disabled. The gallery
+links exist in the exported HTML, but the page still requires Next’s bootstrap
+to reveal that container. Do not describe an HTML-presence test as a successful
+no-JavaScript browser test; check ancestor visibility in the actual export.
+
+Measured against production exports: hero descendants **207 → 127**, homepage
+main descendants **3,106 → 3,045**, including the new gallery (jsdom parsing
+of the exported HTML). Clean local Lighthouse mobile runs through warmed
+Wrangler matched at **0.86 before / 0.86 after**, LCP about **4.0s** and TBT
+about **70ms** in each; accessibility, best practices, and SEO were **1.00**.
+The first candidate run overlapped browser verification and scored 0.78; it
+is not evidence of a regression or a load-speed win. All production artifact
+budgets remain unchanged and pass. This ships for visual hierarchy and fewer
+DOM nodes/subscriptions, not a claimed Lighthouse improvement.

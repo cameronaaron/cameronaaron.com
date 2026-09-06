@@ -299,7 +299,6 @@ describe('animation regression contract', () => {
       'src/components/ui/IntroCurtain.tsx',
       'src/components/ui/SmoothScroll.tsx',
       'src/components/ui/TypewriterEffect.tsx',
-      'src/components/ui/TextReveal.tsx',
     ]) {
       const source = read(path);
       const pagesShowLines = source.split('\n').filter((l) => l.includes("addEventListener('pageshow'"));
@@ -315,17 +314,14 @@ describe('animation regression contract', () => {
     expect(source).toContain('whitespace-nowrap');
   });
 
-  it('usePerformanceProfile and TextReveal use false initial state (not lazy browser-API initializers) to prevent React #418', () => {
+  it('usePerformanceProfile uses false initial state (not lazy browser-API initializers) to prevent React #418', () => {
     const perfProfile = read('src/hooks/usePerformanceProfile.ts');
-    const textReveal = read('src/components/ui/TextReveal.tsx');
 
     // Both had lazy initializers that read browser APIs before hydration, causing #418.
     // Fix: useState(false) matches SSR; real values set in useEffect post-hydration.
     expect(perfProfile).not.toContain('useState(() =>');
     expect(perfProfile).toContain('useState(false)');
 
-    expect(textReveal).not.toContain('useState(() =>');
-    expect(textReveal).toContain('useState(false)');
   });
 
   it('Skills section headings are plain h3 elements inside the stagger container (no standalone whileInView inside stagger)', () => {

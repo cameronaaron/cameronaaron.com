@@ -32,6 +32,7 @@ const SERVER_COMPONENTS = [
   'src/components/Education.tsx',
   'src/components/Footer.tsx',
   'src/components/Certifications.tsx',
+  'src/components/SelectedWork.tsx',
 ];
 
 // The client island that holds the page's orchestration — this one MUST be a
