@@ -6,8 +6,11 @@ import {
   buildEpisodeViews,
   EMBED_ORIGIN,
   formatRuntime,
+  numberWord,
   SECONDS_PER_MINUTE,
+  seriesSummary,
   toEpisodeView,
+  totalRuntimeSeconds,
 } from './playlist-theater-logic';
 
 /** A video shaped like the data file's, with individual fields overridden. */
@@ -185,5 +188,90 @@ describe('buildEpisodeViews', () => {
 
   it('returns an empty list for an empty series', () => {
     expect(buildEpisodeViews([])).toEqual([]);
+  });
+});
+
+describe('numberWord', () => {
+  /** Every entry asserted individually: the table is prose that ships to the
+   *  page, so a wrong word in it is a visible defect, and an entry no test can
+   *  reach is an entry with nothing holding it correct. */
+  it.each([
+    [0, 'zero'], [1, 'one'], [2, 'two'], [3, 'three'], [4, 'four'],
+    [5, 'five'], [6, 'six'], [7, 'seven'], [8, 'eight'], [9, 'nine'],
+    [10, 'ten'], [11, 'eleven'], [12, 'twelve'], [13, 'thirteen'],
+    [14, 'fourteen'], [15, 'fifteen'], [16, 'sixteen'], [17, 'seventeen'],
+    [18, 'eighteen'], [19, 'nineteen'], [20, 'twenty'],
+  ])('spells %i as %s', (value, word) => {
+    expect(numberWord(value)).toBe(word);
+  });
+
+  it('falls back to the numeral past the table', () => {
+    expect(numberWord(21)).toBe('21');
+    expect(numberWord(90)).toBe('90');
+  });
+
+  it('falls back rather than indexing backwards on a negative', () => {
+    expect(numberWord(-1)).toBe('-1');
+  });
+});
+
+describe('totalRuntimeSeconds', () => {
+  it('sums the series', () => {
+    expect(
+      totalRuntimeSeconds([
+        makeVideo({ duration: 'PT3M12S' }),
+        makeVideo({ duration: 'PT2M33S' }),
+      ]),
+    ).toBe(192 + 153);
+  });
+
+  it('is zero for an empty series', () => {
+    expect(totalRuntimeSeconds([])).toBe(0);
+  });
+
+  it('skips a duration it cannot parse rather than counting it as zero', () => {
+    // An unparseable entry is an unknown, not a nothing. Counting it as 0 would
+    // quietly shorten the advertised total.
+    expect(
+      totalRuntimeSeconds([makeVideo({ duration: 'PT3M12S' }), makeVideo({ duration: '3:12' })]),
+    ).toBe(192);
+  });
+
+  it('counts a bare-seconds duration', () => {
+    expect(totalRuntimeSeconds([makeVideo({ duration: 'PT45S' })])).toBe(45);
+  });
+});
+
+describe('seriesSummary', () => {
+  it('spells out the count and the rounded total', () => {
+    expect(
+      seriesSummary([
+        makeVideo({ duration: 'PT3M12S' }),
+        makeVideo({ duration: 'PT2M33S' }),
+        makeVideo({ duration: 'PT4M42S' }),
+      ]),
+    ).toBe('Three videos, about ten minutes');
+  });
+
+  it('singularises one video and one minute', () => {
+    expect(seriesSummary([makeVideo({ duration: 'PT1M0S' })])).toBe('One video, about one minute');
+  });
+
+  it('falls back to numerals past the spelled-out table', () => {
+    expect(seriesSummary([makeVideo({ duration: 'PT90M' })])).toBe('One video, about 90 minutes');
+  });
+
+  it('describes an empty series without inventing content', () => {
+    expect(seriesSummary([])).toBe('Zero videos, about zero minutes');
+  });
+
+  /** THE REGRESSION. The rail heading read "Five videos, about twelve minutes"
+   *  as a hand-typed string while the five videos totalled 19:08 — the planned
+   *  lengths were entered and never updated to what got published. Deriving the
+   *  heading is the fix; this pins it to the real data so the two cannot drift
+   *  apart again. */
+  it('matches the real series, so the heading cannot drift from the data', () => {
+    expect(totalRuntimeSeconds(capstone.videos)).toBe(1148);
+    expect(seriesSummary(capstone.videos)).toBe('Five videos, about nineteen minutes');
   });
 });
