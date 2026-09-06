@@ -85,6 +85,14 @@ const strykerConfig = {
     // without every unrelated future commit to that file tripping the gate.
     break: 90,
   },
+  // Stryker copies the working tree into .stryker-tmp/sandbox-*/ before
+  // mutating. `/_local_archive/` is a gitignored local scratch directory
+  // (.gitignore:158) that holds symlinks into other checkouts and /tmp —
+  // copying one blew up the whole run with `ENOTSUP: operation not supported
+  // on socket, copyfile`, which reads like a mutation-score failure in the
+  // runner's output but is a sandbox-setup failure before a single mutant is
+  // scored. Nothing gitignored belongs in the sandbox; it is not source.
+  ignorePatterns: ['/_local_archive'],
   incremental: true,
   incrementalFile: '.stryker-tmp/incremental.json',
   tempDirName: '.stryker-tmp',
