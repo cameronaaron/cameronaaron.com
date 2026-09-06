@@ -40,7 +40,14 @@ const root = process.cwd();
 const outDir = resolve(root, 'out');
 const cacheDir = resolve(root, 'scripts/generate/critical-css-cache');
 
-const PAGES = ['index.html', 'capstone.html', 'credentials.html', 'internet.html', 'nursing.html'];
+const PAGES = [
+  'index.html',
+  'capstone.html',
+  'credentials.html',
+  'internet.html',
+  'nursing.html',
+  'bridging-transitions.html',
+];
 const VIEWPORTS = [
   { width: 412, height: 823 },
   { width: 1350, height: 940 },

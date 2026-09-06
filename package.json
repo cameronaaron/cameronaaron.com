@@ -1,7 +1,7 @@
 {
   "name": "cameron-aaron-portfolio",
   "version": "0.1.0",
-  "description": "Cameron Aaron's personal portfolio site — Next.js, React, TypeScript, Tailwind CSS, deployed on Cloudflare Pages.",
+  "description": "Cameron Aaron's personal portfolio site \u2014 Next.js, React, TypeScript, Tailwind CSS, deployed on Cloudflare Pages.",
   "author": "Cameron Aaron",
   "license": "UNLICENSED",
   "repository": {
@@ -76,7 +76,8 @@
     "lighthouse": "pnpm run lighthouse:desktop",
     "lighthouse:desktop": "lighthouse http://localhost:3000 --preset=desktop --view",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --form-factor=mobile --screenEmulation.mobile --view",
-    "measure:scroll-cost": "node scripts/checks/measure-scroll-cost.mjs"
+    "measure:scroll-cost": "node scripts/checks/measure-scroll-cost.mjs",
+    "check:coep-embed": "node scripts/checks/coep-youtube-embed-probe.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",

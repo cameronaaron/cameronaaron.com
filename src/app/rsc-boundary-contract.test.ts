@@ -29,6 +29,7 @@ const hasUseClient = (rel: string) => /^\s*['"]use client['"]/m.test(read(rel));
 // more sections migrate; never shrink it without a measured reason.
 const SERVER_COMPONENTS = [
   'src/app/page.tsx',
+  'src/app/bridging-transitions/page.tsx',
   'src/components/Education.tsx',
   'src/components/Footer.tsx',
   'src/components/Certifications.tsx',

@@ -44,7 +44,52 @@ describe('headers-integrity-contract — security headers on every page', () => 
     expect(site).toContain('Referrer-Policy: strict-origin-when-cross-origin');
     expect(site).toMatch(/Strict-Transport-Security: max-age=\d{7,}; includeSubDomains; preload/);
     expect(site).toContain('Cross-Origin-Opener-Policy: same-origin');
+    expect(site).toContain('Cross-Origin-Embedder-Policy: require-corp');
     expect(site).toMatch(/Permissions-Policy: .*camera=\(\)/);
+  });
+
+  // /bridging-transitions is the QR-code destination printed on the SNS26
+  // poster and its whole purpose is an embedded YouTube playlist. Measured in
+  // a real Chrome (scripts/checks/coep-youtube-embed-probe.mjs): under the
+  // site-wide `Cross-Origin-Embedder-Policy: require-corp` above, the
+  // youtube-nocookie frame never commits — it stays empty and logs nothing.
+  // `credentialless` fails the same way, because COEP relaxes subresources
+  // while a nested DOCUMENT must still assert COEP itself and YouTube sends
+  // only the report-only variant.
+  //
+  // So the detach below is load-bearing: delete it and the page silently
+  // renders a blank player in production while every test here still passes
+  // and local `next dev` (which sends no _headers at all) looks perfect.
+  // Both spellings are pinned because Cloudflare Pages matches on the request
+  // path, which is `/bridging-transitions` for a visitor and
+  // `/bridging-transitions.html` for anyone who kept the extension.
+  describe('the YouTube-embedding route detaches COEP', () => {
+    it.each(['/bridging-transitions', '/bridging-transitions.html'])(
+      '%s detaches Cross-Origin-Embedder-Policy',
+      (route) => {
+        expect(
+          blockFor(route),
+          `public/_headers must keep a "${route}" block; without it the embedded playlist is blocked by the site-wide require-corp`,
+        ).toContain('! Cross-Origin-Embedder-Policy');
+      },
+    );
+
+    it('detaches COEP without weakening the rest of the security set on that route', () => {
+      // The detach must stay surgical — a block that also dropped COOP or
+      // HSTS would trade a working embed for a real regression.
+      for (const route of ['/bridging-transitions', '/bridging-transitions.html']) {
+        const block = blockFor(route);
+        for (const kept of ['Cross-Origin-Opener-Policy', 'Strict-Transport-Security', 'X-Frame-Options']) {
+          expect(block, `${route} must not detach or override ${kept}`).not.toContain(kept);
+        }
+      }
+    });
+
+    it('serves the poster PDFs the page links to', () => {
+      const poster = blockFor('/poster/*');
+      expect(poster).toContain('Content-Type: application/pdf');
+      expect(poster).toContain('immutable');
+    });
   });
 });
 

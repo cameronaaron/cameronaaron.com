@@ -183,6 +183,8 @@ src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
 src/app/section-reveal-bfcache.test.ts  # bfcache blank-screen regression
 src/app/rsc-boundary-contract.test.ts   # page.tsx + converted sections stay Server Components
+src/app/bridging-transitions/page.test.tsx            # poster landing page: sections, downloads, JSON-LD
+src/app/bridging-transitions/PlaylistTheater.test.tsx # facade-before-iframe, rail selection, tap targets
 src/hooks/use-performance-profile.test.tsx  # tier derivation, reactive updates
 src/components/ui/ui-coverage-hardening.test.tsx  # AmbientBackground, SmoothScroll…
 src/data/data-complete.test.ts         # data completeness + LACCD/CHEM 051/Dean's Honor assertions
@@ -336,6 +338,43 @@ import after mount. Measured against clean `/out`: framer's bootup dropped
 which is a TBT/main-thread win, not an LCP one. `strict` mode makes any stray
 `motion.*` throw, so new components must use `m.*`.
 
+### 18. `/bridging-transitions` must not carry the site-wide COEP header
+
+`public/_headers` sets `Cross-Origin-Embedder-Policy: require-corp` on `/*`.
+That header **silently blocks the YouTube embed** this route exists for: a
+nested document has to assert COEP itself, and YouTube sends only
+`cross-origin-embedder-policy-report-only`, so Chrome never commits the frame.
+It renders as an empty black box with no console error. `credentialless` fails
+the same way. YouTube's `cross-origin-resource-policy: cross-origin` is a red
+herring — CORP covers subresources, not nested documents.
+
+So `_headers` detaches exactly that one header on `/bridging-transitions` and
+`/bridging-transitions.html` (`! Cross-Origin-Embedder-Policy`), keeping COOP,
+HSTS, XFO, nosniff and Permissions-Policy. Nothing on this site uses
+`SharedArrayBuffer`, so cross-origin isolation was never a capability in use.
+
+**This is invisible in local dev** — `next dev` serves none of `public/_headers`
+— so the page looks perfect right up until it ships. Verify against
+`wrangler pages dev out`, never against `next dev`. `pnpm run check:coep-embed`
+re-runs the three-way browser measurement; `headers-integrity-contract` pins
+both the global header and the surgical detach. See ENGINEERING-STANDARDS §9.4.
+
+### 19. The `/bridging-transitions` route name is printed on paper
+
+A QR code on the physical SNS26 poster resolves to
+`https://cameronaaron.com/bridging-transitions`. Renaming the route or changing
+its canonical 404s every printed copy, with no way to fix them. Treat the path
+as immutable; `metadata.test.ts` says so with an assertion.
+
+### 20. The playlist player is a facade, deliberately
+
+`PlaylistTheater` renders a designed play card and mounts the real
+`youtube-nocookie` iframe only after the visitor presses play — measured zero
+third-party requests before that click. A printed QR code hands this page to
+strangers who never opted into third-party tracking by walking past a poster,
+and conference wifi is the worst case for loading a ~500KB player nobody asked
+for. Don't "simplify" it into a bare iframe.
+
 ## Data
 
 Site content lives in `src/data/`:
@@ -348,6 +387,7 @@ Site content lives in `src/data/`:
 | `certifications.ts` | Certs with verification URLs |
 | `education.ts` | Degrees + prerequisite coursework (4 items; LACCD sorts first as most recent); `honorsAndAffiliations` is `HonorItem[]` (`{ label: string; url?: string }`) not `string[]` |
 | `testimonials.ts` | LinkedIn recommendations |
+| `bridgingTransitions.ts` | Poster-session companion copy for `/bridging-transitions` — session/venue, the "Monday" actions, reviewer quotes, poster PDF links. Every string is copied **verbatim** from `content/poster.yaml` in `cameronaaron/bridging-transitions-poster`, which is language-linted and citation-checked there; reword here and the page stops matching the poster the reader is standing in front of |
 | `site.ts` | `SITE_URL` + `getPageUrl(path)` — the **only** place `https://cameronaaron.com` may be hardcoded; every other file imports from here (enforced by a repo-wide sweep in `modularization-contract.test.ts`) |
 | `metadata.ts` | Root `<head>` metadata — `buildRootMetadata()` / `buildRootViewport()`, plus the `SEO_KEYWORDS` catalog, consumed by `src/app/layout.tsx`. Sub-pages (`capstone`, `credentials`, `internet`) each have their own co-located `./metadata.ts` with a `build*Metadata(pageUrl)` function |
 

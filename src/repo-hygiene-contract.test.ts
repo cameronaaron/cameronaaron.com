@@ -88,6 +88,8 @@ describe('repository hygiene contract', () => {
     //   public/icons/  — favicon-family PNGs referenced by src/app/layout.tsx
     //   public/images/ — profile photo + hero crops referenced by src/data, src/components
     //   public/social/ — OpenGraph/Twitter share card images
+    //   public/poster/ — print-ready conference poster PDFs linked from
+    //                    src/data/bridgingTransitions.ts
     const EXPECTED_PUBLIC_ROOT_FILES = [
       '_headers',
       '_redirects',
@@ -100,7 +102,7 @@ describe('repository hygiene contract', () => {
       'sitemap-images.xml',
       'sw.js',
     ] as const;
-    const EXPECTED_PUBLIC_DIRS = ['icons', 'images', 'logos', 'resume', 'social'] as const;
+    const EXPECTED_PUBLIC_DIRS = ['icons', 'images', 'logos', 'poster', 'resume', 'social'] as const;
 
     const publicPaths = getTrackedFiles()
       .filter((filePath) => filePath.startsWith('public/'))
@@ -115,6 +117,9 @@ describe('repository hygiene contract', () => {
     for (const p of publicPaths) {
       if (p.startsWith('resume/')) {
         expect(p, 'public/resume/ holds only PDF downloads').toMatch(/\.pdf$/);
+      }
+      if (p.startsWith('poster/')) {
+        expect(p, 'public/poster/ holds only print-ready poster PDFs').toMatch(/\.pdf$/);
       }
       if (p.startsWith('logos/') || p.startsWith('images/') || p.startsWith('social/')) {
         expect(p, `public/${p.split('/')[0]}/ holds only image assets`).toMatch(/\.(webp|svg|png|avif)$/);

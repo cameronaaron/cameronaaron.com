@@ -10,6 +10,7 @@ const requiredOutputFiles = [
   'capstone.html',
   'credentials.html',
   'internet.html',
+  'bridging-transitions.html',
   'sw.js',
 ];
 
@@ -50,8 +51,19 @@ const budgets = {
   homeHtmlGzipBytes: 77_500,
   singleHtmlBytes: 705_000,
   singleHtmlGzipBytes: 77_500,
-  totalHtmlBytes: 1_450_000,
-  totalHtmlGzipBytes: 260_000,
+  // Recalibrated again 2026-09-05 for the same reason as the /nursing bump
+  // above, and by the same method: /bridging-transitions is a real 9th route
+  // (the QR-code destination on the printed SNS26 poster), not a regression.
+  // Measured on a clean `npm run build`, it is 130,213B raw / 31,212B gzip —
+  // in line with the other detail pages (capstone 127,908/28,523, internet
+  // 135,826/29,207), so there was nothing to trim before moving the number.
+  // New total baseline across all 9 pages: 1,526,452B raw / 272,210B gzip.
+  // Ceilings carry ~8% headroom over that: enough that content edits don't
+  // trip them, tight enough that a 10th page or a real regression does.
+  // Per-page ceilings untouched — the largest single page is still the home
+  // page, and this was a total-across-pages problem, not a per-page one.
+  totalHtmlBytes: 1_650_000,
+  totalHtmlGzipBytes: 295_000,
   singleJsBytes: 320_000,
   singleJsGzipBytes: 95_000,
   totalJsBytes: 1_200_000,
