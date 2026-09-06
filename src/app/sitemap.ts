@@ -27,6 +27,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      // The QR code on the printed SNS26 poster resolves here. Highest
+      // priority of the detail pages because it is the only one with an
+      // off-web entry point that cannot be redeployed.
+      url: `${baseUrl}/bridging-transitions`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/internet`,
       lastModified,
       changeFrequency: 'monthly',

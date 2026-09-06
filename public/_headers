@@ -57,3 +57,30 @@
 /robots.txt
   Cache-Control: public, max-age=3600
   Content-Type: text/plain
+
+# /bridging-transitions embeds the YouTube playlist the printed SNS26 poster's
+# QR code points at, so it is the one route that CANNOT carry the site-wide
+# Cross-Origin-Embedder-Policy: require-corp above.
+#
+# Measured, not assumed (scripts/checks/coep-youtube-embed-probe.mjs): under
+# require-corp a real Chrome refuses to commit the youtube-nocookie frame at
+# all — the frame stays empty with no console error. `credentialless` does not
+# help either; COEP relaxes SUBRESOURCE loading, but a nested DOCUMENT still
+# has to assert COEP itself, and YouTube only sends
+# cross-origin-embedder-policy-REPORT-ONLY. With no COEP header the same frame
+# loads normally.
+#
+# Detaching it costs this page cross-origin isolation, which nothing on this
+# site uses (no SharedArrayBuffer, no high-resolution timers anywhere in src/).
+# Every other security header — COOP, HSTS, nosniff, XFO, Permissions-Policy —
+# still applies from the /* block. Pinned by headers-integrity-contract.
+/bridging-transitions
+  ! Cross-Origin-Embedder-Policy
+
+/bridging-transitions.html
+  ! Cross-Origin-Embedder-Policy
+
+# Poster PDFs are content-addressed by name and never rewritten in place.
+/poster/*
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/pdf

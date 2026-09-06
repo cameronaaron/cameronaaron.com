@@ -46,6 +46,7 @@ ${PROFILE.bio}
 
 - [Home](https://cameronaaron.com/): Overview of Cameron's interdisciplinary background, featured projects, work experience, education, and certifications.
 - [Capstone Research](https://cameronaaron.com/capstone): Arts-based graduate dissertation on thrice-exceptional Black male students in higher education transition — a five-part educational video series.
+- [Bridging Transitions](https://cameronaaron.com/bridging-transitions): The five-video series on thrice-exceptional Black male students and the K-12 to higher-education transition, presented as a poster at the Stanford Neurodiversity Summit 2026.
 - [Credentials](https://cameronaaron.com/credentials): Complete list of clinical certifications, academic credentials, and verification links.
 - [My Internet Presence](https://cameronaaron.com/internet): Publications, media appearances, and links to Cameron's online presence.
 

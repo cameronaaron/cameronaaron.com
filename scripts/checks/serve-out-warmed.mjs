@@ -12,7 +12,7 @@ import { spawn, execSync } from 'node:child_process';
 
 const PORT = process.env.PORT ?? '3000';
 const BASE = `http://127.0.0.1:${PORT}`;
-const WARMUP_PATHS = ['/', '/capstone', '/credentials', '/internet', '/nursing'];
+const WARMUP_PATHS = ['/', '/capstone', '/credentials', '/internet', '/nursing', '/bridging-transitions'];
 
 // ── Measurement-integrity guard (ENGINEERING-STANDARDS §0.5) ────────────────
 // Every number this server feeds a gate is only as trustworthy as "am I even
