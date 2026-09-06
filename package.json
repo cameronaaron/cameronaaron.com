@@ -102,7 +102,7 @@
     "jsdom": "^30.0.1",
     "lighthouse": "^13.4.1",
     "markdownlint-cli2": "^0.23.2",
-    "playwright": "^1.62.1",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.26",
     "simple-git-hooks": "^2.14.0",
     "tailwindcss": "^4.3.3",
