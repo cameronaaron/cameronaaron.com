@@ -14,82 +14,9 @@ const requiredOutputFiles = [
   'sw.js',
 ];
 
-// Recalibrated 2026-07 with real data (ENGINEERING-STANDARDS.md §4.7 pattern:
-// adjust with a measured baseline, not a guess) — the home page's content
-// (certifications, education, testimonials, structured data) has grown
-// enough that the prior thresholds started failing on a clean build with no
-// bug behind it. A fresh `npm run build` measured: home HTML 523,233B raw /
-// 61,900B gzip, total HTML 1,113,927B raw / 195,084B gzip, total JS
-// 1,043,608B raw / 321,400B gzip. New ceilings give ~15-18% headroom over
-// that baseline, not unlimited room — a real regression still trips this.
-//
-// Recalibrated again 2026-07-18: the new /nursing page (a real, distinct
-// route, not a bug) added an 8th HTML output file. A fresh `npm run build`
-// measured total HTML 1,249,562B raw / 223,892B gzip across all 8 pages —
-// raw was still just inside the old 1,300,000 ceiling (96% used, no headroom
-// left for the next page or content addition) and gzip had already crossed
-// the old 220,000 ceiling. Both ceilings below carry ~16% headroom over this
-// baseline. Per-page (home/single) budgets were untouched — home HTML
-// (534,925B raw / 63,721B gzip) and the largest single page still sit
-// comfortably under their existing ceilings; this was a total-across-pages
-// problem, not a per-page one.
-// Recalibrated again 2026-07-23, root-caused to the RSC islands migration
-// (§5): converting page.tsx + Education/Footer/Certifications to Server
-// Components moved their markup out of hydrated client JS and into the HTML
-// document itself — a deliberate trade (zero hydration cost for those
-// sections) whose HTML side crossed the old per-page ceilings on a clean
-// build: home 670,981B raw / 73,680B gzip vs 620,000/72,000 caps. Nothing
-// flagged it for five days because this script only ran pre-manual-deploy
-// while pushes auto-deploy — that hole is now closed (pre-push builds and
-// runs this script; see package.json simple-git-hooks). New per-page
-// ceilings carry ~5% headroom over the measured baseline: tight enough that
-// the next real regression trips, loose enough that content edits don't.
-// Known recoverable slack, parked in ENGINEERING-STANDARDS §9.4: the 33KB
-// JSON-LD block ships twice (once as ld+json, once RSC-flight-escaped).
-const budgets = {
-  homeHtmlBytes: 705_000,
-  homeHtmlGzipBytes: 77_500,
-  singleHtmlBytes: 705_000,
-  singleHtmlGzipBytes: 77_500,
-  // Recalibrated again 2026-09-05 for the same reason as the /nursing bump
-  // above, and by the same method: /bridging-transitions is a real 9th route
-  // (the QR-code destination on the printed SNS26 poster), not a regression.
-  // Measured on a clean `npm run build`, it is 130,213B raw / 31,212B gzip —
-  // in line with the other detail pages (capstone 127,908/28,523, internet
-  // 135,826/29,207), so there was nothing to trim before moving the number.
-  // New total baseline across all 9 pages: 1,526,452B raw / 272,210B gzip.
-  // Ceilings carry ~8% headroom over that: enough that content edits don't
-  // trip them, tight enough that a 10th page or a real regression does.
-  // Per-page ceilings untouched — the largest single page is still the home
-  // page, and this was a total-across-pages problem, not a per-page one.
-  totalHtmlBytes: 1_650_000,
-  totalHtmlGzipBytes: 295_000,
-  singleJsBytes: 320_000,
-  singleJsGzipBytes: 95_000,
-  totalJsBytes: 1_200_000,
-  totalJsGzipBytes: 370_000,
-  // CSS recalibrated 2026-07-26, measured not guessed (same discipline as the
-  // dom-size and HTML recalibrations above). Six new project mini-games plus
-  // the demo-disclosure took the largest stylesheet 129,123B -> 131,844B:
-  // +2,721B total, ~450B per new interactive component, which is the distinct
-  // state styling each one genuinely needs (option correct/wrong/missed bands,
-  // decay bar, sensor cone) and not accidental bloat. Checked before moving
-  // the number: the new components reuse the established `min-h-[44px]` and
-  // `tracking-[0.14em]` arbitrary values rather than minting their own, so
-  // there was no meaningful trimming available.
-  //
-  // The real finding is that the old 130,000 ceiling sat only 877B above the
-  // then-current 129,123B — no headroom at all, so ANY new feature was going
-  // to trip it. New ceilings carry ~14% over the measured baseline, matching
-  // the headroom the HTML and dom-size recalibrations settled on.
-  singleCssBytes: 150_000,
-  singleCssGzipBytes: 23_000,
-  totalCssBytes: 170_000,
-  totalCssGzipBytes: 33_000,
-  singleImageBytes: 300_000,
-  totalImageBytes: 800_000,
-  serviceWorkerBytes: 12_000,
-};
+// Asset sizes are informational by owner decision (September 2026).
+// This script retains its command path for hook/CI compatibility. Only build
+// integrity failures block release; design choices have no fixed byte ceiling.
 
 const imageExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico', '.avif']);
 
@@ -207,13 +134,8 @@ function formatBytes(bytes) {
   return `${bytes.toLocaleString()} bytes`;
 }
 
-function pushBudgetError(errors, label, actual, limit, filePath = '') {
-  const suffix = filePath ? ` (${relative(root, filePath)})` : '';
-  errors.push(`${label}${suffix}: ${formatBytes(actual)} exceeds ${formatBytes(limit)}`);
-}
-
 if (!existsSync(outDir)) {
-  console.error('Performance budget checks failed:');
+  console.error('Build integrity checks failed:');
   console.error('- Build output directory "out" not found. Run "npm run build" first.');
   process.exit(1);
 }
@@ -240,76 +162,6 @@ const cssMetrics = summarizeTextAssets(cssFiles);
 const imageMetrics = summarizeBinaryAssets(imageFiles);
 
 const homeHtmlPath = resolve(outDir, 'index.html');
-if (existsSync(homeHtmlPath)) {
-  const homeHtmlBuffer = readFileSync(homeHtmlPath);
-  const homeHtmlBytes = homeHtmlBuffer.length;
-  const homeHtmlGzipBytes = gzipSync(homeHtmlBuffer, { level: 9 }).length;
-
-  if (homeHtmlBytes > budgets.homeHtmlBytes) {
-    pushBudgetError(errors, 'Home HTML raw size', homeHtmlBytes, budgets.homeHtmlBytes, homeHtmlPath);
-  }
-
-  if (homeHtmlGzipBytes > budgets.homeHtmlGzipBytes) {
-    pushBudgetError(errors, 'Home HTML gzip size', homeHtmlGzipBytes, budgets.homeHtmlGzipBytes, homeHtmlPath);
-  }
-}
-
-if (htmlMetrics.maxBytes > budgets.singleHtmlBytes) {
-  pushBudgetError(errors, 'Largest HTML raw size', htmlMetrics.maxBytes, budgets.singleHtmlBytes, htmlMetrics.maxFile);
-}
-
-if (htmlMetrics.maxGzipBytes > budgets.singleHtmlGzipBytes) {
-  pushBudgetError(errors, 'Largest HTML gzip size', htmlMetrics.maxGzipBytes, budgets.singleHtmlGzipBytes, htmlMetrics.maxGzipFile);
-}
-
-if (htmlMetrics.totalBytes > budgets.totalHtmlBytes) {
-  pushBudgetError(errors, 'Total HTML raw size', htmlMetrics.totalBytes, budgets.totalHtmlBytes);
-}
-
-if (htmlMetrics.totalGzipBytes > budgets.totalHtmlGzipBytes) {
-  pushBudgetError(errors, 'Total HTML gzip size', htmlMetrics.totalGzipBytes, budgets.totalHtmlGzipBytes);
-}
-
-if (jsMetrics.maxBytes > budgets.singleJsBytes) {
-  pushBudgetError(errors, 'Largest JS raw size', jsMetrics.maxBytes, budgets.singleJsBytes, jsMetrics.maxFile);
-}
-
-if (jsMetrics.maxGzipBytes > budgets.singleJsGzipBytes) {
-  pushBudgetError(errors, 'Largest JS gzip size', jsMetrics.maxGzipBytes, budgets.singleJsGzipBytes, jsMetrics.maxGzipFile);
-}
-
-if (jsMetrics.totalBytes > budgets.totalJsBytes) {
-  pushBudgetError(errors, 'Total JS raw size', jsMetrics.totalBytes, budgets.totalJsBytes);
-}
-
-if (jsMetrics.totalGzipBytes > budgets.totalJsGzipBytes) {
-  pushBudgetError(errors, 'Total JS gzip size', jsMetrics.totalGzipBytes, budgets.totalJsGzipBytes);
-}
-
-if (cssMetrics.maxBytes > budgets.singleCssBytes) {
-  pushBudgetError(errors, 'Largest CSS raw size', cssMetrics.maxBytes, budgets.singleCssBytes, cssMetrics.maxFile);
-}
-
-if (cssMetrics.maxGzipBytes > budgets.singleCssGzipBytes) {
-  pushBudgetError(errors, 'Largest CSS gzip size', cssMetrics.maxGzipBytes, budgets.singleCssGzipBytes, cssMetrics.maxGzipFile);
-}
-
-if (cssMetrics.totalBytes > budgets.totalCssBytes) {
-  pushBudgetError(errors, 'Total CSS raw size', cssMetrics.totalBytes, budgets.totalCssBytes);
-}
-
-if (cssMetrics.totalGzipBytes > budgets.totalCssGzipBytes) {
-  pushBudgetError(errors, 'Total CSS gzip size', cssMetrics.totalGzipBytes, budgets.totalCssGzipBytes);
-}
-
-if (imageMetrics.maxBytes > budgets.singleImageBytes) {
-  pushBudgetError(errors, 'Largest image size', imageMetrics.maxBytes, budgets.singleImageBytes, imageMetrics.maxFile);
-}
-
-if (imageMetrics.totalBytes > budgets.totalImageBytes) {
-  pushBudgetError(errors, 'Total image size', imageMetrics.totalBytes, budgets.totalImageBytes);
-}
-
 const modernScriptChunks = findModernScriptChunks(htmlFiles);
 for (const chunkSrc of modernScriptChunks) {
   const chunkPath = resolve(outDir, chunkSrc.replace(/^\//, ''));
@@ -362,24 +214,29 @@ if (existsSync(homeHtmlPath)) {
   }
 }
 
-const serviceWorkerPath = resolve(outDir, 'sw.js');
-if (existsSync(serviceWorkerPath)) {
-  const serviceWorkerBytes = statSync(serviceWorkerPath).size;
-  if (serviceWorkerBytes > budgets.serviceWorkerBytes) {
-    pushBudgetError(errors, 'Service worker size', serviceWorkerBytes, budgets.serviceWorkerBytes, serviceWorkerPath);
-  }
-}
-
 if (errors.length > 0) {
-  console.error('Performance budget checks failed:');
+  console.error('Build integrity checks failed:');
   for (const error of errors) {
     console.error(`- ${error}`);
   }
   process.exit(1);
 }
 
-console.log('Performance budget checks passed.');
+console.log('Build integrity checks passed.');
+console.log('Asset sizes (informational; no byte limits):');
 console.log(`- HTML total: ${formatBytes(htmlMetrics.totalBytes)} (gzip ${formatBytes(htmlMetrics.totalGzipBytes)})`);
 console.log(`- JS total: ${formatBytes(jsMetrics.totalBytes)} (gzip ${formatBytes(jsMetrics.totalGzipBytes)})`);
 console.log(`- CSS total: ${formatBytes(cssMetrics.totalBytes)} (gzip ${formatBytes(cssMetrics.totalGzipBytes)})`);
 console.log(`- Images total: ${formatBytes(imageMetrics.totalBytes)}`);
+
+for (const [label, metrics] of [['HTML', htmlMetrics], ['JS', jsMetrics], ['CSS', cssMetrics]]) {
+  console.log(`- Largest ${label}: ${formatBytes(metrics.maxBytes)} (${relative(root, metrics.maxFile)}); largest gzip ${formatBytes(metrics.maxGzipBytes)} (${relative(root, metrics.maxGzipFile)})`);
+}
+console.log(`- Largest image: ${formatBytes(imageMetrics.maxBytes)} (${relative(root, imageMetrics.maxFile)})`);
+console.log(`- Home HTML: ${formatBytes(statSync(homeHtmlPath).size)} (gzip ${formatBytes(gzipSync(readFileSync(homeHtmlPath), { level: 9 }).length)})`);
+console.log(`- Service worker: ${formatBytes(statSync(resolve(outDir, 'sw.js')).size)}`);
+const publicDir = resolve(root, 'public');
+if (existsSync(publicDir)) {
+  const publicMetrics = summarizeBinaryAssets(walkFiles(publicDir));
+  console.log(`- Public files total: ${formatBytes(publicMetrics.totalBytes)}; largest ${formatBytes(publicMetrics.maxBytes)} (${relative(root, publicMetrics.maxFile)})`);
+}

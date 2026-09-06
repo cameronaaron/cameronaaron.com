@@ -63,6 +63,19 @@ Enforcing test files:
 
 ---
 
+**Asset-size policy (owner decision, September 2026):** fixed byte ceilings
+must not dictate the visual design. `scripts/checks/performance-budgets.mjs`
+keeps its existing hook/CI command path but now reports HTML, JS, CSS, images,
+service-worker and public-file sizes without size-based failures. Its missing
+output, hero fetch-priority, speculation-rule and legacy-polyfill checks still
+block broken exports. `asset-report-contract.test.ts` runs the script against
+an oversized fixture and deliberately broken fixtures to verify both outcomes.
+`public-asset-weight-contract.test.ts` retains image-format checks; its
+per-image, per-file and total byte caps are removed. Interaction-speed,
+Lighthouse, accessibility and motion-tier checks remain enforced. Historical
+size budgets and recalibrations below record past decisions, not current
+release limits. Evaluate visual benefits and measured user experience together.
+
 ## 0. The first-principles doctrine — how every other rule is derived
 
 Everything below §0 is a *conclusion*. This section is the *method* that
@@ -1417,10 +1430,8 @@ investigate that script before touching the config.
    listeners passive, no mousemove→setState, no date parsing in comparators,
    every `repeat: Infinity` file references a motion gate
    (`prefersReducedMotion` / tier / `shouldAnimate*` — the 2026-07 audit found
-   four components animating forever for reduced-motion users), every
-   `public/` asset within the weight budget
-   (`public-asset-weight-contract.test.ts`: per-image, per-file, and total
-   caps — one oversized image is a silent mobile-LCP regression), every
+   four components animating forever for reduced-motion users), modern image
+   formats in `public/` (`public-asset-weight-contract.test.ts`), every
    timer/listener/observer cleaned up (`lifecycle-hygiene-contract.test.ts` —
    found SmoothScroll's untracked zero-delay re-sync timers, which could call
    scrollTo on a destroyed Lenis after unmount), and the production
@@ -2582,7 +2593,7 @@ reason (§6 item 18).
 | `domAnimation` (smaller framer feature pack) | hero `drag` + nav/rail `layoutId` need `domMax` (documented in `motion-features.ts`) | those interactions are redesigned away | grep is the check: no `drag`/`layoutId` usage → swap the pack same commit |
 | `next` patch re-cuts | pnpm patches pin exact versions | every `next` version bump | contract test asserts patch version == lockfile version *and* installed polyfill files are 0 bytes |
 | Local Lighthouse numbers | §0.5 — the ruler lied twice (dev-build-on-port-3000 incident) | never fully; PSI/CI stay the arbiters | `serve-out-warmed.mjs` refuses occupied ports and non-production responses |
-| JSON-LD flight duplication (~33KB raw in home HTML) | structural to RSC: a Server Component's rendered script content rides the flight stream too, so the structured-data block ships once as `ld+json` and once flight-escaped | Next ships JSON-LD support in the Metadata API, or flight-payload exclusion for opaque script content | the home-HTML budget recalibration note in `performance-budgets.mjs` names this slack; re-measure before any future HTML-budget bump |
+| JSON-LD flight duplication (~33KB raw in home HTML) | structural to RSC: a Server Component's rendered script content rides the flight stream too, so the structured-data block ships once as `ld+json` and once flight-escaped | Next ships JSON-LD support in the Metadata API, or flight-payload exclusion for opaque script content | the informational home-HTML report in `performance-budgets.mjs` exposes the byte cost; re-measure when framework support changes |
 | Incremental framer removal as a *load-time* win | measured no-op: removing 8 of the page's framer graphs moved mobile Lighthouse 0.86 → 0.86, every metric inside run-to-run spread (§9.5). The load floor is bundle *evaluation* + 3,301-element hydration, and neither falls until the last framer import does | framer-motion is fully removed, or the client tree shrinks materially (more RSC conversions per §5) | re-measure load with LHCI *and* scroll with `pnpm run measure:scroll-cost` per §9.5 — a load-metric no-op does not mean a no-op |
 | Declarative CSS custom properties for per-frame values | measured 6.3× worse: an *inherited* registered property on `:root` invalidates the whole document every frame (3.65ms/frame at 3,424 elements vs 0.58ms writing 8 elements directly) | the element count collapses, or browsers gain per-element custom-property invalidation | the comment block above `.velocity-lean-*` in `globals.css`; re-run the recalc probe before moving any per-frame value back into CSS |
 | Mobile Lighthouse floor at 0.80 (tightened back from 0.45, 2026-08-09) | GitHub-hosted CI's actual shared-runner capacity was unmeasured for a month (CI was off); three fresh runs on re-enabling it measured 0.53/0.59/0.56 and TBT 1401–1696ms, ~50× the prior 27.5ms baseline — a runner-capacity gap, not an app regression (ruled out via a local framer-motion v12-vs-v13 A/B test, §0.5) | three consecutive CI runs clear 0.80 with no dependency change to explain the jump (evidence the runner tier or its load genuinely improved) | `performance-regression-contract.test.ts`'s pinned `0.45` + inline history; re-measure with 3+ fresh CI runs (not local) before raising the floor back |
