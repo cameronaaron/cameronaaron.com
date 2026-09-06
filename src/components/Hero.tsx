@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { profile } from '@/data/profile';
 import Button from '@/components/ui/Button';
 import StatCard from '@/components/ui/StatCard';
-import TextReveal from '@/components/ui/TextReveal';
 import GlyphDissolveName from '@/components/hero/GlyphDissolveName';
 import ProfileImage from '@/components/hero/ProfileImage';
 import ScrollIndicator from '@/components/hero/ScrollIndicator';
@@ -28,7 +27,7 @@ export default function Hero() {
   const isHeroInView = useInView(heroRef, { margin: '80px' });
   const { performanceTier, shouldRenderHeavyEffects, shouldRenderParticles } = usePerformanceProfile();
   const { shouldUseParallax, showFloatingBadges, parallaxDepth, scaleFloor } = getHeroMotionConfig(performanceTier);
-  const { scrollY, scrollYProgress } = useScroll();
+  const { scrollY } = useScroll();
   const rawPointerX = useMotionValue(0);
   const rawPointerY = useMotionValue(0);
 
@@ -39,7 +38,6 @@ export default function Hero() {
   const bottomGlowY = useTransform(scrollY, [0, 500], [0, -80]);
   const imageParallaxY = useTransform(scrollY, [0, 500], [0, -100]);
   const auraOpacity = useTransform(scrollY, [0, 500], [0.34, 0.12]);
-  const chapterProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 });
   const auraX = useSpring(rawPointerX, { stiffness: 105, damping: 24, mass: 0.45 });
   const auraY = useSpring(rawPointerY, { stiffness: 105, damping: 24, mass: 0.45 });
 
@@ -71,13 +69,6 @@ export default function Hero() {
       data-world={world.tone}
       data-motion={shouldRenderHeavyEffects && isHeroInView ? 'full' : 'quiet'}
     >
-      <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/5" aria-hidden="true">
-        <m.div
-          className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
-          style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
-        />
-      </div>
-
       {shouldRenderHeavyEffects ? (
         <m.div
           className="hero-pointer-light pointer-events-none absolute left-0 top-0"
@@ -146,7 +137,7 @@ export default function Hero() {
             </h1>
 
             <div className="hero-title text-lg sm:text-2xl font-medium mb-6 text-cyan-100 leading-snug">
-              <TextReveal text={profile.title} delay={0.25} />
+              {profile.title}
             </div>
 
             <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-10 leading-relaxed max-w-xl">
@@ -154,19 +145,17 @@ export default function Hero() {
             </p>
 
             <div className="hero-actions flex flex-wrap gap-3 md:gap-4">
-              <Magnetic strength={0.15}>
-                <Button href="#certifications" variant="primary" size="lg">
+              <Button href="#selected-work" variant="primary" size="lg">
+                Explore My Work <span aria-hidden="true">↗</span>
+              </Button>
+              <Magnetic strength={0.1}>
+                <Button href="#contact" variant="secondary" size="lg">
+                  Let’s Talk
+                </Button>
+              </Magnetic>
+              <Magnetic strength={0.1}>
+                <Button href="#certifications" variant="secondary" size="lg">
                   View Credentials
-                </Button>
-              </Magnetic>
-              <Magnetic strength={0.1}>
-                <Button href="#experience" variant="secondary" size="lg">
-                  Explore Experience
-                </Button>
-              </Magnetic>
-              <Magnetic strength={0.1}>
-                <Button href="/internet" variant="secondary" size="lg">
-                  Online Features
                 </Button>
               </Magnetic>
             </div>

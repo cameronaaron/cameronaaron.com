@@ -240,14 +240,6 @@ describe('modularization contract', () => {
     expect(source).not.toContain('function ensureIframeTitle(');
   });
 
-  it('keeps TextReveal storage and split helpers extracted', () => {
-    const source = read('src/components/ui/TextReveal.tsx');
-
-    expect(source).toContain("from '@/components/ui/text-reveal-logic'");
-    expect(source).not.toContain('function readInitialReveal(');
-    expect(source).not.toContain('const words = text.split(" ");');
-  });
-
   it('keeps IntroCurtain navigation and persistence helpers extracted', () => {
     const source = read('src/components/ui/IntroCurtain.tsx');
 

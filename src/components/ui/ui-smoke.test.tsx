@@ -10,7 +10,6 @@ import SkillBar from './SkillBar';
 import SmoothScroll from './SmoothScroll';
 import SpotlightCard from './SpotlightCard';
 import StatCard from './StatCard';
-import TextReveal from './TextReveal';
 import Tilt from './Tilt';
 import TypewriterEffect from './TypewriterEffect';
 
@@ -27,7 +26,6 @@ describe('ui component smoke coverage', () => {
         <SmoothScroll />
         <SpotlightCard><div>Spot</div></SpotlightCard>
         <StatCard value="10+" label="Years" />
-        <TextReveal text="Reveal text" />
         <Tilt><div>Tilted</div></Tilt>
         <TypewriterEffect text="Typing text" typingSpeed={1} />
       </>

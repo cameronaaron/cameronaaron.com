@@ -13,6 +13,7 @@
 // deepens the critical request graph (mobile LCP 3.4s→3.8s, TTI 3.6s→4.0s).
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
+import SelectedWork from '@/components/SelectedWork';
 import Certifications from '@/components/Certifications';
 import Experience from '@/components/Experience';
 import Education from '@/components/Education';
@@ -38,6 +39,7 @@ export default function Home() {
           <Hero />
         </SectionReveal>
         <VelocityMarquee phrases={HERO_MARQUEE_PHRASES} />
+        <SelectedWork />
         <SectionHandoff label="Credentials" cue="transitioning to verified credentials" index={1} targetId="certifications" />
         <SectionReveal index={1}>
           <Certifications />

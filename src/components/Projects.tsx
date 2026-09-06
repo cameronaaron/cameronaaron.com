@@ -1,6 +1,6 @@
 'use client';
 
-import { m, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform } from 'framer-motion';
 import { useMemo, useRef, type CSSProperties } from 'react';
 import { projects } from '@/data/projects';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -23,7 +23,6 @@ export default function Projects() {
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const backgroundY2 = useTransform(scrollYProgress, [0, 1], [100, -50]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
-  const chapterProgress = useSpring(scrollYProgress, { stiffness: 150, damping: 28, mass: 0.35 });
 
   return (
     <section id="projects" className="py-20 bg-background relative overflow-hidden" ref={containerRef} aria-labelledby="projects-heading">
@@ -50,26 +49,6 @@ export default function Projects() {
       />
 
       <div className="container mx-auto px-6 relative z-10">
-        <div className="mb-10 hidden lg:block">
-          <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md px-5 py-4">
-            <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              <span>Research Storyline</span>
-              <span>Scroll-driven chapter</span>
-            </div>
-            <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
-              <m.div
-                className="h-full bg-gradient-to-r from-cyan-400 via-primary to-secondary"
-                style={{ scaleX: chapterProgress, transformOrigin: 'left' }}
-              />
-            </div>
-            <div className="mt-3 flex items-center justify-between text-[11px] font-medium text-muted-foreground/90">
-              <span>Featured Work</span>
-              <span>Publications</span>
-              <span>Deep Dives</span>
-            </div>
-          </div>
-        </div>
-
         <SectionHeader
           headingId="projects-heading"
           index="04"
@@ -80,10 +59,9 @@ export default function Projects() {
 
         <div className="mb-12 overflow-hidden rounded-2xl border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
           <div
-            className="marquee-track flex w-max items-center gap-2"
-            style={{ '--marquee-duration': '22s' } as CSSProperties}
+            className="flex flex-wrap items-center gap-2"
           >
-            {[...researchSignals, ...researchSignals].map((signal, index) => (
+            {researchSignals.map((signal, index) => (
               <span
                 key={`${signal}-${index}`}
                 className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-950/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100"
@@ -130,7 +108,7 @@ export default function Projects() {
 
         {/* Projects that ship a playable companion, each paired with its own
             game rather than pointing at one stacked further down the page. */}
-        <div className="research-playground mb-20 max-w-6xl mx-auto" data-testid="playable-projects">
+        <div id="research-playground" className="research-playground mb-20 max-w-6xl mx-auto" data-testid="playable-projects">
           <h3 className="research-playground-title font-display text-3xl md:text-5xl font-semibold tracking-tight text-foreground">Play the research</h3>
           {playableProjects.map((project, index) => (
             <div
