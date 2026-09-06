@@ -80,7 +80,21 @@
 /bridging-transitions.html
   ! Cross-Origin-Embedder-Policy
 
-# Poster PDFs are content-addressed by name and never rewritten in place.
+# Poster PDFs. NOT immutable, and not marked so: the filenames carry no
+# content hash, and the files ARE rewritten in place whenever the poster is
+# rebuilt in cameronaaron/bridging-transitions-poster.
+#
+# They were briefly served as `immutable, max-age=31536000` on the claim that
+# they were "content-addressed by name". That claim was false and it bit
+# within the day (2026-09-06): the poster was rebuilt to repoint its QR code,
+# the new bytes deployed, and the edge kept serving the year-cached old file —
+# a poster whose printed code led back to the site root. Recovering it took an
+# explicit Cloudflare purge, and every visitor who had already fetched it
+# would have held the wrong poster in their browser cache for a year.
+#
+# `immutable` is a promise about the URL, not a speed setting. Only re-add it
+# here if the filenames start carrying a content hash. Pinned by
+# headers-integrity-contract.
 /poster/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=300, must-revalidate
   Content-Type: application/pdf
