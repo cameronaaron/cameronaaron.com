@@ -191,12 +191,31 @@ describe('animation regression contract', () => {
     expect(source).not.toMatch(/whileInView=\{\{[^}]*scale:\s*1\s*\}/);
   });
 
-  it('ProfileImage imports usePerformanceProfile and uses isCoarsePointer to suppress mobile animations', () => {
+  it('ProfileImage keeps passive motion off and gates hover on the full performance tier', () => {
     const source = read('src/components/hero/ProfileImage.tsx');
     expect(source).toContain("from '@/hooks/usePerformanceProfile'");
-    expect(source).toContain('isCoarsePointer');
-    // reducedMotion must be derived from BOTH prefersReducedMotion AND isCoarsePointer
-    expect(source).toMatch(/reducedMotion\s*=.*\|\|\s*isCoarsePointer/);
+    expect(source).toContain('shouldRenderHeavyEffects: enableHoverMotion');
+    expect(source).not.toContain('repeat: Infinity');
+    expect(source).not.toContain('animate=');
+    expect(source).not.toContain('preserve-3d');
+  });
+
+  it('element-bound 3D tilt never subscribes to whole-window pointer movement', () => {
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.tsx?$/.test(entry.name) && !entry.name.includes('.test.')) {
+          const source = stripComments(readFileSync(full, 'utf8'));
+          if (/\brotateX\b/.test(source) && /\brotateY\b/.test(source) && source.includes('getBoundingClientRect')) {
+            if (/window\.addEventListener\(\s*['"](?:mousemove|pointermove)['"]/.test(source)) offenders.push(full);
+          }
+        }
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+    expect(offenders, 'Moving over unrelated controls must not rotate/rasterize element-bound tilt surfaces').toEqual([]);
   });
 
   it('AmbientBackground restricts animated (Framer Motion) orbs to the full tier only', () => {

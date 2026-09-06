@@ -2786,3 +2786,27 @@ startup task and a 115ms click task: both were captured, the former reported
 as startup and the latter retained as an interaction failure. Inspector
 `page.evaluate()` work was not a reliable way to inject a Long Tasks entry;
 use a scheduled page task or a real input handler when validating that API.
+
+**Portrait rendering follow-up (September 2026):** the large photo used a
+continuously floating 3D stack with two moving blurred lights and an animated
+shadow. It also tilted on whole-window mouse movement, so an unrelated tab
+click moved the photo. Event Timing showed about 7ms of click handling but
+roughly 144ms to presentation. Hiding the portrait in a diagnostic probe
+reduced that to 80ms, identifying rendering cost rather than handler work.
+Scoping the pointer listener and memoizing the photo alone still measured
+120–144ms; they remove unrelated work but were not the latency fix by
+themselves. Replacing the passive stack with one static radial halo and one
+hover-tilted image plane, plus a finite CSS shine, brought the production
+hero-switch median to **96ms** over three Chromium runs through Wrangler
+(1400×1000, no CPU throttle), versus **144ms** on the original export.
+The same final gate measured menu **48ms**, testimonials **80ms**, and skills
+**80ms**, with zero interaction long tasks. Startup tasks remain reported.
+
+The portrait now has no passive animation or filter, and only the full tier
+gets hover tilt. `profile-image-interaction.test.tsx` verifies local pointer
+response, reset/cleanup, and memoization. `animation-regression-contract`
+sweeps element-bound 3D tilt for whole-window pointer subscriptions; injecting
+that listener back into the portrait made the sweep fail. Production browser
+checks verify tilt on hover, exact rest after leaving, and no tilt on touch
+or reduced-motion profiles. The existing mobile motion contract now pins the
+stronger all-tier absence of passive portrait animation.
