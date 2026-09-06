@@ -178,6 +178,7 @@ src/naming-and-organization-contract.test.ts # filename casing per directory, no
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
+src/poster-artifact-contract.test.ts         # served poster PDFs byte-pinned; their QR resolves to their own page
 src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
 src/components/animation-regression-contract.test.ts  # animation anti-patterns
 src/components/mobile-regression-contract.test.tsx    # mobile tap targets, safe areas
@@ -366,7 +367,23 @@ A QR code on the physical SNS26 poster resolves to
 its canonical 404s every printed copy, with no way to fix them. Treat the path
 as immutable; `metadata.test.ts` says so with an assertion.
 
-### 20. The playlist player is a facade, deliberately
+### 20. Replacing a poster PDF means re-running `pnpm run check:poster`
+
+`public/poster/` serves copies of the SNS26 poster built in
+`cameronaaron/bridging-transitions-poster`. Those copies drift: the served
+poster once became one whose printed QR code pointed at the **site root**, so
+downloading the poster from its own landing page led back to the homepage.
+Nothing caught it — the bytes are opaque and the page rendered fine.
+
+`poster-artifact-contract` byte-pins each PDF against
+`scripts/checks/poster-artifact-ledger.json` and asserts the QR target
+recorded there is `getPageUrl('/bridging-transitions')`. Replacing a PDF
+changes its sha and fails the commit until `pnpm run check:poster` re-decodes
+the QR (needs `pdftoppm` + `zbarimg`; do not hand-edit the ledger). Text
+extraction cannot substitute — Typst subsets its fonts, so the URL is not
+present as plain text in the PDF.
+
+### 21. The playlist player is a facade, deliberately
 
 `PlaylistTheater` renders a designed play card and mounts the real
 `youtube-nocookie` iframe only after the visitor presses play — measured on the
