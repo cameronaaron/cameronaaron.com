@@ -95,6 +95,18 @@
 # `immutable` is a promise about the URL, not a speed setting. Only re-add it
 # here if the filenames start carrying a content hash. Pinned by
 # headers-integrity-contract.
+#
+# The max-age below is NOT what ships. Verified on the wire (§9 — check the
+# artifact, not the source): responses carry `max-age=14400`, because the
+# zone's Browser Cache TTL setting is 14400 and overrides the origin value
+# rather than respecting it. `immutable` and `must-revalidate` DO survive,
+# which is the part that matters here. The zone setting is the real lever for
+# the number, and changing it would move browser caching for every asset on
+# the site, so it is not touched from here.
+#
+# Operationally that means: after replacing a poster PDF, purge that URL at
+# the edge (Cloudflare > Caching > Purge, or the purge_cache API). Deploying
+# new bytes under the same filename is not enough on its own.
 /poster/*
   Cache-Control: public, max-age=300, must-revalidate
   Content-Type: application/pdf

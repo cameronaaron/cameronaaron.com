@@ -393,6 +393,14 @@ which cannot reach the browser caches of anyone who had already downloaded
 it. `headers-integrity-contract` now sweeps every `immutable` rule and fails
 on any whose URLs are not content-addressed.
 
+Two things measured on the wire while fixing it, neither guessable from the
+source: the zone's **Browser Cache TTL is 14400 and overrides the origin
+`max-age`**, so `_headers` cannot set that number (`immutable` and
+`must-revalidate` do survive); and a purge is an operational step, not a
+formality — **after replacing a poster PDF, purge that URL at the edge**,
+because deploying new bytes under the same filename leaves the cached object
+in place.
+
 ### 20a. Editing a video duration means re-running `pnpm run check:video-durations`
 
 Every `duration` in `src/data/capstone.ts` was once the video's **planned**
