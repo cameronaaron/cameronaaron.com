@@ -2771,3 +2771,18 @@ The first candidate run overlapped browser verification and scored 0.78; it
 is not evidence of a regression or a load-speed win. All production artifact
 budgets remain unchanged and pass. This ships for visual hierarchy and fewer
 DOM nodes/subscriptions, not a claimed Lighthouse improvement.
+
+**Interaction timing scope (September 2026):** the latency harness initially
+counted every long task since navigation as interaction work. A production
+Event Timing trace showed a 57ms task at 191ms, but the first pointerdown was
+at 1,845ms; that task cannot have blocked that later input. The harness now
+records a browser-clock boundary before the interaction driver, including any
+scroll/focus needed to reach the control, and partitions the captured tasks.
+Startup tasks remain in the report; any task overlapping the boundary or
+starting afterward still fails the zero-interaction-long-task gate. INP and
+both numeric budgets are unchanged. `interaction-latency-contract.test.ts`
+pins the boundary cases. A real-browser validation injected a 110ms scheduled
+startup task and a 115ms click task: both were captured, the former reported
+as startup and the latter retained as an interaction failure. Inspector
+`page.evaluate()` work was not a reliable way to inject a Long Tasks entry;
+use a scheduled page task or a real input handler when validating that API.
