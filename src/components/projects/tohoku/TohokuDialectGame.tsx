@@ -60,6 +60,7 @@ export default function TohokuDialectGame() {
     <div
       className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
       data-testid="tohoku-dialect-game"
+      role="group"
       aria-label={DIALECT_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

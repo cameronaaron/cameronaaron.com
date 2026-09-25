@@ -229,9 +229,18 @@ describe('ScrambleText', () => {
     expect(cancelAnimationFrame).toHaveBeenCalled();
   });
 
-  it('keeps an accessible label equal to the real text', () => {
+  it('settles back to the real text after a scramble, so assistive tech reads the words', () => {
+    // An aria-label used to stand in for this, but ARIA forbids naming a bare
+    // span, so it was ignored. What AT reads is the text content once the decode ends.
     render(<ScrambleText text="Cameron" />);
-    expect(screen.getByText('Cameron').getAttribute('aria-label')).toBe('Cameron');
+    const node = screen.getByText('Cameron');
+    expect(node.hasAttribute('aria-label')).toBe(false);
+
+    fireEvent.mouseEnter(node);
+    flushFrames(1);
+    expect(node.textContent).not.toBe('Cameron');
+    flushFrames(200);
+    expect(node.textContent).toBe('Cameron');
   });
 });
 
