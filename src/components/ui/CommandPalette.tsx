@@ -125,7 +125,7 @@ export default function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="font-mono-accent fixed bottom-5 left-40 z-40 hidden h-9 items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 md:inline-flex"
+        className="font-mono-accent fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] left-40 z-40 hidden h-9 items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 md:inline-flex"
         aria-haspopup="dialog"
         aria-expanded={open}
         data-testid="command-palette-trigger"

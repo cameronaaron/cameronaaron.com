@@ -10,8 +10,11 @@ import { socialPlatforms } from '@/data/contact';
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
+  // Bottom padding clears the fixed BackToTop + QuickActionsDock stack on the
+  // right (top edge 7.75rem / 8.75rem from sm, plus the home-indicator inset);
+  // without it the stack sat on top of the copyright line at page end.
   return (
-    <footer className="border-t border-white/5 bg-background/80 text-white py-14 relative overflow-hidden">
+    <footer className="border-t border-white/5 bg-background/80 text-white pt-14 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(9rem+env(safe-area-inset-bottom))] relative overflow-hidden">
       <div
         className="hairline-shimmer-anim pointer-events-none absolute inset-x-0 top-0 mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent"
         aria-hidden="true"
