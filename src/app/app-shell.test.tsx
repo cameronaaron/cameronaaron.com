@@ -20,6 +20,23 @@ describe('app shell coverage', () => {
     expect(container.querySelector('#contact')).toBeTruthy();
   });
 
+  it('makes the skip link the first Tab stop, and its target skip past the navigation', () => {
+    // Shipped wrong twice over: PageChrome's floating buttons preceded the
+    // link in DOM order (third Tab stop), and <Navigation> sat inside
+    // #main-content, so "skip" landed back at the start of the nav (WCAG 2.4.1).
+    const { container } = render(<Home />);
+    const focusables = container.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    expect(focusables[0]?.textContent).toBe('Skip to main content');
+    expect(focusables[0]?.getAttribute('href')).toBe('#main-content');
+
+    const main = container.querySelector('#main-content');
+    expect(main?.tagName).toBe('MAIN');
+    const primaryNav = screen.getByRole('navigation', { name: /main navigation/i });
+    expect(main?.contains(primaryNav)).toBe(false);
+  });
+
   it('evaluates layout exports and tree', () => {
     const tree = RootLayout({ children: <div>child</div> });
 

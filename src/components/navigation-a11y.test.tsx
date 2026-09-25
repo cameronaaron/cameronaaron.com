@@ -20,12 +20,6 @@ describe('Navigation accessibility', () => {
     expect(nav).toBeTruthy();
   });
 
-  it('renders a skip-to-content link as the first focusable element', () => {
-    render(<Navigation />);
-    const link = screen.getByText(/skip to main content/i);
-    expect(link.getAttribute('href')).toBe('#main-content');
-  });
-
   it('renders every nav item with an href', () => {
     render(<Navigation />);
     const primary = screen.getByRole('navigation', { name: /primary navigation/i });
