@@ -176,7 +176,7 @@ describe('SectionRail', () => {
 
   it('scrolls through the active Lenis instance instead of scrollIntoView when one is registered', () => {
     const scrollToSpy = vi.fn();
-    setActiveLenis({ scrollTo: scrollToSpy } as never);
+    setActiveLenis({ resize: vi.fn(), scrollTo: scrollToSpy } as never);
     const replaceSpy = vi.spyOn(history, 'replaceState');
 
     render(<SectionRail />);
@@ -196,7 +196,7 @@ describe('SectionRail', () => {
     const fm = await import('framer-motion');
     const spy = vi.spyOn(fm, 'useReducedMotion').mockReturnValue(true);
     const scrollToSpy = vi.fn();
-    setActiveLenis({ scrollTo: scrollToSpy } as never);
+    setActiveLenis({ resize: vi.fn(), scrollTo: scrollToSpy } as never);
 
     render(<SectionRail />);
     fireEvent.click(screen.getByLabelText('Jump to Skills'));

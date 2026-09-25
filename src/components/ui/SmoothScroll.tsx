@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Lenis from 'lenis';
 import { resolveHashElementId, shouldResetScrollPosition } from './smooth-scroll-logic';
 import { setActiveLenis } from './lenis-registry';
+import { cancelSectionScroll, scrollToSection } from './scroll-to-section';
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -11,9 +12,33 @@ export default function SmoothScroll() {
 
     window.history.scrollRestoration = 'manual';
 
+    // Same-page anchor clicks (Navigation, footer, Hero CTAs, QuickActionsDock)
+    // on every tier: the browser — or Lenis's `anchors` option below — starts
+    // the scroll and keeps native hash/focus semantics, and scrollToSection
+    // follows it, re-aiming as `.cv-section` placeholders resolve and push the
+    // target down. Without the follow-up, a nav click to #contact stopped
+    // ~11,700px short.
+    const handleAnchorClick = (event: MouseEvent) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest?.('a[href^="#"]');
+      const elementId = anchor ? resolveHashElementId(anchor.getAttribute('href') ?? '') : null;
+      const target = elementId ? document.getElementById(elementId) : null;
+      if (!target) return;
+      scrollToSection(target, {
+        reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        issueInitialScroll: false,
+      });
+    };
+    document.addEventListener('click', handleAnchorClick);
+    const detachAnchorFollow = () => {
+      document.removeEventListener('click', handleAnchorClick);
+      cancelSectionScroll();
+    };
+
     // Touch devices have native momentum scrolling — Lenis fights it and causes lag
     if (window.matchMedia('(pointer: coarse)').matches) {
       return () => {
+        detachAnchorFollow();
         window.history.scrollRestoration = previousScrollRestoration;
       };
     }
@@ -94,6 +119,7 @@ export default function SmoothScroll() {
       window.clearTimeout(syncTimeoutId);
       cancelAnimationFrame(rafId);
       window.removeEventListener('pageshow', handlePageShow);
+      detachAnchorFollow();
       setActiveLenis(null);
       lenis.destroy();
 

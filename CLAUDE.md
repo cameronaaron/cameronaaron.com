@@ -328,6 +328,13 @@ reachable chunk into the initial wave** — so no import-level deferral can pull
 JS out of the *download* graph (LCP). Keep `.cv-section` off the hero (it holds
 the LCP and must always paint).
 
+The placeholder height has a cost: an in-page jump aimed at a section below
+it lands short as the sections it passes resolve taller (a nav click to
+`#contact` once stopped ~11,700px short, live). **Every in-page jump must call
+`scrollToSection`** (`src/components/ui/scroll-to-section.ts`), never a raw
+`scrollIntoView`/`lenis.scrollTo`; same-page `href="#…"` links are followed up
+automatically by `SmoothScroll`. See ENGINEERING-STANDARDS §9.4c.
+
 **LazyMotion is the exception, and it's shipped (2026-07):** the site renders
 via `m` under a `LazyMotion` provider (`MotionProvider`) that loads the DOM
 feature pack (`domMax`) as an async chunk. Force-preload means the feature

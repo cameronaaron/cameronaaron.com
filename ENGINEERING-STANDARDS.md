@@ -2663,6 +2663,23 @@ settles inside the viewport, rather than issuing one scroll and asserting.
 Same family as §9.4b and §0.5 — before concluding a gate has a real defect,
 confirm the harness gave the page's own layout time to stop moving.
 
+**Correction (2026-09): the same shift *was* a production bug for every
+programmatic jump.** "A natural human scroll never encounters this" holds for
+wheel scrolling only. A nav link, ⌘K command, `g`-shortcut or SectionRail dot
+is one scroll aimed at a placeholder-computed offset, and nothing re-aimed it:
+measured on the live site, a nav click to `#contact` stopped 11,708px short on
+desktop and `#education` 9,496px short on mobile — only the first section
+below the hero was ever reachable. Every in-page jump now goes through
+`scrollToSection` (`src/components/ui/scroll-to-section.ts`), which re-aims
+mid-flight while the target moves; a sweep in `scroll-to-section.test.tsx`
+fails on any raw `scrollIntoView`/`lenis.scrollTo` elsewhere. Two measured
+details a future change must keep: (1) re-aiming *during* the scroll beat
+scroll-stop-scroll-again (~4.2s vs ~6s to mobile `#contact`, one continuous
+motion); (2) under Lenis, re-aiming alone still stranded desktop `#contact`
+~10,900px short, because `lenis.scrollTo` clamps to a cached scroll limit
+taken while the page was placeholders — `lenis.resize()` before each
+`scrollTo` is what makes it land.
+
 ### 9.5 Measure the metric the change actually targets (the scroll-velocity port, 2026-07-25)
 
 The page built the same scroll-velocity spring **eight times** — once per
