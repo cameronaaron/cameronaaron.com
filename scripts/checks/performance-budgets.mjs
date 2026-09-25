@@ -214,6 +214,39 @@ if (existsSync(homeHtmlPath)) {
   }
 }
 
+// Every emitted page must describe itself in its own <head>. The 404 once
+// inherited the root layout's homepage <title> and `index, follow` robots tags
+// alongside the `noindex` Next injects for not-found — two contradictory crawl
+// directives in one document, and a tab titled as the homepage. Swept across
+// every HTML file so the next special page that inherits root metadata is
+// caught too, not just the 404.
+const homeTitle = existsSync(homeHtmlPath)
+  ? /<title>([^<]*)<\/title>/.exec(readFileSync(homeHtmlPath, 'utf8'))?.[1]
+  : undefined;
+for (const htmlFile of htmlFiles) {
+  if (htmlFile === homeHtmlPath) continue;
+  const html = readFileSync(htmlFile, 'utf8');
+  const relativePath = relative(outDir, htmlFile);
+  const title = /<title>([^<]*)<\/title>/.exec(html)?.[1];
+  if (homeTitle !== undefined && title === homeTitle) {
+    errors.push(
+      `out/${relativePath} reuses the homepage <title> "${homeTitle}" — the page inherited root ` +
+        'metadata instead of exporting its own `metadata.title`.',
+    );
+  }
+  for (const name of ['robots', 'googlebot']) {
+    const directives = [...html.matchAll(new RegExp(`<meta name="${name}" content="([^"]*)"`, 'gi'))].map((m) => m[1]);
+    const saysNoindex = directives.some((content) => /\bnoindex\b/i.test(content));
+    const saysIndex = directives.some((content) => /(^|[\s,])index\b/i.test(content));
+    if (saysNoindex && saysIndex) {
+      errors.push(
+        `out/${relativePath} carries contradictory <meta name="${name}"> directives ` +
+          `(${directives.map((d) => `"${d}"`).join(' vs ')}) — the page must export its own \`metadata.robots\`.`,
+      );
+    }
+  }
+}
+
 if (errors.length > 0) {
   console.error('Build integrity checks failed:');
   for (const error of errors) {

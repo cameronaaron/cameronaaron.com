@@ -205,6 +205,17 @@ export function buildRootMetadata(): Metadata {
   };
 }
 
+/** The 404's own <head>. Without it the not-found page inherits
+ *  buildRootMetadata's homepage title and `index, follow` robots tags, which
+ *  then sit beside the `noindex` Next injects for not-found — two contradictory
+ *  crawl directives in one document. */
+export function buildNotFoundMetadata(): Metadata {
+  return {
+    title: 'Page Not Found',
+    robots: { index: false, follow: true, googleBot: { index: false, follow: true } },
+  };
+}
+
 /** Speculation Rules (rendered as a `type="speculationrules"` script by the
  *  root layout): every page here is a static export, so a prefetched
  *  navigation is the complete document — hover-to-tap latency becomes the
