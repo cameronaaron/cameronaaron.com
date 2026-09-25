@@ -31,10 +31,22 @@ import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/v
 export default function Home() {
   return (
     <>
+      {/* First focusable element on the page, ahead of PageChrome's floating
+          buttons, and Navigation sits outside <main> so "skip" actually skips
+          it. Both were wrong once: the link was the third Tab stop and landed
+          back at the top of the nav it was meant to bypass (WCAG 2.4.1). */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-6 focus:py-3 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
+      >
+        Skip to main content
+      </a>
+
       <PageChrome />
 
+      <Navigation />
+
       <main className="min-h-screen" id="main-content">
-        <Navigation />
         <SectionReveal index={0}>
           <Hero />
         </SectionReveal>
