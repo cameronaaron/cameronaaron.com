@@ -81,6 +81,11 @@ export default defineConfig([
     // run left lintable-looking generated JS under .wrangler/tmp/ that
     // could fail `pnpm run lint`'s zero-warning gate for reasons that have
     // nothing to do with this repo's own source.
-    '.wrangler/**'
+    '.wrangler/**',
+    // The Remember agent plugin's session state. It ignores itself via its
+    // own nested .gitignore, so it is never committed, but it writes
+    // `.remember/tmp/last-ndc.ts` (a bare timestamp) mid-session, and that
+    // alone failed the zero-warning gate on an unrelated commit.
+    '.remember/**'
   ])
 ]);
