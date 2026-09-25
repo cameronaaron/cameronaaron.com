@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { buildNotFoundMetadata } from '@/data/metadata';
+
+export const metadata = buildNotFoundMetadata();
 
 export default function NotFound() {
   return (

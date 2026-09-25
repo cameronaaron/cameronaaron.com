@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CHUNK_RELOAD_GUARD_KEY } from './error-boundary-logic';
 import ErrorBoundaryView from './error';
 import Loading from './loading';
-import NotFound from './not-found';
+import NotFound, { metadata as notFoundMetadata } from './not-found';
 import Home from './page';
 import RootLayout, { metadata, viewport } from './layout';
 
@@ -43,6 +43,15 @@ describe('app shell coverage', () => {
     render(<ErrorBoundaryView error={new Error('boom')} reset={reset} />);
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(reset).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives the 404 its own title and noindex so it never inherits the homepage head', () => {
+    // Inheriting root metadata shipped the homepage title plus `index, follow`
+    // beside Next's injected `noindex`. The artifact-level sweep over every
+    // emitted page lives in scripts/checks/performance-budgets.mjs.
+    expect(notFoundMetadata.title).toBe('Page Not Found');
+    expect(notFoundMetadata.title).not.toBe(metadata.title);
+    expect(notFoundMetadata.robots).toMatchObject({ index: false, googleBot: { index: false } });
   });
 });
 
