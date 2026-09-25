@@ -19,7 +19,9 @@ interface ScrambleTextProps {
  * Renders `text`; on a hover-capable pointer, entering the element scrambles
  * the glyphs and decodes them left-to-right. The animation writes straight
  * into the DOM node (no React state at frame rate) and reuses one scratch
- * array across frames.
+ * array across frames. At rest the node's text is always `text` (restored on
+ * completion and on unmount), so assistive tech reads the real words; an
+ * aria-label here would be a no-op, since ARIA forbids naming a bare span.
  */
 export default function ScrambleText({ text, className = '' }: ScrambleTextProps) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -61,7 +63,7 @@ export default function ScrambleText({ text, className = '' }: ScrambleTextProps
   }, [enableHoverMotion, text]);
 
   return (
-    <span ref={nodeRef} className={className} aria-label={text}>
+    <span ref={nodeRef} className={className}>
       {text}
     </span>
   );

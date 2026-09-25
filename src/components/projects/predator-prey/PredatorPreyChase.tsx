@@ -218,7 +218,6 @@ export default function PredatorPreyChase() {
       ) : (
         <div
           className="flex aspect-square w-full max-w-xs items-center justify-center rounded-xl border border-white/10 bg-white/5 p-4 text-center text-xs text-muted-foreground"
-          aria-label={SIMULATION_ARIA_LABEL}
           data-testid="pp-paused"
         >
           {PAUSED_CAPTION}

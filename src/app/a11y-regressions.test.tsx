@@ -149,4 +149,36 @@ describe('Accessibility regression guards', () => {
 
     expect(offenders, `<TypewriterEffect> gradient/styled text will render invisible or unstyled — this file forwards its className prop to a different element but never to <TypewriterEffect> itself:\n${offenders.join('\n')}`).toEqual([]);
   });
+
+  it('repo-wide: no aria-label/aria-labelledby on a role-less span or div (ARIA 1.2 prohibits naming generic)', () => {
+    // Found 2026-09 by the Nu validator (35 errors on the home page):
+    // ScrambleText put aria-label on a bare <span>. Generic elements cannot be
+    // named, so assistive tech ignores the label — it looked like a11y work and
+    // did nothing. Walks the JSX AST of every production .tsx (attributes span
+    // lines and contain `=>`, which defeats a regex over opening tags).
+    const GENERIC_TAGS = new Set(['span', 'div', 'm.span', 'm.div', 'motion.span', 'motion.div']);
+    const offenders: string[] = [];
+    let genericTagsSeen = 0;
+    for (const file of listProductionSources()) {
+      const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+      const visit = (node: ts.Node) => {
+        if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && GENERIC_TAGS.has(node.tagName.getText(source))) {
+          genericTagsSeen += 1;
+          const names = new Set<string>();
+          for (const attribute of node.attributes.properties) {
+            if (ts.isJsxAttribute(attribute)) names.add(attribute.name.getText(source));
+          }
+          if ((names.has('aria-label') || names.has('aria-labelledby')) && !names.has('role')) {
+            const { line } = source.getLineAndCharacterOfPosition(node.getStart(source));
+            offenders.push(`${file}:${line + 1} <${node.tagName.getText(source)}>`);
+          }
+        }
+        ts.forEachChild(node, visit);
+      };
+      visit(source);
+    }
+
+    expect(genericTagsSeen, 'sweep matched no span/div at all — the AST walk is broken').toBeGreaterThan(0);
+    expect(offenders, `name the element with a real role, or drop the no-op label:\n${offenders.join('\n')}`).toEqual([]);
+  });
 });
