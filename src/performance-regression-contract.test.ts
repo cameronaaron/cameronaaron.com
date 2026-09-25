@@ -415,7 +415,7 @@ describe('performance regression contract', () => {
     expect(nextRange, 'package.json must declare a "next" dependency').toBeTruthy();
 
     const workspaceYaml = read('pnpm-workspace.yaml');
-    const patchMatch = /patchedDependencies:\s*\n\s+next@([\d.]+):\s*(\S+)/.exec(workspaceYaml);
+    const patchMatch = /patchedDependencies:\s*\n(?:[ \t]+\S.*\n)*?[ \t]+next@([\d.]+):\s*(\S+)/.exec(workspaceYaml);
     expect(patchMatch, 'pnpm-workspace.yaml must pin a patchedDependencies entry for "next"').not.toBeNull();
 
     const [, patchedVersion, patchRelativePath] = patchMatch!;
