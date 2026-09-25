@@ -6,6 +6,7 @@ import { experiences } from '@/data/experience';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ExperienceCard from '@/components/experience/ExperienceCard';
 import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import { scrollToSection } from '@/components/ui/scroll-to-section';
 import {
   EXPERIENCE_FLOW_PHASES,
   getExperienceItemId,
@@ -35,7 +36,7 @@ export default function Experience() {
   const handleJumpToExperience = (index: number) => {
     setActiveExperienceIndex(index);
     const target = document.getElementById(getExperienceItemId(index));
-    target?.scrollIntoView?.({ behavior: isLiteMotion ? 'auto' : 'smooth', block: 'start' });
+    if (target) scrollToSection(target, { reducedMotion: isLiteMotion });
   };
 
   // Stable identity so the memoized ExperienceCard never re-renders from a

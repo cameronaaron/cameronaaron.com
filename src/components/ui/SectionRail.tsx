@@ -2,7 +2,7 @@
 
 import { m, useScroll, useSpring, useReducedMotion } from 'framer-motion';
 import { getMostVisibleEntry, RAIL_SECTIONS, type SectionRailItem } from './section-rail-logic';
-import { getActiveLenis } from './lenis-registry';
+import { scrollToSection } from './scroll-to-section';
 import { useEffect, useState } from 'react';
 
 interface SectionRailProps {
@@ -54,16 +54,7 @@ export default function SectionRail({ sections = RAIL_SECTIONS }: SectionRailPro
     // scroll instead of two animations racing to the same target.
     event.stopPropagation();
 
-    const lenis = getActiveLenis();
-    if (lenis) {
-      lenis.scrollTo(target, { immediate: Boolean(prefersReducedMotion) });
-    } else {
-      // Touch devices: SmoothScroll never constructs Lenis there.
-      target.scrollIntoView({
-        behavior: prefersReducedMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    }
+    scrollToSection(target, { reducedMotion: Boolean(prefersReducedMotion) });
 
     setActiveId(id);
     if (typeof history !== 'undefined' && history.replaceState) {

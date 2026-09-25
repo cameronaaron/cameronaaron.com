@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { navItems } from '@/data/navigation';
 import { profile } from '@/data/profile';
 import { isEditableTarget } from '@/components/ui/keyboard-shortcuts-logic';
+import { scrollToSection } from '@/components/ui/scroll-to-section';
 import {
   type Command,
   buildCommandCatalog,
@@ -64,10 +65,7 @@ export default function CommandPalette() {
       setRecentIds(lruKeys(recentsRef.current));
       if (command.action.kind === 'jump') {
         const el = document.getElementById(command.action.targetId);
-        el?.scrollIntoView({
-          behavior: prefersReducedMotion ? 'auto' : 'smooth',
-          block: 'start',
-        });
+        if (el) scrollToSection(el, { reducedMotion: Boolean(prefersReducedMotion) });
       } else {
         window.open(command.action.url, '_blank', 'noopener,noreferrer');
       }

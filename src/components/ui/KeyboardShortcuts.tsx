@@ -9,6 +9,7 @@ import {
   SHORTCUTS,
   type KeySequenceState,
 } from '@/components/ui/keyboard-shortcuts-logic';
+import { scrollToSection } from '@/components/ui/scroll-to-section';
 
 const JUMP_MAP: Record<string, string> = buildShortcutJumpMap(SHORTCUTS);
 
@@ -24,10 +25,7 @@ export default function KeyboardShortcuts() {
     (targetId: string) => {
       const el = document.getElementById(targetId);
       if (!el) return;
-      el.scrollIntoView({
-        behavior: prefersReducedMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
+      scrollToSection(el, { reducedMotion: Boolean(prefersReducedMotion) });
       if (typeof history !== 'undefined' && history.replaceState) {
         history.replaceState(null, '', `#${targetId}`);
       }
