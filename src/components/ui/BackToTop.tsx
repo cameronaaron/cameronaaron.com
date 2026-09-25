@@ -39,7 +39,7 @@ export default function BackToTop({ threshold = 600 }: BackToTopProps) {
           transition={{ duration: 0.22, ease: 'easeOut' }}
           whileHover={prefersReducedMotion ? undefined : { y: -3, scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
-          className="pointer-events-auto fixed bottom-20 right-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-black/70 text-cyan-100 shadow-lg shadow-cyan-500/20 backdrop-blur-md transition-colors hover:border-cyan-300/70 hover:text-white sm:bottom-24 sm:right-6"
+          className="pointer-events-auto fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-black/70 text-cyan-100 shadow-lg shadow-cyan-500/20 backdrop-blur-md transition-colors hover:border-cyan-300/70 hover:text-white sm:bottom-[calc(6rem+env(safe-area-inset-bottom))] sm:right-6"
           aria-label="Scroll to top of page"
           data-testid="back-to-top"
         >

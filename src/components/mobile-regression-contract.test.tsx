@@ -1,6 +1,6 @@
 import React from 'react';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -73,7 +73,62 @@ describe('mobile regression contract', () => {
     const button = screen.getByTestId('back-to-top');
     expect(button.className).toContain('h-11');
     expect(button.className).toContain('w-11');
-    expect(button.className).toContain('bottom-20');
+    // Stacked above QuickActionsDock, which rises by the home-indicator inset;
+    // a bare bottom-20 let the dock ride up into this button on notched phones.
+    expect(button.className).toContain('bottom-[calc(5rem+env(safe-area-inset-bottom))]');
+    expect(button.className).toContain('sm:bottom-[calc(6rem+env(safe-area-inset-bottom))]');
+  });
+
+  it('sweeps every fixed, bottom-offset control for the home-indicator safe area', () => {
+    // Class-level check for the BackToTop miss: any `fixed` element lifted off
+    // the bottom edge (bottom-N, N ≠ 0, at any breakpoint) must add
+    // env(safe-area-inset-bottom), or a sibling that does will ride up into it.
+    // bottom-0 is exempt — edge-flush chrome is meant to sit under the inset.
+    const tsxFiles: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.name.endsWith('.tsx') && !entry.name.includes('.test.')) tsxFiles.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const offenders: string[] = [];
+    let fixedBottomCount = 0;
+    for (const file of tsxFiles) {
+      for (const match of readFileSync(file, 'utf8').matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
+        const tokens = (match[1] ?? match[2]).split(/\s+/);
+        if (!tokens.includes('fixed')) continue;
+        for (const token of tokens) {
+          const bottom = /^(?:[a-z0-9]+:)*bottom-(.+)$/.exec(token);
+          if (!bottom || bottom[1] === '0') continue;
+          fixedBottomCount += 1;
+          if (!bottom[1].includes('env(safe-area-inset-bottom)')) offenders.push(`${file}: ${token}`);
+        }
+      }
+    }
+    expect(fixedBottomCount, 'sweep matched nothing — the className parser is broken').toBeGreaterThan(0);
+    expect(offenders).toEqual([]);
+  });
+
+  it('pads the footer past the top of the fixed BackToTop stack so the last line stays readable', () => {
+    // Derived from BackToTop's own classes, not a copied number: the footer's
+    // bottom padding must exceed the button's offset + height at each size.
+    render(<BackToTop threshold={0} />);
+    act(() => setScroll(800));
+    const buttonClasses = screen.getByTestId('back-to-top').className;
+    const rem = (source: string, pattern: RegExp) => Number(pattern.exec(source)?.[1]);
+    const buttonHeightRem = rem(buttonClasses, /\bh-(\d+(?:\.\d+)?)\b/) / 4;
+    const footer = read('src/components/Footer.tsx');
+
+    const mobileTop = rem(buttonClasses, /(?:^|\s)bottom-\[calc\((\d+(?:\.\d+)?)rem\+env/) + buttonHeightRem;
+    const smTop = rem(buttonClasses, /sm:bottom-\[calc\((\d+(?:\.\d+)?)rem\+env/) + buttonHeightRem;
+    const mobilePad = rem(footer, /(?:^|\s)pb-\[calc\((\d+(?:\.\d+)?)rem\+env\(safe-area-inset-bottom\)\)\]/);
+    const smPad = rem(footer, /sm:pb-\[calc\((\d+(?:\.\d+)?)rem\+env\(safe-area-inset-bottom\)\)\]/);
+
+    expect(mobilePad).toBeGreaterThan(mobileTop);
+    expect(smPad).toBeGreaterThan(smTop);
   });
 
   it('keeps quick actions dock reachable from mobile viewport edges', () => {
