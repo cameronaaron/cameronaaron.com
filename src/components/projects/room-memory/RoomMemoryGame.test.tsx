@@ -68,6 +68,38 @@ describe('RoomMemoryGame', () => {
     expect(screen.getByTestId('room-body').style.opacity).toBe('0');
   });
 
+  it('places the body where the pointer is over the canvas', () => {
+    const raf = stubRaf();
+    render(<RoomMemoryGame />);
+    const canvas = screen.getByTestId('room-canvas');
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({ left: 100, top: 50, width: 200, height: 100 } as DOMRect);
+
+    // Three-quarters across, a quarter down the room.
+    fireEvent.pointerMove(canvas, { clientX: 250, clientY: 75 });
+    raf.run(0);
+    raf.run(2000);
+
+    const body = screen.getByTestId('room-body');
+    expect(body.style.opacity).toBe('1');
+    const [, x, y] = /translate\(([\d.]+)cqw, ([\d.]+)cqh\)/.exec(body.style.transform)!.map(Number);
+    expect(x).toBeCloseTo(75, 0);
+    expect(y).toBeCloseTo(25, 0);
+  });
+
+  it('keeps the room live when the canvas has no 2D context', () => {
+    const raf = stubRaf();
+    // The setup's canvas stub is shared and never restored: override one call only.
+    vi.mocked(HTMLCanvasElement.prototype.getContext).mockReturnValueOnce(null);
+    render(<RoomMemoryGame />);
+    fireEvent.keyDown(screen.getByTestId('room-canvas'), { key: 'ArrowRight' });
+    raf.run(0);
+    raf.run(500);
+
+    // No field is painted, but the body and its status still track the room.
+    expect(screen.getByTestId('room-body').style.opacity).toBe('1');
+    expect(screen.getByTestId('room-status').textContent).toBe('Still. The room is remembering you deeply.');
+  });
+
   it('ignores keys that are not arrows', () => {
     const raf = stubRaf();
     render(<RoomMemoryGame />);
