@@ -62,6 +62,7 @@ export const projects: Project[] = [
     tags: ["Rust", "Cryptography", "Post-Quantum", "Privacy Engineering"],
     period: "Aug 2026 - Sep 2026",
     ...repositoryFields('cameronaaron/novachannel'),
+    interactiveDemo: "oram-access-game",
   },
   {
     title: "Social Graph Crawler & Network Map",
@@ -91,7 +92,6 @@ export const projects: Project[] = [
     ],
     period: "Spring 2026",
     cta: "Capstone Project",
-    interactiveDemo: "oram-access-game",
     featured: true,
   },
   {

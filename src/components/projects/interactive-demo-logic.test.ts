@@ -87,3 +87,28 @@ describe('getDemoToggleAriaLabel', () => {
     }
   });
 });
+
+describe('every game is paired with the work it is about', () => {
+  // 2026-10: a wiring script anchored on the first `cta:` after a title; the
+  // new private-repo projects have none, so the ORAM game landed on the
+  // capstone. The pairing is the whole point of a companion game — pin it.
+  it('pins each demo to its project', () => {
+    const pairing: Record<string, string> = {};
+    for (const project of projects) {
+      if (project.interactiveDemo) pairing[project.interactiveDemo] = project.title;
+    }
+    expect(pairing).toEqual({
+      'uds-frame-decoder': 'Mechanic: Open Vehicle Diagnostics',
+      'oram-access-game': 'novachannel: Metadata-Resistant Messaging in Rust',
+      'reaction-time-game': 'Lapses in Sustained Attention Predicted by Changes in Visually-Guided Movements',
+      'predator-prey-chase': 'Predatory and Prey Behavior Modifying MIP Robots',
+      'dna-snp-game': 'Genetic RefleXions Magic Mirror',
+      'twice-exceptional-game': 'Finding the Perfect Fit: The 2e-Friendly Workplace',
+      'ephemeral-room-game': 'thehellisthis.com',
+      'divergent-thinking-game': 'Creating the Perfect Fit: Turning ADD Into an Asset',
+      'collective-intelligence-game': 'Social Intelligence Effect on Team Dynamic',
+      'tohoku-dialect-game': 'Differences Between Standard Japanese & Tohoku Dialects',
+      'toxoplasma-maze': 'Toxoplasma Gondii Modifies Personality',
+    });
+  });
+});
