@@ -79,7 +79,8 @@
     "lighthouse:desktop": "lighthouse http://localhost:3000 --preset=desktop --view",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --form-factor=mobile --screenEmulation.mobile --view",
     "measure:scroll-cost": "node scripts/checks/measure-scroll-cost.mjs",
-    "check:coep-embed": "node scripts/checks/coep-youtube-embed-probe.mjs"
+    "check:coep-embed": "node scripts/checks/coep-youtube-embed-probe.mjs",
+    "check:repos": "node scripts/checks/check-repo-visibility.mjs"
   },
   "dependencies": {
     "framer-motion": "^14.0.0",

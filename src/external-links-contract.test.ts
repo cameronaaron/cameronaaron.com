@@ -78,7 +78,9 @@ function extractExternalUrls(): Map<string, Set<string>> {
       for (const match of text.matchAll(URL_PATTERN)) {
         const url = match[0].replace(/[.,;'"`)]+$/, '');
         if (url.includes('cameronaaron.com')) continue;
-        if (url.includes('${') || url.includes('localhost') || url.includes('127.0.0.1')) continue;
+        // URL_PATTERN stops at '{', so a template literal like `https://x/${y}`
+        // matches as 'https://x/$' — the '${' test alone never sees it.
+        if (url.endsWith('$') || url.includes('${') || url.includes('localhost') || url.includes('127.0.0.1')) continue;
         if (url.includes('schema.org') || url.includes('w3.org')) continue;
 
         const rel = full.replace(`${ROOT}/`, '');

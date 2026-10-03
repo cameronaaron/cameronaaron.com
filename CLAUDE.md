@@ -178,6 +178,7 @@ src/naming-and-organization-contract.test.ts # filename casing per directory, no
 src/lifecycle-hygiene-contract.test.ts       # timers/listeners/observers all cleaned up
 src/test-quality-contract.test.tsx           # no always-true assertions; motion-mock fidelity; local-mock registry
 src/external-links-contract.test.ts          # every external URL in src/data is ledger-verified live, not dead
+src/repo-visibility-contract.test.ts         # GitHub repo links follow the visibility ledger; ledger re-checked live against GitHub
 src/poster-artifact-contract.test.ts         # served poster PDFs byte-pinned; their QR resolves to their own page
 src/video-duration-contract.test.ts          # declared video runtimes match what YouTube actually reports
 src/headers-integrity-contract.test.ts       # security+caching headers pinned, preload targets exist
@@ -457,6 +458,7 @@ Site content lives in `src/data/`:
 | `education.ts` | Degrees + prerequisite coursework (4 items; LACCD sorts first as most recent); `honorsAndAffiliations` is `HonorItem[]` (`{ label: string; url?: string }`) not `string[]` |
 | `testimonials.ts` | LinkedIn recommendations |
 | `bridgingTransitions.ts` | Poster-session companion copy for `/bridging-transitions` — session/venue, the "Monday" actions, reviewer quotes, poster PDF links. Every string is copied **verbatim** from `content/poster.yaml` in `cameronaaron/bridging-transitions-poster`, which is language-linted and citation-checked there; reword here and the page stops matching the poster the reader is standing in front of |
+| `repoVisibility.ts` | `repositoryFields('owner/name')` — derives a project's `link`/`cta` from `scripts/checks/repo-visibility-ledger.json`. Never hard-code a GitHub link: a private repo would link to a 404 and a newly-public one would stay unlinked. When `repo-visibility-contract` reports a change, run `pnpm run check:repos` and commit the ledger; the card flips on the next build. The checker reads GitHub's `private` field on a 200 because an owner token gets 200 for private repos too |
 | `site.ts` | `SITE_URL` + `getPageUrl(path)` — the **only** place `https://cameronaaron.com` may be hardcoded; every other file imports from here (enforced by a repo-wide sweep in `modularization-contract.test.ts`) |
 | `metadata.ts` | Root `<head>` metadata — `buildRootMetadata()` / `buildRootViewport()`, plus the `SEO_KEYWORDS` catalog, consumed by `src/app/layout.tsx`. Sub-pages (`capstone`, `credentials`, `internet`) each have their own co-located `./metadata.ts` with a `build*Metadata(pageUrl)` function |
 

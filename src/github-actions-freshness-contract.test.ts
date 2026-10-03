@@ -35,6 +35,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { resolveGitHubToken } from '../scripts/checks/repo-visibility.mjs';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -76,7 +77,9 @@ function majorOf(tag: string): number | null {
 
 async function fetchLatestTag(ownerRepo: string): Promise<string> {
   const headers: Record<string, string> = { 'User-Agent': 'freshness-contract-test' };
-  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+  // Env token, else the logged-in gh CLI: 60 anonymous calls an hour is
+  // spent fast once two networked contracts share it.
+  const token = resolveGitHubToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const releaseRes = await fetch(`https://api.github.com/repos/${ownerRepo}/releases/latest`, { headers });
