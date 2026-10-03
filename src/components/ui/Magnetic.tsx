@@ -21,9 +21,11 @@ export default function Magnetic({ children, strength = 0.5, className = "" }: M
   const springY = useSpring(y, { stiffness: 180, damping: 17, mass: 0.8 });
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!enableHoverMotion || !ref.current) return;
+    // No hover motion means no offset is rendered — skip the layout read too.
+    if (!enableHoverMotion) return;
 
-    const offset = calculateMagneticOffset(ref.current.getBoundingClientRect(), e.clientX, e.clientY, strength);
+    // React attaches the ref before any pointer event can reach this handler.
+    const offset = calculateMagneticOffset(ref.current!.getBoundingClientRect(), e.clientX, e.clientY, strength);
     x.set(offset.x);
     y.set(offset.y);
   };
