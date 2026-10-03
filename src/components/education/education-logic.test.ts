@@ -70,7 +70,8 @@ describe('education logic', () => {
     const collections = buildEducationCollections(educationItems, prerequisiteCourses, honorsAndAffiliations);
 
     expect(collections.sortedEducationItems[0]?.period).toBe('Sep 2025 - Dec 2026');
-    expect(collections.sortedHonorsAndAffiliations[0].label).toContain('Item Review Panel');
+    expect(collections.sortedHonorsAndAffiliations[0].label).toContain('Magna Cum Laude');
+    expect(collections.sortedHonorsAndAffiliations[1].label).toContain('Item Review Panel');
     expect(collections.sortedPrerequisiteCourses.length).toBe(prerequisiteCourses.length);
   });
 

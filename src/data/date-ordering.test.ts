@@ -35,6 +35,7 @@ describe('date ordering utility', () => {
     expect(sortedProjects[0].title).toContain('Bridging Transitions');
     expect(sortedCertifications[0].name).toBe('Certified Nursing Assistant (CNA)');
     expect(sortedEducation[0].credential).toContain('Nursing Prerequisite Coursework');
-    expect(sortedHonors[0].label).toContain('Item Review Panel');
+    expect(sortedHonors[0].label).toContain('Magna Cum Laude');
+    expect(sortedHonors[1].label).toContain('Item Review Panel');
   });
 });

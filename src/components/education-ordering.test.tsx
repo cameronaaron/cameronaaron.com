@@ -41,8 +41,9 @@ describe('education ordering contract', () => {
     const honorPills = Array.from(container.querySelectorAll('[data-testid^="honor-pill-"]'));
     const values = honorPills.map((pill) => pill.textContent ?? '');
 
-    expect(values[0]).toContain('(Jul 2026)');
-    expect(values[1]).toContain('(Jun 2026)');
+    expect(values[0]).toContain('(Aug 2026)');
+    expect(values[1]).toContain('(Jul 2026)');
+    expect(values[2]).toContain('(Jun 2026)');
   });
 
   it('renders pulse indicators only on in-progress prerequisite rows', () => {

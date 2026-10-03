@@ -16,7 +16,7 @@ export interface TranscriptCourse {
 
 /**
  * Cameron's actual coursework, sourced from College_data/LAC_SR_TSRPT (LACCD
- * unofficial transcript, printed Aug 2026) and the Connecticut College /
+ * unofficial transcript, printed Oct 2026) and the Connecticut College /
  * UMass Amherst transcripts. Each course is tagged with the generic
  * requirement category it satisfies so it can be matched against any
  * program's prerequisite list (see matching-logic.ts). Courses that don't
@@ -153,6 +153,13 @@ export const transcriptCourses: TranscriptCourse[] = [
     grade: 'B+',
     gradePoints: 3.3,
     status: 'completed',
+  },
+  {
+    category: 'written-communication',
+    course: 'ENGL C1000 — Academic Reading & Writing (LAHC)',
+    institution: 'Los Angeles Harbor College',
+    units: 3,
+    status: 'in-progress',
   },
   {
     category: 'general-chemistry',

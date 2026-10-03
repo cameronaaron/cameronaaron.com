@@ -63,15 +63,33 @@ describe('data module coverage', () => {
 
     expect(laccd).toBeDefined();
     expect(laccd?.period).toBe('Sep 2025 - Dec 2026');
-    // Aug 28, 2026 LACCD transcript: cum GPA 3.72, 40.00 units earned.
-    expect(laccd?.details.some((d) => d.includes('3.72'))).toBe(true);
-    expect(laccd?.details.some((d) => d.includes('40.00'))).toBe(true);
+    // Oct 2, 2026 LACCD transcript: cum GPA 3.74 (157 grade points / 42 GPA
+    // units), 43.00 units earned. The Aug figures (3.72 / 40.00) predate
+    // POL SCI 019 posting.
+    expect(laccd?.details.some((d) => d.includes('3.74'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('43.00'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('POL SCI 019'))).toBe(true);
+    expect(laccd?.details.some((d) => d.includes('ENGL C1000'))).toBe(true);
     expect(laccd?.details.some((d) => d.includes("Dean's Honor List"))).toBe(true);
     expect(laccd?.details.some((d) => d.includes('CHEM 051'))).toBe(true);
     expect(laccd?.details.some((d) => d.includes('EKG'))).toBe(true);
 
     const sortedByDate = sortByDateDesc(educationItems, (item) => item.period);
     expect(sortedByDate[0].institution).toContain('Los Angeles Community College District');
+  });
+
+  it('records the Aug 2026 Associate of Arts and its Magna Cum Laude honor', () => {
+    const laccd = educationItems.find((item) =>
+      item.institution.includes('Los Angeles Community College District')
+    );
+    expect(laccd?.credential).toContain('Associate of Arts');
+    expect(laccd?.credential).toContain('Nursing Prerequisite Coursework');
+    expect(
+      laccd?.details.some(
+        (d) => d.includes('Natural and Applied Sciences and Mathematics') && d.includes('Magna Cum Laude') && d.includes('Aug 2026')
+      )
+    ).toBe(true);
+    expect(honorsAndAffiliations.some((h) => h.label.includes('Magna Cum Laude'))).toBe(true);
   });
 
   it('records the Summer 2026 STAT 101 statistics course as completed with an A', () => {
@@ -113,7 +131,7 @@ describe('data module coverage', () => {
     expect(springHonor?.label).toContain('LACCD');
   });
 
-  it('includes the NREMT EMT Item Review Panel recognition as the most recent honor', () => {
+  it('includes the NREMT EMT Item Review Panel recognition, second only to the A.A.', () => {
     const panelHonor = honorsAndAffiliations.find((h) => h.label.includes('Item Review Panel'));
 
     expect(panelHonor).toBeDefined();
@@ -122,7 +140,10 @@ describe('data module coverage', () => {
     expect(panelHonor?.url).toBe('https://www.nremt.org/verify-credentials');
 
     const sortedHonors = sortByDateDesc(honorsAndAffiliations, (h) => h.label);
-    expect(sortedHonors[0].label).toContain('Item Review Panel');
+    // The Aug 2026 A.A. (Magna Cum Laude) is now the newest; the Jul 2026
+    // panel follows it.
+    expect(sortedHonors[0].label).toContain('Magna Cum Laude');
+    expect(sortedHonors[1].label).toContain('Item Review Panel');
   });
 
   it('preserves testimonial source links for externally referenced recommendations', () => {
