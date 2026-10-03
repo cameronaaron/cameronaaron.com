@@ -67,6 +67,16 @@ describe('HomesteadOutboxGame', () => {
     expect(screen.getByTestId('ho-linear-verdict').textContent).toMatch(/^1 duplicate issue/);
   });
 
+  it('switching back to derived ids restores the no-duplicates guarantee', () => {
+    render(<HomesteadOutboxGame />);
+    fireEvent.click(screen.getByTestId('ho-scheme-random'));
+    expect(screen.getByTestId('ho-scheme-random').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(screen.getByTestId('ho-scheme-derived'));
+    expect(screen.getByTestId('ho-scheme-derived').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByTestId('ho-scheme-random').getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('disables logging once the outbox is full, and Reset empties it', () => {
     render(<HomesteadOutboxGame />);
     for (let i = 0; i < 6; i += 1) fireEvent.click(screen.getByTestId('ho-log-task'));

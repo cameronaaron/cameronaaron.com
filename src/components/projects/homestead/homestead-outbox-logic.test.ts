@@ -258,6 +258,14 @@ describe('the dispatcher', () => {
     expect(runDispatcher(game)).toBe(game);
   });
 
+  it('reports the earliest of several pending attempts, whatever their order', () => {
+    const base = createGame();
+    const pending = (eventId: number, nextAt: number) =>
+      ({ eventId, sink: 'discord', status: 'pending', attempts: 1, nextAt, lastError: null }) as const;
+    expect(nextDueAt({ ...base, deliveries: [pending(1, 40), pending(2, 10), pending(3, 25)] })).toBe(10);
+    expect(nextDueAt({ ...base, deliveries: [pending(1, 10), pending(2, 40)] })).toBe(10);
+  });
+
   it('says so when nothing is waiting', () => {
     expect(waitForNextRetry(createGame()).note).toBe('Nothing is waiting to retry.');
     const settled = waitUntilSettled(createGame());
@@ -290,6 +298,22 @@ describe('the Linear crash: why issue ids are derived', () => {
     expect(summarizeLinear(game.issues)).toEqual({ issues: 2, duplicates: 1 });
     expect(game.issues[0].id).not.toBe(game.issues[1].id);
     expect(game.randomIdsIssued).toBe(2);
+  });
+
+  it('a Linear delivery that runs again after its id was recorded files nothing new', () => {
+    // mirror_task's guard: a lease can lapse after the write-back, not only
+    // before it. Random ids make the guard the only thing preventing a second
+    // issue, since a fresh random id would never be found.
+    const recorded = logFarmEvent(setIdScheme(createGame(), 'random'), 'tracked-task');
+    expect(recorded.events[0].recordedIssueId).not.toBeNull();
+    const rerun = {
+      ...recorded,
+      deliveries: recorded.deliveries.map((d) => (d.sink === 'linear' ? { ...d, status: 'pending' as const, nextAt: recorded.now } : d)),
+    };
+    const game = runDispatcher(rerun);
+    expect(delivery(game, 1, 'linear').status).toBe('delivered');
+    expect(summarizeLinear(game.issues)).toEqual({ issues: 1, duplicates: 0 });
+    expect(game.randomIdsIssued).toBe(recorded.randomIdsIssued);
   });
 
   it('a low-stock crossing is just as safe under derived ids', () => {

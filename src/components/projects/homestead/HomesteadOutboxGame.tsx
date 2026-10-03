@@ -173,7 +173,8 @@ export default function HomesteadOutboxGame() {
               <span className="ml-2 font-mono text-xs text-cyan-200/70">{event.kind}</span>
             </p>
             <ul className="mt-2 flex flex-wrap gap-2">
-              {(grouped.get(event.id) ?? []).map((delivery) => (
+              {/* Every kind routes to at least Discord (pinned by the routing test), so each event has deliveries. */}
+              {grouped.get(event.id)!.map((delivery) => (
                 <li
                   key={delivery.sink}
                   className={`flex flex-wrap items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs ${getDeliveryClassName(delivery.status)}`}
