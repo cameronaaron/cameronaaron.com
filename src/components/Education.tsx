@@ -27,7 +27,7 @@ export default function Education() {
           className="[&>h2]:font-display"
         />
 
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-14">
           {sortedEducationItems.map((item, index) => (
             <article
               key={`${item.institution}-${item.credential}`}

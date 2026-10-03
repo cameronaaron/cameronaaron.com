@@ -105,7 +105,7 @@ export default function TwiceExceptionalGame() {
         </span>
       </div>
 
-      <div className="mb-5 grid gap-4 rounded-xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
+      <div className="mb-5 grid grid-cols-1 gap-4 rounded-xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
         <div>
           <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Composite score</span>
           <span className="mt-1 block text-xs text-muted-foreground/80">
@@ -144,7 +144,7 @@ export default function TwiceExceptionalGame() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {STUDENT_PROFILES.map((profile) => (
           <button
             key={profile}

@@ -140,7 +140,7 @@ export default function Testimonials() {
           })}
         </m.div>
 
-        <m.div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
+        <m.div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
           <AnimatePresence mode="popLayout">
             {visibleTestimonials.length === 0 ? (
               <m.div

@@ -69,7 +69,7 @@ export default function CollectiveIntelligenceGame() {
         evenly the conversation is shared. Try the all-star lineup and see.
       </p>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CANDIDATE_POOL.map((candidate) => {
           const isSelected = selected.includes(candidate.id);
           const atCapacity = complete && !isSelected;

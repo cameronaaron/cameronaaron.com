@@ -159,7 +159,7 @@ export default function BridgingTransitionsPage() {
         className="border-t border-white/10 py-12 md:py-16"
       >
         <div className="container mx-auto px-6">
-          <div className="grid gap-8 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
             <div className="lg:col-span-3">
               <h2 id="why-heading" className="mb-4 text-2xl font-bold text-white md:text-3xl">
                 Why the videos exist
@@ -198,7 +198,7 @@ export default function BridgingTransitionsPage() {
           <p className="mb-8 max-w-3xl text-gray-300">
             Each action is addressed to one office, and each is backed by one video in the series.
           </p>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {bridgingTransitions.actions.map((item) => (
               <article
                 key={item.audience}
@@ -227,7 +227,7 @@ export default function BridgingTransitionsPage() {
           <h2 id="takeaway-heading" className="mb-8 text-2xl font-bold text-white md:text-3xl">
             Take the poster with you
           </h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {bridgingTransitions.downloads.map((download) => (
               <a
                 key={download.href}

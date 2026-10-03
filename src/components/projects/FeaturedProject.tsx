@@ -47,7 +47,7 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
     >
       <Tilt intensity={5} className="h-full">
         <div
-          className="group relative grid md:grid-cols-2 gap-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-primary/30 transition-colors duration-500"
+          className="group relative grid grid-cols-1 md:grid-cols-2 gap-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-primary/30 transition-colors duration-500"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           data-cursor="interactive"

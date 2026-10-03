@@ -130,7 +130,7 @@ export default function Hero() {
       ) : null}
 
       <div className="container mx-auto px-6 pt-24 pb-16 md:pt-28 md:pb-20 relative z-10">
-        <div className="hero-layout grid md:grid-cols-2 gap-6 md:gap-12 items-center">
+        <div className="hero-layout grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center">
           {/* Pure-entrance motion.* here were all initial={false} — framer
               rendered them already-visible with no animation, so they were
               framer mount cost on the LCP-critical hero for zero visual effect.

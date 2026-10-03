@@ -84,7 +84,7 @@ export default function InternetPage() {
               return (
                 <div key={category}>
                   <h2 className="mb-4 text-2xl font-bold text-white">{category}</h2>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {items.map((item) => (
                       <article
                         key={`${item.title}-${item.period}`}

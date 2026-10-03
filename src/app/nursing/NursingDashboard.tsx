@@ -107,7 +107,7 @@ export default function NursingDashboard({ programs, transcriptCourses }: Nursin
                 {cityGroups.map((group) => (
                   <div key={group.city}>
                     <h2 className="mb-4 text-2xl font-bold text-white font-display">{group.city}</h2>
-                    <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                       {group.views.map((view) => (
                         <ProgramCard
                           key={view.program.id}

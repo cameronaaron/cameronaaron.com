@@ -82,7 +82,7 @@ export default function UdsDecoderGame() {
             </li>
           ))}
         </ol>
-        <dl className="grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-1 text-sm text-muted-foreground sm:grid-cols-2">
           <div>
             <dt className="inline text-white/70">Signal </dt>
             <dd className="inline">{challenge.label}</dd>
@@ -102,7 +102,7 @@ export default function UdsDecoderGame() {
         </dl>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {round.options.map((option) => (
           <button
             key={option.text}

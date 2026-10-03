@@ -136,7 +136,7 @@ export default function Skills() {
         </m.div>
 
         <m.div
-          className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12"
+          className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}

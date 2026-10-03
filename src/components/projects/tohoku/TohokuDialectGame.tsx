@@ -91,7 +91,7 @@ export default function TohokuDialectGame() {
         </span>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {round.options.map((option) => (
           <button
             key={option}
@@ -129,7 +129,7 @@ export default function TohokuDialectGame() {
         </button>
       ) : null}
 
-      <dl className="mt-6 grid gap-2 border-t border-white/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-3">
+      <dl className="mt-6 grid grid-cols-1 gap-2 border-t border-white/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-3">
         {(Object.keys(RULE_PROFILES) as Array<keyof typeof RULE_PROFILES>).map((rule) => (
           <div key={rule}>
             <dt className="font-medium text-white/70">{RULE_PROFILES[rule].label}</dt>

@@ -301,6 +301,40 @@ describe('mobile grids — a phone layout never falls back to an implicit auto c
     expect(phoneFallsBack, 'give these a base grid-template-columns (e.g. minmax(0, 1fr))').toEqual([]);
   });
 
+  it('every Tailwind grid given columns at a breakpoint also has base columns', () => {
+    // 2026-10: the CSS sweep above missed utility classes. /nursing's program
+    // grid was `grid lg:grid-cols-2`; below lg its implicit `auto` column grew
+    // to the max-content of the cards' `truncate` (nowrap) course lines, so
+    // each card rendered 539–742px wide on a 390px phone and the star button,
+    // progress pill and status chips were clipped off-screen (measured in
+    // Chromium). `grid-cols-1` is minmax(0, 1fr): the track can't outgrow the
+    // container.
+    const tsxFiles: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.name.endsWith('.tsx') && !entry.name.includes('.test.')) tsxFiles.push(full);
+      }
+    };
+    walk(resolve(process.cwd(), 'src'));
+
+    const offenders: string[] = [];
+    let breakpointGridCount = 0;
+    for (const file of tsxFiles) {
+      for (const match of readFileSync(file, 'utf8').matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
+        const tokens = (match[1] ?? match[2]).split(/\s+/);
+        // Bare `grid` only: `hidden md:grid` is not a grid on phones at all.
+        if (!tokens.includes('grid')) continue;
+        if (!tokens.some((token) => /^(?:[a-z0-9]+:)+grid-cols-/.test(token))) continue;
+        breakpointGridCount += 1;
+        if (!tokens.some((token) => token.startsWith('grid-cols-'))) offenders.push(`${file}: ${match[0].slice(0, 80)}`);
+      }
+    }
+    expect(breakpointGridCount, 'sweep matched nothing — the className parser is broken').toBeGreaterThan(0);
+    expect(offenders, 'add a base grid-cols-1 (minmax(0, 1fr)) to these grids').toEqual([]);
+  });
+
   it('every card element in a playable block gets its height reset, not just links', () => {
     // 2026-10: private-repo cards render as <article>; the reset named only
     // `a`, so those three cards stayed h-full and covered the next block's

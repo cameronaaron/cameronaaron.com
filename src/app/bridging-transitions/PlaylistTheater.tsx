@@ -90,7 +90,7 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
   const handlePlay = useCallback(() => setIsPlaying(true), []);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-5">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-3">
         <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/12 bg-black shadow-2xl shadow-black/50">
           {isPlaying ? (

@@ -160,7 +160,7 @@ export default function OramAccessGame() {
         </button>
       ) : null}
 
-      <dl className="mt-6 grid gap-2 border-t border-white/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-2">
+      <dl className="mt-6 grid grid-cols-1 gap-2 border-t border-white/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-2">
         {STORAGE_MODES.map(({ mode, label }) => (
           <div key={mode}>
             <dt className="font-medium text-white/70">{label}</dt>

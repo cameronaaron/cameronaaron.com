@@ -157,7 +157,7 @@ export default function CapstonePage() {
 
       <section className="py-16">
         <div className="container mx-auto px-6">
-          <div className="grid gap-8 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
             <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 lg:col-span-3">
               <h2 className="mb-4 text-2xl font-bold text-white">Project Objectives</h2>
               <ul className="space-y-3 text-gray-300">
@@ -196,7 +196,7 @@ export default function CapstonePage() {
       <section className="pb-20">
         <div className="container mx-auto px-6">
           <h2 className="mb-8 text-3xl font-bold text-white">Five-Video Series</h2>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {capstone.videos.map((video) => (
               <article
                 id={video.id}

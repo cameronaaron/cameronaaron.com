@@ -81,7 +81,7 @@ export default function CredentialsPage() {
       <section className="py-16">
         <div className="container mx-auto px-6">
           <h2 className="mb-6 text-3xl font-bold text-white">Academic Verification</h2>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {academicVerificationResources.map((resource) => (
               <article key={resource.url} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">{resource.institution}</p>
@@ -107,7 +107,7 @@ export default function CredentialsPage() {
       <section className="pb-20">
         <div className="container mx-auto px-6">
           <h2 className="mb-6 text-3xl font-bold text-white">Additional Professional Credentials</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {sortedCredentials.map((credential) => (
               <article
                 key={`${credential.name}-${credential.credentialId}`}
