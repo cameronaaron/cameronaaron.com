@@ -34,7 +34,7 @@ describe('SmallWorldGame', () => {
   it('undoes a step and moves on to the next pair', () => {
     render(<SmallWorldGame />);
     fireEvent.click(screen.getByTestId('small-world-choose-1'));
-    expect(screen.getByTestId('small-world-result').textContent).toBe('1 hops so far.');
+    expect(screen.getByTestId('small-world-result').textContent).toBe('1 hop so far.');
     fireEvent.click(screen.getByTestId('small-world-undo'));
     expect(screen.getByTestId('small-world-result').textContent).toBe('0 hops so far.');
     for (const person of [4, 14, 15]) fireEvent.click(screen.getByTestId(`small-world-choose-${person}`));

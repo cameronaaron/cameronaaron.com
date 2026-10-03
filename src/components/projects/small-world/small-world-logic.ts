@@ -204,8 +204,8 @@ export function getResultText(state: ChainState): string {
   const mine = hops(state.chain);
   const verdict =
     mine === hops(best)
-      ? `${mine} hops — as short as BFS finds.`
-      : `${mine} hops. BFS finds ${hops(best)}: ${formatPath(best)}.`;
+      ? `${formatHops(mine)} — as short as BFS finds.`
+      : `${formatHops(mine)}. BFS finds ${hops(best)}: ${formatPath(best)}.`;
   return verdict;
 }
 
@@ -249,4 +249,8 @@ export function buildChainLinkKeys(chain: readonly number[]): Set<string> {
   const keys = new Set<string>();
   for (let index = 1; index < chain.length; index += 1) keys.add(linkKey(chain[index - 1], chain[index]));
   return keys;
+}
+
+export function formatHops(count: number): string {
+  return `${count} ${count === 1 ? 'hop' : 'hops'}`;
 }

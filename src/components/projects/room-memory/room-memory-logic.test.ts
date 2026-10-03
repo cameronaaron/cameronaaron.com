@@ -64,7 +64,7 @@ describe('constants are the installation’s', () => {
     expect(SPEED_SMOOTHING_KEEP).toBe(0.65);
     expect([GALLERY_HALF_LIFE_MINUTES, TIME_COMPRESSION, DEMO_HALF_LIFE_SECONDS]).toEqual([120, 900, 8]);
     expect(FIELD_FLOOR).toBe(0.0001);
-    expect(DISPLAY_GAIN).toBe(6);
+    expect(DISPLAY_GAIN).toBe(20);
     expect(GROUND_RGB).toEqual([0, 0, 0]);
     expect(MEMORY_FIELD_RGB).toEqual([46, 104, 124]);
     expect(MEMORY_FIELD_ALPHA).toBe(0.62);
@@ -202,11 +202,11 @@ describe('rendering and input', () => {
   it('adds the memory teal to a black ground as light', () => {
     const field = createField();
     field[0] = 1;
-    field[1] = 0.05;
+    field[1] = 0.0125; // sqrt(0.0125 × 20) = 0.5
     const pixels = new Uint8ClampedArray(FIELD_CELLS * 4);
     writeFieldPixels(field, pixels);
     expect(Array.from(pixels.slice(0, 4))).toEqual([Math.round(46 * 0.62), Math.round(104 * 0.62), Math.round(124 * 0.62), 255]);
-    expect(Array.from(pixels.slice(4, 8))).toEqual([Math.round(46 * 0.3 * 0.62), Math.round(104 * 0.3 * 0.62), Math.round(124 * 0.3 * 0.62), 255]);
+    expect(Array.from(pixels.slice(4, 8))).toEqual([Math.round(46 * 0.5 * 0.62), Math.round(104 * 0.5 * 0.62), Math.round(124 * 0.5 * 0.62), 255]);
     expect(Array.from(pixels.slice(8, 12))).toEqual([0, 0, 0, 255]);
   });
 

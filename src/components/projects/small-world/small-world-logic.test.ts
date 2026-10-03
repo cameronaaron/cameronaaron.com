@@ -9,6 +9,7 @@ import {
   buildChainLinkKeys,
   createChain,
   extendChain,
+  formatHops,
   formatPath,
   getGroupFillClass,
   getLinkClassName,
@@ -154,6 +155,10 @@ describe('feedback', () => {
 });
 
 describe('presentation', () => {
+  it('pluralizes hops', () => {
+    expect([0, 1, 2].map(formatHops)).toEqual(['0 hops', '1 hop', '2 hops']);
+  });
+
   it('keys links order-independently and marks those the chain walks', () => {
     expect(linkKey(3, 9)).toBe('3-9');
     expect(linkKey(9, 3)).toBe('3-9');

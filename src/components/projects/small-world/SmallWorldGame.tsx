@@ -9,6 +9,7 @@ import {
   buildChainLinkKeys,
   createChain,
   extendChain,
+  formatHops,
   getGroupFillClass,
   getLinkClassName,
   getLinkDash,
@@ -94,7 +95,7 @@ export default function SmallWorldGame() {
               className={`${getGroupFillClass(person.group)} ${onChain.has(index) || index === target ? 'stroke-white' : 'stroke-transparent'}`}
               strokeWidth={0.5}
             />
-            <text x={person.x} y={person.y + 5} textAnchor="middle" className="fill-white/70 text-[2.6px]">
+            <text x={person.x} y={person.y + 5.6} textAnchor="middle" className="fill-white/80 text-[3.4px]">
               {person.name}
             </text>
           </g>
@@ -119,7 +120,7 @@ export default function SmallWorldGame() {
       )}
 
       <p role="status" aria-live="polite" data-testid="small-world-result" className="mt-4 min-h-[2.5rem] text-sm text-muted-foreground">
-        {complete ? getResultText(state) : `${hops(state.chain)} hops so far.`}
+        {complete ? getResultText(state) : `${formatHops(hops(state.chain))} so far.`}
       </p>
       {mutualityNote ? (
         <p className="mb-3 text-sm text-amber-200/90" data-testid="small-world-note">

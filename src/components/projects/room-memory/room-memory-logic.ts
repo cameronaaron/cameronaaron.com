@@ -14,7 +14,7 @@
  * an image of anyone: it knows only a position and a speed. Two honest
  * changes for a web page, both named: time is compressed 900× (the default
  * 120-minute half-life becomes 8 seconds) so forgetting is watchable, and a
- * display gain lifts the faint field to a visible level. The ratio between a
+ * square-root display gain lifts the faint field to a visible level. The ratio between a
  * still mark and a moving one is unchanged.
  *
  * Colours are the installation's dark-room palette (lib/palette.ts): a black
@@ -46,8 +46,14 @@ export const TIME_COMPRESSION = 900;
 export const DEMO_HALF_LIFE_SECONDS = (GALLERY_HALF_LIFE_MINUTES * 60) / TIME_COMPRESSION;
 export const FIELD_FLOOR = 0.0001;
 
-/** Lifts the faint field into visible range; applied at display only. */
-export const DISPLAY_GAIN = 6;
+/**
+ * Display only: brightness = sqrt(value × gain). The stored field is the
+ * installation's; a linear 6× gain was measured in a real browser to leave a
+ * walked trail invisible (1.2 s of stillness rendered near RGB 9,20,24), so
+ * the square root lifts faint memory the way the projected particle field
+ * makes it legible on a wall.
+ */
+export const DISPLAY_GAIN = 20;
 
 export const GROUND_RGB: readonly [number, number, number] = [0, 0, 0];
 export const MEMORY_FIELD_RGB: readonly [number, number, number] = [46, 104, 124];
@@ -167,7 +173,7 @@ export function stepRoom(state: RoomState, dtMs: number): void {
 export function writeFieldPixels(field: Float32Array, pixels: Uint8ClampedArray): void {
   const [r, g, b] = MEMORY_FIELD_RGB;
   for (let index = 0; index < field.length; index += 1) {
-    const intensity = Math.min(1, field[index] * DISPLAY_GAIN) * MEMORY_FIELD_ALPHA;
+    const intensity = Math.min(1, Math.sqrt(field[index] * DISPLAY_GAIN)) * MEMORY_FIELD_ALPHA;
     const offset = index * 4;
     pixels[offset] = GROUND_RGB[0] + r * intensity;
     pixels[offset + 1] = GROUND_RGB[1] + g * intensity;
