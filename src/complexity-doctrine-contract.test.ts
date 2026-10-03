@@ -410,7 +410,13 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
     expect(preCommit, 'pre-commit must verify the lockfile is in sync').toContain('verify-lockfile-sync');
     expect(preCommit, 'pre-commit must type-check').toContain('type-check');
     expect(preCommit, 'pre-commit must lint with zero warnings').toContain('lint');
-    expect(preCommit, 'pre-commit must run the full test suite, not a subset').toMatch(/pnpm test(?!:)/);
+    // The full suite runs under the coverage gate: CI's 100% thresholds were
+    // enforced only in CI, so from 2026-09-06 every push went red there while
+    // each commit passed locally — a month of uncovered code before anyone
+    // looked. Istanbul instrumentation measured ~0s extra on this suite.
+    expect(preCommit, 'pre-commit must run the full test suite under the coverage gate').toMatch(
+      /pnpm run test:coverage(?![:\w])/,
+    );
   });
 
   it('pre-push runs everything pre-commit runs, as a strict prefix (redundant safety net)', () => {
@@ -429,8 +435,40 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
       true,
     );
     expect(prePush, 'pre-push must additionally build and check artifact-level performance budgets').toMatch(
-      /pnpm run build && node scripts\/checks\/performance-budgets\.mjs$/,
+      /pnpm run build && node scripts\/checks\/performance-budgets\.mjs/,
     );
+  });
+
+  it('no CI step is the first place a failure can surface — each runs locally before push', () => {
+    // The class behind CI's month of red (2026-09-06 → 2026-10-03): a step
+    // CI ran and no hook did. Every `pnpm run X` in a workflow must appear in
+    // pre-push, or be a vitest file subset of the full suite pre-commit
+    // already runs (verified below, not taken on trust). A new CI-only step
+    // fails here until it gets a local equivalent.
+    const SUITE_SUBSETS = new Set(['test:modularization', 'test:repo:hygiene', 'test:freshness']);
+    const prePush = pkg['simple-git-hooks']?.['pre-push'] ?? '';
+    const workflowDir = join(ROOT, '.github', 'workflows');
+    const ciScripts = new Set<string>();
+    for (const file of readdirSync(workflowDir)) {
+      for (const match of readFileSync(join(workflowDir, file), 'utf8').matchAll(/^\s+run: pnpm run (\S+)/gm)) {
+        ciScripts.add(match[1]);
+      }
+    }
+    expect(ciScripts.size, 'the workflow parse found no steps — the sweep would pass vacuously').toBeGreaterThan(5);
+
+    const missing: string[] = [];
+    for (const name of ciScripts) {
+      const script = pkg.scripts?.[name] ?? '';
+      if (SUITE_SUBSETS.has(name)) {
+        expect(script, `${name} is listed as a suite subset, so it must be a plain vitest file run`).toMatch(
+          /^(sh -c ')?vitest run (?!.*--)/,
+        );
+        continue;
+      }
+      if (script === 'node scripts/checks/performance-budgets.mjs' && prePush.includes(script)) continue;
+      if (!new RegExp(`pnpm run ${name.replace(/[:.]/g, '\\$&')}(?![:\\w])`).test(prePush)) missing.push(name);
+    }
+    expect(missing, 'CI step(s) with no local equivalent — add each to pre-push').toEqual([]);
   });
 
   it('test:complexity stays a fast, offline, standalone subset for iterative dev use', () => {
@@ -460,7 +498,7 @@ describe('complexity-doctrine-contract — assured before every commit', () => {
 
   it('the shared pre-commit/pre-push gate runs the full suite', () => {
     const prePush = pkg['simple-git-hooks']?.['pre-push'] ?? '';
-    expect(prePush).toContain('pnpm test');
+    expect(prePush).toContain('pnpm run test:coverage');
     expect(prePush).toContain('type-check');
     expect(prePush).toContain('lint');
   });

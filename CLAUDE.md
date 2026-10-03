@@ -68,12 +68,18 @@ brings the old history back.
 Hook gate (simple-git-hooks): **pre-commit runs the full gate, and pre-push
 runs that same gate as a strict prefix plus more** — lockfile sync, a
 gitleaks staged-diff scan, type-check, zero-warning lint, the entire test
-suite (every contract, including networked freshness checks), and mutation
+suite under the 100% coverage gate (every contract, including networked
+freshness checks), and mutation
 testing scoped to whichever changed files are logic modules (fails the
 commit if a changed logic module's mutation score drops below the threshold
 in `stryker.config.mjs`). A red gate blocks the commit itself. Pre-push runs
-the same gate **plus a full-history gitleaks scan, a production build, and
-`scripts/checks/performance-budgets.mjs`** (the build+budgets step was added
+the same gate **plus a full-history gitleaks scan, the V8 coverage
+cross-check, a production build, `scripts/checks/performance-budgets.mjs`,
+Pages parity and the SEO check** — every step CI runs, so CI is never the
+first place a failure surfaces (`complexity-doctrine-contract` sweeps
+`.github/workflows` and fails on a CI-only step; added 2026-10-03 after the
+coverage gate, then CI-only, sat red on every push for a month while each
+commit passed locally) (the build+budgets step was added
 2026-07-23 after the RSC migration's HTML growth sat unflagged for five days
 — pushes auto-deploy, so the artifact-integrity checks must gate the push, not
 just the manual `deploy:prod` path; the gitleaks steps were added 2026-08
