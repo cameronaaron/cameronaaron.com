@@ -27,8 +27,10 @@ import { SectionHandoff, SectionReveal } from '@/components/ui/SectionTransition
 import VelocityMarquee from '@/components/ui/VelocityMarquee';
 import RibbonBandLazy from '@/components/ui/RibbonBandLazy';
 import { CONTACT_MARQUEE_PHRASES, HERO_MARQUEE_PHRASES } from '@/components/ui/velocity-marquee-logic';
+import { HOME_FONT_PRELOADS, preloadFontFiles } from './font-preloads';
 
 export default function Home() {
+  preloadFontFiles(HOME_FONT_PRELOADS);
   return (
     <>
       {/* First focusable element on the page, ahead of PageChrome's floating

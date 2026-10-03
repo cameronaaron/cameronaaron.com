@@ -2562,6 +2562,22 @@ the measurement on record:
   resource the *current viewport* actually paints — `as=image` preloads are
   media-scoped, and favicon/manifest assets are never preloaded. Enforced by
   `headers-integrity-contract`'s preload-hygiene sweep.
+  **Fonts too (2026-10-03):** next/font preloads a font on every route
+  under the layout that declares it, so all six routes spent 64KB of
+  first-wave bandwidth on Bricolage and Geist Mono. Only the home page
+  paints them above the fold (measured with `FontFace.status` after load,
+  no scroll); on the poster's QR landing page they were pure contention.
+  The layout now declares them `preload: false`, and the routes that paint
+  them hint them through `src/app/font-preloads.ts`. Two framework facts,
+  neither in the docs: the `preload` flag **renames the emitted file**
+  (`-s.p.<hash>.woff2` vs `-s.<hash>.woff2`), so a second, preloading
+  declaration fetches a second copy instead of warming the first; and a
+  `<Link>` prefetch **replays the target route's preload hints** into the
+  current page, so `/capstone` still fetches the home fonts, but after the
+  load event, to warm the likely next click. Enforced by
+  `performance-budgets.mjs` (every font preload must name a file a built
+  `@font-face` uses, and accent fonts only on routes in
+  `ROUTES_PAINTING_ACCENT_FONTS`) and `font-preloads.test.ts`.
 - **Vendor bytes are patchable — "not fixable from `src/`" is not
   "unfixable."** Next.js unconditionally ships two legacy-polyfill bundles;
   both are now empty via `pnpm patch` (§4.7's `polyfill-module` entry and

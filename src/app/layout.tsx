@@ -13,15 +13,20 @@ const manrope = Manrope({
   preload: true,
 });
 
+// Not preloaded here: a layout-level preload lands on every route, and only
+// the home page paints these above the fold (measured 2026-10-03). Routes that
+// do call preloadFontFiles() from ./font-preloads.
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   display: 'swap',
+  preload: false,
   variable: '--font-display',
 });
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: 'swap',
+  preload: false,
   variable: '--font-mono-accent',
   weight: ['400', '500'],
 });

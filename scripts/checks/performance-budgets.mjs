@@ -214,6 +214,50 @@ if (existsSync(homeHtmlPath)) {
   }
 }
 
+// Font preloads are high-priority requests in the first wave, so each one must
+// be a file the page's CSS can use, and only routes that paint the font in
+// their first viewport may ask for it. All six routes once preloaded the two
+// accent fonts (64KB) through the root layout while only the home page painted
+// them above the fold (measured 2026-10-03). Accent fonts are now hinted per
+// route by src/app/font-preloads.ts, whose hard-coded content-hashed names go
+// stale on a font or next/font update; the first check below catches that.
+const ROUTES_PAINTING_ACCENT_FONTS = {
+  'index.html': ['Bricolage Grotesque', 'Geist Mono'],
+  'nursing.html': ['Bricolage Grotesque'],
+};
+const BODY_FONT_FAMILY = 'Manrope';
+const fontFamilyByFile = new Map();
+for (const cssFile of cssFiles) {
+  for (const [, block] of readFileSync(cssFile, 'utf8').matchAll(/@font-face\{([^}]*)\}/g)) {
+    const family = /font-family:\s*([^;]+)/.exec(block)?.[1].replace(/["']/g, '').trim();
+    for (const [, url] of block.matchAll(/url\(([^)]+)\)/g)) {
+      fontFamilyByFile.set(url.replace(/["']/g, '').split('/').pop(), family);
+    }
+  }
+}
+for (const htmlFile of htmlFiles) {
+  const relativePath = relative(outDir, htmlFile);
+  const allowed = new Set([BODY_FONT_FAMILY, ...(ROUTES_PAINTING_ACCENT_FONTS[relativePath] ?? [])]);
+  for (const tag of readFileSync(htmlFile, 'utf8').matchAll(/<link rel="preload"[^>]*as="font"[^>]*>/g)) {
+    const href = /href="([^"]+)"/.exec(tag[0])?.[1] ?? '';
+    const fileName = href.split('/').pop();
+    const family = fontFamilyByFile.get(fileName);
+    if (!existsSync(resolve(outDir, href.replace(/^\//, ''))) || family === undefined) {
+      const emitted = [...fontFamilyByFile].map(([file, fam]) => `${fam} → /_next/static/media/${file}`).join('; ');
+      errors.push(
+        `out/${relativePath} preloads ${href}, which no built @font-face uses — the browser fetches it and ` +
+          `throws it away. If a font or next/font update renamed it, update src/app/font-preloads.ts. Emitted: ${emitted}`,
+      );
+    } else if (!allowed.has(family)) {
+      errors.push(
+        `out/${relativePath} preloads ${family}, which it does not paint in its first viewport. ` +
+          'Keep accent-font preloads route-scoped (src/app/font-preloads.ts), or add the route to ' +
+          'ROUTES_PAINTING_ACCENT_FONTS after measuring that it paints the font above the fold.',
+      );
+    }
+  }
+}
+
 // Every emitted page must describe itself in its own <head>. The 404 once
 // inherited the root layout's homepage <title> and `index, follow` robots tags
 // alongside the `noindex` Next injects for not-found — two contradictory crawl
