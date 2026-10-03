@@ -42,6 +42,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { detectSoftNotFound } from '../scripts/checks/soft-not-found.mjs';
+
 const ROOT = resolve(process.cwd());
 const DATA_DIR = join(ROOT, 'src', 'data');
 // Lives next to the generator script, not in src/data/ — that directory's
@@ -163,5 +165,40 @@ describe('external-links-contract — every external URL is verified live', () =
       insecure,
       `http:// URL(s) — use https:// (verify the host supports it first):\n${insecure.map((u) => `  ${u}`).join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+describe('external-links-contract — a 200 is not proof a page exists (soft 404)', () => {
+  // 2026-10: LinkedIn re-slugged three essays and served the old URLs as
+  // HTTP 200 + "We can't find the page". The ledger called them live.
+  const linkedInNotFound =
+    '<html><head><script>var x="We can’t find the page you’re looking for"</script></head>' +
+    '<body><main><h1>We can’t find the page you’re looking for.</h1></main></body></html>';
+  const linkedInArticle = '<html><body><h1>Differences in Standard Japanese and Tohoku Dialects</h1></body></html>';
+
+  it("flags LinkedIn's not-found page served with a 200", () => {
+    expect(detectSoftNotFound('www.linkedin.com', linkedInNotFound)).not.toBeNull();
+  });
+
+  it('passes a real LinkedIn article', () => {
+    expect(detectSoftNotFound('www.linkedin.com', linkedInArticle)).toBeNull();
+  });
+
+  it('ignores a signature phrase that exists only inside a script', () => {
+    const bundleOnly = '<html><head><script>var x="We can’t find the page you’re looking for"</script></head><body>Essay</body></html>';
+    expect(detectSoftNotFound('www.linkedin.com', bundleOnly)).toBeNull();
+  });
+
+  it('never applies one host’s signature to another host', () => {
+    // Parchment renders a live credential while its bundle contains "no longer
+    // available"; a generic phrase list misreported it dead.
+    expect(detectSoftNotFound('www.parchment.com', linkedInNotFound)).toBeNull();
+    expect(detectSoftNotFound('notlinkedin.com', linkedInNotFound)).toBeNull();
+  });
+
+  it('the networked checker actually consults the detector before recording "live"', () => {
+    const checker = readFileSync(join(ROOT, 'scripts', 'checks', 'check-external-links.mjs'), 'utf8');
+    expect(checker).toMatch(/import \{[^}]*detectSoftNotFound[^}]*\} from '\.\/soft-not-found\.mjs'/);
+    expect(checker).toMatch(/detectSoftNotFound\(finalHostname, await response\.text\(\)\)/);
   });
 });

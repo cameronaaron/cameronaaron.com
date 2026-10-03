@@ -461,6 +461,7 @@ Site content lives in `src/data/`:
 | `metadata.ts` | Root `<head>` metadata — `buildRootMetadata()` / `buildRootViewport()`, plus the `SEO_KEYWORDS` catalog, consumed by `src/app/layout.tsx`. Sub-pages (`capstone`, `credentials`, `internet`) each have their own co-located `./metadata.ts` with a `build*Metadata(pageUrl)` function |
 
 Every external URL referenced from `src/data` is tracked in a generated ledger — `scripts/checks/external-links-ledger.json` (do not hand-edit; refresh with `pnpm run check:links` after adding or changing any external URL). `src/external-links-contract.test.ts` fails the commit if the ledger shows a dead link, is missing an entry, has an orphaned entry, or has drifted stale (45+ days unverified).
+An HTTP 200 is not proof of life: LinkedIn serves a re-slugged article's old URL as 200 + "We can't find the page", and three essays sat dead behind a `live` ledger entry until 2026-10. The checker reads the body for hosts listed in `scripts/checks/soft-not-found.mjs`; add a host there only after seeing its real not-found page (a generic phrase list misfired on Parchment's JS bundle).
 
 ## Quick reference patterns
 

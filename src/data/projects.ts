@@ -155,7 +155,7 @@ export const projects: Project[] = [
   {
     title: "Behavioral Medicine Career: Paperbrief Literature Review",
     description: "LinkedIn Pulse essay exploring the intersection of behavioral medicine and career development, examining key literature and practical applications.",
-    link: "https://www.linkedin.com/pulse/behavioral-medicine-career-paperbrief-literature-review-aaron",
+    link: "https://www.linkedin.com/pulse/behavioral-medicine-career-paperbrief-literature-review-aaron-",
     tags: ["Publication", "Behavioral Medicine", "Research"],
     period: "2020",
     cta: "Read Article",
@@ -163,7 +163,7 @@ export const projects: Project[] = [
   {
     title: "Social Intelligence Effect on Team Dynamic",
     description: "LinkedIn Pulse essay examining how social intelligence influences team dynamics and interpersonal effectiveness in collaborative settings.",
-    link: "https://www.linkedin.com/pulse/social-intelligence-effect-team-dynamic-cameron-aaron",
+    link: "https://www.linkedin.com/pulse/social-intelligence-effect-team-dynamic-cameron-aaron-",
     tags: ["Publication", "Leadership", "Team Dynamics"],
     period: "2020",
     cta: "Read Article",
@@ -172,7 +172,7 @@ export const projects: Project[] = [
   {
     title: "Differences Between Standard Japanese & Tohoku Dialects",
     description: "LinkedIn Pulse essay exploring linguistic differences between standard Japanese and Tohoku regional dialects.",
-    link: "https://www.linkedin.com/pulse/differences-standard-japanese-tohoku-dialects-cameron-aaron",
+    link: "https://www.linkedin.com/pulse/differences-standard-japanese-tohoku-dialects-cameron-aaron-",
     tags: ["Publication", "Linguistics", "Cultural Studies"],
     period: "2020",
     cta: "Read Article",

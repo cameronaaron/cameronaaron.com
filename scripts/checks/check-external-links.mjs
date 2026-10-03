@@ -41,6 +41,12 @@
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { SOFT_NOT_FOUND_SIGNATURES, detectSoftNotFound } from './soft-not-found.mjs';
+
+function hasSoftNotFoundSignature(hostname) {
+  return Object.keys(SOFT_NOT_FOUND_SIGNATURES).some((host) => hostname === host || hostname.endsWith(`.${host}`));
+}
+
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const DATA_DIR = join(ROOT, 'src', 'data');
 // Lives next to this script, not in src/data/ — that directory's hygiene
@@ -132,6 +138,15 @@ async function checkUrl(url, { retries = 2, timeoutMs = 15_000 } = {}) {
       // checking the original host would misclassify a live, redirecting
       // DOI as dead.
       const finalHostname = new URL(response.url || url).hostname;
+      // A 200 can still be a not-found page (soft-not-found.mjs). Only
+      // hosts with a measured signature pay for reading the body.
+      const softNotFound =
+        response.ok && hasSoftNotFoundSignature(finalHostname)
+          ? detectSoftNotFound(finalHostname, await response.text())
+          : null;
+      if (softNotFound) {
+        return { status: 'dead', httpCode: response.status, finalUrl: response.url, error: `soft 404: "${softNotFound}"` };
+      }
       return {
         status: classify(response.status, finalHostname),
         httpCode: response.status,
