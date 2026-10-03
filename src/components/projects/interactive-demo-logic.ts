@@ -21,8 +21,8 @@ export interface DemoDescriptor {
 
 export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
   'dna-snp-game': {
-    title: 'Spot the SNP',
-    teaser: 'Find the single base that differs, and see whether it was a transition or a transversion.',
+    title: 'Read the Raw File',
+    teaser: 'Run the mirror’s real pipeline on a line of 23andMe data. Some lines never reach the glass, and one of the reasons is a bug.',
   },
   'reaction-time-game': {
     title: 'Catch the Lapse',

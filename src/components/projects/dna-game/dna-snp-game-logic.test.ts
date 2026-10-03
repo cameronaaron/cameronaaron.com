@@ -1,386 +1,270 @@
 import { describe, expect, it } from 'vitest';
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
-import type { Base, DnaRound } from './dna-snp-game-logic';
+
 import {
-  BASES,
-  BASE_COLOR_CLASSES,
-  INITIAL_ROUND_SEED,
   INITIAL_SCORE_STATE,
-  ROUND_ADVANCE_DELAY_MS,
-  SCORE_INCREMENT,
-  STRAND_LENGTH,
-  checkGuess,
+  MIN_MAGNITUDE,
+  NOTHING_SHOWN,
+  POSITIONS,
+  RAW_FILE_HEADER,
+  ROUNDS,
+  SNPEDIA_ROWS,
+  buildRound,
   computeScoreUpdate,
-  generateRound,
-  getBaseColorClass,
-  getRoundResultMessage,
-  chooseVariantBase,
-  TRANSITION_PARTNER,
-  TRANSITION_PROBABILITY,
-  TRANSITION_TRANSVERSION_RATIO,
-  getTileAriaLabel,
-  getTileClassName,
-  getTileVisualState,
+  describeLookup,
+  explainResult,
+  getInitialRound,
+  getNextRound,
+  getOptionClassName,
+  getOptionVisualState,
+  getResultMessage,
+  normalizeGenotype,
+  runMirror,
 } from './dna-snp-game-logic';
 
-describe('generateRound', () => {
-  it('is deterministic for a fixed seed and length — exact reproduction', () => {
-    const first = generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH);
-    const second = generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH);
-
-    expect(second).toEqual(first);
-  });
-
-  it('produces the pinned reference/sample/snpIndex for INITIAL_ROUND_SEED — hydration contract', () => {
-    // Pinned exact values: the very first round shown must be byte-identical
-    // between server render and client first paint. If this snapshot ever
-    // needs to change (e.g. STRAND_LENGTH changes), regenerate deliberately —
-    // never let it silently drift.
-    const round = generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH);
-
-    expect(round.reference).toHaveLength(STRAND_LENGTH);
-    expect(round.sample).toHaveLength(STRAND_LENGTH);
-    expect(round.snpIndex).toBeGreaterThanOrEqual(0);
-    expect(round.snpIndex).toBeLessThan(STRAND_LENGTH);
-  });
-
-  it('reference and sample differ at exactly one index — the SNP', () => {
-    const round = generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH);
-
-    let diffCount = 0;
-    let diffIndex = -1;
-    for (let i = 0; i < STRAND_LENGTH; i += 1) {
-      if (round.reference[i] !== round.sample[i]) {
-        diffCount += 1;
-        diffIndex = i;
-      }
-    }
-
-    expect(diffCount).toBe(1);
-    expect(diffIndex).toBe(round.snpIndex);
-  });
-
-  it('the mutated base is always a real, different base than the original', () => {
-    for (const seed of [1, 2, 3, 42, 999, INITIAL_ROUND_SEED]) {
-      const round = generateRound(seed, STRAND_LENGTH);
-      const original = round.reference[round.snpIndex];
-      const mutated = round.sample[round.snpIndex];
-
-      expect(BASES).toContain(mutated);
-      expect(mutated).not.toBe(original);
-    }
-  });
-
-  it('every base in both strands is one of the four valid bases', () => {
-    const round = generateRound(7, STRAND_LENGTH);
-
-    for (const base of [...round.reference, ...round.sample]) {
-      expect(BASES).toContain(base);
-    }
-  });
-
-  it('produces a different round for a different seed', () => {
-    const roundA = generateRound(1, STRAND_LENGTH);
-    const roundB = generateRound(2, STRAND_LENGTH);
-
-    expect(roundA).not.toEqual(roundB);
-  });
-
-  it('respects a custom length', () => {
-    const round = generateRound(INITIAL_ROUND_SEED, 5);
-
-    expect(round.reference).toHaveLength(5);
-    expect(round.sample).toHaveLength(5);
-    expect(round.snpIndex).toBeLessThan(5);
-  });
-
-  it('defaults to STRAND_LENGTH when no length is passed', () => {
-    const round = generateRound(INITIAL_ROUND_SEED);
-
-    expect(round).toEqual(generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH));
-    expect(round.reference).toHaveLength(STRAND_LENGTH);
-  });
-
-  it('derives each base and the SNP position as exactly Math.floor(random() * N) — not random() / N', () => {
-    // Independently re-derives the expected sequence from the same seeded
-    // PRNG, calling it in the identical order generateRound does, rather
-    // than asserting loose membership/range checks that a `*` -> `/`
-    // mutant can still satisfy for many seeds.
-    const seed = 555;
-    const length = 8;
-    const random = createSeededRandom(seed);
-
-    const expectedReference: Base[] = [];
-    for (let i = 0; i < length; i += 1) {
-      expectedReference.push(BASES[Math.floor(random() * BASES.length)]);
-    }
-    const expectedSnpIndex = Math.floor(random() * length);
-    // Same two draws, in the same order, that generateRound consumes for the
-    // transition/transversion decision.
-    const expectedVariant = chooseVariantBase(expectedReference[expectedSnpIndex], random(), random());
-
-    const round = generateRound(seed, length);
-    expect(round.reference).toEqual(expectedReference);
-    expect(round.snpIndex).toBe(expectedSnpIndex);
-    expect(round.sample[expectedSnpIndex]).toBe(expectedVariant.base);
-    expect(round.substitutionKind).toBe(expectedVariant.kind);
-  });
-
-  it('always changes exactly one base, and changes it to a genuinely different one', () => {
-    for (let seed = 1; seed <= 40; seed += 1) {
-      const round = generateRound(seed, STRAND_LENGTH);
-      const differing: number[] = [];
-      for (let i = 0; i < STRAND_LENGTH; i += 1) {
-        if (round.reference[i] !== round.sample[i]) differing.push(i);
-      }
-      expect(differing).toEqual([round.snpIndex]);
-    }
-  });
-
-  it('reproduces the real transition/transversion bias across many rounds', () => {
-    // The scientific point of the fix: uniform choice among the 3 alternative
-    // bases would give Ti/Tv = 0.5 (2 transversion partners vs 1 transition
-    // partner). Real human variation runs ~2:1 the other way.
-    let transitions = 0;
-    let transversions = 0;
-    for (let seed = 1; seed <= 4000; seed += 1) {
-      const round = generateRound(seed, STRAND_LENGTH);
-      if (round.substitutionKind === 'transition') transitions += 1;
-      else transversions += 1;
-    }
-
-    const observedRatio = transitions / transversions;
-    expect(observedRatio).toBeGreaterThan(1.7);
-    expect(observedRatio).toBeLessThan(2.4);
-    // And decisively on the correct side of the uniform-draw value it replaced.
-    expect(observedRatio).toBeGreaterThan(1);
-  });
-
-  it('labels every generated substitution consistently with the bases it changed', () => {
-    for (let seed = 1; seed <= 60; seed += 1) {
-      const round = generateRound(seed, STRAND_LENGTH);
-      const from = round.reference[round.snpIndex];
-      const to = round.sample[round.snpIndex];
-      const expected = TRANSITION_PARTNER[from] === to ? 'transition' : 'transversion';
-      expect(round.substitutionKind).toBe(expected);
-    }
-  });
-});
-
-describe('chooseVariantBase', () => {
-  it('returns the same-class partner for a draw below the transition probability', () => {
-    expect(chooseVariantBase('A', 0, 0)).toEqual({ base: 'G', kind: 'transition' });
-    expect(chooseVariantBase('G', 0, 0)).toEqual({ base: 'A', kind: 'transition' });
-    expect(chooseVariantBase('C', 0, 0)).toEqual({ base: 'T', kind: 'transition' });
-    expect(chooseVariantBase('T', 0, 0)).toEqual({ base: 'C', kind: 'transition' });
-  });
-
-  it('crosses chemical class for a draw at or above the transition probability', () => {
-    expect(chooseVariantBase('A', 0.99, 0)).toEqual({ base: 'C', kind: 'transversion' });
-    expect(chooseVariantBase('A', 0.99, 0.99)).toEqual({ base: 'T', kind: 'transversion' });
-    expect(chooseVariantBase('C', 0.99, 0)).toEqual({ base: 'A', kind: 'transversion' });
-    expect(chooseVariantBase('C', 0.99, 0.99)).toEqual({ base: 'G', kind: 'transversion' });
-    // G and T weren't exercised above — each has its own TRANSVERSION_PARTNERS
-    // entry, and a mutation sweep found both were untested for the
-    // transversion branch (only their transition partner was covered).
-    expect(chooseVariantBase('G', 0.99, 0)).toEqual({ base: 'C', kind: 'transversion' });
-    expect(chooseVariantBase('G', 0.99, 0.99)).toEqual({ base: 'T', kind: 'transversion' });
-    expect(chooseVariantBase('T', 0.99, 0)).toEqual({ base: 'A', kind: 'transversion' });
-    expect(chooseVariantBase('T', 0.99, 0.99)).toEqual({ base: 'G', kind: 'transversion' });
-  });
-
-  it('treats the transition probability itself as the exclusive upper bound', () => {
-    // At exactly 2/3 the draw is NOT a transition — pins the boundary a
-    // '<' -> '<=' mutant would otherwise slip through.
-    expect(chooseVariantBase('A', TRANSITION_PROBABILITY, 0).kind).toBe('transversion');
-    expect(chooseVariantBase('A', TRANSITION_PROBABILITY - 1e-9, 0).kind).toBe('transition');
-  });
-
-  it('splits the two transversion partners at exactly one half', () => {
-    expect(chooseVariantBase('A', 0.99, 0.5)).toEqual({ base: 'T', kind: 'transversion' });
-    expect(chooseVariantBase('A', 0.99, 0.4999).base).toBe('C');
-  });
-
-  it('pins the ratio and the probability it implies', () => {
-    expect(TRANSITION_TRANSVERSION_RATIO).toBe(2);
-    expect(TRANSITION_PROBABILITY).toBeCloseTo(2 / 3, 12);
-  });
-
-  it('never returns the reference base itself', () => {
-    for (const base of BASES) {
-      for (const kindDraw of [0, 0.5, 0.66, 0.9]) {
-        for (const transversionDraw of [0, 0.5, 0.9]) {
-          expect(chooseVariantBase(base, kindDraw, transversionDraw).base).not.toBe(base);
-        }
-      }
-    }
-  });
-});
-
-describe('checkGuess', () => {
-  it('is correct only when the guessed index equals the SNP index', () => {
-    const round = generateRound(INITIAL_ROUND_SEED, STRAND_LENGTH);
-
-    expect(checkGuess(round, round.snpIndex)).toBe(true);
-    expect(checkGuess(round, (round.snpIndex + 1) % STRAND_LENGTH)).toBe(false);
-  });
-});
-
-describe('computeScoreUpdate', () => {
-  it('increments score and streak on a correct guess', () => {
-    const next = computeScoreUpdate(INITIAL_SCORE_STATE, true);
-
-    expect(next).toEqual({ score: SCORE_INCREMENT, streak: 1, bestStreak: 1 });
-  });
-
-  it('accumulates streak across consecutive correct guesses and tracks best streak', () => {
-    let state = INITIAL_SCORE_STATE;
-    state = computeScoreUpdate(state, true);
-    state = computeScoreUpdate(state, true);
-    state = computeScoreUpdate(state, true);
-
-    expect(state).toEqual({ score: 3, streak: 3, bestStreak: 3 });
-  });
-
-  it('resets streak but never decrements score on an incorrect guess', () => {
-    let state = { score: 5, streak: 4, bestStreak: 4 };
-    state = computeScoreUpdate(state, false);
-
-    expect(state).toEqual({ score: 5, streak: 0, bestStreak: 4 });
-  });
-
-  it('preserves best streak after a miss even though the live streak resets', () => {
-    const afterMiss = computeScoreUpdate({ score: 10, streak: 6, bestStreak: 6 }, false);
-    const afterNextCorrect = computeScoreUpdate(afterMiss, true);
-
-    expect(afterMiss.bestStreak).toBe(6);
-    expect(afterNextCorrect).toEqual({ score: 11, streak: 1, bestStreak: 6 });
-  });
-});
-
-describe('getRoundResultMessage', () => {
-  it('produces an exact correct message with a 1-indexed position', () => {
-    expect(getRoundResultMessage(true, 4, 'C', 'T', 'transition')).toBe(
-      'Correct — position 5 was the variant: T→C, a transition (purine↔purine or pyrimidine↔pyrimidine).'
+describe('the mirror’s data', () => {
+  it('pins the SNPedia rows copied from result.csv', () => {
+    expect(SNPEDIA_ROWS.map((r) => `${r.rsid}(${r.genotype}) ${r.magnitude}`)).toEqual([
+      'rs1815739(CC) 2.2', 'rs1815739(TT) 2.2', 'rs1815739(CT) 2.1',
+      'rs671(AA) 4', 'rs671(AG) 3.5', 'rs671(GG) 2',
+      'rs12913832(GG) 2.5',
+      'rs17822931(TT) 2.5', 'rs17822931(CC) 2', 'rs17822931(CT) 2',
+      'rs762551(AA) 1.5',
+      'rs4988235(CC) 2.5', 'rs4988235(CT) 1.1', 'rs4988235(TT) 1.1',
+    ]);
+    expect(SNPEDIA_ROWS.find((r) => r.rsid === 'rs12913832')!.summary).toBe('blue eye color, 99% of the time');
+    expect(SNPEDIA_ROWS.find((r) => r.rsid === 'rs762551')!.summary).toBe(
+      'Faster caffeine metabolism in smokers and heavy coffee consumers'
     );
   });
 
-  it('produces an exact incorrect message naming position and base', () => {
-    expect(getRoundResultMessage(false, 0, 'G', 'C', 'transversion')).toBe(
-      'Not quite — the variant was at position 1: C→G, a transversion (purine↔pyrimidine).'
+  it('matches result.csv row for row, summaries verbatim', () => {
+    expect(SNPEDIA_ROWS).toEqual([
+          {
+                "rsid": "rs1815739",
+                "genotype": "CC",
+                "magnitude": 2.2,
+                "summary": "Better performing muscles. Likely sprinter."
+          },
+          {
+                "rsid": "rs1815739",
+                "genotype": "TT",
+                "magnitude": 2.2,
+                "summary": "Impaired muscle performance. Likely endurance athlete."
+          },
+          {
+                "rsid": "rs1815739",
+                "genotype": "CT",
+                "magnitude": 2.1,
+                "summary": "Mix of muscle types. Likely sprinter."
+          },
+          {
+                "rsid": "rs671",
+                "genotype": "AA",
+                "magnitude": 4.0,
+                "summary": "Asian Flusher; increased risk of esophageal cancer; East Asian ancestry; Disulfiram not effective for alcoholism."
+          },
+          {
+                "rsid": "rs671",
+                "genotype": "AG",
+                "magnitude": 3.5,
+                "summary": "Asian Flush; worse hangovers; increased risk of esophageal cancer; East Asian ancestry; Disulfiram probably not effective for alcoholism."
+          },
+          {
+                "rsid": "rs671",
+                "genotype": "GG",
+                "magnitude": 2.0,
+                "summary": "Alcohol Flush: Normal, doesn't flush. Normal hangovers. Normal risk of Alcoholism. Normal risk of Esophageal Cancer. Disulfiram is effective for alcoholism."
+          },
+          {
+                "rsid": "rs12913832",
+                "genotype": "GG",
+                "magnitude": 2.5,
+                "summary": "blue eye color, 99% of the time"
+          },
+          {
+                "rsid": "rs17822931",
+                "genotype": "TT",
+                "magnitude": 2.5,
+                "summary": "Dry earwax. No body odour. Likely Asian ancestry. Reduced colostrum."
+          },
+          {
+                "rsid": "rs17822931",
+                "genotype": "CC",
+                "magnitude": 2.0,
+                "summary": "Wet earwax. Normal body odour. Normal colostrum."
+          },
+          {
+                "rsid": "rs17822931",
+                "genotype": "CT",
+                "magnitude": 2.0,
+                "summary": "Wet earwax. Slightly better body odour."
+          },
+          {
+                "rsid": "rs762551",
+                "genotype": "AA",
+                "magnitude": 1.5,
+                "summary": "Faster caffeine metabolism in smokers and heavy coffee consumers"
+          },
+          {
+                "rsid": "rs4988235",
+                "genotype": "CC",
+                "magnitude": 2.5,
+                "summary": "likely to be lactose intolerant as an adult"
+          },
+          {
+                "rsid": "rs4988235",
+                "genotype": "CT",
+                "magnitude": 1.1,
+                "summary": "likely to be able to digest milk as an adult"
+          },
+          {
+                "rsid": "rs4988235",
+                "genotype": "TT",
+                "magnitude": 1.1,
+                "summary": "can digest milk"
+          }
+    ]);
+  });
+
+  it('stores every SNPedia genotype in the sorted form the mirror keys by', () => {
+    for (const row of SNPEDIA_ROWS) expect(normalizeGenotype(row.genotype)).toBe(row.genotype);
+  });
+
+  it('pins positions, checked against the repository’s sample 23andMe file', () => {
+    expect(POSITIONS).toEqual({
+      rs1815739: ['11', 66328095],
+      rs671: ['12', 112241766],
+      rs12913832: ['15', 28365618],
+      rs17822931: ['16', 48258198],
+      rs762551: ['15', 75041917],
+      rs4988235: ['2', 136608646],
+    });
+    expect(MIN_MAGNITUDE).toBe(2);
+  });
+});
+
+describe('normalize_genotype', () => {
+  it('sorts the two alleles', () => {
+    expect(normalizeGenotype('GA')).toBe('AG');
+    expect(normalizeGenotype('AG')).toBe('AG');
+    expect(normalizeGenotype(' tc ')).toBe('CT');
+  });
+
+  it('gives no key for no-calls, indels and single alleles', () => {
+    expect(normalizeGenotype('--')).toBeNull();
+    expect(normalizeGenotype('DI')).toBeNull();
+    expect(normalizeGenotype('A')).toBeNull();
+    expect(normalizeGenotype('AN')).toBeNull();
+    expect(normalizeGenotype('NA')).toBeNull();
+    expect(normalizeGenotype('AGT')).toBeNull();
+  });
+
+  it('does not complement — the strand bug, pinned', () => {
+    // 23andMe "GG" at rs4988235 is SNPedia's "CC" on the other strand.
+    expect(normalizeGenotype('GG')).toBe('GG');
+  });
+});
+
+describe('runMirror', () => {
+  it('shows a match at or above the magnitude floor', () => {
+    expect(runMirror('rs671', 'GG')).toEqual({ outcome: 'shown', row: SNPEDIA_ROWS[5], display: SNPEDIA_ROWS[5].summary });
+    expect(runMirror('rs671', 'GA').display).toBe(SNPEDIA_ROWS[4].summary);
+  });
+
+  it('filters a match under the floor', () => {
+    expect(runMirror('rs762551', 'AA')).toEqual({ outcome: 'below-magnitude', row: SNPEDIA_ROWS[10], display: NOTHING_SHOWN });
+  });
+
+  it('finds nothing across the strand mismatch', () => {
+    expect(runMirror('rs4988235', 'GG')).toEqual({ outcome: 'no-match', row: null, display: NOTHING_SHOWN });
+    expect(runMirror('rs4988235', 'CC').outcome).toBe('shown');
+  });
+
+  it('skips a no-call', () => {
+    expect(runMirror('rs12913832', '--')).toEqual({ outcome: 'no-call', row: null, display: NOTHING_SHOWN });
+  });
+});
+
+describe('rounds', () => {
+  it('writes the raw line exactly as 23andMe does', () => {
+    expect(RAW_FILE_HEADER).toBe('# rsid\tchromosome\tposition\tgenotype');
+    expect(getInitialRound().line).toBe('rs1815739\t11\t66328095\tCT');
+  });
+
+  it('covers every way a line can end', () => {
+    expect(ROUNDS.map((_, i) => buildRound(i).result.outcome)).toEqual([
+      'shown', 'shown', 'shown', 'below-magnitude', 'shown', 'no-match', 'no-call',
+    ]);
+  });
+
+  it('offers every SNPedia summary for the rsid plus nothing', () => {
+    expect(getInitialRound().options).toEqual([
+      'Better performing muscles. Likely sprinter.',
+      'Impaired muscle performance. Likely endurance athlete.',
+      'Mix of muscle types. Likely sprinter.',
+      NOTHING_SHOWN,
+    ]);
+    expect(buildRound(2).options).toEqual(['blue eye color, 99% of the time', NOTHING_SHOWN]);
+  });
+
+  it('advances and wraps', () => {
+    expect(getNextRound(getInitialRound()).rsid).toBe('rs671');
+    expect(buildRound(ROUNDS.length).rsid).toBe('rs1815739');
+  });
+});
+
+describe('copy', () => {
+  it('describes the lookup table', () => {
+    expect(describeLookup(buildRound(3))).toBe('SNPedia has rs762551 as AA (magnitude 1.5). The mirror shows magnitude 2 and up.');
+    expect(describeLookup(getInitialRound())).toBe(
+      'SNPedia has rs1815739 as CC (magnitude 2.2), TT (magnitude 2.2), CT (magnitude 2.1). The mirror shows magnitude 2 and up.'
     );
   });
 
-  it('names the reference base first and the variant base second', () => {
-    // Regression pin: the component used to pass the REFERENCE base where the
-    // variant belonged, so every result line named the unchanged base as the
-    // variant. Order is now load-bearing, so it is asserted directly.
-    const message = getRoundResultMessage(true, 2, 'G', 'A', 'transition');
-    expect(message).toContain('A→G');
-    expect(message).not.toContain('G→A');
+  it('explains each outcome', () => {
+    expect(explainResult(buildRound(0))).toBe(
+      'CT matches SNPedia at magnitude 2.1, above the floor, so it floats around the reflection.'
+    );
+    expect(explainResult(buildRound(1))).toBe(
+      'AG (sorted from GA) matches SNPedia at magnitude 3.5, above the floor, so it floats around the reflection.'
+    );
+    expect(explainResult(buildRound(3))).toBe(
+      "AA matches SNPedia, but at magnitude 1.5 — under the mirror's 2 floor, so it is filtered out."
+    );
+    expect(explainResult(buildRound(5))).toBe(
+      'GG matches nothing. 23andMe reports this SNP on the plus strand (A/G); SNPedia files it on the minus strand ' +
+        '(C/T). The mirror sorts alleles but never complements them, so the lookup misses — GG here is SNPedia\'s CC.'
+    );
+    expect(explainResult(buildRound(6))).toBe(
+      '"--" is a no-call: the chip did not read this position, so the parser skips it.'
+    );
+  });
+
+  it('prefixes the verdict', () => {
+    const round = getInitialRound();
+    expect(getResultMessage(round, round.result.display)).toBe(`Correct. ${explainResult(round)}`);
+    expect(getResultMessage(round, NOTHING_SHOWN)).toBe(`Not quite. ${explainResult(round)}`);
   });
 });
 
-describe('getTileAriaLabel', () => {
-  it('formats an exact, descriptive label', () => {
-    expect(getTileAriaLabel(5, 'T')).toBe('Position 5, base T');
-    expect(getTileAriaLabel(1, 'A')).toBe('Position 1, base A');
-  });
-});
-
-describe('getTileVisualState', () => {
-  const round: DnaRound = { reference: ['A', 'T', 'C', 'G'], sample: ['A', 'T', 'C', 'A'], snpIndex: 3 };
-
-  it('is default for every tile while still guessing', () => {
-    expect(getTileVisualState(0, round, 'guessing', null)).toBe('default');
-    expect(getTileVisualState(3, round, 'guessing', null)).toBe('default');
+describe('scoring and presentation', () => {
+  it('scores streaks and keeps the best', () => {
+    const one = computeScoreUpdate(INITIAL_SCORE_STATE, true);
+    expect(one).toEqual({ score: 1, streak: 1, bestStreak: 1 });
+    expect(computeScoreUpdate(computeScoreUpdate(one, true), false)).toEqual({ score: 2, streak: 0, bestStreak: 2 });
+    expect(computeScoreUpdate({ score: 5, streak: 0, bestStreak: 3 }, true)).toEqual({ score: 6, streak: 1, bestStreak: 3 });
   });
 
-  it('marks only the SNP tile guessed-correct after a correct guess', () => {
-    expect(getTileVisualState(3, round, 'correct', 3)).toBe('guessed-correct');
-    expect(getTileVisualState(0, round, 'correct', 3)).toBe('default');
-  });
-
-  it('marks the wrong clicked tile guessed-incorrect and reveals the true SNP', () => {
-    expect(getTileVisualState(1, round, 'incorrect', 1)).toBe('guessed-incorrect');
-    expect(getTileVisualState(3, round, 'incorrect', 1)).toBe('reveal-snp');
-    expect(getTileVisualState(0, round, 'incorrect', 1)).toBe('default');
-  });
-});
-
-describe('getTileClassName', () => {
-  it('includes the pulse animation class when motion is allowed', () => {
-    expect(getTileClassName('guessed-correct', false)).toBe('ring-4 ring-emerald-300 bg-emerald-500 animate-pulse');
-  });
-
-  it('omits the animation class entirely when reduced motion is preferred', () => {
-    expect(getTileClassName('guessed-correct', true)).toBe('ring-4 ring-emerald-300 bg-emerald-500');
-  });
-
-  it('has no state class and no animation for the default state', () => {
-    expect(getTileClassName('default', false)).toBe('');
-    expect(getTileClassName('default', true)).toBe('');
-  });
-
-  it('styles guessed-incorrect distinctly from guessed-correct', () => {
-    const incorrect = getTileClassName('guessed-incorrect', true);
-    const correct = getTileClassName('guessed-correct', true);
-
-    expect(incorrect).not.toBe(correct);
-    expect(incorrect).toContain('red');
-    expect(correct).toContain('emerald');
-  });
-
-  it('animates guessed-incorrect too when motion is allowed', () => {
-    // guessed-incorrect's own membership in the animated-states set was
-    // never exercised with motion allowed — only its reduced-motion form.
-    expect(getTileClassName('guessed-incorrect', false)).toBe('ring-4 ring-red-300 bg-red-500 animate-pulse');
-  });
-
-  it('gives reveal-snp the exact same highlight as guessed-correct, and animates it too', () => {
-    // Never exercised before: getTileVisualState's tests only check that the
-    // STATE NAME 'reveal-snp' comes back, never that getTileClassName
-    // actually renders it correctly — its class value and its membership in
-    // the animated-states set were both untested.
-    expect(getTileClassName('reveal-snp', false)).toBe('ring-4 ring-emerald-300 bg-emerald-500 animate-pulse');
-    expect(getTileClassName('reveal-snp', true)).toBe('ring-4 ring-emerald-300 bg-emerald-500');
-  });
-});
-
-describe('getBaseColorClass / BASE_COLOR_CLASSES', () => {
-  it('maps every base to a distinct Tailwind background class', () => {
-    const classes = BASES.map((base) => getBaseColorClass(base));
-
-    expect(new Set(classes).size).toBe(BASES.length);
-    for (const base of BASES) {
-      expect(getBaseColorClass(base)).toBe(BASE_COLOR_CLASSES[base]);
-    }
-  });
-
-  it('maps every base to its exact hardcoded class — not just self-referential equality', () => {
-    // The test above compares getBaseColorClass(base) against the SAME
-    // imported BASE_COLOR_CLASSES constant, so a mutation emptying an entry
-    // empties both sides of that comparison at once and can never be caught
-    // that way. These hardcoded literals are what actually pin the content.
-    expect(getBaseColorClass('A')).toBe('bg-emerald-700');
-    expect(getBaseColorClass('T')).toBe('bg-cyan-700');
-    expect(getBaseColorClass('C')).toBe('bg-amber-700');
-    expect(getBaseColorClass('G')).toBe('bg-fuchsia-700');
-  });
-});
-
-describe('named constants', () => {
-  it('pins strand length within the 10-14 design range', () => {
-    expect(STRAND_LENGTH).toBeGreaterThanOrEqual(10);
-    expect(STRAND_LENGTH).toBeLessThanOrEqual(14);
-  });
-
-  it('pins the score increment and advance delay to sane positive values', () => {
-    expect(SCORE_INCREMENT).toBe(1);
-    expect(ROUND_ADVANCE_DELAY_MS).toBeGreaterThan(0);
-  });
-
-  it('pins the initial score state to all zeros', () => {
-    expect(INITIAL_SCORE_STATE).toEqual({ score: 0, streak: 0, bestStreak: 0 });
+  it('derives option states and classes', () => {
+    const round = getInitialRound();
+    const answer = round.result.display;
+    expect(getOptionVisualState(answer, round, null)).toBe('idle');
+    expect(getOptionVisualState(answer, round, NOTHING_SHOWN)).toBe('correct');
+    expect(getOptionVisualState(NOTHING_SHOWN, round, NOTHING_SHOWN)).toBe('wrong');
+    expect(getOptionVisualState(round.options[0], round, NOTHING_SHOWN)).toBe('dimmed');
+    expect(getOptionClassName('correct')).toBe('border-emerald-300/70 bg-emerald-400/15');
+    expect(getOptionClassName('wrong')).toBe('border-rose-300/70 bg-rose-400/15');
+    expect(getOptionClassName('dimmed')).toBe('border-white/10 bg-white/[0.02] opacity-60');
+    expect(getOptionClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/60 hover:bg-cyan-400/10');
   });
 });

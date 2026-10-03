@@ -1,91 +1,53 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { useCallback, useState } from 'react';
+
 import {
   INITIAL_SCORE_STATE,
-  ROUND_ADVANCE_DELAY_MS,
-  STRAND_LENGTH,
-  checkGuess,
+  RAW_FILE_HEADER,
   computeScoreUpdate,
-  generateRound,
-  getBaseColorClass,
+  describeLookup,
   getInitialRound,
-  getRoundResultMessage,
-  getTileAriaLabel,
-  getTileClassName,
-  getTileVisualState,
-  type RoundState,
-  type ScoreState,
+  getNextRound,
+  getOptionClassName,
+  getOptionVisualState,
+  getResultMessage,
 } from '@/components/projects/dna-game/dna-snp-game-logic';
 
 /**
- * "Spot the SNP" — a playable DNA/genomics mini-game paired with the
- * Genetic RefleXions Magic Mirror project. The player taps the tile in the
- * SAMPLE strand that differs from the REFERENCE strand (the SNP — a
- * single-nucleotide polymorphism). All round generation, scoring, and
- * per-tile visual-state derivation lives in ./dna-snp-game-logic; this
- * component only wires state to markup.
- *
- * The very first round is seeded with the fixed INITIAL_ROUND_SEED so the
- * server-rendered HTML and the client's first paint show an identical
- * round (CLAUDE.md #10 — hydration safety). Every subsequent round is
- * generated only inside a click handler (handleNextRound), so seeding off
- * Date.now() there is safe — it never runs during initial render.
+ * "Read the Raw File" — the playable companion to Genetic RefleXions. The
+ * player does what the mirror did: read a 23andMe raw-data row, consult the
+ * GWAS association, count effect alleles, and call the trait. Catalog and
+ * calls live in ./dna-snp-game-logic; this component wires state to markup.
+ * Every interaction is O(1).
  */
 export default function DnaSnpGame() {
-  const { prefersReducedMotion } = useInteractionMode();
-
   const [round, setRound] = useState(getInitialRound);
-  const [roundState, setRoundState] = useState<RoundState>('guessing');
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [scoreState, setScoreState] = useState<ScoreState>(INITIAL_SCORE_STATE);
-  const [message, setMessage] = useState('');
+  const [chosen, setChosen] = useState<string | null>(null);
+  const [scoreState, setScoreState] = useState(INITIAL_SCORE_STATE);
 
-  const handleNextRound = useCallback(() => {
-    setRound(generateRound(Date.now(), STRAND_LENGTH));
-    setRoundState('guessing');
-    setSelectedIndex(null);
-    setMessage('');
+  const handleAnswer = useCallback(
+    (option: string) => {
+      setChosen(option);
+      setScoreState((current) => computeScoreUpdate(current, option === round.result.display));
+    },
+    [round]
+  );
+
+  const handleNext = useCallback(() => {
+    setRound(getNextRound);
+    setChosen(null);
   }, []);
 
-  // Correct guesses auto-advance after a short beat; an incorrect guess
-  // waits for the explicit "Next round" click below (same button covers
-  // both — it also lets a player skip the auto-advance wait early).
-  useEffect(() => {
-    if (roundState !== 'correct') return undefined;
-
-    const timeoutId = window.setTimeout(handleNextRound, ROUND_ADVANCE_DELAY_MS);
-    return () => window.clearTimeout(timeoutId);
-  }, [roundState, handleNextRound]);
-
-  // No in-handler guessing-state guard needed here: every sample tile's
-  // `disabled` attribute below is the single source of truth once a round
-  // has resolved, and disabled buttons never dispatch click events.
-  const handleGuess = (index: number) => {
-    const correct = checkGuess(round, index);
-    setSelectedIndex(index);
-    setRoundState(correct ? 'correct' : 'incorrect');
-    setScoreState((current) => computeScoreUpdate(current, correct));
-    // The variant base is the SAMPLE's base at the SNP index. This used to
-    // pass the REFERENCE base, so every result line named the unchanged base
-    // as though it were the variant — wrong on the one fact the game exists to
-    // teach. Both are passed explicitly now so the pair can't be swapped again.
-    setMessage(
-      getRoundResultMessage(
-        correct,
-        round.snpIndex,
-        round.sample[round.snpIndex],
-        round.reference[round.snpIndex],
-        round.substitutionKind
-      )
-    );
-  };
-
   return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md" data-testid="dna-snp-game">
+    <div
+      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      data-testid="dna-snp-game"
+      role="group"
+      aria-label="Read the Raw File: call a trait from a line of 23andMe raw data, the way the Genetic RefleXions mirror did"
+    >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Spot the SNP</h3>
+        <h3 className="text-lg font-bold text-white">Read the Raw File</h3>
         <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
           <span>
             Score <strong data-testid="dna-game-score" className="text-cyan-300">{scoreState.score}</strong>
@@ -94,79 +56,65 @@ export default function DnaSnpGame() {
             Streak <strong data-testid="dna-game-streak" className="text-emerald-300">{scoreState.streak}</strong>
           </span>
           <span>
-            Best <strong data-testid="dna-game-best-streak" className="text-fuchsia-300">{scoreState.bestStreak}</strong>
+            Best <strong data-testid="dna-game-best-streak" className="text-amber-300">{scoreState.bestStreak}</strong>
           </span>
         </div>
       </div>
 
       <p className="mb-4 text-sm text-muted-foreground">
-        Tap the base in the sample strand that differs from the reference strand — that one tile is the SNP (a
-        single-nucleotide polymorphism, a real DNA variation).
+        A visitor plugs in their 23andMe file. The mirror reads this line, looks it up in SNPedia, and decides what to
+        float around their reflection. What does it show?
       </p>
 
-      <div className="mb-3">
-        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/80">
-          Reference strand
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          <span className="sr-only">Reference sequence: {round.reference.join(' ')}</span>
-          {round.reference.map((base, index) => (
-            <div
-              key={`ref-${index}`}
-              aria-hidden="true"
-              className={`flex h-9 w-9 items-center justify-center rounded-lg font-mono text-sm font-bold text-white ${getBaseColorClass(base)}`}
-            >
-              {base}
-            </div>
-          ))}
-        </div>
-      </div>
+      <pre
+        className="mb-3 overflow-x-auto rounded-xl border border-white/10 bg-black/50 p-4 font-mono-accent text-sm leading-relaxed"
+        data-testid="dna-raw-line"
+      >
+        <span className="text-muted-foreground/70">{RAW_FILE_HEADER}</span>
+        {'\n'}
+        <span className="text-cyan-100">{round.line}</span>
+      </pre>
+      <p className="mb-5 text-sm text-white/80" data-testid="dna-association">
+        {describeLookup(round)}
+      </p>
 
-      <div className="mb-4">
-        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/80">
-          Sample strand — tap the base that differs
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {round.sample.map((base, index) => {
-            const tileState = getTileVisualState(index, round, roundState, selectedIndex);
-            const tileClassName = getTileClassName(tileState, Boolean(prefersReducedMotion));
-
-            return (
-              <button
-                key={`sample-${index}`}
-                type="button"
-                disabled={roundState !== 'guessing'}
-                onClick={() => handleGuess(index)}
-                aria-label={getTileAriaLabel(index + 1, base)}
-                className={`flex h-9 w-9 items-center justify-center rounded-lg font-mono text-sm font-bold text-white transition-colors disabled:cursor-default ${getBaseColorClass(base)} ${tileClassName}`}
-              >
-                {base}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p
-          role="status"
-          aria-live="polite"
-          data-testid="dna-game-message"
-          className="min-h-[1.25rem] text-sm font-medium text-cyan-200"
-        >
-          {message}
-        </p>
-        {roundState !== 'guessing' && (
+      <div className="grid gap-3 sm:grid-cols-2">
+        {round.options.map((option, optionIndex) => (
           <button
+            key={option}
             type="button"
-            data-testid="dna-game-next-round"
-            onClick={handleNextRound}
-            className="rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-primary/40 hover:bg-primary/10"
+            onClick={() => handleAnswer(option)}
+            disabled={chosen !== null}
+            data-testid={`dna-option-${optionIndex}`}
+            className={`min-h-[44px] rounded-xl border px-4 py-3 text-sm text-white transition-colors disabled:cursor-default ${getOptionClassName(
+              getOptionVisualState(option, round, chosen)
+            )}`}
           >
-            Next round
+            {option}
           </button>
-        )}
+        ))}
       </div>
+
+      <p role="status" aria-live="polite" data-testid="dna-game-message" className="mt-5 min-h-[3.5rem] text-sm text-muted-foreground">
+        {chosen === null ? '' : getResultMessage(round, chosen)}
+      </p>
+
+      {chosen !== null ? (
+        <button
+          type="button"
+          onClick={handleNext}
+          data-testid="dna-game-next-round"
+          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+        >
+          Next line
+        </button>
+      ) : null}
+
+      <p className="mt-6 border-t border-white/10 pt-4 text-xs text-muted-foreground/80">
+        This is the mirror&rsquo;s own code path: sort the two alleles, look the pair up in SNPedia, drop anything under
+        magnitude 2. Summaries are SNPedia&rsquo;s (CC BY-NC-SA), verbatim. They are associations, not diagnoses —
+        which is why the mirror could only ever guess.
+      </p>
     </div>
   );
 }
