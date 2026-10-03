@@ -34,6 +34,7 @@ export const educationItems: EducationItem[] = [
     period: "Sep 2025 - Dec 2026",
     details: [
       "A.A. Liberal Arts: Natural and Applied Sciences and Mathematics — Los Angeles City College, Aug 2026, Magna Cum Laude",
+      "A.S. Pre-Allied Health and A.A. Liberal Arts: Social and Behavioral Sciences — petitioned with the A.A.; awarded on completion of CHEM 051 (Fall 2026, in progress), which meets their chemistry requirement",
       "Cumulative GPA: 3.74 | Units Earned: 43.00 (LACCD credit record)",
       "Spring 2026: 4.0 GPA — Full Time Dean's Honor List (Anatomy, Child Dev, Microbiology, Physiology, Sociology — all A's)",
       "Summer 2026: 4.0 GPA — STAT 101 Statistics for the Social Sciences (A), POL SCI 019 Women in Politics (A)",

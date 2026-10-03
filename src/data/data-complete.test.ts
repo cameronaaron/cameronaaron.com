@@ -92,6 +92,22 @@ describe('data module coverage', () => {
     expect(honorsAndAffiliations.some((h) => h.label.includes('Magna Cum Laude'))).toBe(true);
   });
 
+  it('lists the two petitioned degrees as pending on chemistry, never as awarded', () => {
+    // Oct 1, 2026 graduation petition: the Natural and Applied Sciences A.A.
+    // posted for Summer 2026; Pre-Allied Health (A.S.) and Social and
+    // Behavioral Sciences (A.A.) were not awarded yet, missing CHEM 060 or
+    // CHEM 101; CHEM 051, in progress Fall 2026, meets that requirement.
+    // When they post, replace this line with the awarded term.
+    const laccd = educationItems.find((item) =>
+      item.institution.includes('Los Angeles Community College District')
+    );
+    const pending = laccd?.details.find((d) => d.includes('Pre-Allied Health'));
+    expect(pending).toContain('Social and Behavioral Sciences');
+    expect(pending).toContain('CHEM 051');
+    expect(pending).toContain('in progress');
+    expect(pending).toMatch(/awarded on completion of CHEM 051/);
+  });
+
   it('records the Summer 2026 STAT 101 statistics course as completed with an A', () => {
     const stat101 = prerequisiteCourses.find((c) => c.course.includes('STAT 101'));
 
