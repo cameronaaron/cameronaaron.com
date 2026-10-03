@@ -46,15 +46,25 @@ vi.mock('framer-motion', () => {
     return rest;
   };
 
+  // One component per tag, cached — real framer-motion returns the same
+  // `m.article` on every access. Minting a fresh forwardRef per property read
+  // gave each re-render a new element type, so React remounted the subtree
+  // and any node a test had already queried went stale mid-test.
+  const motionTags = new Map<string, React.ForwardRefExoticComponent<Record<string, unknown>>>();
   const motion = new Proxy(
     {},
     {
       get: (_target, key) => {
         const tag = typeof key === 'string' ? key : 'div';
-        return React.forwardRef<HTMLElement, Record<string, unknown>>(function MotionTag(props, ref) {
-          const clean = stripMotionProps(props);
-          return React.createElement(tag, { ...clean, ref }, clean.children);
-        });
+        let component = motionTags.get(tag);
+        if (!component) {
+          component = React.forwardRef<HTMLElement, Record<string, unknown>>(function MotionTag(props, ref) {
+            const clean = stripMotionProps(props);
+            return React.createElement(tag, { ...clean, ref }, clean.children);
+          });
+          motionTags.set(tag, component);
+        }
+        return component;
       },
     }
   );

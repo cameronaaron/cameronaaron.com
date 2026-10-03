@@ -30,9 +30,9 @@
 import React from 'react';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import { m, motion, useMotionValue, useTransform } from 'framer-motion';
 
 import { SectionHandoff } from '@/components/ui/SectionTransitions';
 import { LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD } from '@/hooks/usePerformanceProfile';
@@ -222,5 +222,24 @@ describe('test-quality-contract — the shared motion mock stays faithful', () =
     // Real framer writes computed numbers to the DOM; the mock must match,
     // or component tests can only ever see "[object Object]".
     expect((container.firstChild as HTMLElement).style.opacity).toBe('0.34');
+  });
+
+  it('a motion tag read during render keeps its DOM node across re-renders', () => {
+    // Real framer returns the same `m.article` on every access. The mock once
+    // minted a new component per read, so a component choosing its tag in
+    // render (ProjectCard's `as={isLinked ? m.a : m.article}`) remounted on
+    // every state change — a queried node went stale and a hover test's
+    // mousemove hit a detached element, leaving the handler uncovered.
+    function Toggle() {
+      const [on, setOn] = React.useState(false);
+      return React.createElement(m.article, { 'data-on': String(on), onMouseEnter: () => setOn(true) }, 'card');
+    }
+    render(React.createElement(Toggle));
+    const before = screen.getByText('card');
+    fireEvent.mouseEnter(before);
+
+    expect(screen.getByText('card')).toBe(before);
+    expect(before.getAttribute('data-on')).toBe('true');
+    expect(m.article).toBe(m.article);
   });
 });
