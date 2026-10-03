@@ -56,6 +56,10 @@ export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
     title: 'Unusual Uses',
     teaser: "Guilford's alternative uses task, scored on category spread rather than how many you name.",
   },
+  'uds-frame-decoder': {
+    title: 'Decode the Response',
+    teaser: 'Read a real diagnostic reply. Every wrong answer is a specific decoding mistake the test vectors exist to catch.',
+  },
 };
 
 export function getDemoDescriptor(demo: InteractiveDemo): DemoDescriptor {

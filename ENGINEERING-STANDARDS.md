@@ -1989,6 +1989,17 @@ investigate that script before touching the config.
     comparison already excludes an ungraded course on its own. Documented
     inline at its source. Final: matching-logic.ts 98.57% (one equivalent);
     the other five files at 100%.
+
+    **Module-level string constants survive by construction (measured
+    2026-10).** A Tailwind class map declared as a top-level `const` (e.g.
+    `OPTION_STATE_CLASSES` in `tohoku-dialect-logic.ts`) reports every
+    `StringLiteral` mutant as Survived even when a test pins each value
+    with `toBe`, and wrapping the map in an exported accessor does not
+    change that. Re-running Stryker against Tohoku's long-standing map
+    reproduced the same survivors, so it is the harness (static
+    initializers are evaluated once per worker), not a missing assertion.
+    Pin the values anyway and read these specific survivors as noise; any
+    *other* survivor is still a real gap.
 14. **A rendered-text assertion is only as strong as its regex — a wildcard
     is a mutant's escape hatch.** `expect(screen.getAllByText(/expires in 3
     months.*renew soon/i))` passes as long as *something* sits between the

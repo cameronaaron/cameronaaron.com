@@ -10,7 +10,8 @@ export type InteractiveDemo =
   | 'collective-intelligence-game'
   | 'ephemeral-room-game'
   | 'twice-exceptional-game'
-  | 'divergent-thinking-game';
+  | 'divergent-thinking-game'
+  | 'uds-frame-decoder';
 
 export interface Project {
   title: string;
@@ -49,6 +50,7 @@ export const projects: Project[] = [
     tags: ["Rust", "Automotive Diagnostics", "UDS / OBD-II", "Reverse Engineering"],
     period: "Sep 2026",
     cta: "Private repository",
+    interactiveDemo: "uds-frame-decoder",
   },
   {
     title: "novachannel: Metadata-Resistant Messaging in Rust",

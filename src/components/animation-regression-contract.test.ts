@@ -719,6 +719,7 @@ describe('animation regression contract', () => {
       'ephemeral-room/EphemeralRoomGame',
       'twice-exceptional/TwiceExceptionalGame',
       'divergent-thinking/DivergentThinkingGame',
+      'uds-decoder/UdsDecoderGame',
     ];
     for (const widget of splitWidgets) {
       // Whitespace-tolerant on purpose: a longer module path wraps across

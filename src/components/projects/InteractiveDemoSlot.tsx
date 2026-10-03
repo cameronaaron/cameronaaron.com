@@ -49,6 +49,7 @@ const DEMO_COMPONENTS: Record<InteractiveDemo, ComponentType> = {
     () => import('@/components/projects/divergent-thinking/DivergentThinkingGame'),
     { ssr: false }
   ),
+  'uds-frame-decoder': dynamic(() => import('@/components/projects/uds-decoder/UdsDecoderGame'), { ssr: false }),
 };
 
 interface InteractiveDemoSlotProps {
