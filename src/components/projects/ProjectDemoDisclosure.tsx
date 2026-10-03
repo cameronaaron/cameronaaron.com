@@ -75,7 +75,7 @@ export default function ProjectDemoDisclosure({
   return (
     <div ref={containerRef} className="mt-6" data-testid={`demo-disclosure-${demo}`}>
       <div className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-4">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[min(100%,14rem)] flex-1">
           <span className="block text-xs uppercase tracking-[0.14em] text-cyan-300/80">Playable companion</span>
           <strong className="mt-1 block text-base text-white">{descriptor.title}</strong>
           <span className="mt-1 block text-sm text-muted-foreground">{descriptor.teaser}</span>

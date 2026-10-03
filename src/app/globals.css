@@ -729,10 +729,16 @@
 .experience-links { justify-content: flex-start; gap: 0.5rem; }
 .experience-links button { min-height: 44px; font-size: 0.8125rem; letter-spacing: 0; text-transform: none; border-radius: 0.75rem; }
 .experience-story { border-radius: 1.5rem; }
-.research-playground { display: grid; gap: 1.5rem; }
+/* minmax(0, 1fr), not the implicit `auto` column: with `auto`, phone rows
+   were sized before the demo headers wrapped, so each block rendered 1018px
+   tall around 1507px of content and the next project covered its Play button. */
+.research-playground { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
 .research-playground-title { grid-column: 1 / -1; margin: 1rem 0; }
 .research-playground > div { min-width: 0; background: linear-gradient(145deg, rgb(126 231 255 / 0.045), transparent); }
-.research-playground > div > a { height: auto; }
+/* Both card elements: a private-repo card is an <article>, and leaving it at
+   h-full let it fill the block and push its Play button under the next one. */
+.research-playground > div > a,
+.research-playground > div > article { height: auto; }
 @keyframes orbit-turn { to { transform: rotate(360deg); } }
 @keyframes badge-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes world-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }

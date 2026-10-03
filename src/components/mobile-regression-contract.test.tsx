@@ -264,3 +264,58 @@ describe('mobile regression contract', () => {
     expect(label.className).not.toContain('tracking-[0.16em]');
   });
 });
+
+describe('mobile grids — a phone layout never falls back to an implicit auto column', () => {
+  // 2026-10: .research-playground set grid-template-columns only inside
+  // @media (min-width: 768px). On phones the implicit `auto` column let each
+  // playable block's row be sized before its demo header wrapped: blocks
+  // rendered 1018px tall around 1507px of content (measured in Chromium at
+  // 390px), and the next project's card covered the Play button.
+  const css = readFileSync(join(resolve(process.cwd()), 'src', 'app', 'globals.css'), 'utf8');
+
+  function selectorsWithColumns(source: string): Set<string> {
+    const found = new Set<string>();
+    for (const [, selectors, body] of source.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (!/grid-template-columns\s*:/.test(body)) continue;
+      for (const selector of selectors.split(',')) found.add(selector.trim());
+    }
+    return found;
+  }
+
+  it('every grid given columns at a min-width breakpoint also has base columns', () => {
+    const uncommented = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    const withoutMedia = uncommented.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '');
+    const base = selectorsWithColumns(withoutMedia);
+    const atBreakpoint = new Set<string>();
+    for (const [, block] of uncommented.matchAll(/@media\s*\(min-width:[^)]*\)\s*\{((?:[^{}]*\{[^{}]*\})*[^{}]*)\}/g)) {
+      for (const selector of selectorsWithColumns(block)) atBreakpoint.add(selector);
+    }
+    expect(atBreakpoint.size, 'parser found no breakpoint grids — check the regex').toBeGreaterThan(0);
+    // Only selectors that are grids on phones too: .experience-journey becomes
+    // a grid inside its breakpoint, so phones never see an implicit column.
+    const gridOnPhones = new Set<string>();
+    for (const [, selectors, body] of withoutMedia.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (/display:\s*grid/.test(body)) for (const selector of selectors.split(',')) gridOnPhones.add(selector.trim());
+    }
+    const phoneFallsBack = [...atBreakpoint].filter((selector) => gridOnPhones.has(selector) && !base.has(selector));
+    expect(phoneFallsBack, 'give these a base grid-template-columns (e.g. minmax(0, 1fr))').toEqual([]);
+  });
+
+  it('every card element in a playable block gets its height reset, not just links', () => {
+    // 2026-10: private-repo cards render as <article>; the reset named only
+    // `a`, so those three cards stayed h-full and covered the next block's
+    // Play button (hit-tested in Chromium at 360 and 390px).
+    expect(css).toMatch(/\.research-playground > div > a,\s*\.research-playground > div > article \{ height: auto; \}/);
+  });
+
+  it('the demo header text keeps a minimum width so the Play button wraps below it', () => {
+    // With min-w-0 + flex-1 beside a whitespace-nowrap button, flex-wrap never
+    // fires and the text column collapsed to ~70px on a phone.
+    const source = readFileSync(
+      join(resolve(process.cwd()), 'src', 'components', 'projects', 'ProjectDemoDisclosure.tsx'),
+      'utf8'
+    );
+    expect(source).toContain('min-w-[min(100%,14rem)] flex-1');
+    expect(source).not.toMatch(/className="min-w-0 flex-1"/);
+  });
+});
