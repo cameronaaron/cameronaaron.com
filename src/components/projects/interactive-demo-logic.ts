@@ -60,6 +60,10 @@ export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
     title: 'Decode the Response',
     teaser: 'Read a real diagnostic reply. Every wrong answer is a specific decoding mistake the test vectors exist to catch.',
   },
+  'oram-access-game': {
+    title: 'Whose Record Was Read?',
+    teaser: 'Play the server. With plain storage you always know whose record was read; with Path ORAM you are stuck at chance.',
+  },
 };
 
 export function getDemoDescriptor(demo: InteractiveDemo): DemoDescriptor {

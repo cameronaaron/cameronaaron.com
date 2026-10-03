@@ -50,6 +50,7 @@ const DEMO_COMPONENTS: Record<InteractiveDemo, ComponentType> = {
     { ssr: false }
   ),
   'uds-frame-decoder': dynamic(() => import('@/components/projects/uds-decoder/UdsDecoderGame'), { ssr: false }),
+  'oram-access-game': dynamic(() => import('@/components/projects/oram/OramAccessGame'), { ssr: false }),
 };
 
 interface InteractiveDemoSlotProps {

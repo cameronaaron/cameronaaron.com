@@ -17,7 +17,8 @@ describe('projects logic', () => {
     // playable companion, so it now leads playableProjects rather than the
     // compact grid — the three-way partition (2026-07-26) exists precisely so
     // a demo-bearing project never sits in the grid away from its game.
-    // Mechanic (Sep 2026) is the newest project with a playable companion.
+    // Mechanic (Sep 2026) is the newest project with a playable companion;
+    // novachannel (Aug - Sep 2026) ties it and follows in source order.
     expect(playableProjects[0]?.title).toContain('Mechanic');
     // Homestead (Sep 2026 - Present) is the newest project without a demo.
     expect(otherProjects[0]?.title).toContain('Homestead');

@@ -12,7 +12,8 @@ export type InteractiveDemo =
   | 'ephemeral-room-game'
   | 'twice-exceptional-game'
   | 'divergent-thinking-game'
-  | 'uds-frame-decoder';
+  | 'uds-frame-decoder'
+  | 'oram-access-game';
 
 export interface Project {
   title: string;
@@ -90,6 +91,7 @@ export const projects: Project[] = [
     ],
     period: "Spring 2026",
     cta: "Capstone Project",
+    interactiveDemo: "oram-access-game",
     featured: true,
   },
   {

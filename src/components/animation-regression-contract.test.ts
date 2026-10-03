@@ -719,6 +719,7 @@ describe('animation regression contract', () => {
       'ephemeral-room/EphemeralRoomGame',
       'twice-exceptional/TwiceExceptionalGame',
       'divergent-thinking/DivergentThinkingGame',
+      'oram/OramAccessGame',
       'uds-decoder/UdsDecoderGame',
     ];
     for (const widget of splitWidgets) {
