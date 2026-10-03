@@ -21,7 +21,8 @@ export default function SmoothScroll() {
     const handleAnchorClick = (event: MouseEvent) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest?.('a[href^="#"]');
-      const elementId = anchor ? resolveHashElementId(anchor.getAttribute('href') ?? '') : null;
+      // The selector requires an href, so the attribute is always present.
+      const elementId = anchor ? resolveHashElementId(anchor.getAttribute('href')!) : null;
       const target = elementId ? document.getElementById(elementId) : null;
       if (!target) return;
       scrollToSection(target, {

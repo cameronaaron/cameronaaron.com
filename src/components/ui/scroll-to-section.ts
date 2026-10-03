@@ -54,7 +54,9 @@ export function scrollToSection(
   const stop = () => {
     cancelAnimationFrame(activeFrame);
     for (const type of USER_INPUT_EVENTS) window.removeEventListener(type, stop);
-    if (stopActiveJump === stop) stopActiveJump = null;
+    // A stop only ever runs as the active jump — its own input listeners or
+    // cancelSectionScroll call it — so it can always clear the slot.
+    stopActiveJump = null;
   };
 
   let listening = false;

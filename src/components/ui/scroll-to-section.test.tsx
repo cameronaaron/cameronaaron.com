@@ -177,6 +177,20 @@ describe('SmoothScroll anchor follow-up', () => {
     expect(frames).toHaveLength(0);
   });
 
+  it('ignores clicks that are not on an in-page link to a real element', () => {
+    makeTarget();
+    const { getByText } = render(
+      <>
+        <SmoothScroll />
+        <p>Plain text</p>
+        <a href="#">Top</a>
+        <a href="#nowhere">Dangling</a>
+      </>,
+    );
+    for (const label of ['Plain text', 'Top', 'Dangling']) fireEvent.click(getByText(label));
+    expect(frames).toHaveLength(0);
+  });
+
   it('stops following on unmount', () => {
     const { target, link, unmount } = renderWithAnchor();
     fireEvent.click(link);

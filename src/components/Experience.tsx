@@ -35,8 +35,9 @@ export default function Experience() {
 
   const handleJumpToExperience = (index: number) => {
     setActiveExperienceIndex(index);
-    const target = document.getElementById(getExperienceItemId(index));
-    if (target) scrollToSection(target, { reducedMotion: isLiteMotion });
+    // The quick-nav buttons and the items map the same list in one render,
+    // so every button's item exists.
+    scrollToSection(document.getElementById(getExperienceItemId(index))!, { reducedMotion: isLiteMotion });
   };
 
   // Stable identity so the memoized ExperienceCard never re-renders from a
