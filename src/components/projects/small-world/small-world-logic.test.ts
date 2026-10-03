@@ -97,6 +97,14 @@ describe('BFS', () => {
     expect(formatPath(shortestPath(6, 0, false)!)).toBe('Gia → Hugo → Cleo → Ana');
     expect(shortestPath(4, 4, true)).toEqual([4]);
   });
+
+  it('returns null once the queue is exhausted without reaching the target', () => {
+    // The roster is connected (pinned above), so the only undiscoverable
+    // target is one outside it — BFS must drain the queue and report no path,
+    // never loop or return a partial chain.
+    expect(shortestPath(0, PEOPLE.length, false)).toBeNull();
+    expect(shortestPath(0, PEOPLE.length, true)).toBeNull();
+  });
 });
 
 describe('rounds and chains', () => {
@@ -119,6 +127,14 @@ describe('rounds and chains', () => {
     expect(nextChoices(one)).toEqual([1, 3, 7]);
     expect(extendChain(one, 0)).toBe(one);
     expect(extendChain(one, 15)).toBe(one);
+  });
+
+  it('strands a chain whose end has no unvisited links — a real dead end', () => {
+    let state = INITIAL_CHAIN;
+    for (const person of [1, 2, 3, 5, 6, 8, 9, 7]) state = extendChain(state, person);
+    expect(state.chain).toEqual([0, 1, 2, 3, 5, 6, 8, 9, 7]);
+    expect(isComplete(state)).toBe(false);
+    expect(nextChoices(state)).toEqual([]);
   });
 
   it('undoes one step and never past the start', () => {

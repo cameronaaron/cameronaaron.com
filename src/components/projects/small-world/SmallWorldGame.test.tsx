@@ -41,4 +41,14 @@ describe('SmallWorldGame', () => {
     fireEvent.click(screen.getByTestId('small-world-next'));
     expect(screen.getByTestId('small-world-goal').textContent).toContain('Gia');
   });
+
+  it('says so when the chain walks into a dead end, and undo gets out of it', () => {
+    render(<SmallWorldGame />);
+    for (const person of [1, 2, 3, 5, 6, 8, 9, 7]) fireEvent.click(screen.getByTestId(`small-world-choose-${person}`));
+    expect(screen.getByTestId('small-world-choices').textContent).toBe('Dead end — undo a step.');
+
+    fireEvent.click(screen.getByTestId('small-world-undo'));
+    expect(screen.queryByText('Dead end — undo a step.')).toBeNull();
+    expect(screen.getByTestId('small-world-choose-7')).toBeTruthy();
+  });
 });
