@@ -5,14 +5,14 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20260921.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20260921.1'
-  - '@cloudflare/workerd-linux-64@1.20260921.1'
-  - '@cloudflare/workerd-linux-arm64@1.20260921.1'
-  - '@cloudflare/workerd-windows-64@1.20260921.1'
-  - miniflare@5.20260921.0-alpha
-  - workerd@1.20260921.1
-  - wrangler@4.137.0
+  - '@cloudflare/workerd-darwin-64@1.20261001.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20261001.1'
+  - '@cloudflare/workerd-linux-64@1.20261001.1'
+  - '@cloudflare/workerd-linux-arm64@1.20261001.1'
+  - '@cloudflare/workerd-windows-64@1.20261001.1'
+  - miniflare@5.20261001.0-alpha
+  - workerd@1.20261001.1
+  - wrangler@4.147.0
 overrides:
   postcss: ">=8.5.20"
   "@opentelemetry/core": ">=2.8.0"
@@ -70,4 +70,14 @@ overrides:
   smol-toml: ">=1.9.0 <2"
 patchedDependencies:
   '@stryker-mutator/vitest-runner@10.0.0': patches/@stryker-mutator__vitest-runner@10.0.0.patch
-  next@16.3.6: patches/next@16.3.6.patch
+  next@16.3.8: patches/next@16.3.8.patch
+auditConfig:
+  ignoreGhsas:
+    # GHSA-vfj7-8cjw-p6xm (high, published 2026-09-18): braces stack-exhaustion
+    # DoS on deeply nested patterns. Every release <=3.0.3 is affected and no
+    # patched version exists, so no override can fix it. Reached only via
+    # micromatch from eslint-config-next and markdownlint-cli2 — lint-time
+    # tooling fed this repo's own glob patterns, never shipped to a visitor.
+    # Reopen: delete this entry the day braces publishes a fix, and add a
+    # `braces: ">=<fixed>"` override instead.
+    - GHSA-vfj7-8cjw-p6xm
