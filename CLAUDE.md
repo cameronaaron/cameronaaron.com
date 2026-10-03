@@ -55,6 +55,16 @@ are **one** commit (the ratchet rule); unrelated changes are separate commits.
 Every commit passes `npm test`, `npm run type-check`, and `npm run lint`.
 See ENGINEERING-STANDARDS.md §6, ratchet item 12.
 
+No AI-tool attribution in commit messages, ever. A `commit-msg` hook
+(`scripts/verify/verify-commit-message.mjs`) strips `Co-authored-by:` and
+similar trailers naming a coding tool, `Generated with …` lines and the 🤖
+marker from every commit, and `commit-attribution-contract` fails the gate if
+any commit in history still has one. History was rewritten on 2026-10-03 to
+remove 192 such trailers (191 Claude, 1 Cursor), re-signing the 55 commits that
+had SSH signatures; another clone made before then must be re-cloned or
+`git reset --hard origin/master`, never merged or pulled with rebase, or it
+brings the old history back.
+
 Hook gate (simple-git-hooks): **pre-commit runs the full gate, and pre-push
 runs that same gate as a strict prefix plus more** — lockfile sync, a
 gitleaks staged-diff scan, type-check, zero-warning lint, the entire test
@@ -196,6 +206,7 @@ src/components/section-ordering-contract.test.tsx  # experience/projects render 
 src/ssr-hydration-contract.test.ts     # no browser-API useState lazy initializers (React #418)
 src/coverage-provider-contract.test.ts # istanbul strict gate + V8 second-opinion provider pinned
 src/standards-enforcement-contract.test.ts  # docs cite real enforcers; contracts documented; §9.4 registry complete; artifact gate on pre-push
+src/commit-attribution-contract.test.ts     # no AI-tool co-author/"Generated with" lines in any commit; commit-msg hook wired
 ```
 
 Run a focused subset: `npx vitest run src/components/animation-regression-contract.test.ts`

@@ -29,6 +29,7 @@
     ]
   },
   "simple-git-hooks": {
+    "commit-msg": "node scripts/verify/verify-commit-message.mjs \"$1\"",
     "pre-commit": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run security:leaks:staged && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed",
     "pre-push": "node scripts/verify/verify-lockfile-sync.mjs && pnpm run security:leaks:staged && pnpm run type-check && pnpm run lint && pnpm test && pnpm run test:mutation:changed && pnpm run security:leaks:history && pnpm run build && node scripts/checks/performance-budgets.mjs"
   },
