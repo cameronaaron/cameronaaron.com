@@ -135,11 +135,17 @@ export interface DivergentScore {
   total: number;
 }
 
-/** Resolve selected use ids against an object, skipping anything unknown. */
+/**
+ * Resolve selected use ids against an object, skipping anything unknown.
+ * Indexes the catalog once, then one lookup per id — O(uses + selected), in
+ * selection order.
+ */
 export function resolveUses(object: UseObject, selected: readonly string[]): AlternativeUse[] {
+  const byId = new Map<string, AlternativeUse>();
+  for (const use of object.uses) byId.set(use.id, use);
   const resolved: AlternativeUse[] = [];
   for (const id of selected) {
-    const use = object.uses.find((candidate) => candidate.id === id);
+    const use = byId.get(id);
     if (use) resolved.push(use);
   }
   return resolved;
@@ -181,11 +187,10 @@ export function toggleUse(selected: readonly string[], id: string): string[] {
 
 /** Every distinct category an object can reach — the flexibility ceiling. */
 export function getAvailableCategories(object: UseObject): UseCategory[] {
-  const categories: UseCategory[] = [];
-  for (const use of object.uses) {
-    if (!categories.includes(use.category)) categories.push(use.category);
-  }
-  return categories;
+  // A Set keeps insertion order, so first-seen order survives the dedupe.
+  const categories = new Set<UseCategory>();
+  for (const use of object.uses) categories.add(use.category);
+  return [...categories];
 }
 
 /**

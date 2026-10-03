@@ -30,6 +30,7 @@ import {
 export default function CollectiveIntelligenceGame() {
   const [selected, setSelected] = useState<string[]>([]);
 
+  const selectedIds = useMemo(() => new Set(selected), [selected]);
   const team = useMemo(() => resolveTeam(selected), [selected]);
   const score = useMemo(() => scoreTeam(team), [team]);
   const complete = isTeamComplete(selected);
@@ -71,7 +72,7 @@ export default function CollectiveIntelligenceGame() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CANDIDATE_POOL.map((candidate) => {
-          const isSelected = selected.includes(candidate.id);
+          const isSelected = selectedIds.has(candidate.id);
           const atCapacity = complete && !isSelected;
           return (
             <button

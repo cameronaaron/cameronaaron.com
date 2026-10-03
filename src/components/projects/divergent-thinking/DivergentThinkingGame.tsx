@@ -30,6 +30,7 @@ export default function DivergentThinkingGame() {
   const [selected, setSelected] = useState<string[]>([]);
 
   const object = USE_OBJECTS[objectIndex];
+  const selectedIds = useMemo(() => new Set(selected), [selected]);
   const uses = useMemo(() => resolveUses(object, selected), [object, selected]);
   const score = useMemo(() => scoreResponses(uses), [uses]);
   const categories = useMemo(() => getAvailableCategories(object), [object]);
@@ -81,7 +82,7 @@ export default function DivergentThinkingGame() {
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {object.uses.map((use) => {
-          const isSelected = selected.includes(use.id);
+          const isSelected = selectedIds.has(use.id);
           return (
             <button
               key={use.id}

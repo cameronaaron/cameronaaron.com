@@ -60,6 +60,74 @@ function sweep(rule: string, offenders: (src: string) => boolean): string[] {
   return hits;
 }
 
+const ITERATING_METHODS = new Set(['map', 'filter', 'forEach', 'some', 'every', 'reduce', 'flatMap', 'find', 'findIndex']);
+const SCANNING_METHODS = new Set(['find', 'findIndex', 'findLast', 'indexOf', 'lastIndexOf', 'includes', 'filter', 'some', 'every']);
+
+/**
+ * Every array scan (find/includes/indexOf/filter/some/…) whose receiver the
+ * type checker resolves to an array, sitting inside a loop body or an array
+ * iteration callback. Returns `relative/path.ts:line  source` strings.
+ * `overrides` serves in-memory file contents (the instrument check).
+ */
+function findNestedArrayScans(files: string[], overrides: Record<string, string> = {}): string[] {
+  const config = ts.getParsedCommandLineOfConfigFile(join(ROOT, 'tsconfig.json'), {}, {
+    ...ts.sys,
+    onUnRecoverableConfigFileDiagnostic: () => {},
+  });
+  const options = { ...config?.options, noEmit: true };
+  const host = ts.createCompilerHost(options);
+  const readSource = host.getSourceFile.bind(host);
+  host.getSourceFile = (name, languageVersion, ...rest) =>
+    name in overrides ? ts.createSourceFile(name, overrides[name], languageVersion, true) : readSource(name, languageVersion, ...rest);
+  const program = ts.createProgram(files, options, host);
+  const checker = program.getTypeChecker();
+  const wanted = new Set(files);
+  const isArray = (node: ts.Node) => {
+    const type = checker.getNonNullableType(checker.getTypeAtLocation(node));
+    return checker.isArrayType(type) || checker.isTupleType(type);
+  };
+  const isCallback = (node: ts.Node) => ts.isArrowFunction(node) || ts.isFunctionExpression(node);
+
+  const hits: string[] = [];
+  for (const sourceFile of program.getSourceFiles()) {
+    if (!wanted.has(sourceFile.fileName)) continue;
+    const visit = (node: ts.Node, depth: number): void => {
+      if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+        const method = node.expression.name.text;
+        const receiver = node.expression.expression;
+        if (depth > 0 && SCANNING_METHODS.has(method) && isArray(receiver)) {
+          const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+          const rel = sourceFile.fileName.replace(`${ROOT}/`, '');
+          hits.push(`${rel}:${line + 1}  ${node.getText().replace(/\s+/g, ' ').slice(0, 90)}`);
+        }
+        if (ITERATING_METHODS.has(method) && isArray(receiver)) {
+          visit(node.expression, depth);
+          for (const arg of node.arguments) visit(arg, isCallback(arg) ? depth + 1 : depth);
+          return;
+        }
+      }
+      // A named function is its own unit: its body runs per call, not per item.
+      if (ts.isFunctionDeclaration(node)) {
+        ts.forEachChild(node, (child) => visit(child, 0));
+        return;
+      }
+      if (ts.isForOfStatement(node) || ts.isForInStatement(node)) {
+        visit(node.initializer, depth);
+        visit(node.expression, depth);
+        visit(node.statement, depth + 1);
+        return;
+      }
+      if (ts.isForStatement(node) || ts.isWhileStatement(node) || ts.isDoStatement(node)) {
+        ts.forEachChild(node, (child) => visit(child, depth + 1));
+        return;
+      }
+      ts.forEachChild(node, (child) => visit(child, depth));
+    };
+    visit(sourceFile, 0);
+  }
+  return hits;
+}
+
 describe('complexity-doctrine-contract — repo-wide anti-pattern sweeps', () => {
   it('no filter().map() chains — single-pass loop instead of an intermediate array', () => {
     // Mirror of the existing map().filter() ban: .filter(...).map(...) walks
@@ -143,13 +211,32 @@ describe('complexity-doctrine-contract — repo-wide anti-pattern sweeps', () =>
     ).toEqual([]);
   });
 
-  it('no .find() inside a .map() callback — that is an O(n·m) nested scan; index with a Map first', () => {
-    const nestedScan = /\.map\((?:[^()]|\([^()]*\))*\.find\(/;
-    const hits = sweep('nested-scan', (src) => nestedScan.test(src));
+  it('no linear array scan nested inside an iteration — O(n·m); index with a Map/Set first (typed AST)', () => {
+    // 2026-10: this was a regex for `.find(` inside `.map(` only. It missed a
+    // `.find` inside a for…of (divergent-thinking resolveUses), an
+    // `.includes` dedupe inside a for…of, and `selected.includes(id)` inside
+    // the render `.map` of two games — every item's render rescanned the
+    // selection. The type checker is what makes the wider net usable: it
+    // separates an array `.includes` (a scan) from a string `.includes`.
+    const hits = findNestedArrayScans(listProductionSources()).filter(
+      (hit) => !(`${hit.split(':')[0]}::nested-scan` in ALLOWED_COMPLEXITY_EXCEPTIONS),
+    );
     expect(
       hits,
-      `nested collection scan(s) — build a Map keyed by the join field once, then .get() in the map callback:\n${hits.join('\n')}`,
+      `nested collection scan(s) — build a Map/Set once outside the loop, then .get()/.has() inside it:\n${hits.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('the nested-scan sweep fires on both loop forms and ignores string scans (instrument check)', () => {
+    const fixture = join(SRC, '__nested_scan_fixture__.ts');
+    const source = [
+      'export function a(ids: string[], items: { id: string }[]) { return items.map((i) => ids.includes(i.id)); }',
+      'export function b(ids: string[], items: { id: string }[]) { for (const id of ids) items.find((i) => i.id === id); }',
+      'export function c(words: string[], text: string) { return words.map((w) => text.includes(w)); }',
+      'export function d(ids: string[], items: { id: string }[]) { return ids.includes(items[0].id); }',
+    ].join('\n');
+    const hits = findNestedArrayScans([fixture], { [fixture]: source });
+    expect(hits.map((hit) => /:(\d+)\s/.exec(hit)?.[1])).toEqual(['1', '2']);
   });
 
   it('no .filter(...).length — allocates a throwaway array to compute a count or an existence check', () => {

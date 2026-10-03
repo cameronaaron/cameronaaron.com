@@ -170,6 +170,12 @@ describe('resolveUses / getAvailableCategories', () => {
     expect(resolveUses(BRICK, ['wall', 'not-a-use']).map((u) => u.id)).toEqual(['wall']);
   });
 
+  it('keeps selection order and repeats, not catalog order', () => {
+    // A Set-filter over the catalog would also be linear but silently reorder
+    // and dedupe — that rewrite was tried (2026-10) and broke the spread test.
+    expect(resolveUses(BRICK, ['chalk', 'wall', 'wall']).map((u) => u.id)).toEqual(['chalk', 'wall', 'wall']);
+  });
+
   it('lists each available category exactly once, in first-seen order', () => {
     const categories = getAvailableCategories(BRICK);
     expect(new Set(categories).size).toBe(categories.length);
