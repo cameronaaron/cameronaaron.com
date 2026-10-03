@@ -68,6 +68,10 @@ export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
     title: 'Shortest Chain',
     teaser: 'Connect two friend groups and beat breadth-first search, then see which links were only ever seen one way.',
   },
+  'room-memory-field': {
+    title: 'The Room Remembers',
+    teaser: 'Walk through a dark room running the installation’s own memory field. Stand still and it remembers you; leave and it forgets.',
+  },
 };
 
 export function getDemoDescriptor(demo: InteractiveDemo): DemoDescriptor {

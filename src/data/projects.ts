@@ -14,7 +14,8 @@ export type InteractiveDemo =
   | 'divergent-thinking-game'
   | 'uds-frame-decoder'
   | 'oram-access-game'
-  | 'small-world-path';
+  | 'small-world-path'
+  | 'room-memory-field';
 
 export interface Project {
   title: string;
@@ -47,6 +48,7 @@ export const projects: Project[] = [
     description: "An offline gallery installation. A camera is reduced on the spot to anonymous motion cells — no frame is kept — and a WebGL2 field of up to 360,000 particles follows the room's memory of where people walked. Stillness leaves a deeper mark than motion, memories decay and mutate each time they are recalled, and occasionally one comes back false. Voices are held in RAM for the visit only; nothing leaves the machine.",
     tags: ["Interactive Installation", "WebGL2", "Privacy by Design", "TypeScript"],
     period: "Sep 2026",
+    interactiveDemo: "room-memory-field",
     ...repositoryFields('cameronaaron/Art-Project'),
   },
   {

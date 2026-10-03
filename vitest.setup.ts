@@ -293,6 +293,13 @@ beforeAll(() => {
       fillRect: vi.fn(),
       drawImage: vi.fn(),
       createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+      // Shaped like the real ImageData so pixel-writing code runs for real.
+      createImageData: vi.fn((width: number, height: number) => ({
+        width,
+        height,
+        data: new Uint8ClampedArray(width * height * 4),
+      })),
+      putImageData: vi.fn(),
       fillStyle: '',
       strokeStyle: '',
       lineWidth: 1,

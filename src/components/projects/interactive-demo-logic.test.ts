@@ -98,6 +98,7 @@ describe('every game is paired with the work it is about', () => {
       if (project.interactiveDemo) pairing[project.interactiveDemo] = project.title;
     }
     expect(pairing).toEqual({
+      'room-memory-field': 'The Room Remembers You',
       'uds-frame-decoder': 'Mechanic: Open Vehicle Diagnostics',
       'oram-access-game': 'novachannel: Metadata-Resistant Messaging in Rust',
       'small-world-path': 'Social Graph Crawler & Network Map',
