@@ -69,6 +69,12 @@ const SCANNING_METHODS = new Set(['find', 'findIndex', 'findLast', 'indexOf', 'l
  * iteration callback. Returns `relative/path.ts:line  source` strings.
  * `overrides` serves in-memory file contents (the instrument check).
  */
+// Building a type-checked program parses every source plus the lib and
+// dependency .d.ts files. Measured 2026-10-03: ~0.8 s locally, 10.6 s on a
+// GitHub runner under the coverage gate — past vitest's 5 s default, so the
+// sweep failed CI on time alone. Both callers get an explicit budget.
+const TYPED_AST_TIMEOUT_MS = 60_000;
+
 function findNestedArrayScans(files: string[], overrides: Record<string, string> = {}): string[] {
   const config = ts.getParsedCommandLineOfConfigFile(join(ROOT, 'tsconfig.json'), {}, {
     ...ts.sys,
@@ -225,7 +231,7 @@ describe('complexity-doctrine-contract — repo-wide anti-pattern sweeps', () =>
       hits,
       `nested collection scan(s) — build a Map/Set once outside the loop, then .get()/.has() inside it:\n${hits.join('\n')}`,
     ).toEqual([]);
-  });
+  }, TYPED_AST_TIMEOUT_MS);
 
   it('the nested-scan sweep fires on both loop forms and ignores string scans (instrument check)', () => {
     const fixture = join(SRC, '__nested_scan_fixture__.ts');
@@ -237,7 +243,7 @@ describe('complexity-doctrine-contract — repo-wide anti-pattern sweeps', () =>
     ].join('\n');
     const hits = findNestedArrayScans([fixture], { [fixture]: source });
     expect(hits.map((hit) => /:(\d+)\s/.exec(hit)?.[1])).toEqual(['1', '2']);
-  });
+  }, TYPED_AST_TIMEOUT_MS);
 
   it('no .filter(...).length — allocates a throwaway array to compute a count or an existence check', () => {
     const filterLength = /\.filter\((?:[^()]|\([^()]*\))*\)\.length/;
