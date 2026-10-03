@@ -523,6 +523,7 @@ All security/caching headers live in `public/_headers` (there is no `middleware.
 - Gradient text missing `text-transparent` — the gradient won't show without it (and never nest a persistently-transformed element inside a `bg-clip-text` ancestor — constraint #15).
 - Static export can't use Next.js features needing a Node.js runtime (API routes, ISR, etc.).
 - Missing ARIA labels — every section needs `aria-label` or `aria-labelledby`.
+- Browser-checking `/out` with `data-testid` selectors — `reactRemoveProperties` strips them from production builds, so a Playwright probe finds nothing and looks like a broken site. Select by role, `aria-label`, or element id instead.
 
 ## Algorithm and data-structure standards
 
