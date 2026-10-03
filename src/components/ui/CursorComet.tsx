@@ -121,7 +121,9 @@ export default function CursorComet() {
       ctx.clearRect(0, 0, width, height);
       for (const spark of pool.sparks) {
         if (spark.life <= 0) continue;
-        // Colours come from PARTICLE_COLORS, so the sprite always exists.
+        // Every world colour is pre-rendered above (PARTICLE_COLORS is the
+        // 'ice' world's palette, pinned in hero-logic.test), and handleWorldChange
+        // renders any other colour before it can be emitted.
         const sprite = sprites.get(spark.color)!;
         const diameter = spark.size * GLOW_DIAMETER_MULTIPLIER * spark.life;
         ctx.globalAlpha = Math.min(1, spark.life);

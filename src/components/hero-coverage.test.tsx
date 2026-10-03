@@ -188,6 +188,10 @@ describe('hero worlds interaction', () => {
     fireEvent.click(clinical);
     expect(worldListener).toHaveBeenCalledTimes(1);
     expect(clinical.getAttribute('aria-selected')).toBe('true');
+    // Clicking the world that is already showing is not a change — no second
+    // spark storm from CursorComet.
+    fireEvent.click(clinical);
+    expect(worldListener).toHaveBeenCalledTimes(1);
     expect(container.querySelector('#home')?.getAttribute('data-world')).toBe('mint');
     expect(getByRole('link', { name: /view clinical credentials/i }).getAttribute('href')).toBe('#certifications');
     expect(container.querySelectorAll('[data-testid="dynamic-mock"]')).toHaveLength(1);

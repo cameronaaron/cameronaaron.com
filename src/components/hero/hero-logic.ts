@@ -146,17 +146,8 @@ export function buildHeroWorldChangeEvent(tone: HeroWorldTone): CustomEvent<Hero
 /** Unique particle colours across every world — CursorComet pre-renders one sprite each. */
 export function collectHeroWorldParticleColors(): string[] {
   const seen = new Set<string>();
-  const out: string[] = [];
-  const atmospheres = Object.values(HERO_WORLD_ATMOSPHERE);
-  for (let a = 0; a < atmospheres.length; a += 1) {
-    const colors = atmospheres[a].particleColors;
-    for (let i = 0; i < colors.length; i += 1) {
-      const color = colors[i];
-      if (!seen.has(color)) {
-        seen.add(color);
-        out.push(color);
-      }
-    }
+  for (const atmosphere of Object.values(HERO_WORLD_ATMOSPHERE)) {
+    for (const color of atmosphere.particleColors) seen.add(color);
   }
-  return out;
+  return [...seen];
 }

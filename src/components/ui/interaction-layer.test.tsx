@@ -304,6 +304,29 @@ describe('CursorComet', () => {
     expect(rafQueue).toHaveLength(0);
   });
 
+  it('renders a world colour it has never seen with a sprite of its own', () => {
+    render(<CursorComet />);
+    const novel = 'rgba(1, 2, 3, 0.5)';
+
+    fireEvent(window, new CustomEvent(HERO_WORLD_CHANGE_EVENT, { detail: { tone: 'amber', colors: [novel] } }));
+    flushFrames(400);
+
+    // A missing sprite would reach drawImage as undefined.
+    expect(mockCtx.drawImage).toHaveBeenCalled();
+    for (const [image] of mockCtx.drawImage.mock.calls) expect(image).toBeInstanceOf(HTMLCanvasElement);
+  });
+
+  it('keeps the current trail colours when a world change carries none', () => {
+    render(<CursorComet />);
+
+    fireEvent(window, new CustomEvent(HERO_WORLD_CHANGE_EVENT, { detail: { tone: 'amber', colors: [] } }));
+    expect(rafQueue.length).toBeGreaterThan(0);
+    flushFrames(400);
+
+    expect(mockCtx.drawImage).toHaveBeenCalled();
+    for (const [image] of mockCtx.drawImage.mock.calls) expect(image).toBeInstanceOf(HTMLCanvasElement);
+  });
+
   it('cleans up listeners and frames on unmount', () => {
     const { unmount } = render(<CursorComet />);
     fireEvent.mouseMove(window, { clientX: 100, clientY: 100 });
