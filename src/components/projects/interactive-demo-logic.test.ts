@@ -98,6 +98,7 @@ describe('every game is paired with the work it is about', () => {
       if (project.interactiveDemo) pairing[project.interactiveDemo] = project.title;
     }
     expect(pairing).toEqual({
+      'homestead-outbox': 'Homestead: Operations Core for Sun Brewed Homestead',
       'room-memory-field': 'The Room Remembers You',
       'uds-frame-decoder': 'Mechanic: Open Vehicle Diagnostics',
       'oram-access-game': 'novachannel: Metadata-Resistant Messaging in Rust',

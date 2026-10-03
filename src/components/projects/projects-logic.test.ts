@@ -17,11 +17,12 @@ describe('projects logic', () => {
     // playable companion, so it now leads playableProjects rather than the
     // compact grid — the three-way partition (2026-07-26) exists precisely so
     // a demo-bearing project never sits in the grid away from its game.
-    // The Room Remembers You (Sep 2026) leads the Sep 2026 projects with a
-    // playable companion; ties keep source order (stable sort).
-    expect(playableProjects[0]?.title).toContain('The Room Remembers You');
-    // Homestead (Sep 2026 - Present) is the newest project without a demo.
-    expect(otherProjects[0]?.title).toContain('Homestead');
+    // Homestead (Sep 2026 - Present) is the newest project and, since it got
+    // Survive the Outage, a playable one; The Room Remembers You follows.
+    expect(playableProjects[0]?.title).toContain('Homestead');
+    expect(playableProjects[1]?.title).toContain('The Room Remembers You');
+    // Matrix Archive (Aug 2025 - Aug 2026) is now the newest project without a demo.
+    expect(otherProjects[0]?.title).toContain('Matrix Archive');
   });
 
   it('actually reorders featured projects by period, not by input order', () => {

@@ -720,6 +720,7 @@ describe('animation regression contract', () => {
       'twice-exceptional/TwiceExceptionalGame',
       'divergent-thinking/DivergentThinkingGame',
       'room-memory/RoomMemoryGame',
+      'homestead/HomesteadOutboxGame',
       'small-world/SmallWorldGame',
       'oram/OramAccessGame',
       'uds-decoder/UdsDecoderGame',

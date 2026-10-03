@@ -72,6 +72,10 @@ export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
     title: 'The Room Remembers',
     teaser: 'Walk through a dark room running the installation’s own memory field. Stand still and it remembers you; leave and it forgets.',
   },
+  'homestead-outbox': {
+    title: 'Survive the Outage',
+    teaser: 'Take Discord or Linear down and watch the outbox back off and dead-letter. Then crash a delivery halfway and count the Linear issues.',
+  },
 };
 
 export function getDemoDescriptor(demo: InteractiveDemo): DemoDescriptor {
