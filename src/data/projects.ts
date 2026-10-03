@@ -38,7 +38,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     title: "Homestead: Operations Core for Sun Brewed Homestead",
-    description: "One Rust service (Axum, Postgres) that runs a community farm's day-to-day operations — plantings, harvests, tasks, animals, inventory, volunteer hours, the farm stand — and keeps Discord and Linear in sync through a transactional outbox. Every write commits its event in the same transaction; deliveries retry with backoff into a dead-letter queue, and Linear issues get IDs derived from what they mirror, so a retried delivery finds its issue instead of duplicating it. Permissions are capabilities, bundled per role.",
+    description: "One Rust service (Axum, Postgres) that runs a community farm's day-to-day operations — plantings, harvests, tasks, animals, inventory, volunteer hours, the farm stand — and keeps Discord and Linear in sync through a transactional outbox. Every write commits its event in the same transaction; deliveries retry with backoff into a dead-letter queue, and Linear issues get IDs derived from what they mirror, so a retried delivery finds its issue instead of duplicating it. Permissions are capabilities, bundled per role. Discord, Linear, GitHub, Zeffy, Buffer and Documenso are each described by a TOML file in the repo, and CI keeps file and system in step both ways: it applies repo edits, writes edits made in the apps back to TOML, and stops on a conflict.",
     tags: ["Rust", "Postgres", "Event-Driven Architecture", "Nonprofit Operations"],
     period: "Sep 2026 - Present",
     ...repositoryFields('cameronaaron/homestead'),
