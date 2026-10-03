@@ -11,6 +11,10 @@ import { experiences } from '@/data/experience';
 import { profile } from '@/data/profile';
 import { projects } from '@/data/projects';
 
+// The featured capstone: a linked project. Not `projects[0]` — the data is
+// ordered newest-first, and the newest work can be a private repository.
+const capstoneProject = projects.find((project) => project.link?.includes('/capstone'))!;
+
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -77,7 +81,7 @@ describe('remaining line coverage', () => {
   });
 
   it('covers ProjectCard hover branches and fallback CTA in featured project', () => {
-    render(<ProjectCard project={projects[0]} index={0} />);
+    render(<ProjectCard project={capstoneProject} index={0} />);
 
     const card = screen.getByTestId('project-card-0') as HTMLElement;
     Object.defineProperty(card, 'getBoundingClientRect', {
@@ -89,7 +93,7 @@ describe('remaining line coverage', () => {
     fireEvent.mouseMove(card, { clientX: 70, clientY: 45 });
     fireEvent.mouseLeave(card);
 
-    render(<FeaturedProject project={{ ...projects[0], cta: undefined }} index={0} />);
+    render(<FeaturedProject project={{ ...capstoneProject, cta: undefined }} index={0} />);
     render(<FeaturedProject project={projects[1]} />);
     expect(screen.getByText('View Publication')).toBeTruthy();
   });
@@ -104,7 +108,7 @@ describe('remaining line coverage', () => {
     }));
 
     const { default: ProjectCardReduced } = await import('@/components/projects/ProjectCard');
-    render(<ProjectCardReduced project={projects[0]} index={1} />);
+    render(<ProjectCardReduced project={capstoneProject} index={1} />);
 
     const reducedCard = screen.getByTestId('project-card-1');
     fireEvent.mouseEnter(reducedCard);

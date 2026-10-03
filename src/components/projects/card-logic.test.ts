@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PROJECT_CARD_MAX_TAGS,
   getProjectCardCta,
+  getProjectCardLinkProps,
   getProjectReadingMinutes,
   getProjectTopTags,
 } from '@/components/projects/card-logic';
@@ -28,5 +29,19 @@ describe('project card logic', () => {
     expect(getProjectTopTags(tags)).toBe(tags);
     const exact = ['a', 'b', 'c'];
     expect(getProjectTopTags(exact)).toBe(exact);
+  });
+
+  it('gives a linked card new-tab anchor attributes', () => {
+    expect(getProjectCardLinkProps('https://github.com/cameronaaron/novachannel')).toEqual({
+      href: 'https://github.com/cameronaaron/novachannel',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    });
+  });
+
+  it('gives a private-repository card no anchor attributes at all, without allocating', () => {
+    expect(getProjectCardLinkProps(undefined)).toEqual({});
+    expect(getProjectCardLinkProps('')).toEqual({});
+    expect(getProjectCardLinkProps(undefined)).toBe(getProjectCardLinkProps(undefined));
   });
 });

@@ -7,6 +7,10 @@ import { experiences } from '@/data/experience';
 import { profile } from '@/data/profile';
 import { projects } from '@/data/projects';
 
+// The featured capstone: a linked project. Not `projects[0]` — the data is
+// ordered newest-first, and the newest work can be a private repository.
+const capstoneProject = projects.find((project) => project.link?.includes('/capstone'))!;
+
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -194,7 +198,7 @@ describe('targeted coverage gaps', () => {
       <>
         <ExperienceCard experience={experiences[0]} index={0} />
         <ProfileImage src={profile.image} alt={profile.name} />
-        <ProjectCard project={projects[0]} index={0} />
+        <ProjectCard project={capstoneProject} index={0} />
         <Button onClick={() => undefined}>NoHover</Button>
         <Magnetic><button type="button">Still</button></Magnetic>
       </>
@@ -206,7 +210,7 @@ describe('targeted coverage gaps', () => {
     fireEvent.mouseMove(experienceCard, { clientX: 20, clientY: 20 });
     fireEvent.mouseLeave(experienceCard);
 
-    const projectLink = screen.getAllByRole('link').find((link) => link.getAttribute('href') === projects[0].link);
+    const projectLink = screen.getAllByRole('link').find((link) => link.getAttribute('href') === capstoneProject.link);
     expect(projectLink).toBeTruthy();
 
     if (projectLink) {

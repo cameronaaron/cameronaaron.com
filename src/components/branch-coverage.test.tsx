@@ -15,6 +15,10 @@ import TypewriterEffect from './ui/TypewriterEffect';
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
 
+// The featured capstone: a linked project. Not `projects[0]` — the data is
+// ordered newest-first, and the newest work can be a private repository.
+const capstoneProject = projects.find((project) => project.link?.includes('/capstone'))!;
+
 afterEach(() => {
   vi.useRealTimers();
 });
@@ -60,9 +64,9 @@ describe('branch coverage targets', () => {
       <>
         <ExperienceCard experience={experiences[0]} index={0} />
         <ExperienceCard experience={expWithoutUrl} index={1} />
-        <FeaturedProject project={projects[0]} index={1} />
-        <FeaturedProject project={projects[0]} index={2} />
-        <ProjectCard project={projects[0]} index={0} />
+        <FeaturedProject project={capstoneProject} index={1} />
+        <FeaturedProject project={capstoneProject} index={2} />
+        <ProjectCard project={capstoneProject} index={0} />
       </>
     );
 
@@ -75,7 +79,7 @@ describe('branch coverage targets', () => {
     fireEvent.error(companyImages[0]);
 
     const projectLinks = screen.getAllByRole('link');
-    const projectCardLink = projectLinks.find((node) => node.getAttribute('href') === projects[0].link);
+    const projectCardLink = projectLinks.find((node) => node.getAttribute('href') === capstoneProject.link);
     expect(projectCardLink).toBeTruthy();
 
     if (projectCardLink) {

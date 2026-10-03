@@ -7,7 +7,12 @@ import ScrambleText from '@/components/ui/ScrambleText';
 import SpotlightCard from '@/components/ui/SpotlightCard';
 import { use3DTilt } from '@/hooks/use3DTilt';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
-import { getProjectCardCta, getProjectReadingMinutes, getProjectTopTags } from '@/components/projects/card-logic';
+import {
+  getProjectCardCta,
+  getProjectCardLinkProps,
+  getProjectReadingMinutes,
+  getProjectTopTags,
+} from '@/components/projects/card-logic';
 
 interface ProjectCardProps {
   project: Project;
@@ -25,7 +30,10 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   const { handleMouseMove: tiltMouseMove, handleMouseLeave: tiltMouseLeave, rotateX: springRotateX, rotateY: springRotateY } =
     use3DTilt({ maxRotation: 8 });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const linkProps = useMemo(() => getProjectCardLinkProps(project.link), [project.link]);
+  const isLinked = linkProps.href !== undefined;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!enableHoverMotion) return;
     tiltMouseMove(e);
   };
@@ -42,10 +50,8 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
   return (
     <SpotlightCard
-      as={m.a}
-      href={project.link}
-      target="_blank"
-      rel="noopener noreferrer"
+      as={isLinked ? m.a : m.article}
+      {...linkProps}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -128,15 +134,22 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           transition={{ duration: 0.2 }}
         >
           {getProjectCardCta(project.cta)}
-          <svg
-            className="arrow-nudge-anim w-4 h-4 ml-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+          {isLinked ? (
+            <svg
+              className="arrow-nudge-anim w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" strokeWidth={2} />
+              <path strokeLinecap="round" strokeWidth={2} d="M8 11V7a4 4 0 018 0v4" />
+            </svg>
+          )}
         </m.div>
       </div>
     </SpotlightCard>

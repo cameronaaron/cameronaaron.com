@@ -278,7 +278,7 @@ describe('structured data builders', () => {
 
       it('marks only the capstone-linked project as ScholarlyArticle with extra fields', () => {
         for (const entry of items) {
-          const isCapstone = entry.item.name === projects.find((p) => p.link.includes('/capstone'))?.title;
+          const isCapstone = entry.item.name === projects.find((p) => p.link?.includes('/capstone'))?.title;
           if (isCapstone) {
             expect(entry.item['@type']).toBe('ScholarlyArticle');
             expect(entry.item.isAccessibleForFree).toBe(true);

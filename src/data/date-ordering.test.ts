@@ -32,7 +32,8 @@ describe('date ordering utility', () => {
     const sortedEducation = sortByDateDesc(educationItems, (item) => item.period);
     const sortedHonors = sortByDateDesc(honorsAndAffiliations, (item) => item.label);
 
-    expect(sortedProjects[0].title).toContain('Bridging Transitions');
+    // Sep 2026 work (Homestead first in source order, stable sort) now leads.
+    expect(sortedProjects[0].title).toContain('Homestead');
     expect(sortedCertifications[0].name).toBe('Certified Nursing Assistant (CNA)');
     expect(sortedEducation[0].credential).toContain('Nursing Prerequisite Coursework');
     expect(sortedHonors[0].label).toContain('Magna Cum Laude');

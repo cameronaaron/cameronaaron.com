@@ -67,7 +67,7 @@ describe('meoninternet coverage integration', () => {
     const internetTitles = internetFeatures.map((item) => item.title);
     const internetUrls = internetFeatures.map((item) => item.url ?? '');
     const projectTitles = projects.map((item) => item.title);
-    const projectLinks = projects.map((item) => item.link);
+    const projectLinks = projects.flatMap((item) => (item.link ? [item.link] : []));
 
     expect(internetTitles).toContain('2e Symposium Speaker Biography');
     expect(internetTitles).toContain('Stanford Neurodiversity in Entrepreneurship Summit Speaker Listing');
@@ -154,7 +154,7 @@ describe('meoninternet coverage integration', () => {
       ...additionalCredentials.map((item) => item.verificationUrl),
       ...certifications.map((item) => item.verificationUrl),
       ...internetFeatures.map((item) => item.url ?? ''),
-      ...projects.map((item) => item.link),
+      ...projects.flatMap((item) => (item.link ? [item.link] : [])),
       ...educationItems.flatMap((item) =>
         (item.verificationLinks ?? []).map((link) => link.url)
       ),

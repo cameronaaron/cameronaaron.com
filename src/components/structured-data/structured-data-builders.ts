@@ -210,7 +210,7 @@ export function buildStructuredDataGraph(baseUrl = SITE_URL) {
     '@type': 'ItemList',
     name: 'Research and Publications',
     itemListElement: sortedProjects.map((project, index) => {
-      const isCapstone = project.link.includes('/capstone');
+      const isCapstone = project.link?.includes('/capstone') === true;
       const datePublished = toIsoDate(project.period);
       return {
         '@type': 'ListItem',
@@ -228,7 +228,7 @@ export function buildStructuredDataGraph(baseUrl = SITE_URL) {
               }
             : {}),
           description: project.description,
-          url: project.link,
+          ...(project.link ? { url: project.link } : {}),
           keywords: project.tags.join(', '),
           ...(datePublished ? { datePublished } : {}),
         },

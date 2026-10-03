@@ -15,7 +15,12 @@ export type InteractiveDemo =
 export interface Project {
   title: string;
   description: string;
-  link: string;
+  /**
+   * Public URL for the work. Omitted when the work lives in a private
+   * repository: a card must never send a visitor to a GitHub 404, and the
+   * external-links ledger would (rightly) flag one as dead.
+   */
+  link?: string;
   tags: string[];
   period: string;
   cta?: string;
@@ -24,6 +29,49 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  {
+    title: "Homestead: Operations Core for Sun Brewed Homestead",
+    description: "One Rust service (Axum, Postgres) that runs a community farm's day-to-day operations — plantings, harvests, tasks, animals, inventory, volunteer hours, the farm stand — and keeps Discord and Linear in sync through a transactional outbox. Every write commits its event in the same transaction; deliveries retry with backoff into a dead-letter queue, and Linear issues get IDs derived from what they mirror, so a retried delivery finds its issue instead of duplicating it. Permissions are capabilities, bundled per role.",
+    tags: ["Rust", "Postgres", "Event-Driven Architecture", "Nonprofit Operations"],
+    period: "Sep 2026 - Present",
+    cta: "Private repository",
+  },
+  {
+    title: "The Room Remembers You",
+    description: "An offline gallery installation. A camera is reduced on the spot to anonymous motion cells — no frame is kept — and a WebGL2 field of up to 360,000 particles follows the room's memory of where people walked. Stillness leaves a deeper mark than motion, memories decay and mutate each time they are recalled, and occasionally one comes back false. Voices are held in RAM for the visit only; nothing leaves the machine.",
+    tags: ["Interactive Installation", "WebGL2", "Privacy by Design", "TypeScript"],
+    period: "Sep 2026",
+    cta: "Private repository",
+  },
+  {
+    title: "Mechanic: Open Vehicle Diagnostics",
+    description: "Vehicle diagnostics in Rust, built around a community module database: one TOML file per ECU, and every data identifier ships with the raw response bytes it must decode to, checked in CI so a reviewer never has to trust a contributor's bit offsets. Includes an ELM327/ISO-TP/SocketCAN transport, UDS and OBD-II services, a hazard gate on actuator routines, and a decoder for FORScan's database format. Not yet run against physical hardware, and it says so.",
+    tags: ["Rust", "Automotive Diagnostics", "UDS / OBD-II", "Reverse Engineering"],
+    period: "Sep 2026",
+    cta: "Private repository",
+  },
+  {
+    title: "novachannel: Metadata-Resistant Messaging in Rust",
+    description: "A five-crate research workspace: hybrid classical/post-quantum X3DH and a forward-secret ratchet, zero-knowledge rate-limiting nullifiers proved with a STARK, Path ORAM so a server can't tell whose record it touched, and FROST threshold signing (RFC 9591). Documented as unaudited — its own review withdrew an earlier differential-privacy claim and corrected the proof-security figure from ~148 to 127 bits.",
+    link: "https://github.com/cameronaaron/novachannel",
+    tags: ["Rust", "Cryptography", "Post-Quantum", "Privacy Engineering"],
+    period: "Aug 2026 - Sep 2026",
+    cta: "View on GitHub",
+  },
+  {
+    title: "Social Graph Crawler & Network Map",
+    description: "A Python crawler and visualizer that maps a personal Instagram network out to friends-of-friends: Leiden community detection, approximate betweenness, and a tour mode that animates the true BFS shortest path between friend groups. Checkpoints are written atomically and refuse to shrink, after one corrupt-file overwrite cost 200 crawled records.",
+    tags: ["Python", "Network Science", "Graph Algorithms", "Data Engineering"],
+    period: "Feb 2026 - Sep 2026",
+    cta: "Private repository",
+  },
+  {
+    title: "Matrix Archive (Go port)",
+    description: "A Go rewrite of Oliver Steele's 2018 Dinacon Matrix room archiver, rebuilt on mautrix-go with end-to-end-encrypted room support, Beeper login, DuckDB storage with message de-duplication, and HTML, text, JSON, and YAML export with local image download.",
+    tags: ["Go", "Matrix Protocol", "DuckDB", "Digital Archiving"],
+    period: "Aug 2025 - Aug 2026",
+    cta: "Private repository",
+  },
   {
     title: "Bridging Transitions: Video-Based Educational Content on Thrice-exceptional Black Male Students' Higher Education Journey",
     description: "Graduate capstone project producing a five-part educational video series on identification challenges, transition barriers, strength-based practices, social-emotional experiences, and institutional recommendations.",

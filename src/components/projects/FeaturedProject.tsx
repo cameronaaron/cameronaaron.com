@@ -86,13 +86,15 @@ export default function FeaturedProject({ project, index = 0 }: FeaturedProjectP
                 ))}
               </div>
 
-              <Button 
-                href={project.link} 
-                variant="primary" 
-                className="w-fit group-hover:shadow-[0_0_20px_rgba(56,214,255,0.45)] transition-shadow"
-              >
-                {getFeaturedProjectCta(project.cta)}
-              </Button>
+              {project.link ? (
+                <Button
+                  href={project.link}
+                  variant="primary"
+                  className="w-fit group-hover:shadow-[0_0_20px_rgba(56,214,255,0.45)] transition-shadow"
+                >
+                  {getFeaturedProjectCta(project.cta)}
+                </Button>
+              ) : null}
             </div>
           </div>
 

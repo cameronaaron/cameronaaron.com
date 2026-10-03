@@ -18,7 +18,8 @@ describe('projects logic', () => {
     // compact grid — the three-way partition (2026-07-26) exists precisely so
     // a demo-bearing project never sits in the grid away from its game.
     expect(playableProjects[0]?.title).toContain('thehellisthis.com');
-    expect(otherProjects[0]?.title).toContain('Stanford Neurodiversity Summit');
+    // Homestead (Sep 2026 - Present) is the newest project without a demo.
+    expect(otherProjects[0]?.title).toContain('Homestead');
   });
 
   it('actually reorders featured projects by period, not by input order', () => {
