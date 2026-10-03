@@ -13,7 +13,8 @@ export type InteractiveDemo =
   | 'twice-exceptional-game'
   | 'divergent-thinking-game'
   | 'uds-frame-decoder'
-  | 'oram-access-game';
+  | 'oram-access-game'
+  | 'small-world-path';
 
 export interface Project {
   title: string;
@@ -70,6 +71,7 @@ export const projects: Project[] = [
     tags: ["Python", "Network Science", "Graph Algorithms", "Data Engineering"],
     period: "Feb 2026 - Sep 2026",
     ...repositoryFields('cameronaaron/insa'),
+    interactiveDemo: "small-world-path",
   },
   {
     title: "Matrix Archive (Go port)",

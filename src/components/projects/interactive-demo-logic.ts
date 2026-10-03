@@ -64,6 +64,10 @@ export const DEMO_DESCRIPTORS: Record<InteractiveDemo, DemoDescriptor> = {
     title: 'Whose Record Was Read?',
     teaser: 'Play the server. With plain storage you always know whose record was read; with Path ORAM you are stuck at chance.',
   },
+  'small-world-path': {
+    title: 'Shortest Chain',
+    teaser: 'Connect two friend groups and beat breadth-first search, then see which links were only ever seen one way.',
+  },
 };
 
 export function getDemoDescriptor(demo: InteractiveDemo): DemoDescriptor {

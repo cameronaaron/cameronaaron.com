@@ -51,6 +51,7 @@ const DEMO_COMPONENTS: Record<InteractiveDemo, ComponentType> = {
   ),
   'uds-frame-decoder': dynamic(() => import('@/components/projects/uds-decoder/UdsDecoderGame'), { ssr: false }),
   'oram-access-game': dynamic(() => import('@/components/projects/oram/OramAccessGame'), { ssr: false }),
+  'small-world-path': dynamic(() => import('@/components/projects/small-world/SmallWorldGame'), { ssr: false }),
 };
 
 interface InteractiveDemoSlotProps {

@@ -100,6 +100,7 @@ describe('every game is paired with the work it is about', () => {
     expect(pairing).toEqual({
       'uds-frame-decoder': 'Mechanic: Open Vehicle Diagnostics',
       'oram-access-game': 'novachannel: Metadata-Resistant Messaging in Rust',
+      'small-world-path': 'Social Graph Crawler & Network Map',
       'reaction-time-game': 'Lapses in Sustained Attention Predicted by Changes in Visually-Guided Movements',
       'predator-prey-chase': 'Predatory and Prey Behavior Modifying MIP Robots',
       'dna-snp-game': 'Genetic RefleXions Magic Mirror',
