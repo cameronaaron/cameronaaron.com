@@ -10,7 +10,7 @@
   },
   "homepage": "https://cameronaaron.com",
   "private": true,
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.14.0",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -84,11 +84,11 @@
     "check:repos": "node scripts/checks/check-repo-visibility.mjs"
   },
   "dependencies": {
-    "framer-motion": "^14.0.0",
+    "framer-motion": "^14.3.0",
     "lenis": "^1.3.26",
-    "next": "^16.3.8",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "next": "^16.4.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "sharp": "^0.35.5"
   },
   "devDependencies": {
@@ -97,23 +97,23 @@
     "@stryker-mutator/vitest-runner": "^10.0.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.3",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitest/coverage-istanbul": "^5.0.3",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/coverage-istanbul": "^5.0.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^10.12.0",
-    "eslint-config-next": "^16.3.8",
-    "jsdom": "^30.1.1",
+    "eslint-config-next": "^16.4.1",
+    "jsdom": "^30.1.3",
     "lighthouse": "^13.5.0",
     "markdownlint-cli2": "^0.23.3",
-    "playwright": "^1.63.0",
-    "postcss": "^8.5.28",
+    "playwright": "^1.64.1",
+    "postcss": "^8.5.30",
     "simple-git-hooks": "^2.14.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.3",
-    "web-vitals": "^6.2.2",
-    "wrangler": "^4.147.0"
+    "vitest": "^5.0.5",
+    "web-vitals": "^6.2.3",
+    "wrangler": "^4.151.0"
   }
 }
