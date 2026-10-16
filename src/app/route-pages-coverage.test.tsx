@@ -58,10 +58,29 @@ describe('route pages coverage hardening', () => {
     expect(screen.getByRole('link', { name: 'View credential archive' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Speaking' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Profiles' })).toBeTruthy();
-    expect(screen.getAllByText('Public recording link not provided in source notes.').length).toBeGreaterThan(0);
 
     const schema = container.querySelector('script[type="application/ld+json"]');
     expect(schema?.textContent).toContain('"Internet Features and Mentions"');
+  });
+
+  it('covers internet page fallback for a feature without a public link', async () => {
+    // Every real entry has a URL since 2026-10-15, so the fallback is pinned
+    // with a mocked entry instead of the live data.
+    vi.doMock('@/data/internetFeatures', () => ({
+      internetFeatures: [
+        {
+          title: 'Unlinked Session',
+          organization: 'Test Org',
+          period: '2023',
+          summary: 'A session with no public recording',
+          category: 'Speaking',
+        },
+      ],
+    }));
+    const { default: InternetPageDynamic } = await import('./internet/page');
+    render(<InternetPageDynamic />);
+    expect(screen.getByText('Unlinked Session')).toBeTruthy();
+    expect(screen.getAllByText('Public recording link not provided in source notes.').length).toBe(1);
   });
 
   it('covers credentials page null credentialId branch (line 106)', async () => {

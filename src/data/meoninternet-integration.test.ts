@@ -63,6 +63,31 @@ describe('meoninternet coverage integration', () => {
     expect(ids).toContain('NNB9A5JV8WSA');
   });
 
+  // Each speaking date and host below was read off the organizer's own page
+  // on 2026-10-15, after the site had carried three wrong ones for months:
+  // NNEA's monthly speaker series listed as a "summit", the 2021 Summit panel
+  // and the 2019 Bridges symposium both dated 2023, and the June 2023 NNEA
+  // session credited to a "Community Health Worker Program Event". Stanford's
+  // 2023 Summit programs (Days 1-3) do not name Cameron at all.
+  it('dates and labels speaking engagements as their organizers list them', () => {
+    const speaking = internetFeatures.filter((item) => item.category === 'Speaking');
+    const nnea = speaking.filter((item) => item.organization.includes('NNEA'));
+    expect(nnea.map((item) => item.period)).toEqual(['Apr 14, 2022', 'Jun 8, 2023']);
+    for (const item of nnea) {
+      expect(`${item.title} ${item.organization} ${item.summary}`).not.toMatch(/summit/i);
+    }
+    expect(speaking.map((item) => item.organization).join(' ')).not.toMatch(/community health worker/i);
+
+    const corpus = [
+      ...speaking.map((item) => ({ text: `${item.title} ${item.organization}`, period: item.period })),
+      ...projects.map((item) => ({ text: item.title, period: item.period })),
+    ];
+    for (const { text, period } of corpus) {
+      if (/symposium/i.test(text)) expect(period).toBe('Oct 2019');
+      if (/neurodiversity summit/i.test(text) && !/2026/.test(text)) expect(period).toMatch(/2021/);
+    }
+  });
+
   it('places internet features and publications into internet and projects data', () => {
     const internetTitles = internetFeatures.map((item) => item.title);
     const internetUrls = internetFeatures.map((item) => item.url ?? '');
@@ -70,7 +95,7 @@ describe('meoninternet coverage integration', () => {
     const projectLinks = projects.flatMap((item) => (item.link ? [item.link] : []));
 
     expect(internetTitles).toContain('2e Symposium Speaker Biography');
-    expect(internetTitles).toContain('Stanford Neurodiversity in Entrepreneurship Summit Speaker Listing');
+    expect(internetTitles).toContain('Panel on Special Education for Neurodiverse Students');
     expect(internetTitles).toContain('Neurodiversity Advocacy Session with Kristin Rourke and Cameron Aaron');
     expect(internetTitles).toContain('4me Welcomes Cameron Aaron');
     expect(internetTitles).toContain('Internships: By the Dozen');

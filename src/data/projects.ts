@@ -131,11 +131,11 @@ export const projects: Project[] = [
   },
   {
     title: "Stanford Neurodiversity Summit Panel",
-    description: "Panelist contribution focused on neurodiversity, systems change, and inclusive pathways in education and work.",
-    link: "https://www.stanfordnnea.com/2023-speakers",
+    description: "Panelist on K-12 Panel 1, the \"Neurodivergent Student Panel,\" at the 2021 Stanford Neurodiversity Summit, alongside Ryan Neale, Cynthia Wen, and Martika Theis.",
+    link: "https://med.stanford.edu/neurodiversity/SNS2021/program.html",
     tags: ["Neurodiversity", "Public Speaking", "Advocacy"],
-    period: "2023",
-    cta: "View Speakers",
+    period: "Nov 2021",
+    cta: "View Program",
   },
   {
     title: "Finding the Perfect Fit: The 2e-Friendly Workplace",
@@ -151,7 +151,7 @@ export const projects: Project[] = [
     description: "Panelist presentation on cognitive diversity, educational pathways, and leadership development.",
     link: "https://2esymposium.com/speaker-attendee-biographies-a-f/",
     tags: ["Leadership", "Education", "Panel"],
-    period: "2023",
+    period: "Oct 2019",
     cta: "View Speaker Profile",
   },
   {
