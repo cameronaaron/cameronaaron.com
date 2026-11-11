@@ -156,11 +156,13 @@ export const projects: Project[] = [
   },
   {
     title: "thehellisthis.com",
-    description: "Anonymous chat experiment on Cloudflare Workers with markdown support, disappearing custom rooms, and a main room that fades after ten quiet minutes unless people keep the conversation going.",
-    link: "https://thehellisthis.com",
-    tags: ["Cloudflare Workers", "Ephemeral Chat", "Social Art", "Anonymous"],
+    description: "Anonymous chat experiment: a Rust (Axum) WebSocket server in a Cloudflare Container, with markdown support, disappearing custom rooms, and a main room that fades after ten quiet minutes unless people keep the conversation going. No accounts and no database; every room lives in memory.",
+    tags: ["Rust", "Cloudflare Workers", "Ephemeral Chat", "Social Art", "Anonymous"],
     period: "2025 - Present",
-    cta: "Visit Site",
+    // Links the public source, not the live site: the site's single container
+    // answered 503 from 2026-11-11, and a card must never send a visitor to an
+    // outage. Point it back at the live site once that answers 200.
+    ...repositoryFields('cameronaaron/thehellisthis'),
     interactiveDemo: "ephemeral-room-game",
   },
   {
