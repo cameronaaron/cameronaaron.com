@@ -183,7 +183,7 @@ export function buildRootMetadata(): Metadata {
     appleWebApp: {
       capable: true,
       title: 'Cameron Aaron, M.Ed.',
-      statusBarStyle: 'black-translucent',
+      statusBarStyle: 'default',
     },
     formatDetection: {
       telephone: false,
@@ -247,14 +247,18 @@ export const SPECULATION_RULES = {
  *  inline component config. */
 export function buildRootViewport() {
   return {
+    // The page paper (--color-background in globals.css), so the browser
+    // chrome continues the page instead of capping it with a coloured bar.
+    // The site has one theme, so both media queries get the same value;
+    // design-token-contract pins this to the CSS token.
     themeColor: [
-      { media: '(prefers-color-scheme: dark)', color: '#0cbdf2' },
-      { media: '(prefers-color-scheme: light)', color: '#0cbdf2' },
+      { media: '(prefers-color-scheme: dark)', color: '#f4f5f7' },
+      { media: '(prefers-color-scheme: light)', color: '#f4f5f7' },
     ],
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
     viewportFit: 'cover',
-    colorScheme: 'dark',
+    colorScheme: 'light',
   };
 }

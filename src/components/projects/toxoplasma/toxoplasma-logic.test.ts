@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 
 import {
   INFECTED_AVERSION,
@@ -325,9 +325,9 @@ describe('labels and visual state', () => {
   });
 
   it('maps each visual state to a distinct exact class string', () => {
-    expect(getArmClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/50');
-    expect(getArmClassName('chosen')).toBe('border-emerald-300 bg-emerald-500/20');
-    expect(getArmClassName('rejected')).toBe('border-white/10 bg-white/5 opacity-60');
+    expect(getArmClassName('idle')).toBe('border-foreground/15 bg-foreground/5 hover:border-primary/50');
+    expect(getArmClassName('chosen')).toBe('border-success bg-success/20');
+    expect(getArmClassName('rejected')).toBe('border-foreground/10 bg-foreground/5 opacity-60');
   });
 
   it('pins the widget aria-label and reveal delay', () => {

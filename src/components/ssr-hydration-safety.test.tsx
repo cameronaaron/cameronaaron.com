@@ -1,130 +1,19 @@
-/**
- * Regression tests for the back-navigation blank-screen bug (2026-05).
- *
- * Root cause: components read `sessionStorage` / `performance.getEntriesByType`
- * inside `useState` initializers. Server and client diverge → React aborts
- * hydration → ancestor `SectionReveal` wrappers get stuck at `opacity: 0`
- * → page appears blank until full reload.
- *
- * Two complementary guards:
- *   1. Source-code lint: forbid client-only reads inside `useState(...)` calls
- *      for the affected files.
- *   2. Behavioral SSR test: render each component via `renderToString` twice
- *      (with and without the "skip" sessionStorage marker) — markup MUST be
- *      identical. Whatever the client sees first must match what SSR emitted.
- */
 
-import React from 'react';
-import { renderToString } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-import IntroCurtain from './ui/IntroCurtain';
-import TypewriterEffect from './ui/TypewriterEffect';
-
-const TYPEWRITER_STORAGE_KEY = 'typewriter-complete:Cameron Aaron';
-const INTRO_CURTAIN_STORAGE_KEY = 'intro-curtain-shown';
-
-function mockNavigationType(type: 'navigate' | 'back_forward' | 'reload') {
-  vi.spyOn(performance, 'getEntriesByType').mockImplementation((name: string) => {
-    if (name === 'navigation') {
-      return [{ type } as unknown as PerformanceEntry];
-    }
-    return [];
-  });
-}
-
-describe('SSR/client first-paint parity (hydration safety)', () => {
-  beforeEach(() => {
-    window.sessionStorage.clear();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-    window.sessionStorage.clear();
-  });
-
-  describe('IntroCurtain', () => {
-    it('renders identical markup regardless of sessionStorage state', () => {
-      mockNavigationType('navigate');
-      const fresh = renderToString(<IntroCurtain holdMs={500} />);
-
-      window.sessionStorage.setItem(INTRO_CURTAIN_STORAGE_KEY, '1');
-      const seen = renderToString(<IntroCurtain holdMs={500} />);
-
-      expect(fresh).toBe(seen);
-    });
-
-    it('renders identical markup regardless of navigation type', () => {
-      mockNavigationType('navigate');
-      const navigate = renderToString(<IntroCurtain holdMs={500} />);
-
-      mockNavigationType('back_forward');
-      const backForward = renderToString(<IntroCurtain holdMs={500} />);
-
-      expect(navigate).toBe(backForward);
-    });
-
-    it('renders the curtain (not a blank fragment) on first paint', () => {
-      mockNavigationType('navigate');
-      const html = renderToString(<IntroCurtain holdMs={500} />);
-      // SSR output must include the curtain — otherwise client will try to
-      // mount it after hydration and trigger a mismatch.
-      expect(html).toContain('intro-curtain');
-    });
-  });
-
-  describe('TypewriterEffect', () => {
-    it('renders identical markup regardless of sessionStorage state', () => {
-      mockNavigationType('navigate');
-      const fresh = renderToString(
-        <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
-      );
-
-      window.sessionStorage.setItem(TYPEWRITER_STORAGE_KEY, '1');
-      const seen = renderToString(
-        <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
-      );
-
-      expect(fresh).toBe(seen);
-    });
-
-    it('renders identical markup regardless of navigation type', () => {
-      mockNavigationType('navigate');
-      const navigate = renderToString(
-        <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
-      );
-
-      mockNavigationType('back_forward');
-      const backForward = renderToString(
-        <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
-      );
-
-      expect(navigate).toBe(backForward);
-    });
-
-    it('SSR output starts with the first character only (matches client first paint)', () => {
-      mockNavigationType('navigate');
-      window.sessionStorage.setItem(TYPEWRITER_STORAGE_KEY, '1');
-      const html = renderToString(
-        <TypewriterEffect text="Cameron Aaron" typingSpeed={80} />
-      );
-      // The invisible spacer always holds the full text to reserve layout space (prevents CLS).
-      expect(html).toContain('style="visibility:hidden">Cameron Aaron</span>');
-      // The visible (absolutely positioned) span shows only "C" at SSR time —
-      // sessionStorage is not read during renderToString; real state is set post-hydration.
-      expect(html).toContain('style="position:absolute;left:0;top:0">C');
-      // sr-only always carries the full string for screen readers.
-      expect(html).toContain('Cameron Aaron');
-    });
-  });
-});
+import { describe, expect, it } from 'vitest';
 
 describe('Source-code guard: useState initializers must not read client-only state', () => {
+  // Every component that still persists something across visits or reads the
+  // navigation type. The two files this guard was written for (the intro
+  // curtain and the typewriter name) were removed in the 2026-11 redesign; the
+  // pattern they taught applies to whatever does the same job now.
   const FORBIDDEN_FILES = [
-    'src/components/ui/IntroCurtain.tsx',
-    'src/components/ui/TypewriterEffect.tsx',
+    'src/components/ui/LocalTimeStatus.tsx',
+    'src/components/ui/KeyboardShortcuts.tsx',
+    'src/components/ui/CommandPalette.tsx',
+    'src/components/ui/BackToTop.tsx',
+    'src/components/Navigation.tsx',
   ];
 
   // Patterns that indicate a `useState(...)` initializer is branching on

@@ -10,9 +10,7 @@ import Navigation from '@/components/Navigation';
 import { MOBILE_MENU_DESKTOP_BREAKPOINT } from '@/components/navigation/navigation-logic';
 import BackToTop from '@/components/ui/BackToTop';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
-import QuickActionsDock from '@/components/ui/QuickActionsDock';
 import SpotlightCard from '@/components/ui/SpotlightCard';
-import StatCard from '@/components/ui/StatCard';
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), 'utf8');
@@ -73,10 +71,10 @@ describe('mobile regression contract', () => {
     const button = screen.getByTestId('back-to-top');
     expect(button.className).toContain('h-11');
     expect(button.className).toContain('w-11');
-    // Stacked above QuickActionsDock, which rises by the home-indicator inset;
-    // a bare bottom-20 let the dock ride up into this button on notched phones.
-    expect(button.className).toContain('bottom-[calc(5rem+env(safe-area-inset-bottom))]');
-    expect(button.className).toContain('sm:bottom-[calc(6rem+env(safe-area-inset-bottom))]');
+    // The only floating control on the right edge now, so it sits at the
+    // corner — still lifted by the home-indicator inset on notched phones.
+    expect(button.className).toContain('bottom-[calc(1.25rem+env(safe-area-inset-bottom))]');
+    expect(button.className).toContain('sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]');
   });
 
   it('sweeps every fixed, bottom-offset control for the home-indicator safe area', () => {
@@ -131,25 +129,13 @@ describe('mobile regression contract', () => {
     expect(smPad).toBeGreaterThan(smTop);
   });
 
-  it('keeps quick actions dock reachable from mobile viewport edges', () => {
-    render(<QuickActionsDock performanceTier="full" />);
-
-    const dock = screen.getByRole('navigation', { name: /quick navigation dock/i });
-    // Fixed bottom offset must add the home-indicator safe area on notched phones
-    expect(dock.className).toContain('bottom-[calc(1.25rem+env(safe-area-inset-bottom))]');
-    expect(dock.className).toContain('right-5');
-    expect(dock.className).toContain('sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]');
-
-    fireEvent.click(screen.getByRole('button', { name: /explore quick actions/i }));
-    expect(screen.getByRole('link', { name: /credentials/i })).toBeTruthy();
-  });
-
   it('keeps full-screen sections on svh units so the iOS URL bar never hides content', () => {
     // 100vh on iOS is the LARGE viewport: with the URL bar visible, the bottom
     // of a min-h-screen hero (scroll cue, CTA) sits below the fold. svh sizes
     // to the small viewport, so above-the-fold content is always visible.
+    // The hero is not in this list: since the 2026-11 redesign it is as tall
+    // as its content, not as tall as the viewport, so it has no fold to miss.
     for (const path of [
-      'src/components/Hero.tsx',
       'src/app/error.tsx',
       'src/app/loading.tsx',
       'src/app/not-found.tsx',
@@ -249,19 +235,12 @@ describe('mobile regression contract', () => {
   });
 
   it('keeps hero top clearance so centered content never slides under the fixed nav', () => {
-    // min-h-svh + items-center pushes tall content upward on short viewports;
-    // without top padding the availability pill sat underneath the nav bar.
-    const hero = read('src/components/Hero.tsx');
-    expect(hero).toContain('pt-24 pb-16 md:pt-28 md:pb-20');
-  });
-
-  it('keeps StatCard labels wrappable so long words never clip inside the card', () => {
-    render(<StatCard value="10+" label="Clinical Certifications" />);
-
-    const label = screen.getByText('Clinical Certifications');
-    expect(label.className).toContain('break-words');
-    // Wide letter-spacing is what pushed 'CERTIFICATIONS' past the card edge.
-    expect(label.className).not.toContain('tracking-[0.16em]');
+    // The nav is fixed and ~4rem tall; without top padding the availability
+    // line sat underneath it. The clearance lives in the .hero rule, and its
+    // floor (the clamp minimum) must stay taller than the bar.
+    const heroRule = /\.hero\s*\{[^}]*\}/.exec(read('src/app/globals.css'))?.[0] ?? '';
+    const floorRem = Number(/padding-top:\s*clamp\((\d+(?:\.\d+)?)rem/.exec(heroRule)?.[1]);
+    expect(floorRem).toBeGreaterThanOrEqual(5.5);
   });
 });
 

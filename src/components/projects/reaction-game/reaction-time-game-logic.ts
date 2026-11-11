@@ -296,9 +296,9 @@ export function getTargetAriaLabel(phase: RoundPhase): string {
 }
 
 const TARGET_PHASE_CLASSES: Record<RoundPhase, string> = {
-  waiting: 'bg-slate-700 border-slate-500',
-  go: 'bg-emerald-500 border-emerald-300',
-  result: 'bg-slate-800 border-slate-600',
+  waiting: 'bg-muted border-foreground/20',
+  go: 'bg-success border-success',
+  result: 'bg-surface border-foreground/20',
 };
 
 /**

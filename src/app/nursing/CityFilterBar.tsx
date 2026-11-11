@@ -8,10 +8,10 @@ interface CityFilterBarProps {
 
 export default function CityFilterBar({ cities, selectedCity, onSelectCity }: CityFilterBarProps) {
   const chipClass = (active: boolean) =>
-    `rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
+    `rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
       active
-        ? 'border-cyan-300/40 bg-cyan-500/15 text-cyan-50'
-        : 'border-white/15 bg-white/5 text-muted-foreground hover:border-cyan-300/30 hover:text-cyan-100'
+        ? 'border-primary/40 bg-primary/15 text-foreground'
+        : 'border-foreground/15 bg-foreground/5 text-muted-foreground hover:border-primary/30 hover:text-foreground'
     }`;
 
   return (

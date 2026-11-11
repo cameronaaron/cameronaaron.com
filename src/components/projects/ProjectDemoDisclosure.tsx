@@ -74,10 +74,10 @@ export default function ProjectDemoDisclosure({
 
   return (
     <div ref={containerRef} className="mt-6" data-testid={`demo-disclosure-${demo}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted p-4">
         <div className="min-w-[min(100%,14rem)] flex-1">
-          <span className="block text-xs uppercase tracking-[0.14em] text-cyan-300/80">Playable companion</span>
-          <strong className="mt-1 block text-base text-white">{descriptor.title}</strong>
+          <span className="block text-xs font-medium text-muted-foreground">Playable companion</span>
+          <strong className="mt-1 block text-base text-foreground">{descriptor.title}</strong>
           <span className="mt-1 block text-sm text-muted-foreground">{descriptor.teaser}</span>
         </div>
         <button
@@ -87,7 +87,7 @@ export default function ProjectDemoDisclosure({
           aria-controls={panelId}
           aria-label={getDemoToggleAriaLabel(demo, projectTitle, shouldMount)}
           data-testid={`demo-toggle-${demo}`}
-          className="min-h-[44px] whitespace-nowrap rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] whitespace-nowrap rounded-full border border-foreground/15 bg-surface px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
         >
           {getDemoToggleLabel(demo, shouldMount)}
         </button>

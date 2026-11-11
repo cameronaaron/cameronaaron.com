@@ -21,7 +21,7 @@ describe('button logic', () => {
 
   it('pins the exact base style string (focus ring, transitions, etc.)', () => {
     expect(BUTTON_BASE_STYLES).toBe(
-      'font-semibold rounded-full transition-all duration-300 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+      'font-semibold rounded-full transition-colors duration-200 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
     );
   });
 });

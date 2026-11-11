@@ -197,9 +197,9 @@ describe('presentation helpers', () => {
   it('labels the SID, the identifier, and the payload', () => {
     expect([0, 1, 2, 3, 4].map(getByteRole)).toEqual(['sid', 'did', 'did', 'data', 'data']);
     // Each role must be visibly distinct, or the tiles stop teaching the frame layout.
-    expect(getByteRoleClassName('sid')).toBe('border-amber-300/50 bg-amber-400/10 text-amber-200');
-    expect(getByteRoleClassName('did')).toBe('border-violet-300/50 bg-violet-400/10 text-violet-200');
-    expect(getByteRoleClassName('data')).toBe('border-cyan-300/60 bg-cyan-400/15 text-cyan-100');
+    expect(getByteRoleClassName('sid')).toBe('border-warning/50 bg-warning/10 text-warning');
+    expect(getByteRoleClassName('did')).toBe('border-violet-300/50 bg-violet-400/10 text-violet-700');
+    expect(getByteRoleClassName('data')).toBe('border-primary/60 bg-primary/15 text-foreground');
   });
 
   it('derives option states from the choice', () => {
@@ -212,10 +212,10 @@ describe('presentation helpers', () => {
     expect(getOptionVisualState(wrong, wrong)).toBe('wrong');
     expect(getOptionVisualState(wrong, correct)).toBe('dimmed');
     expect(getOptionVisualState(other, wrong)).toBe('dimmed');
-    expect(getOptionClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/60 hover:bg-cyan-400/10');
-    expect(getOptionClassName('correct')).toBe('border-emerald-300/70 bg-emerald-400/15');
-    expect(getOptionClassName('wrong')).toBe('border-rose-300/70 bg-rose-400/15');
-    expect(getOptionClassName('dimmed')).toBe('border-white/10 bg-white/[0.02] opacity-60');
+    expect(getOptionClassName('idle')).toBe('border-foreground/15 bg-foreground/5 hover:border-primary/60 hover:bg-primary/10');
+    expect(getOptionClassName('correct')).toBe('border-success/70 bg-success/15');
+    expect(getOptionClassName('wrong')).toBe('border-danger/70 bg-danger/15');
+    expect(getOptionClassName('dimmed')).toBe('border-foreground/10 bg-foreground/[0.02] opacity-60');
   });
 
   it('formats identifiers and requests as a tester writes them', () => {

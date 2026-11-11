@@ -7,10 +7,6 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-// Side-effect imports: loading these modules in Node exercises the ternary.
-import '@/components/ui/IntroCurtain';
-import '@/components/ui/TypewriterEffect';
-
 describe('SSR guards (node environment — typeof window === undefined)', () => {
   it('selects useEffect branch of isomorphic layout-effect ternary in Node', () => {
     expect(typeof window).toBe('undefined');

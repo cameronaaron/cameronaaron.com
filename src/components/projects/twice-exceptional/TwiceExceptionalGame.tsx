@@ -61,23 +61,23 @@ export default function TwiceExceptionalGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="twice-exceptional-game"
       role="group"
       aria-label={IDENTIFICATION_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Who Gets Missed?</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Who Gets Missed?</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
-            Correct <strong data-testid="te-score" className="text-cyan-300">{scoreState.score}</strong>
+            Correct <strong data-testid="te-score" className="text-primary">{scoreState.score}</strong>
           </span>
           <span>
-            Streak <strong data-testid="te-streak" className="text-emerald-300">{scoreState.streak}</strong>
+            Streak <strong data-testid="te-streak" className="text-success">{scoreState.streak}</strong>
           </span>
           <span>
             2e caught{' '}
-            <strong data-testid="te-caught" className="text-amber-300">
+            <strong data-testid="te-caught" className="text-warning">
               {scoreState.twiceExceptionalCaught}/{scoreState.twiceExceptionalSeen}
             </strong>
           </span>
@@ -92,37 +92,37 @@ export default function TwiceExceptionalGame() {
         suppressing it.
       </p>
 
-      <div className="mb-5 rounded-xl border border-white/10 bg-white/5 p-5">
-        <span className="block text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+      <div className="mb-5 rounded-xl border border-foreground/10 bg-surface p-5">
+        <span className="block text-xs text-primary/80">
           Signature strength &mdash; start here
         </span>
         <span className="mt-1 block text-xs text-muted-foreground/80">
           What this student does exceptionally well. Baum&rsquo;s model treats this as the real starting point for
           identification, not a detail to notice after the numbers.
         </span>
-        <span data-testid="te-strength" className="mt-2 block text-base font-medium text-white">
+        <span data-testid="te-strength" className="mt-2 block text-base font-medium text-foreground">
           &ldquo;{studentCase.signatureStrength}&rdquo;
         </span>
       </div>
 
-      <div className="mb-5 grid grid-cols-1 gap-4 rounded-xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
+      <div className="mb-5 grid grid-cols-1 gap-4 rounded-xl border border-foreground/10 bg-surface p-5 sm:grid-cols-2">
         <div>
-          <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Composite score</span>
+          <span className="block text-xs text-muted-foreground">Composite score</span>
           <span className="mt-1 block text-xs text-muted-foreground/80">
             One overall test score, like an IQ score. Typical range: {AVERAGE_COMPOSITE_MIN}&ndash;
             {AVERAGE_COMPOSITE_MAX}.
           </span>
-          <span data-testid="te-composite" className="mt-2 block font-display text-3xl text-white">
+          <span data-testid="te-composite" className="mt-2 block font-display text-3xl text-foreground">
             {studentCase.composite}
           </span>
-          <span className="mt-1 block text-sm font-medium text-white/90">
+          <span className="mt-1 block text-sm font-medium text-foreground/90">
             {isAverageComposite(studentCase.composite)
               ? 'This student: within the typical range'
               : 'This student: outside the typical range'}
           </span>
         </div>
         <div>
-          <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground">Subtest scatter</span>
+          <span className="block text-xs text-muted-foreground">Subtest scatter</span>
           <span className="mt-1 block text-xs text-muted-foreground/80">
             The gap between this student&rsquo;s strongest and weakest subject scores. A gap of{' '}
             {NOTABLE_SCATTER_THRESHOLD}+ points is wide enough to be worth a second look &mdash; but it is still just
@@ -131,12 +131,12 @@ export default function TwiceExceptionalGame() {
           <span
             data-testid="te-scatter"
             className={`mt-2 block font-display text-3xl ${
-              isNotableScatter(studentCase.scatter) ? 'text-amber-300' : 'text-white'
+              isNotableScatter(studentCase.scatter) ? 'text-warning' : 'text-foreground'
             }`}
           >
             {studentCase.scatter}
           </span>
-          <span className="mt-1 block text-sm font-medium text-white/90">
+          <span className="mt-1 block text-sm font-medium text-foreground/90">
             {isNotableScatter(studentCase.scatter)
               ? 'This student: unusually wide gap'
               : 'This student: ordinary variation'}
@@ -153,7 +153,7 @@ export default function TwiceExceptionalGame() {
             disabled={resolved}
             aria-label={getOptionAriaLabel(profile)}
             data-testid={`te-option-${profile}`}
-            className={`min-h-[44px] rounded-xl border px-4 py-3 text-left text-sm text-white transition-colors disabled:cursor-default ${getOptionClassName(
+            className={`min-h-[44px] rounded-xl border px-4 py-3 text-left text-sm text-foreground transition-colors disabled:cursor-default ${getOptionClassName(
               getOptionVisualState(profile, studentCase, chosen)
             )}`}
           >
@@ -176,13 +176,13 @@ export default function TwiceExceptionalGame() {
           type="button"
           onClick={handleNextCase}
           data-testid="te-next"
-          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Next student
         </button>
       ) : null}
 
-      <p className="mt-6 border-t border-white/10 pt-4 text-xs text-muted-foreground/80" data-testid="te-masking">
+      <p className="mt-6 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80" data-testid="te-masking">
         {getMaskingSummary(scoreState)}
       </p>
     </div>

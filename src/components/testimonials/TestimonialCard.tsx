@@ -32,24 +32,21 @@ function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
       className="h-full"
     >
       <SpotlightCard className={getTestimonialCardClass(testimonial.featured)}>
-        {/* Quote Icon */}
-        <div className="text-cyan-400 text-4xl mb-4 font-serif">"</div>
-        
         {/* Testimonial Text */}
-        <p className="text-gray-300 mb-6 leading-relaxed line-clamp-4">
+        <p className="text-foreground mb-6 leading-relaxed line-clamp-5">
           {testimonial.text}
         </p>
         
         {/* Author Info */}
-        <div className="flex items-start gap-4 border-t border-white/10 pt-4 mt-auto">
+        <div className="flex items-start gap-4 border-t border-foreground/10 pt-4 mt-auto">
           <div className="flex-1">
-            <h3 className="font-bold text-white">
+            <h3 className="font-bold text-foreground">
               {testimonial.profileUrl ? (
                 <a
                   href={testimonial.profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan-300 transition-colors"
+                  className="hover:text-primary transition-colors"
                   aria-label={getProfileAriaLabel(testimonial.name)}
                 >
                   {testimonial.name}
@@ -58,15 +55,15 @@ function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
                 testimonial.name
               )}
             </h3>
-            <p className="text-sm text-gray-400">{testimonial.role}</p>
+            <p className="text-sm text-muted-foreground">{testimonial.role}</p>
             {testimonial.company && (
-              <p className="text-sm text-emerald-300">
+              <p className="text-sm text-muted-foreground">
                 {testimonial.companyUrl ? (
                   <a
                     href={testimonial.companyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-emerald-200 transition-colors"
+                    className="hover:text-primary transition-colors"
                     aria-label={getCompanyAriaLabel(testimonial.company)}
                   >
                     {testimonial.company}
@@ -76,16 +73,16 @@ function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
                 )}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {getRelationshipMeta(testimonial.relationship, testimonial.date)}
             </p>
             {testimonial.originalPostUrl ? (
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 <a
                   href={testimonial.originalPostUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan-300 transition-colors"
+                  className="hover:text-primary transition-colors"
                   aria-label={getOriginalPostAriaLabel(testimonial.name)}
                 >
                   Original post

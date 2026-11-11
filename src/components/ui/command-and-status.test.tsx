@@ -1,10 +1,9 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CommandPalette from '@/components/ui/CommandPalette';
 import LocalTimeStatus from '@/components/ui/LocalTimeStatus';
-import StatCard from '@/components/ui/StatCard';
 
 const interactionMode = {
   prefersReducedMotion: false,
@@ -252,25 +251,5 @@ describe('LocalTimeStatus', () => {
     expect(html).toMatch(/visibility:\s*hidden/);
     // The reserved width comes from a full "HH:MM AM/PM" placeholder.
     expect(html).toMatch(/\d{1,2}:\d{2}\s?(AM|PM)/i);
-  });
-});
-
-describe('StatCard tilt', () => {
-  it('attaches pointer-tilt handlers on hover-capable pointers', () => {
-    interactionMode.enableHoverMotion = true;
-    const { container } = render(<StatCard value="10+" label="Clinical Certifications" />);
-    const card = container.firstElementChild as HTMLElement;
-
-    expect(card.className).toContain('[transform-style:preserve-3d]');
-    // Moving and leaving must not throw — motion values absorb the writes.
-    fireEvent.mouseMove(card, { clientX: 40, clientY: 30 });
-    fireEvent.mouseLeave(card);
-    expect(within(card).getByText('Clinical Certifications')).toBeTruthy();
-  });
-
-  it('renders the counted value and label on coarse pointers without tilt handlers', () => {
-    interactionMode.enableHoverMotion = false;
-    render(<StatCard value="8+" label="Years Interdisciplinary" />);
-    expect(screen.getByText('Years Interdisciplinary')).toBeTruthy();
   });
 });

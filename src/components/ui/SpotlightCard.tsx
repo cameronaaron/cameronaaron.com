@@ -14,7 +14,7 @@ interface SpotlightCardProps<T extends ElementType> {
 export default function SpotlightCard<T extends ElementType = 'div'>({ 
   children, 
   className = "", 
-  spotlightColor = "rgba(99, 102, 241, 0.15)",
+  spotlightColor = "rgba(33, 71, 217, 0.07)",
   as,
   ...props
 }: SpotlightCardProps<T> & ComponentPropsWithoutRef<T>) {
@@ -71,12 +71,12 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
         handleMouseLeave();
         onMouseLeaveProp?.(event);
       }}
-      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-foreground/10 bg-surface ${className}`}
       {...restProps}
     >
       <div
-        className="pointer-events-none absolute inset-0 rounded-2xl border border-cyan-300/0 transition-colors duration-300"
-        style={{ borderColor: isHovering ? 'rgba(126, 231, 255, 0.26)' : 'rgba(126, 231, 255, 0)' }}
+        className="pointer-events-none absolute inset-0 rounded-2xl border border-primary/0 transition-colors duration-300"
+        style={{ borderColor: isHovering ? 'rgba(33, 71, 217, 0.45)' : 'rgba(33, 71, 217, 0)' }}
         aria-hidden="true"
       />
 
@@ -86,27 +86,6 @@ export default function SpotlightCard<T extends ElementType = 'div'>({
         style={{
           opacity: isHovering ? 1 : 0,
           background: `radial-gradient(600px circle at var(--spotlight-x, 0px) var(--spotlight-y, 0px), ${spotlightColor}, transparent 40%)`,
-        }}
-        aria-hidden="true"
-      />
-
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500"
-        style={{
-          opacity: isHovering ? 0.8 : 0,
-          backgroundImage: 'linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.22) 50%, transparent 80%)',
-          transform: isHovering ? 'translateX(130%)' : 'translateX(-130%)',
-          transition: 'transform 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease',
-        }}
-        aria-hidden="true"
-      />
-
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500"
-        style={{
-          opacity: isHovering ? 1 : 0,
-          backgroundImage: 'repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 7px)',
-          mixBlendMode: 'soft-light',
         }}
         aria-hidden="true"
       />

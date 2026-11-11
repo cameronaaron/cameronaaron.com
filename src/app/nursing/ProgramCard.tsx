@@ -21,22 +21,22 @@ export default function ProgramCard({ view, isStarred, onToggleStar, completedTa
   return (
     <article
       data-testid={`program-card-${program.id}`}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+      className="rounded-2xl border border-foreground/10 bg-surface p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-300">{program.city}</p>
-          <h3 className="mt-1 text-xl font-bold text-foreground font-display">{program.institution}</h3>
+          <p className="text-xs font-semibold text-primary">{program.city}</p>
+          <h3 className="mt-1 text-xl font-medium text-foreground font-display">{program.institution}</h3>
           <p className="text-sm text-muted-foreground">{program.programName}</p>
         </div>
         <button
           type="button"
           onClick={onToggleStar}
           aria-pressed={isStarred}
-          className={`flex-shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
+          className={`flex-shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
             isStarred
-              ? 'border-emerald-300/40 bg-emerald-500/15 text-emerald-100'
-              : 'border-white/15 bg-white/5 text-muted-foreground hover:border-emerald-300/30 hover:text-emerald-100'
+              ? 'border-success/40 bg-success/15 text-success'
+              : 'border-foreground/15 bg-foreground/5 text-muted-foreground hover:border-success/30 hover:text-success'
           }`}
         >
           {isStarred ? '★ Applying' : '☆ Track this one'}
@@ -44,11 +44,11 @@ export default function ProgramCard({ view, isStarred, onToggleStar, completedTa
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full border border-foreground/15 bg-foreground/5 px-3 py-1 text-xs font-medium text-muted-foreground">
           {DEGREE_TYPE_LABELS[program.degreeType]}
         </span>
         <span className={`rounded-full border px-3 py-1 text-xs font-medium ${chemBadge.className}`}>{chemBadge.label}</span>
-        <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full border border-foreground/15 bg-foreground/5 px-3 py-1 text-xs font-medium text-muted-foreground">
           {progress.completed}/{progress.total} prereqs complete
         </span>
         <ApplicationStatusBadge activeWindow={activeWindow} />
@@ -79,7 +79,7 @@ export default function ProgramCard({ view, isStarred, onToggleStar, completedTa
                   type="checkbox"
                   checked={completedTaskIds[task.id] ?? false}
                   onChange={() => onToggleTask(task.id)}
-                  className="h-4 w-4 flex-shrink-0 rounded border-white/20 bg-white/5 text-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+                  className="h-4 w-4 flex-shrink-0 rounded border-foreground/20 bg-foreground/5 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                 />
                 <label htmlFor={inputId} className="text-sm text-muted-foreground">
                   {task.label}
@@ -90,7 +90,7 @@ export default function ProgramCard({ view, isStarred, onToggleStar, completedTa
         </ul>
       </div>
 
-      {program.notes ? <p className="mt-4 text-xs text-cyan-200/70">{program.notes}</p> : null}
+      {program.notes ? <p className="mt-4 text-xs text-primary/70">{program.notes}</p> : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {program.sourceUrls.map((url) => (
@@ -99,7 +99,7 @@ export default function ProgramCard({ view, isStarred, onToggleStar, completedTa
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-md border border-emerald-300/35 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-100 transition hover:bg-emerald-400/20"
+            className="inline-flex items-center rounded-md border border-success/35 bg-success/10 px-3 py-1.5 text-xs font-semibold text-success transition hover:bg-success/20"
           >
             Official source
           </a>

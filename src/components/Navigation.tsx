@@ -4,8 +4,6 @@ import { AnimatePresence, m, useScroll, useSpring } from 'framer-motion';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { navItems, type NavItem } from '@/data/navigation';
-import Magnetic from '@/components/ui/Magnetic';
-import ScrambleText from '@/components/ui/ScrambleText';
 import {
   ACTIVE_SECTION_TRIGGER_LINE,
   buildNavLabelMap,
@@ -15,44 +13,35 @@ import {
 } from '@/components/navigation/navigation-logic';
 
 // Memoized so toggling mobileMenuOpen — which re-renders all of Navigation —
-// doesn't also reconcile all 8 desktop links (each wrapping a Magnetic with
-// two useSpring hooks). Confirmed necessary: this list was the dominant cost
-// of the mobile-menu-toggle interaction's one long task (measured via
-// scripts/checks/measure-interaction-latency.mjs, 2026-07).
+// doesn't also reconcile all 8 desktop links. Confirmed necessary: this list
+// was the dominant cost of the mobile-menu-toggle interaction's one long task
+// (measured via scripts/checks/measure-interaction-latency.mjs, 2026-07).
 const DesktopNavLink = memo(function DesktopNavLink({
   item,
   isActive,
-  isScrolled,
 }: {
   item: NavItem;
   isActive: boolean;
-  isScrolled: boolean;
 }) {
   return (
-    <Magnetic>
-      <m.a
-        href={item.href}
-        className={`relative inline-block whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors xl:px-3 xl:text-base ${
-          isScrolled ? 'text-foreground hover:text-cyan-100' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] hover:text-cyan-100'
-        } ${isActive ? 'text-cyan-100' : ''}`}
-        whileHover={{ y: -2 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-        aria-current={isActive ? 'page' : undefined}
-      >
-        {isActive ? (
-          <m.span
-            layoutId="active-nav-pill"
-            className="absolute inset-0 -z-10 rounded-full border"
-            style={{
-              background: 'linear-gradient(90deg, rgba(12, 189, 242, 0.24), rgba(12, 189, 242, 0.18))',
-              borderColor: 'rgba(126, 231, 255, 0.25)',
-            }}
-            transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.35 }}
-          />
-        ) : null}
-        <span className="relative z-10">{item.name}</span>
-      </m.a>
-    </Magnetic>
+    <a
+      href={item.href}
+      className={`relative inline-block whitespace-nowrap rounded-full px-3 py-1.5 text-[0.9375rem] font-medium transition-colors ${
+        isActive ? 'text-accent-foreground' : 'text-muted-foreground hover:text-foreground'
+      }`}
+      aria-current={isActive ? 'page' : undefined}
+    >
+      {/* The highlighter marks where you are; it slides between links
+          (shared layoutId) rather than blinking from one to the next. */}
+      {isActive ? (
+        <m.span
+          layoutId="active-nav-pill"
+          className="absolute inset-0 rounded-full bg-accent"
+          transition={{ type: 'spring', stiffness: 380, damping: 34, mass: 0.4 }}
+        />
+      ) : null}
+      <span className="relative z-10">{item.name}</span>
+    </a>
   );
 });
 
@@ -80,8 +69,8 @@ const MobileNavLink = memo(function MobileNavLink({
       transition={{ delay: index * 0.03 }}
       className={`min-h-[44px] rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
         isActive
-          ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
-          : 'border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground active:bg-white/10'
+          ? 'border-transparent bg-accent text-accent-foreground'
+          : 'border-foreground/10 bg-surface text-muted-foreground hover:text-foreground active:bg-muted'
       }`}
     >
       {item.name}
@@ -169,55 +158,38 @@ export default function Navigation() {
     <>
       {/* Scroll Progress Bar */}
       <m.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-primary to-secondary origin-left z-[60]"
+        className="fixed top-0 left-0 right-0 h-0.5 bg-primary origin-left z-[60]"
         style={{ scaleX }}
       />
 
-      <m.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50"
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
+          isScrolled || mobileMenuOpen
+            ? 'border-foreground/10 bg-background/95 md:bg-background/80 md:backdrop-blur-xl'
+            : 'border-transparent bg-transparent'
+        }`}
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Floating capsule: at rest the nav is transparent over the hero; once
-            scrolled it lifts into an inset glass pill instead of a full-width bar. */}
-        <div className={`transition-all duration-300 ${isScrolled ? 'px-3 pt-3 sm:px-4' : ''}`}>
-        <div
-          className={`container mx-auto transition-all duration-300 ${
-            isScrolled
-              ? 'overflow-hidden rounded-2xl border border-white/10 bg-background/95 shadow-lg shadow-black/30 md:bg-background/80 md:backdrop-blur-xl'
-              : 'bg-transparent'
-          }`}
-        >
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <m.a
-              href="#home"
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold text-white transition-colors hover:text-cyan-100 font-display"
-            >
-              <ScrambleText text="Cameron" />
-            </m.a>
+        <div className="container mx-auto">
+        <div className="px-6 py-3.5">
+          <div className="flex items-center justify-between gap-4">
+            <a href="#home" className="font-display text-[1.375rem] font-medium leading-none text-foreground">
+              Cameron Aaron
+            </a>
 
-            <m.div
-              key={activeHref}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="font-mono-accent hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-200/90 xl:flex"
+            {/* Below the desktop breakpoint the links are behind the menu
+                button, so the bar itself says which section is on screen. */}
+            <div
+              className="ml-auto text-sm font-medium text-muted-foreground lg:sr-only"
               aria-live="polite"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
-              </span>
               {activeNavLabel}
-            </m.div>
+            </div>
 
-            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5" aria-label="Primary navigation">
+            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Primary navigation">
               {navItems.map((item) => (
-                <DesktopNavLink key={item.href} item={item} isActive={activeHref === item.href} isScrolled={isScrolled} />
+                <DesktopNavLink key={item.href} item={item} isActive={activeHref === item.href} />
               ))}
             </nav>
 
@@ -226,7 +198,7 @@ export default function Navigation() {
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
                 whileTap={{ scale: 0.92 }}
-                className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/60 text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/40 hover:text-cyan-200"
+                className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 bg-surface text-foreground transition-colors hover:border-foreground/45"
                 aria-expanded={mobileMenuOpen}
                 aria-controls={mobileMenuOpen ? 'mobile-nav-panel' : undefined}
                 aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
@@ -262,7 +234,7 @@ export default function Navigation() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-t border-white/10 bg-black/85 backdrop-blur-xl lg:hidden pb-[env(safe-area-inset-bottom)]"
+              className="border-t border-foreground/10 lg:hidden pb-[env(safe-area-inset-bottom)]"
             >
               <div className="container mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-2">
@@ -281,8 +253,7 @@ export default function Navigation() {
           ) : null}
         </AnimatePresence>
         </div>
-        </div>
-      </m.nav>
+      </nav>
     </>
   );
 }

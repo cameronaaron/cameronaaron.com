@@ -124,9 +124,9 @@ describe('certifications logic', () => {
 
     it('maps every status kind to its exact Tailwind color class', () => {
       expect(STATUS_ICON_STYLES).toEqual({
-        verified: 'text-emerald-400',
-        'expiring-soon': 'text-amber-400',
-        expired: 'text-red-400',
+        verified: 'text-success',
+        'expiring-soon': 'text-warning',
+        expired: 'text-danger',
       });
     });
 

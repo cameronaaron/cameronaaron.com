@@ -58,22 +58,22 @@ export default function ToxoplasmaMaze() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="toxoplasma-maze"
       role="group"
       aria-label={MAZE_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Fatal Feline Attraction</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Fatal Feline Attraction</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
-            Score <strong data-testid="toxo-score" className="text-cyan-300">{scoreState.score}</strong>
+            Score <strong data-testid="toxo-score" className="text-primary">{scoreState.score}</strong>
           </span>
           <span>
-            Streak <strong data-testid="toxo-streak" className="text-emerald-300">{scoreState.streak}</strong>
+            Streak <strong data-testid="toxo-streak" className="text-success">{scoreState.streak}</strong>
           </span>
           <span>
-            Best <strong data-testid="toxo-best" className="text-amber-300">{scoreState.bestStreak}</strong>
+            Best <strong data-testid="toxo-best" className="text-warning">{scoreState.bestStreak}</strong>
           </span>
         </div>
       </div>
@@ -85,14 +85,14 @@ export default function ToxoplasmaMaze() {
       </p>
 
       <div
-        className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2"
+        className="mb-5 inline-flex items-center gap-2 rounded-full border border-foreground/15 bg-foreground/5 px-4 py-2"
         data-testid="toxo-rodent"
       >
         <span
           aria-hidden="true"
-          className={`h-2.5 w-2.5 rounded-full ${round.infected ? 'bg-rose-400' : 'bg-emerald-400'}`}
+          className={`h-2.5 w-2.5 rounded-full ${round.infected ? 'bg-danger' : 'bg-success'}`}
         />
-        <span className="text-sm font-medium text-white">{getRodentLabel(round.infected)}</span>
+        <span className="text-sm font-medium text-foreground">{getRodentLabel(round.infected)}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -111,7 +111,7 @@ export default function ToxoplasmaMaze() {
                 getArmVisualState(arm, round, resolved)
               )}`}
             >
-              <span className="block text-base font-semibold text-white">{profile.label}</span>
+              <span className="block text-base font-semibold text-foreground">{profile.label}</span>
               <span className="mt-1 block text-xs text-muted-foreground">{profile.detail}</span>
             </button>
           );
@@ -132,7 +132,7 @@ export default function ToxoplasmaMaze() {
           type="button"
           onClick={handleNextRound}
           data-testid="toxo-next"
-          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Next rodent
         </button>

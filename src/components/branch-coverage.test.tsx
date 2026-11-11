@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Testimonials from './Testimonials';
@@ -7,10 +7,7 @@ import ExperienceCard from './experience/ExperienceCard';
 import FeaturedProject from './projects/FeaturedProject';
 import ProjectCard from './projects/ProjectCard';
 import Button from './ui/Button';
-import Magnetic from './ui/Magnetic';
 import SmoothScroll from './ui/SmoothScroll';
-import Tilt from './ui/Tilt';
-import TypewriterEffect from './ui/TypewriterEffect';
 
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
@@ -116,51 +113,6 @@ describe('branch coverage targets', () => {
     expect(screen.getByText('SBH')).toBeTruthy();
   });
 
-  it('drives UI utility motion handlers', () => {
-    render(
-      <>
-        <Magnetic><button type="button">Magnet</button></Magnetic>
-        <Tilt><button type="button">Tilt Target</button></Tilt>
-      </>
-    );
-
-    const magnet = screen.getByRole('button', { name: 'Magnet' });
-    fireEvent.mouseMove(magnet, { clientX: 50, clientY: 50 });
-    fireEvent.mouseLeave(magnet);
-
-    const tilt = screen.getByRole('button', { name: 'Tilt Target' });
-    fireEvent.mouseMove(tilt, { clientX: 90, clientY: 60 });
-    fireEvent.mouseLeave(tilt);
-
-    expect(tilt).toBeTruthy();
-  });
-
-  it('runs typewriter completion and smooth scroll RAF path', () => {
-    vi.useFakeTimers();
-    const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
-
-    const smooth = render(<SmoothScroll />);
-    expect(rafSpy).toHaveBeenCalled();
-
-    const firstRaf = rafSpy.mock.calls[0]?.[0];
-    if (firstRaf) {
-      act(() => {
-        firstRaf(16);
-      });
-    }
-
-    smooth.unmount();
-
-    render(<TypewriterEffect text="Done" typingSpeed={1} />);
-    act(() => {
-      vi.advanceTimersByTime(20);
-    });
-
-    // TypewriterEffect now renders "Done" in both sr-only and the invisible spacer span
-    expect(screen.getAllByText('Done').length).toBeGreaterThan(0);
-    rafSpy.mockRestore();
-  });
-
   it('resets browser scroll restoration and snaps back on reload navigation', () => {
     const scrollToSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
     const getEntriesSpy = vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
@@ -184,5 +136,20 @@ describe('branch coverage targets', () => {
 
     scrollToSpy.mockRestore();
     getEntriesSpy.mockRestore();
+  });
+
+  it('keeps the smooth-scroll frame loop running: each frame schedules the next', () => {
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+
+    const smooth = render(<SmoothScroll />);
+    const scheduledAtMount = rafSpy.mock.calls.length;
+    expect(scheduledAtMount).toBeGreaterThan(0);
+
+    // Run the frame callback the component queued; it must queue exactly one more.
+    const frame = rafSpy.mock.calls[scheduledAtMount - 1][0];
+    frame(16);
+    expect(rafSpy.mock.calls.length).toBe(scheduledAtMount + 1);
+
+    smooth.unmount();
   });
 });

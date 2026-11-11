@@ -262,9 +262,9 @@ describe('scoring and presentation', () => {
     expect(getOptionVisualState(answer, round, NOTHING_SHOWN)).toBe('correct');
     expect(getOptionVisualState(NOTHING_SHOWN, round, NOTHING_SHOWN)).toBe('wrong');
     expect(getOptionVisualState(round.options[0], round, NOTHING_SHOWN)).toBe('dimmed');
-    expect(getOptionClassName('correct')).toBe('border-emerald-300/70 bg-emerald-400/15');
-    expect(getOptionClassName('wrong')).toBe('border-rose-300/70 bg-rose-400/15');
-    expect(getOptionClassName('dimmed')).toBe('border-white/10 bg-white/[0.02] opacity-60');
-    expect(getOptionClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/60 hover:bg-cyan-400/10');
+    expect(getOptionClassName('correct')).toBe('border-success/70 bg-success/15');
+    expect(getOptionClassName('wrong')).toBe('border-danger/70 bg-danger/15');
+    expect(getOptionClassName('dimmed')).toBe('border-foreground/10 bg-foreground/[0.02] opacity-60');
+    expect(getOptionClassName('idle')).toBe('border-foreground/15 bg-foreground/5 hover:border-primary/60 hover:bg-primary/10');
   });
 });

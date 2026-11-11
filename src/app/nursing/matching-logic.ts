@@ -90,17 +90,17 @@ export const FULFILLMENT_STYLES: Record<
 > = {
   completed: {
     label: 'Completed',
-    className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200',
+    className: 'border-success/25 bg-success/10 text-success',
     showPulse: false,
   },
   'in-progress': {
     label: 'In progress',
-    className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200',
+    className: 'border-primary/25 bg-primary/10 text-primary',
     showPulse: true,
   },
   missing: {
     label: 'Not started',
-    className: 'border-white/15 bg-white/5 text-muted-foreground',
+    className: 'border-foreground/15 bg-foreground/5 text-muted-foreground',
     showPulse: false,
   },
 };

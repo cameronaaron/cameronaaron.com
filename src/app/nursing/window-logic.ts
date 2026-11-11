@@ -66,8 +66,8 @@ export function getActiveWindow(program: NursingProgram, now: Date): ActiveWindo
 }
 
 export const WINDOW_STATUS_STYLES: Record<WindowStatus, { label: string; className: string }> = {
-  open: { label: 'Open now', className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200' },
-  'closing-soon': { label: 'Closing soon', className: 'border-amber-400/25 bg-amber-500/10 text-amber-200' },
-  closed: { label: 'Closed', className: 'border-white/15 bg-white/5 text-muted-foreground' },
-  upcoming: { label: 'Upcoming', className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200' },
+  open: { label: 'Open now', className: 'border-success/25 bg-success/10 text-success' },
+  'closing-soon': { label: 'Closing soon', className: 'border-warning/25 bg-warning/10 text-warning' },
+  closed: { label: 'Closed', className: 'border-foreground/15 bg-foreground/5 text-muted-foreground' },
+  upcoming: { label: 'Upcoming', className: 'border-primary/25 bg-primary/10 text-primary' },
 };

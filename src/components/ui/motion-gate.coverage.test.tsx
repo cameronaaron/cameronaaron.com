@@ -46,28 +46,5 @@ describe('infinite-animation motion gates', () => {
       expect(getByText('TypeScript')).toBeTruthy();
       expect(getByText('95%')).toBeTruthy();
     });
-
-    it(`ScrollIndicator bounce is ${mode}`, async () => {
-      mockInteractionMode(prefersReducedMotion);
-      const { default: ScrollIndicator } = await import('../hero/ScrollIndicator');
-      const { container } = render(<ScrollIndicator />);
-      expect(container.querySelector('svg')).toBeTruthy();
-    });
-
-    it(`SectionReveal and SectionHandoff glows are ${mode}`, async () => {
-      mockInteractionMode(prefersReducedMotion);
-      const { SectionReveal, SectionHandoff } = await import('./SectionTransitions');
-      const { getByText } = render(
-        <>
-          <SectionReveal index={1}>
-            <p>Section body</p>
-          </SectionReveal>
-          <SectionHandoff label="Next up" index={1} cue="Keep scrolling" targetId="skills" />
-        </>
-      );
-      expect(getByText('Section body')).toBeTruthy();
-      expect(getByText('Next up')).toBeTruthy();
-      expect(getByText('Keep scrolling')).toBeTruthy();
-    });
   }
 });

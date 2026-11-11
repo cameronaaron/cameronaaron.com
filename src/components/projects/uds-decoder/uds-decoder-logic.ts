@@ -258,9 +258,9 @@ export function getByteRole(position: number): ByteRole {
 }
 
 const BYTE_ROLE_CLASS: Record<ByteRole, string> = {
-  sid: 'border-amber-300/50 bg-amber-400/10 text-amber-200',
-  did: 'border-violet-300/50 bg-violet-400/10 text-violet-200',
-  data: 'border-cyan-300/60 bg-cyan-400/15 text-cyan-100',
+  sid: 'border-warning/50 bg-warning/10 text-warning',
+  did: 'border-violet-300/50 bg-violet-400/10 text-violet-700',
+  data: 'border-primary/60 bg-primary/15 text-foreground',
 };
 
 export type OptionVisualState = 'idle' | 'correct' | 'wrong' | 'dimmed';
@@ -272,10 +272,10 @@ export function getOptionVisualState(option: DecodeOption, chosen: DecodeOption 
 }
 
 const OPTION_STATE_CLASS: Record<OptionVisualState, string> = {
-  idle: 'border-white/15 bg-white/5 hover:border-cyan-300/60 hover:bg-cyan-400/10',
-  correct: 'border-emerald-300/70 bg-emerald-400/15',
-  wrong: 'border-rose-300/70 bg-rose-400/15',
-  dimmed: 'border-white/10 bg-white/[0.02] opacity-60',
+  idle: 'border-foreground/15 bg-foreground/5 hover:border-primary/60 hover:bg-primary/10',
+  correct: 'border-success/70 bg-success/15',
+  wrong: 'border-danger/70 bg-danger/15',
+  dimmed: 'border-foreground/10 bg-foreground/[0.02] opacity-60',
 };
 
 export function formatDid(did: number): string {

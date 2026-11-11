@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  getTimelineDotAnimation,
-  sortExperiencesForTimeline,
-} from '@/components/experience/experience-logic';
+import { sortExperiencesForTimeline } from '@/components/experience/experience-logic';
 import type { Experience } from '@/data/experience';
 
 describe('experience logic — coverage fill for lines 31 and 57', () => {
@@ -40,22 +37,6 @@ describe('experience logic — coverage fill for lines 31 and 57', () => {
 
       const real = result.find((e) => e.company === 'Real Corp');
       expect(real?.latestPeriod).toBe('Jan 2023 - Dec 2023');
-    });
-  });
-
-  describe('getTimelineDotAnimation — line 57: inactive non-lite boxShadow branch', () => {
-    it('returns the full-motion (non-lite) boxShadow when inactive and isLiteMotion is false', () => {
-      const result = getTimelineDotAnimation(false, false);
-
-      // This hits the false branch of `isLiteMotion ?` on line 57
-      expect(result.boxShadow).toBe('0 0 10px rgba(16, 212, 146, 0.5)');
-    });
-
-    it('returns the lite boxShadow when inactive and isLiteMotion is true', () => {
-      const result = getTimelineDotAnimation(true, false);
-
-      // This hits the true branch of `isLiteMotion ?` on line 57
-      expect(result.boxShadow).toBe('0 0 6px rgba(16, 212, 146, 0.35)');
     });
   });
 });

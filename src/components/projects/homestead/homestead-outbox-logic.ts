@@ -551,9 +551,9 @@ export function getDeliveryText(delivery: Delivery, now: number): string {
 }
 
 const DELIVERY_CLASSES: Record<DeliveryStatus, string> = {
-  delivered: 'border-emerald-300/40 bg-emerald-500/10 text-emerald-100',
-  pending: 'border-amber-300/40 bg-amber-500/10 text-amber-100',
-  dead: 'border-rose-300/50 bg-rose-500/15 text-rose-100',
+  delivered: 'border-success/40 bg-success/10 text-success',
+  pending: 'border-warning/40 bg-warning/10 text-warning',
+  dead: 'border-danger/50 bg-danger/15 text-danger',
 };
 
 export function getDeliveryClassName(status: DeliveryStatus): string {
@@ -562,8 +562,8 @@ export function getDeliveryClassName(status: DeliveryStatus): string {
 
 export function getToggleClassName(active: boolean): string {
   return active
-    ? 'border-cyan-300 bg-cyan-400/15 text-white'
-    : 'border-white/15 bg-white/5 text-muted-foreground hover:border-cyan-300/50';
+    ? 'border-primary bg-primary/15 text-foreground'
+    : 'border-foreground/15 bg-foreground/5 text-muted-foreground hover:border-primary/50';
 }
 
 export function getScheduleText(): string {

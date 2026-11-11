@@ -47,20 +47,20 @@ export default function DivergentThinkingGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="divergent-thinking-game"
       role="group"
       aria-label={DIVERGENT_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Unusual Uses</h3>
-        <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-          Score <strong data-testid="dt-total" className="text-cyan-300">{score.total}</strong>
+        <h3 className="text-lg font-bold text-foreground">Unusual Uses</h3>
+        <span className="text-xs text-muted-foreground">
+          Score <strong data-testid="dt-total" className="text-primary">{score.total}</strong>
         </span>
       </div>
 
       <p className="mb-5 text-sm text-muted-foreground">
-        How many uses can you find for <strong className="text-white">{object.name}</strong>? This is scored the way
+        How many uses can you find for <strong className="text-foreground">{object.name}</strong>? This is scored the way
         divergent thinking actually is — not on how many you pick, but on how many different{' '}
         <em>categories</em> you reach, and how few other people would have said them.
       </p>
@@ -71,8 +71,8 @@ export default function DivergentThinkingGame() {
             key={category}
             className={`rounded-full border px-3 py-1 text-xs transition-colors ${
               reachedCategories.has(category)
-                ? 'border-emerald-300/60 bg-emerald-500/15 text-emerald-200'
-                : 'border-white/15 bg-white/5 text-muted-foreground'
+                ? 'border-success/60 bg-success/15 text-success'
+                : 'border-foreground/15 bg-foreground/5 text-muted-foreground'
             }`}
           >
             {CATEGORY_PROFILES[category].label}
@@ -92,8 +92,8 @@ export default function DivergentThinkingGame() {
               data-testid={`dt-use-${use.id}`}
               className={`min-h-[44px] rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                 isSelected
-                  ? 'border-cyan-300 bg-cyan-400/15 text-white'
-                  : 'border-white/15 bg-white/5 text-white/80 hover:border-cyan-300/50'
+                  ? 'border-primary bg-primary/15 text-foreground'
+                  : 'border-foreground/15 bg-foreground/5 text-foreground/80 hover:border-primary/50'
               }`}
             >
               {use.label}
@@ -102,8 +102,8 @@ export default function DivergentThinkingGame() {
         })}
       </div>
 
-      <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4">
-        <span data-testid="dt-breakdown" className="block text-sm text-white/80">
+      <div className="mt-5 rounded-xl border border-foreground/10 bg-surface p-4">
+        <span data-testid="dt-breakdown" className="block text-sm text-foreground/80">
           {formatScoreBreakdown(score)}
         </span>
         <p role="status" aria-live="polite" data-testid="dt-verdict" className="mt-2 text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ export default function DivergentThinkingGame() {
         type="button"
         onClick={handleNextObject}
         data-testid="dt-next"
-        className="mt-5 min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+        className="mt-5 min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
       >
         Try a different object
       </button>

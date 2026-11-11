@@ -91,43 +91,42 @@ export default function BridgingTransitionsPage() {
     <main className="min-h-screen bg-background">
       <section
         aria-labelledby="poster-heading"
-        className="relative overflow-hidden border-b border-white/10 py-14 md:py-20"
+        className="relative overflow-hidden border-b border-foreground/10 py-14 md:py-20"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(252,211,77,0.18),transparent_55%)]" />
         <div className="container relative z-10 mx-auto px-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+          <p className="mb-4 text-xs font-semibold text-warning">
             {bridgingTransitions.session.event} · {bridgingTransitions.kicker}
           </p>
           <h1
             id="poster-heading"
-            className="max-w-5xl text-3xl font-bold leading-tight text-white md:text-5xl"
+            className="max-w-5xl text-3xl font-bold leading-tight text-foreground md:text-5xl"
           >
             {bridgingTransitions.posterTitle}
           </h1>
-          <p className="mt-5 max-w-3xl text-base text-gray-300 md:text-lg">
+          <p className="mt-5 max-w-3xl text-base text-muted-foreground md:text-lg">
             {bridgingTransitions.premise}
           </p>
-          <div className="mt-7 flex flex-wrap gap-2 text-sm text-gray-300">
-            <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1">
+          <div className="mt-7 flex flex-wrap gap-2 text-sm text-muted-foreground">
+            <span className="rounded-full border border-foreground/15 bg-foreground/5 px-3 py-1">
               {bridgingTransitions.presenter}
             </span>
-            <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1">
+            <span className="rounded-full border border-foreground/15 bg-foreground/5 px-3 py-1">
               {bridgingTransitions.advisor}
             </span>
-            <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1">
+            <span className="rounded-full border border-foreground/15 bg-foreground/5 px-3 py-1">
               {bridgingTransitions.category}
             </span>
           </div>
-          <p className="mt-4 text-sm text-gray-400">{bridgingTransitions.session.detail}</p>
+          <p className="mt-4 text-sm text-muted-foreground">{bridgingTransitions.session.detail}</p>
         </div>
       </section>
 
       <section aria-labelledby="watch-heading" className="py-12 md:py-16">
         <div className="container mx-auto px-6">
-          <h2 id="watch-heading" className="mb-2 text-2xl font-bold text-white md:text-3xl">
+          <h2 id="watch-heading" className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
             Watch the series
           </h2>
-          <p className="mb-8 max-w-3xl text-gray-300">
+          <p className="mb-8 max-w-3xl text-muted-foreground">
             Five short videos, two to five minutes each, on how thrice-exceptional Black male
             students are identified, what happens to their support at the transition into college,
             and what institutions can do about it.
@@ -140,13 +139,13 @@ export default function BridgingTransitionsPage() {
               href={capstone.playlistUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-amber-300/40 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/20"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-warning/40 bg-warning/10 px-4 py-2 text-sm font-semibold text-warning transition hover:bg-warning/20"
             >
               Open the playlist on YouTube
             </a>
             <Link
               href="/capstone"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex min-h-[44px] items-center min-h-[44px] rounded-full border border-foreground/15 bg-surface px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
             >
               Read the full capstone
             </Link>
@@ -156,29 +155,29 @@ export default function BridgingTransitionsPage() {
 
       <section
         aria-labelledby="why-heading"
-        className="border-t border-white/10 py-12 md:py-16"
+        className="border-t border-foreground/10 py-12 md:py-16"
       >
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
             <div className="lg:col-span-3">
-              <h2 id="why-heading" className="mb-4 text-2xl font-bold text-white md:text-3xl">
+              <h2 id="why-heading" className="mb-4 text-2xl font-bold text-foreground md:text-3xl">
                 Why the videos exist
               </h2>
-              <p className="text-gray-300">{bridgingTransitions.problem}</p>
-              <p className="mt-4 text-gray-300">{bridgingTransitions.method}</p>
+              <p className="text-muted-foreground">{bridgingTransitions.problem}</p>
+              <p className="mt-4 text-muted-foreground">{bridgingTransitions.method}</p>
             </div>
-            <aside className="rounded-2xl border border-white/10 bg-black/25 p-6 lg:col-span-2">
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-amber-300">
+            <aside className="rounded-2xl border border-foreground/10 bg-surface p-6 lg:col-span-2">
+              <h3 className="mb-4 text-sm font-semibold text-warning">
                 Reviewed by
               </h3>
               <ul className="space-y-5">
                 {bridgingTransitions.reviews.map((review) => (
                   <li key={review.reviewer}>
-                    <blockquote className="border-l-2 border-amber-300/40 pl-3 text-gray-200">
+                    <blockquote className="border-l-2 border-warning/40 pl-3 text-muted-foreground">
                       “{review.quote}”
                     </blockquote>
-                    <p className="mt-2 text-sm font-semibold text-white">{review.reviewer}</p>
-                    <p className="text-xs text-gray-400">{review.role}</p>
+                    <p className="mt-2 text-sm font-semibold text-foreground">{review.reviewer}</p>
+                    <p className="text-xs text-muted-foreground">{review.role}</p>
                   </li>
                 ))}
               </ul>
@@ -189,30 +188,30 @@ export default function BridgingTransitionsPage() {
 
       <section
         aria-labelledby="monday-heading"
-        className="border-t border-white/10 py-12 md:py-16"
+        className="border-t border-foreground/10 py-12 md:py-16"
       >
         <div className="container mx-auto px-6">
-          <h2 id="monday-heading" className="mb-2 text-2xl font-bold text-white md:text-3xl">
+          <h2 id="monday-heading" className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
             What institutions can do Monday
           </h2>
-          <p className="mb-8 max-w-3xl text-gray-300">
+          <p className="mb-8 max-w-3xl text-muted-foreground">
             Each action is addressed to one office, and each is backed by one video in the series.
           </p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {bridgingTransitions.actions.map((item) => (
               <article
                 key={item.audience}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+                className="rounded-2xl border border-foreground/10 bg-surface p-6"
               >
                 <div className="mb-3 flex items-center gap-2">
-                  <span className="rounded-md bg-amber-300/15 px-2 py-0.5 font-mono text-xs font-bold text-amber-200">
+                  <span className="rounded-md bg-warning/15 px-2 py-0.5 font-mono text-xs font-bold text-warning">
                     {item.video}
                   </span>
-                  <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-white">
+                  <h3 className="text-sm font-bold text-foreground">
                     {item.audience}
                   </h3>
                 </div>
-                <p className="text-gray-300">{item.action}</p>
+                <p className="text-muted-foreground">{item.action}</p>
               </article>
             ))}
           </div>
@@ -221,10 +220,10 @@ export default function BridgingTransitionsPage() {
 
       <section
         aria-labelledby="takeaway-heading"
-        className="border-t border-white/10 py-12 md:py-16"
+        className="border-t border-foreground/10 py-12 md:py-16"
       >
         <div className="container mx-auto px-6">
-          <h2 id="takeaway-heading" className="mb-8 text-2xl font-bold text-white md:text-3xl">
+          <h2 id="takeaway-heading" className="mb-8 text-2xl font-bold text-foreground md:text-3xl">
             Take the poster with you
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -233,22 +232,22 @@ export default function BridgingTransitionsPage() {
                 key={download.href}
                 href={download.href}
                 download
-                className="flex min-h-[44px] flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-amber-300/40 hover:bg-amber-300/[0.06]"
+                className="flex min-h-[44px] flex-col rounded-2xl border border-foreground/10 bg-surface p-6 transition hover:border-warning/40 hover:bg-warning/[0.06]"
               >
-                <span className="text-base font-bold text-white">{download.label}</span>
-                <span className="mt-1 text-sm text-gray-400">{download.description}</span>
-                <span className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-amber-300">
+                <span className="text-base font-bold text-foreground">{download.label}</span>
+                <span className="mt-1 text-sm text-muted-foreground">{download.description}</span>
+                <span className="mt-3 text-xs font-semibold text-warning">
                   Download PDF
                 </span>
               </a>
             ))}
           </div>
 
-          <figure className="mt-12 border-l-2 border-amber-300/50 pl-5">
-            <blockquote className="text-lg font-medium leading-relaxed text-white md:text-xl">
+          <figure className="mt-12 border-l-2 border-warning/50 pl-5">
+            <blockquote className="text-lg font-medium leading-relaxed text-foreground md:text-xl">
               “{bridgingTransitions.closing.quote}”
             </blockquote>
-            <figcaption className="mt-3 text-sm text-gray-400">
+            <figcaption className="mt-3 text-sm text-muted-foreground">
               {bridgingTransitions.closing.attribution}
             </figcaption>
           </figure>
@@ -256,13 +255,13 @@ export default function BridgingTransitionsPage() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href="/"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex min-h-[44px] items-center min-h-[44px] rounded-full border border-foreground/15 bg-surface px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
             >
               Back to main portfolio
             </Link>
             <Link
               href="/credentials"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex min-h-[44px] items-center min-h-[44px] rounded-full border border-foreground/15 bg-surface px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
             >
               View credential archive
             </Link>

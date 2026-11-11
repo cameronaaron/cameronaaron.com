@@ -140,12 +140,15 @@ checks — same commit discipline as the ratchet rule, not a follow-up:
 
 ### Performance tier system
 
-Every animation and effect decision is gated on `usePerformanceProfile()`:
+Every animation decision is gated on `usePerformanceProfile()`. (The
+particles, cursor trail and ambient orbs the tiers were first built to ration
+were removed in the 2026-11 redesign; the tiers now ration framer entrances
+and Lenis.)
 
 | Tier | Trigger | What works |
 | ------ | --------- | ------------ |
-| `full` | Desktop fine-pointer, high-spec | All effects: particles, cursor trail, Lenis, ambient animation, parallax |
-| `balanced` | Touch / coarse pointer (mobile) | Static ambient orbs, basic scroll animations, NO particles, NO Lenis, NO cursor trail |
+| `full` | Desktop fine-pointer, high-spec | Lenis smooth scroll, hover lifts, staggered section entrances |
+| `balanced` | Touch / coarse pointer (mobile) | Basic scroll entrances, NO Lenis, no hover motion |
 | `lite` | Low hardware (≤4 cores / ≤4 GB) or save-data | Minimal motion only |
 | `reduced` | `prefers-reduced-motion` | Near-static |
 
@@ -174,7 +177,7 @@ src/
     contact/     # SocialLink, SocialPlatformIcon + contact-logic
     …            # One directory per section, qualified *-logic.ts extracted alongside
   data/          # Static data files (experience.ts, profile.ts, projects.ts…)
-  hooks/         # usePerformanceProfile, useInteractionMode, use3DTilt…
+  hooks/         # usePerformanceProfile, useInteractionMode, useScrollPosition…
 ```
 
 ## Test structure
@@ -205,7 +208,9 @@ src/app/rsc-boundary-contract.test.ts   # page.tsx + converted sections stay Ser
 src/app/bridging-transitions/page.test.tsx            # poster landing page: sections, downloads, JSON-LD
 src/app/bridging-transitions/PlaylistTheater.test.tsx # facade-before-iframe, rail selection, tap targets
 src/hooks/use-performance-profile.test.tsx  # tier derivation, reactive updates
-src/components/ui/ui-coverage-hardening.test.tsx  # AmbientBackground, SmoothScroll…
+src/components/ui/ui-coverage-hardening.test.tsx  # SmoothScroll, command palette, shortcuts…
+src/design-token-contract.test.ts       # semantic colour tokens only; palette pinned at WCAG AA contrast
+src/components/hero-coverage.test.tsx  # hero is static server HTML; LCP candidates never start hidden
 src/data/data-complete.test.ts         # data completeness + LACCD/CHEM 051/Dean's Honor assertions
 src/components/education-ordering.test.tsx  # education card order + pulse indicator contract
 src/components/section-ordering-contract.test.tsx  # experience/projects render newest-first
@@ -219,15 +224,13 @@ Run a focused subset: `npx vitest run src/components/animation-regression-contra
 
 ## Critical constraints
 
-### 1. IntroCurtain must be a static import
+### 1. (Retired 2026-11) IntroCurtain must be a static import
 
-```ts
-// ✅ correct
-import IntroCurtain from '@/components/ui/IntroCurtain';
-
-// ❌ wrong — causes a flash where the page renders without the curtain, then it appears
-const IntroCurtain = dynamic(() => import('@/components/ui/IntroCurtain'), { ssr: false });
-```
+The intro curtain was removed in the "Daylight" redesign — a curtain is a
+delay between the visitor and the page. The number is kept so later
+constraints keep theirs. If a full-page intro is ever reintroduced, the old
+rule still holds: import it statically, because `dynamic(..., { ssr: false })`
+flashes the uncovered page first.
 
 ### 2. Never add root-level files without updating the hygiene contract
 
@@ -237,15 +240,12 @@ const IntroCurtain = dynamic(() => import('@/components/ui/IntroCurtain'), { ssr
 
 The parent `Experience.tsx` drives entry animation via a variant stagger. If `ExperienceCard`'s `SpotlightCard` also has `initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}`, both start at `opacity: 0` and the card appears blank until the race resolves — usually never in headless environments. Let the parent stagger handle entry; the card's `whileHover` and `animate` (for active state) are fine.
 
-### 4. AmbientBackground animated orbs: `'full'` tier only
+### 4. (Retired 2026-11) AmbientBackground animated orbs: `'full'` tier only
 
-```ts
-// ✅ correct
-const animateOrbs = performanceTier === 'full';
-
-// ❌ wrong — mobile gets 4 Framer Motion orbs with repeat:Infinity → lag
-const animateOrbs = performanceTier === 'full' || performanceTier === 'balanced';
-```
+The ambient orb field was removed in the "Daylight" redesign. The lesson it
+recorded is general and still applies: a framer `repeat: Infinity` animation
+on the mobile (`balanced`) path is a main-thread loop for every phone
+visitor. `animation-regression-contract` sweeps for it repo-wide.
 
 ### 5. Lenis disabled on touch devices
 
@@ -462,6 +462,43 @@ strangers who never opted into third-party tracking by walking past a poster,
 and conference wifi is the worst case for loading a ~500KB player nobody asked
 for. Don't "simplify" it into a bare iframe.
 
+## Design system — "Daylight" (2026-11 redesign)
+
+The site is **light**. The owner's brief was that the previous dark theme
+"looks very heavy and space like"; everything below follows from that, and
+ENGINEERING-STANDARDS §7 carries the amendment and the list of effects that
+were deleted on purpose. Do not bring them back unasked.
+
+- **Palette comes from the portrait**, defined once in the `@theme` block of
+  `globals.css`: navy tie → `foreground` (#0f1b33), shirt blue → `primary`
+  (#2147d9), studio backdrop → `background` (#f4f5f7) with white `surface`
+  cards. The one loud colour is `accent` (#d8f24b), EMS high-visibility
+  yellow-green, used like a highlighter: the active nav link, selected
+  filters, the block behind the portrait, link hovers. Status inks are
+  `success` / `warning` / `danger`.
+- **Tokens only.** There is no `text-white`, `bg-black`, `border-white/10`,
+  `text-cyan-300` or `bg-emerald-500` anywhere in the source: use
+  `text-foreground`, `bg-surface`, `border-foreground/10`, `text-primary`,
+  `bg-success/10`. On a filled `bg-primary` use `text-primary-foreground`.
+  `design-token-contract` sweeps for raw palette names and pins every text
+  token at WCAG AA (4.5:1) against the surfaces it sits on.
+- **Two typefaces.** Newsreader (`.font-display`) for the name, section titles
+  and card titles, at regular/medium weight — never bold; Atkinson
+  Hyperlegible Next for everything else. Numbers, dates and credential IDs
+  take `.font-data` (tabular figures), not a monospace: there is no third font
+  file to download. Labels are sentence case — no tracked-out uppercase.
+- **The house interaction is `mark-link`**: a hover/focus swipe of the accent
+  under a text link, in CSS. It needs no handler and no hydration, and
+  `section-engagement-contract` both counts it and proves the CSS rule exists.
+- **Nothing above the fold starts hidden.** The hero is a Server Component; its
+  name, lede and portrait have no entrance animation because an element that
+  fades in from `opacity: 0` is not an LCP candidate until it finishes. The one
+  load moment (the accent block sliding out from behind the portrait, the
+  rules drawing) is transform-only CSS. Pinned by `hero-coverage.test.tsx`.
+- **Sections are a rule, a title, and content** (`SectionHeader`, a Server
+  Component, `.section-header` in `globals.css`). No numbered eyebrows, no
+  gradient text, no glow blobs behind sections, no glass.
+
 ## Data
 
 Site content lives in `src/data/`:
@@ -551,7 +588,7 @@ These patterns are enforced by `src/components/algorithm-and-datastructure-contr
 Never `.map(transform).filter(alive)` — it allocates a full intermediate array. Use a `for` loop with conditional `push()`; in per-frame code, go further and compact in place with zero allocation (ENGINEERING-STANDARDS §2.8):
 
 ```ts
-// ✅ single-pass, zero-allocation — stepBursts (per-frame code)
+// ✅ single-pass, zero-allocation (per-frame code)
 let write = 0;
 for (const burst of bursts) {
   // ...mutate burst in place
@@ -577,7 +614,7 @@ return result;
 When collecting up to `maxN` items, break as soon as the limit is hit rather than building the full collection and calling `.slice()`:
 
 ```ts
-// ✅ labeled break — buildConnections (count tracks pooled slots in use)
+// ✅ labeled break (count tracks pooled slots in use)
 outer: for (let i = 0; i < particles.length; i++) {
   for (let j = i + 1; j < particles.length; j++) {
     if (count >= maxConnections) break outer;
@@ -621,7 +658,7 @@ export function filterTestimonialsByRelationship(items, filter) {
 Don't drive a `useState` from `mousemove`-rate events when the value only feeds animation — every state update re-renders the whole subtree even though most consumers just want smooth motion. Write straight into a Framer Motion `useMotionValue` from the event handler instead; `useTransform`/`useSpring` consumers update without React ever re-rendering:
 
 ```ts
-// ✅ Hero.tsx / use3DTilt.ts / ProfileImage.tsx
+// ✅ Button.tsx (the magnetic primary button)
 const rawPointerX = useMotionValue(0);
 useEffect(() => {
   const handlePointerMove = (event: MouseEvent) => rawPointerX.set(event.clientX);
@@ -651,12 +688,6 @@ export const LOW_HARDWARE_CORES_THRESHOLD = 4;
 export const LOW_HARDWARE_MEMORY_GB_THRESHOLD = 4;
 export const DEFAULT_HARDWARE_CONCURRENCY = 8;
 export const DEFAULT_DEVICE_MEMORY_GB = 8;
-
-// ✅ interactive-particles-engine.ts
-export const POINTER_ATTRACT_RADIUS = 22;
-export const POINTER_ATTRACT_RADIUS_SQ = POINTER_ATTRACT_RADIUS * POINTER_ATTRACT_RADIUS;
-export const ATTRACTION_STRENGTH_FULL = 0.012;
-export const ATTRACTION_STRENGTH_BALANCED = 0.008;
 ```
 
 ## Deployment

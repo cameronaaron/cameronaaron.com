@@ -37,9 +37,9 @@ const EXPIRES_MONTH_YEAR_RE = /expires\s+([a-z]{3,9})\s+(\d{4})/i;
 export type CertificationStatusKind = 'verified' | 'expiring-soon' | 'expired';
 
 export const STATUS_ICON_STYLES: Record<CertificationStatusKind, string> = {
-  verified: 'text-emerald-400',
-  'expiring-soon': 'text-amber-400',
-  expired: 'text-red-400',
+  verified: 'text-success',
+  'expiring-soon': 'text-warning',
+  expired: 'text-danger',
 };
 
 export const STATUS_ICON_PATH: Record<CertificationStatusKind, string> = {

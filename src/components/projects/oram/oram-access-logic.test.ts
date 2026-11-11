@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 import {
   ALL_NODES,
   BUCKET_CAPACITY,
@@ -277,10 +277,10 @@ describe('presentation', () => {
     expect(getGuessVisualState(guessed, game.reader)).toBe('reader');
     expect(getGuessVisualState(guessed, other)).toBe('wrong-guess');
     expect(getGuessVisualState(guessed, third)).toBe('idle');
-    expect(getGuessClassName('reader')).toBe('border-emerald-300/70 bg-emerald-400/15');
-    expect(getGuessClassName('wrong-guess')).toBe('border-rose-300/70 bg-rose-400/15');
-    expect(getGuessClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/60');
-    expect(getModeClassName(true)).toBe('border-cyan-300/60 bg-cyan-400/15 text-cyan-100');
-    expect(getModeClassName(false)).toBe('border-white/15 bg-white/5 text-muted-foreground hover:border-cyan-300/40');
+    expect(getGuessClassName('reader')).toBe('border-success/70 bg-success/15');
+    expect(getGuessClassName('wrong-guess')).toBe('border-danger/70 bg-danger/15');
+    expect(getGuessClassName('idle')).toBe('border-foreground/15 bg-foreground/5 hover:border-primary/60');
+    expect(getModeClassName(true)).toBe('border-primary/60 bg-primary/15 text-foreground');
+    expect(getModeClassName(false)).toBe('border-foreground/15 bg-foreground/5 text-muted-foreground hover:border-primary/40');
   });
 });

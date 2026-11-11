@@ -1,15 +1,8 @@
 import React from 'react';
-import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import { act, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Certifications from './Certifications';
-import { experiences } from '@/data/experience';
-import { profile } from '@/data/profile';
-import { projects } from '@/data/projects';
-
-// The featured capstone: a linked project. Not `projects[0]` — the data is
-// ordered newest-first, and the newest work can be a private repository.
-const capstoneProject = projects.find((project) => project.link?.includes('/capstone'))!;
 
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
@@ -57,13 +50,11 @@ describe('targeted coverage gaps', () => {
     render(<Navigation />);
 
     const nav = screen.getByRole('navigation', { name: 'Main navigation' });
-    // Scrolled state lifts the inner capsule into blurred glass (the nav shell
-    // itself stays a transparent fixed strip so the blur only covers the pill).
-    expect(nav.querySelector('[class*="backdrop-blur-xl"]')).not.toBeNull();
-    expect(nav.querySelector('[class*="rounded-2xl"]')).not.toBeNull();
-
-    const homeLink = screen.getByRole('link', { name: 'Home' });
-    expect(homeLink.className).toContain('hover:text-cyan-100');
+    // Scrolled state gives the bar a paper background and a hairline, so the
+    // links stay legible over whatever content is passing underneath.
+    expect(nav.className).toContain('bg-background/95');
+    expect(nav.className).toContain('border-foreground/10');
+    expect(nav.className).not.toContain('bg-transparent');
   });
 
   it('covers structured-data fallback when dates are missing or invalid', async () => {
@@ -174,51 +165,6 @@ describe('targeted coverage gaps', () => {
 
     expect(screen.queryByRole('button', { name: /view all/i })).toBeNull();
     expect(screen.getByText('Hidden Person')).toBeTruthy();
-  });
-
-  it('covers disabled-hover branches in interaction-driven components', async () => {
-    vi.doMock('@/hooks/useInteractionMode', () => ({
-      useInteractionMode: () => ({
-        enableHoverMotion: false,
-        prefersReducedMotion: true,
-        isCoarsePointer: true,
-      }),
-    }));
-
-    const [{ default: ExperienceCard }, { default: ProfileImage }, { default: ProjectCard }, { default: Button }, { default: Magnetic }] =
-      await Promise.all([
-        import('@/components/experience/ExperienceCard'),
-        import('@/components/hero/ProfileImage'),
-        import('@/components/projects/ProjectCard'),
-        import('@/components/ui/Button'),
-        import('@/components/ui/Magnetic'),
-      ]);
-
-    render(
-      <>
-        <ExperienceCard experience={experiences[0]} index={0} />
-        <ProfileImage src={profile.image} alt={profile.name} />
-        <ProjectCard project={capstoneProject} index={0} />
-        <Button onClick={() => undefined}>NoHover</Button>
-        <Magnetic><button type="button">Still</button></Magnetic>
-      </>
-    );
-
-    // Fire mouseEnter to cover the false branch of if (enableHoverMotion) in ExperienceCard
-    const experienceCard = screen.getByTestId('experience-card-0');
-    fireEvent.mouseEnter(experienceCard);
-    fireEvent.mouseMove(experienceCard, { clientX: 20, clientY: 20 });
-    fireEvent.mouseLeave(experienceCard);
-
-    const projectLink = screen.getAllByRole('link').find((link) => link.getAttribute('href') === capstoneProject.link);
-    expect(projectLink).toBeTruthy();
-
-    if (projectLink) {
-      fireEvent.mouseEnter(projectLink);
-      fireEvent.mouseLeave(projectLink);
-    }
-
-    fireEvent.mouseMove(screen.getByRole('button', { name: 'NoHover' }), { clientX: 80, clientY: 40 });
   });
 
   it('cleans up stale service worker registrations in production', async () => {

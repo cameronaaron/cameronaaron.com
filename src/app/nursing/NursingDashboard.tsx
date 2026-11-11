@@ -75,11 +75,10 @@ export default function NursingDashboard({ programs, transcriptCourses }: Nursin
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="relative overflow-hidden border-b border-white/10 py-16">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,212,146,0.2),transparent_55%)]" />
+      <section className="relative overflow-hidden border-b border-foreground/10 py-16">
         <div className="container relative z-10 mx-auto px-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Private Tracker</p>
-          <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-4xl font-display">
+          <p className="mb-4 text-xs font-semibold text-success">Private Tracker</p>
+          <h1 className="max-w-3xl text-3xl font-medium leading-tight text-foreground md:text-4xl font-display">
             Nursing Program Tracker
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
@@ -94,7 +93,7 @@ export default function NursingDashboard({ programs, transcriptCourses }: Nursin
       <section className="py-12">
         <div className="container mx-auto px-6">
           {programs.length === 0 ? (
-            <p className="rounded-2xl border border-white/10 bg-white/5 p-6 text-muted-foreground">
+            <p className="rounded-2xl border border-foreground/10 bg-surface p-6 text-muted-foreground">
               No verified programs yet.
             </p>
           ) : (
@@ -106,7 +105,7 @@ export default function NursingDashboard({ programs, transcriptCourses }: Nursin
               <div className="space-y-10">
                 {cityGroups.map((group) => (
                   <div key={group.city}>
-                    <h2 className="mb-4 text-2xl font-bold text-white font-display">{group.city}</h2>
+                    <h2 className="mb-4 text-2xl font-medium text-foreground font-display">{group.city}</h2>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                       {group.views.map((view) => (
                         <ProgramCard

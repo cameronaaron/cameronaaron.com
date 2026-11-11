@@ -195,8 +195,8 @@ export function getOptionVisualState(option: string, round: Round, chosen: strin
 }
 
 export function getOptionClassName(state: OptionVisualState): string {
-  if (state === 'correct') return 'border-emerald-300/70 bg-emerald-400/15';
-  if (state === 'wrong') return 'border-rose-300/70 bg-rose-400/15';
-  if (state === 'dimmed') return 'border-white/10 bg-white/[0.02] opacity-60';
-  return 'border-white/15 bg-white/5 hover:border-cyan-300/60 hover:bg-cyan-400/10';
+  if (state === 'correct') return 'border-success/70 bg-success/15';
+  if (state === 'wrong') return 'border-danger/70 bg-danger/15';
+  if (state === 'dimmed') return 'border-foreground/10 bg-foreground/[0.02] opacity-60';
+  return 'border-foreground/15 bg-foreground/5 hover:border-primary/60 hover:bg-primary/10';
 }

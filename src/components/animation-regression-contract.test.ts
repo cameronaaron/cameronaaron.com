@@ -100,70 +100,7 @@ function stripComments(src: string): string {
   return out;
 }
 
-/** The className string literal of a JSX opening element, or '' when it is not
- * a plain literal (template/expression classNames are not what this pins). */
-function classNameOf(node: ts.JsxOpeningLikeElement): string {
-  for (const prop of node.attributes.properties) {
-    if (!ts.isJsxAttribute(prop) || prop.name.getText() !== 'className') continue;
-    const init = prop.initializer;
-    if (init && ts.isStringLiteral(init)) return init.text;
-  }
-  return '';
-}
-
-/** Body of a single top-level CSS rule, matched on its exact selector. */
-function cssRuleBody(css: string, selector: string): string {
-  const start = css.indexOf(`\n${selector} {`);
-  if (start === -1) throw new Error(`CSS rule not found: ${selector}`);
-  const open = css.indexOf('{', start);
-  const close = css.indexOf('}', open);
-  return css.slice(open + 1, close);
-}
-
 describe('animation regression contract', () => {
-  it('hero world word is not a descendant of the portrait stage (2026-09 face-collision)', () => {
-    const source = read('src/components/Hero.tsx');
-    const file = ts.createSourceFile('Hero.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-
-    // Locate the portrait stage element, then prove the world word is nowhere
-    // inside it. Inside .hero-stage there is no offset that clears the portrait
-    // at every viewport width, so containment itself is the regression.
-    let stage: ts.Node | undefined;
-    const findStage = (node: ts.Node): void => {
-      if (ts.isJsxElement(node) && /(^|\s)hero-stage(\s|$)/.test(classNameOf(node.openingElement))) {
-        stage = node;
-      }
-      ts.forEachChild(node, findStage);
-    };
-    findStage(file);
-    expect(stage, 'Hero.tsx has no .hero-stage element').toBeDefined();
-
-    let wordInsideStage = false;
-    const findWord = (node: ts.Node): void => {
-      const cls =
-        ts.isJsxSelfClosingElement(node) ? classNameOf(node)
-        : ts.isJsxElement(node) ? classNameOf(node.openingElement)
-        : '';
-      if (cls.includes('hero-stage-word')) wordInsideStage = true;
-      ts.forEachChild(node, findWord);
-    };
-    findWord(stage!);
-
-    expect(
-      wordInsideStage,
-      'The hero world word is inside .hero-stage again — it will paint over the portrait. Keep it a sibling AFTER the stage.',
-    ).toBe(false);
-
-    // ...and it must still exist somewhere in the hero, or the pin is vacuous.
-    expect(source).toContain('hero-stage-word');
-  });
-
-  it('hero world word stays in flow — never absolutely positioned over the portrait (2026-09)', () => {
-    const body = cssRuleBody(read('src/app/globals.css'), '.hero-stage-word');
-
-    expect(/position:\s*(absolute|fixed)/.test(body), '.hero-stage-word re-acquired absolute/fixed positioning').toBe(false);
-    expect(/(^|[^-])z-index:/.test(body), '.hero-stage-word re-acquired a z-index').toBe(false);
-  });
 
   it('the portrait carries no decorative FloatingBadge icons overlapping its meaning pills (2026-09)', () => {
     const source = read('src/components/hero/ProfileImage.tsx');
@@ -191,15 +128,6 @@ describe('animation regression contract', () => {
     expect(source).not.toMatch(/whileInView=\{\{[^}]*scale:\s*1\s*\}/);
   });
 
-  it('ProfileImage keeps passive motion off and gates hover on the full performance tier', () => {
-    const source = read('src/components/hero/ProfileImage.tsx');
-    expect(source).toContain("from '@/hooks/usePerformanceProfile'");
-    expect(source).toContain('shouldRenderHeavyEffects: enableHoverMotion');
-    expect(source).not.toContain('repeat: Infinity');
-    expect(source).not.toContain('animate=');
-    expect(source).not.toContain('preserve-3d');
-  });
-
   it('element-bound 3D tilt never subscribes to whole-window pointer movement', () => {
     const offenders: string[] = [];
     const walk = (dir: string) => {
@@ -216,18 +144,6 @@ describe('animation regression contract', () => {
     };
     walk(resolve(process.cwd(), 'src'));
     expect(offenders, 'Moving over unrelated controls must not rotate/rasterize element-bound tilt surfaces').toEqual([]);
-  });
-
-  it('AmbientBackground restricts animated (Framer Motion) orbs to the full tier only', () => {
-    const component = read('src/components/ui/AmbientBackground.tsx');
-    const logic = read('src/components/ui/ambient-background-logic.ts');
-    // The component must delegate the decision to the extracted helper
-    expect(component).toContain('shouldAnimateOrbs(performanceTier)');
-    // The logic module must enforce full-only animation
-    expect(logic).toContain("return performanceTier === 'full'");
-    // Neither file must gate animation on the balanced (mobile) tier
-    expect(component).not.toMatch(/animateOrbs\s*=.*balanced/);
-    expect(logic).not.toMatch(/animateOrbs.*balanced/);
   });
 
   it('SmoothScroll bails out before creating Lenis when the pointer is coarse', () => {
@@ -259,38 +175,15 @@ describe('animation regression contract', () => {
     expect(source).toContain('order-2 md:order-1');
   });
 
-  it('Hero title uses a responsive font scale starting from text-3xl on mobile', () => {
-    const source = read('src/components/Hero.tsx');
-    // Must not start at text-4xl (too large for 390px screens). The pin
-    // guards the mobile floor only — the desktop scale is free to grow
-    // (the 2026-07 makeover took md+ to display scale).
-    expect(source).toMatch(/className="text-3xl sm:text-4xl md:text-/);
-  });
-
-  it('IntroCurtain is a static import in the client page-chrome island (no ssr:false dynamic import)', () => {
-    // Moved from page.tsx to PageChrome in the RSC migration (2026-07): page.tsx
-    // is now a Server Component and all client orchestration (curtain, overlays,
-    // interaction gating) lives in the PageChrome island. The invariant is
-    // unchanged — CLAUDE.md #1: IntroCurtain stays a static import so it's
-    // present on first paint, never a flash-causing ssr:false dynamic.
-    const source = read('src/components/ui/PageChrome.tsx');
-    expect(source).toContain("import IntroCurtain from '@/components/ui/IntroCurtain'");
-    expect(source).not.toMatch(/dynamic\s*\([^)]*IntroCurtain/);
-  });
-
-  it('event listeners in particle components use passive flag', () => {
-    for (const path of [
-      'src/components/hero/BackgroundParticles.tsx',
-      'src/components/hero/InteractiveParticles.tsx',
-      'src/components/hero/ProfileImage.tsx',
-    ]) {
-      const source = read(path);
-      // Every mousemove listener must be passive (these never call preventDefault)
-      const mousemoveLines = source.split('\n').filter((l) => l.includes("addEventListener('mousemove'"));
-      for (const line of mousemoveLines) {
-        expect(line).toContain('passive: true');
-      }
-    }
+  it('Hero name floor fits a 390px phone without wrapping a name line', () => {
+    // The pin guards the mobile floor only — the desktop scale is free to
+    // grow. "Cameron" is the longer line: seven glyphs at roughly 0.5em each
+    // in the display serif, so at the clamp minimum it must fit inside a
+    // 390px screen less the 24px gutters (342px), measured live at 3.75rem.
+    const rule = /\.hero-name\s*\{[^}]*\}/.exec(read('src/app/globals.css'))?.[0] ?? '';
+    const floorRem = Number(/font-size:\s*clamp\((\d+(?:\.\d+)?)rem/.exec(rule)?.[1]);
+    expect(floorRem).toBeGreaterThan(0);
+    expect(floorRem * 16 * 7 * 0.56).toBeLessThanOrEqual(342);
   });
 
   it('Navigation resize and keydown listeners are passive', () => {
@@ -306,19 +199,19 @@ describe('animation regression contract', () => {
     }
   });
 
-  it('Hero pointer tracking and useScrollPosition hooks use passive listeners', () => {
+  it('the hero tracks nothing, and the useScrollPosition hook listens passively', () => {
+    // The hero used to follow the pointer and the scroll position. It is a
+    // Server Component now, so the strongest form of "its listeners are
+    // passive" is that it has none.
     const hero = read('src/components/Hero.tsx');
     const scroll = read('src/hooks/useScrollPosition.ts');
-    expect(hero.split('\n').find((l) => l.includes("addEventListener('mousemove'"))).toContain('passive: true');
+    expect(hero).not.toContain('addEventListener');
+    expect(hero).not.toMatch(/\buse[A-Z]\w*\(/);
     expect(scroll.split('\n').find((l) => l.includes("addEventListener('scroll'"))).toContain('passive: true');
   });
 
   it('pageshow listeners in bfcache-aware components are passive', () => {
-    for (const path of [
-      'src/components/ui/IntroCurtain.tsx',
-      'src/components/ui/SmoothScroll.tsx',
-      'src/components/ui/TypewriterEffect.tsx',
-    ]) {
+    for (const path of ['src/components/ui/SmoothScroll.tsx']) {
       const source = read(path);
       const pagesShowLines = source.split('\n').filter((l) => l.includes("addEventListener('pageshow'"));
       expect(pagesShowLines.length).toBeGreaterThan(0);
@@ -326,11 +219,6 @@ describe('animation regression contract', () => {
         expect(line, `${path} pageshow listener missing passive: true`).toContain('passive: true');
       }
     }
-  });
-
-  it('Hero signal chips use whitespace-nowrap to prevent mid-word wrapping on mobile', () => {
-    const source = read('src/components/Hero.tsx');
-    expect(source).toContain('whitespace-nowrap');
   });
 
   it('usePerformanceProfile uses false initial state (not lazy browser-API initializers) to prevent React #418', () => {
@@ -349,10 +237,10 @@ describe('animation regression contract', () => {
     // live inside a stagger container. They must NOT have their own initial={{ opacity: 0 }}
     // combined with whileInView — that is the same double-animation blank pattern from
     // ExperienceCard. The parent stagger drives column visibility; headings ride along.
-    expect(source).toContain('<h3 className="text-2xl font-bold mb-6 text-white">');
-    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Core Competencies/);
-    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Domain Expertise/);
-    expect(source).not.toMatch(/<m\.h3[^>]+whileInView[^>]+>[\s\S]*?Certification Highlights/);
+    for (const heading of ['Core competencies', 'Domain expertise', 'Certification highlights']) {
+      expect(source, `"${heading}" must be a plain <h3>`).toMatch(new RegExp(`<h3 className="[^"]*">${heading}</h3>`));
+    }
+    expect(source).not.toMatch(/<m\.h3\b/);
   });
 
   it('repo-wide: every file with a framer infinite animation references a motion gate (2026-07)', () => {
@@ -396,8 +284,9 @@ describe('animation regression contract', () => {
   it('mobile-path decorative loops stay CSS, and every *-anim class exists in globals.css (2026-07)', () => {
     // These components render on the mobile (balanced/reduced) path and each
     // carried framer repeat:Infinity loops that, multiplied across the page
-    // (SectionHandoff ×7 × {glow,ring,3 dots}, StatCard ×5 × 3, per-card
-    // ProjectCard/SkillBar), pegged a real Moto G Power's main thread to a 4.6s
+    // (seven section handoffs × {glow,ring,3 dots}, five stat cards × 3, per-card
+    // ProjectCard/SkillBar — the handoffs and stat cards were removed outright
+    // in the 2026-11 redesign), pegged a real Moto G Power's main thread to a 4.6s
     // TBT. Their infinite animations are now CSS @keyframes — compositor-run
     // and paused off-screen by their section's content-visibility. Lock it in:
     // (a) a framer repeat:Infinity reappearing in any of them is a mobile-perf
@@ -406,7 +295,6 @@ describe('animation regression contract', () => {
     // animation the type system can't catch.
     const CSS_CONVERTED = [
       'src/components/ui/SectionTransitions.tsx',
-      'src/components/ui/StatCard.tsx',
       'src/components/ui/SkillBar.tsx',
       'src/components/projects/ProjectCard.tsx',
       'src/components/certifications/HeartbeatMonitor.tsx',
@@ -441,7 +329,10 @@ describe('animation regression contract', () => {
       }
     }
     // Guard the guard (§6 item 8): the sweep must actually be finding classes.
-    expect(referencedCount, 'no *-anim classes found — the sweep regex is broken').toBeGreaterThanOrEqual(10);
+    // The floor was 10 while the page carried a dozen ambient loops; the
+    // 2026-11 redesign deleted all but the ECG trace, so the floor is the one
+    // class that is known to exist.
+    expect(referencedCount, 'no *-anim classes found — the sweep regex is broken').toBeGreaterThanOrEqual(1);
     expect(
       Array.from(new Set(missing)),
       `*-anim class referenced in a component but not defined in globals.css (dead animation):\n${Array.from(new Set(missing)).join('\n')}`,
@@ -463,12 +354,7 @@ describe('animation regression contract', () => {
     // or useInView). Genuine exceptions — a loop that self-terminates or
     // self-sleeps, so it is not perpetual — go in ALLOWED_UNGATED_CANVAS_LOOPS
     // with a concrete, checkable reason (§6 item 18), never a blanket excuse.
-    const ALLOWED_UNGATED_CANVAS_LOOPS: Record<string, string> = {
-      'src/components/ui/CursorComet.tsx':
-        'Self-sleeps: the loop sets frameId=0 and returns when pool.liveCount===0 and nothing emitted, so it stops within one spark lifetime of the pointer going still — bounded off-screen work, restarted by wake() on real movement, never perpetual.',
-      'src/components/hero/GlyphDissolveName.tsx':
-        'Finite: the tick returns without rescheduling once hasEnteringFinished/hasLeavingFinished, so the name dissolve plays exactly once and stops — it is not a perpetual loop.',
-    };
+    const ALLOWED_UNGATED_CANVAS_LOOPS: Record<string, string> = {};
     const VISIBILITY_GATE = /gateLoopOnVisibility|useInView/;
 
     const files: string[] = [];
@@ -494,7 +380,10 @@ describe('animation regression contract', () => {
 
     // Guard the guard (§6 item 8): the sweep must actually be finding the
     // canvas components, or it would pass vacuously.
-    expect(canvasLoops.length, 'no canvas rAF components found — the sweep is broken').toBeGreaterThanOrEqual(5);
+    // The floor was 5 while the page carried four decorative canvases (two
+    // hero particle fields, the cursor comet, the skill web); the 2026-11
+    // redesign removed them, leaving the one game that draws to a canvas.
+    expect(canvasLoops.length, 'no canvas rAF components found — the sweep is broken').toBeGreaterThanOrEqual(1);
     expect(
       ungated,
       `canvas rAF loop not gated on visibility (§3.7) — wire it through gateLoopOnVisibility / useInView, or add a reasoned ALLOWED_UNGATED_CANVAS_LOOPS entry:\n${ungated.join('\n')}`,
@@ -549,7 +438,9 @@ describe('animation regression contract', () => {
     }
 
     // Guard the guard (§6 item 8): the parser must be finding keyframes.
-    expect(keyframeCount, 'no @keyframes found — the parser is broken').toBeGreaterThanOrEqual(10);
+    // Floor lowered from 10 with the 2026-11 redesign, which deleted the
+    // ambient loops: what remains is the ECG trace and the hero's load moment.
+    expect(keyframeCount, 'no @keyframes found — the parser is broken').toBeGreaterThanOrEqual(4);
     expect(
       violations,
       `CSS keyframes must animate only transform/opacity/filter (compositor thread). Rework to a compositable property, or add a reasoned ALLOWED_NONCOMPOSITED entry:\n${violations.join('\n')}`,
@@ -564,7 +455,7 @@ describe('animation regression contract', () => {
     // See incident 7 above. Precise, not a proximity heuristic: flags only a
     // color-affecting property key whose OWN value object sets `type: 'spring'`
     // (e.g. `backgroundColor: { type: 'spring', ... }`) — the shape both real fixes
-    // (SectionRail.tsx, experience/logic.ts) now deliberately avoid, always using a
+    // (experience/experience-logic.ts) now deliberately avoids, always using a
     // tween for these keys instead. A broader "spring anywhere near a color key"
     // proximity check was tried and dropped: it false-positived on a `scale` spring
     // legitimately sharing a per-property transition map with a *tweened* color key
@@ -588,7 +479,7 @@ describe('animation regression contract', () => {
 
     expect(
       offenders,
-      `color-affecting property directly sprung — use a tween instead (see SectionRail.tsx or experience/logic.ts's getTimelineDotTransition):\n${offenders.join('\n')}`,
+      `color-affecting property directly sprung — use a tween instead (see experience/experience-logic.ts's getTimelineDotTransition):\n${offenders.join('\n')}`,
     ).toEqual([]);
   });
 
@@ -676,9 +567,6 @@ describe('animation regression contract', () => {
     const gatedWidgets = [
       'src/components/projects/predator-prey/PredatorPreyChase.tsx',
       'src/components/projects/reaction-game/ReactionTimeGame.tsx',
-      'src/components/skills/SkillWeb.tsx',
-      'src/components/ui/RibbonBand.tsx',
-      'src/components/ui/MagneticField.tsx',
     ];
     for (const file of gatedWidgets) {
       const source = read(file);
@@ -696,7 +584,7 @@ describe('animation regression contract', () => {
     // file happens to hold its import — and the old file-pin proved that:
     // moving the games behind an InteractiveDemoSlot dispatch table (§2.2)
     // failed this check while the code-split it protects was fully intact.
-    // Same lesson as RibbonBandLazy below, and the same "sweeps over pins"
+    // The same "sweeps over pins"
     // rule as §6 item 2. As a sweep it also covers every FUTURE game
     // automatically, which the enumerated pin never did.
     const splitFiles: string[] = [];
@@ -742,15 +630,5 @@ describe('animation regression contract', () => {
         `${widget} must be dynamically imported with ssr:false somewhere in production (§3.8)`
       ).toBe(true);
     }
-    expect(read('src/components/Skills.tsx')).toContain("dynamic(() => import('@/components/skills/SkillWeb'), { ssr: false })");
-    // RibbonBand's ssr:false dynamic moved to the RibbonBandLazy client island
-    // (RSC migration, 2026-07): next/dynamic with ssr:false is disallowed inside
-    // a Server Component, so the now-server page.tsx renders <RibbonBandLazy/>,
-    // which carries the lazy import. §3.8 code-split preserved.
-    expect(read('src/components/ui/RibbonBandLazy.tsx')).toContain("dynamic(() => import('@/components/ui/RibbonBand'), { ssr: false })");
-
-    // Deliberately NOT split — it wraps real content (the contact links),
-    // which must stay in the prerendered HTML (§3.8's content boundary):
-    expect(read('src/components/Contact.tsx')).toContain("import MagneticField from '@/components/ui/MagneticField'");
   });
 });

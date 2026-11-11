@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 
 import {
   DIALECT_ARIA_LABEL,
@@ -371,10 +371,10 @@ describe('labels and visual state', () => {
   });
 
   it('maps each visual state to a distinct exact class string', () => {
-    expect(getOptionClassName('idle')).toBe('border-white/15 bg-white/5 hover:border-cyan-300/50');
-    expect(getOptionClassName('correct')).toBe('border-emerald-300 bg-emerald-500/20');
-    expect(getOptionClassName('wrong')).toBe('border-rose-300 bg-rose-500/20');
-    expect(getOptionClassName('missed')).toBe('border-white/10 bg-white/5 opacity-60');
+    expect(getOptionClassName('idle')).toBe('border-foreground/15 bg-foreground/5 hover:border-primary/50');
+    expect(getOptionClassName('correct')).toBe('border-success bg-success/20');
+    expect(getOptionClassName('wrong')).toBe('border-danger bg-danger/20');
+    expect(getOptionClassName('missed')).toBe('border-foreground/10 bg-foreground/5 opacity-60');
   });
 
   it('pins the widget aria-label', () => {

@@ -36,24 +36,24 @@ const EpisodeButton = memo(function EpisodeButton({
         aria-current={isActive ? 'true' : undefined}
         className={`group flex min-h-[44px] w-full flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition ${
           isActive
-            ? 'border-amber-300/60 bg-amber-300/10'
-            : 'border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]'
+            ? 'border-warning/60 bg-warning/10'
+            : 'border-foreground/10 bg-foreground/[0.03] hover:border-foreground/25 hover:bg-foreground/[0.06]'
         }`}
       >
         <span className="flex w-full items-center gap-2">
           <span
             className={`rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${
-              isActive ? 'bg-amber-300 text-black' : 'bg-white/10 text-gray-300'
+              isActive ? 'bg-warning text-foreground' : 'bg-foreground/10 text-muted-foreground'
             }`}
           >
             {episode.badge}
           </span>
-          <span className="text-sm font-semibold text-white">{episode.headline}</span>
+          <span className="text-sm font-semibold text-foreground">{episode.headline}</span>
           {episode.runtime ? (
-            <span className="ml-auto font-mono text-xs text-gray-400">{episode.runtime}</span>
+            <span className="ml-auto font-mono text-xs text-muted-foreground">{episode.runtime}</span>
           ) : null}
         </span>
-        <span className="text-xs leading-relaxed text-gray-400">{episode.summary}</span>
+        <span className="text-xs leading-relaxed text-muted-foreground">{episode.summary}</span>
       </button>
     </li>
   );
@@ -92,7 +92,7 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <div className="lg:col-span-3">
-        <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/12 bg-black shadow-2xl shadow-black/50">
+        <div className="relative aspect-video overflow-hidden rounded-2xl bg-foreground shadow-xl shadow-foreground/15">
           {isPlaying ? (
             <iframe
               // Keyed by episode so switching swaps the document outright
@@ -110,9 +110,9 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
             <button
               type="button"
               onClick={handlePlay}
-              className="group absolute inset-0 flex h-full w-full flex-col justify-end bg-[radial-gradient(circle_at_30%_20%,rgba(252,211,77,0.22),transparent_60%),radial-gradient(circle_at_80%_80%,rgba(56,214,255,0.18),transparent_55%)] p-5 text-left transition hover:brightness-110 sm:p-8"
+              className="group absolute inset-0 flex h-full w-full flex-col justify-end bg-foreground p-5 text-left sm:p-8"
             >
-              <span className="absolute left-1/2 top-[42%] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-amber-300 text-black shadow-lg shadow-amber-300/25 transition group-hover:scale-110 sm:h-20 sm:w-20">
+              <span className="absolute left-1/2 top-[42%] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform duration-200 group-hover:scale-110 sm:h-20 sm:w-20">
                 <svg
                   viewBox="0 0 24 24"
                   aria-hidden="true"
@@ -122,14 +122,13 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </span>
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
-              <span className="relative font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-amber-200 sm:text-xs">
+              <span className="relative text-xs font-semibold text-accent sm:text-sm">
                 {active.badge} · {active.focusArea}
               </span>
-              <span className="relative mt-1 text-lg font-bold leading-tight text-white sm:mt-2 sm:text-2xl">
+              <span className="relative mt-1 text-lg font-bold leading-tight text-background sm:mt-2 sm:text-2xl">
                 {active.headline}
               </span>
-              <span className="relative mt-1.5 text-[11px] text-gray-300 sm:text-xs">
+              <span className="relative mt-1.5 text-[11px] text-background/75 sm:text-xs">
                 {active.runtime ? `${active.runtime} · ` : ''}Loads YouTube only when you press play
               </span>
             </button>
@@ -138,7 +137,7 @@ export default function PlaylistTheater({ videos, playlistId }: PlaylistTheaterP
       </div>
 
       <div className="lg:col-span-2">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+        <h3 className="mb-3 text-xs font-semibold text-warning">
           {summary}
         </h3>
         <ul aria-label="Episodes in the Bridging Transitions series" className="flex flex-col gap-2">

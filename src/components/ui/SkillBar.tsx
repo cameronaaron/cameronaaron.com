@@ -17,22 +17,17 @@ function SkillBar({ name, level, index }: SkillBarProps) {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <span className="font-semibold text-foreground/90">{name}</span>
-        <span className="text-primary font-bold">{level}%</span>
+        <span className="font-medium text-foreground">{name}</span>
+        <span className="font-data text-muted-foreground">{level}%</span>
       </div>
-      <div className="h-3 bg-white/10 rounded-full overflow-hidden relative">
+      <div className="h-1.5 bg-muted rounded-full overflow-hidden relative">
         <m.div
           initial={{ width: 0 }}
           whileInView={{ width: `${level}%` }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: index * 0.1, ease: "easeOut" }}
-          className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full relative overflow-hidden"
-        >
-          <div
-            className="skill-sheen-anim absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full"
-            aria-hidden="true"
-          />
-        </m.div>
+          className="h-full bg-primary rounded-full"
+        />
       </div>
     </div>
   );

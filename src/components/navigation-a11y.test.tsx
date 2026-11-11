@@ -208,22 +208,34 @@ describe('Navigation accessibility', () => {
     }
   });
 
-  it('keeps cinematic transparent classes before the scroll threshold', () => {
+  it('stays a transparent bar over the hero before the scroll threshold', () => {
     render(<Navigation />);
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i });
-    // Before the threshold the inner capsule stays transparent — no glass pill yet.
-    expect(nav.querySelector('[class*="bg-transparent"]')).not.toBeNull();
-    expect(nav.querySelector('[class*="rounded-2xl"]')).toBeNull();
-    expect(nav.className).not.toContain('bg-slate-950/55');
+    expect(nav.className).toContain('bg-transparent');
+    expect(nav.className).toContain('border-transparent');
+    expect(nav.className).not.toContain('backdrop-blur');
+  });
 
-    const brand = screen.getByRole('link', { name: /cameron/i });
-    expect(brand.className).toContain('hover:text-cyan-100');
+  it('marks the active link with the highlighter and readable ink, and leaves the rest muted', () => {
+    render(<Navigation />);
 
     const primary = screen.getByRole('navigation', { name: /primary navigation/i });
-    const active = within(primary).getByRole('link', { name: navItems[0].name });
+    const [active, ...rest] = navItems.map((item) => within(primary).getByRole('link', { name: item.name }));
 
-    expect(active.className).toContain('text-cyan-100');
-    expect(active.className).toContain('hover:text-cyan-100');
+    expect(active.getAttribute('aria-current')).toBe('page');
+    expect(active.className).toContain('text-accent-foreground');
+    expect(active.querySelector('.bg-accent')).not.toBeNull();
+    for (const link of rest) {
+      expect(link.getAttribute('aria-current')).toBeNull();
+      expect(link.querySelector('.bg-accent')).toBeNull();
+      expect(link.className).toContain('text-muted-foreground');
+    }
+  });
+
+  it('names the section on screen in a polite live region', () => {
+    render(<Navigation />);
+    const status = document.querySelector('nav [aria-live="polite"]');
+    expect(status?.textContent).toBe(navItems[0].name);
   });
 });

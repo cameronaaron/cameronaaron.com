@@ -28,10 +28,10 @@ export const READINESS_THRESHOLDS: Record<Exclude<ReadinessBand, 'early'>, { min
 const BAND_ORDER: Exclude<ReadinessBand, 'early'>[] = ['strong', 'competitive', 'developing'];
 
 export const READINESS_BAND_STYLES: Record<ReadinessBand, { label: string; className: string }> = {
-  strong: { label: 'Strong', className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200' },
-  competitive: { label: 'Competitive', className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200' },
-  developing: { label: 'Developing', className: 'border-amber-400/25 bg-amber-500/10 text-amber-200' },
-  early: { label: 'Early', className: 'border-white/15 bg-white/5 text-muted-foreground' },
+  strong: { label: 'Strong', className: 'border-success/25 bg-success/10 text-success' },
+  competitive: { label: 'Competitive', className: 'border-primary/25 bg-primary/10 text-primary' },
+  developing: { label: 'Developing', className: 'border-warning/25 bg-warning/10 text-warning' },
+  early: { label: 'Early', className: 'border-foreground/15 bg-foreground/5 text-muted-foreground' },
 };
 
 function pickBand(percentComplete: number, gpa: number | null): ReadinessBand {

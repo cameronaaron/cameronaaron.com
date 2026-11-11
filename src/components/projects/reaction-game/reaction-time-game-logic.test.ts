@@ -258,18 +258,18 @@ describe('getTargetAriaLabel', () => {
 
 describe('getTargetClassName', () => {
   it('includes the pulse animation only for the go phase when motion is allowed', () => {
-    expect(getTargetClassName('go', false)).toBe('bg-emerald-500 border-emerald-300 animate-pulse');
+    expect(getTargetClassName('go', false)).toBe('bg-success border-success animate-pulse');
   });
 
   it('omits the animation class for go under reduced motion — instant color swap only', () => {
-    expect(getTargetClassName('go', true)).toBe('bg-emerald-500 border-emerald-300');
+    expect(getTargetClassName('go', true)).toBe('bg-success border-success');
   });
 
   it('never animates the waiting or result phases regardless of motion preference', () => {
-    expect(getTargetClassName('waiting', false)).toBe('bg-slate-700 border-slate-500');
-    expect(getTargetClassName('waiting', true)).toBe('bg-slate-700 border-slate-500');
-    expect(getTargetClassName('result', false)).toBe('bg-slate-800 border-slate-600');
-    expect(getTargetClassName('result', true)).toBe('bg-slate-800 border-slate-600');
+    expect(getTargetClassName('waiting', false)).toBe('bg-muted border-foreground/20');
+    expect(getTargetClassName('waiting', true)).toBe('bg-muted border-foreground/20');
+    expect(getTargetClassName('result', false)).toBe('bg-surface border-foreground/20');
+    expect(getTargetClassName('result', true)).toBe('bg-surface border-foreground/20');
   });
 
   it('styles every phase distinctly from the others', () => {

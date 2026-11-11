@@ -4,6 +4,7 @@ import { sortByDateDesc } from '@/data/dateOrdering';
 import { getPageUrl } from '@/data/site';
 import { groupFeaturesByCategory } from './internet-logic';
 import { buildInternetMetadata } from './metadata';
+import { SUBPAGE_FONT_PRELOADS, preloadFontFiles } from '../font-preloads';
 
 export const dynamic = 'force-static';
 
@@ -12,6 +13,7 @@ const pageUrl = getPageUrl('/internet');
 export const metadata = buildInternetMetadata(pageUrl);
 
 export default function InternetPage() {
+  preloadFontFiles(SUBPAGE_FONT_PRELOADS);
   const sortedFeatures = sortByDateDesc(internetFeatures, (item) => item.period);
   const featureGroups = groupFeaturesByCategory(sortedFeatures);
 
@@ -50,26 +52,25 @@ export default function InternetPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="relative overflow-hidden border-b border-white/10 py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,212,146,0.2),transparent_55%)]" />
+      <section className="relative overflow-hidden border-b border-foreground/10 py-20">
         <div className="container relative z-10 mx-auto px-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Public Presence</p>
-          <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-5xl">
+          <p className="mb-4 text-xs font-semibold text-success">Public Presence</p>
+          <h1 className="max-w-4xl font-display text-4xl font-medium leading-[1.08] text-foreground md:text-6xl">
             Cameron Aaron on the Internet
           </h1>
-          <p className="mt-5 max-w-3xl text-lg text-gray-300">
+          <p className="mt-5 max-w-3xl text-lg text-muted-foreground">
             A curated index of speaking pages, media write-ups, project features, publication links, and profile pages.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/"
-              className="inline-flex items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex items-center min-h-[44px] rounded-full border border-foreground/15 bg-surface px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
             >
               Back to main portfolio
             </Link>
             <Link
               href="/credentials"
-              className="inline-flex items-center rounded-lg border border-emerald-300/35 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/20"
+              className="inline-flex items-center rounded-lg border border-success/35 bg-success/10 px-4 py-2 text-sm font-semibold text-success transition hover:bg-success/20"
             >
               View credential archive
             </Link>
@@ -83,32 +84,32 @@ export default function InternetPage() {
             {featureGroups.map(({ category, items }) => {
               return (
                 <div key={category}>
-                  <h2 className="mb-4 text-2xl font-bold text-white">{category}</h2>
+                  <h2 className="mb-4 text-2xl font-bold text-foreground">{category}</h2>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {items.map((item) => (
                       <article
                         key={`${item.title}-${item.period}`}
-                        className="rounded-xl border border-white/10 bg-black/20 p-5"
+                        className="rounded-xl border border-foreground/10 bg-surface p-5"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
-                          <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                          <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-gray-300">
+                          <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
+                          <span className="rounded-full border border-foreground/20 bg-foreground/5 px-3 py-1 text-xs font-medium text-muted-foreground">
                             {item.period}
                           </span>
                         </div>
-                        <p className="mt-2 text-sm text-cyan-200/85">{item.organization}</p>
-                        <p className="mt-3 text-gray-300">{item.summary}</p>
+                        <p className="mt-2 text-sm text-primary/85">{item.organization}</p>
+                        <p className="mt-3 text-muted-foreground">{item.summary}</p>
                         {item.url ? (
                           <a
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-4 inline-flex items-center rounded-md border border-emerald-300/35 bg-emerald-400/10 px-3 py-1.5 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/20"
+                            className="mt-4 inline-flex items-center rounded-md border border-success/35 bg-success/10 px-3 py-1.5 text-sm font-semibold text-success transition hover:bg-success/20"
                           >
                             Open link
                           </a>
                         ) : (
-                          <p className="mt-4 text-sm text-gray-400">Public recording link not provided in source notes.</p>
+                          <p className="mt-4 text-sm text-muted-foreground">Public recording link not provided in source notes.</p>
                         )}
                       </article>
                     ))}

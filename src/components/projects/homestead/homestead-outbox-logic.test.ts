@@ -382,9 +382,9 @@ describe('presentation', () => {
   it('colours each status differently', () => {
     const classes = new Set(['delivered', 'pending', 'dead'].map((s) => getDeliveryClassName(s as Delivery['status'])));
     expect(classes.size).toBe(3);
-    expect(getDeliveryClassName('dead')).toContain('rose');
-    expect(getToggleClassName(true)).toContain('border-cyan-300 ');
-    expect(getToggleClassName(false)).not.toContain('border-cyan-300 ');
+    expect(getDeliveryClassName('dead')).toContain('danger');
+    expect(getToggleClassName(true)).toContain('border-primary ');
+    expect(getToggleClassName(false)).not.toContain('border-primary ');
   });
 
   it('states the real schedule', () => {

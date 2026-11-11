@@ -67,13 +67,6 @@ describe('Section wrapper bfcache safety', () => {
     expect(afterReturn).not.toMatch(/return \(\s*<(?:motion|m)\./);
   });
 
-  it('SectionHandoff outer wrapper is a framer-free plain div for the same reason', () => {
-    const body = extractFunctionBody(readSectionTransitionsSource(), 'SectionHandoff');
-    const afterReturn = body.slice(body.indexOf('return ('));
-    expect(afterReturn).toMatch(/return \(\s*<div\b/);
-    expect(afterReturn).not.toMatch(/return \(\s*<(?:motion|m)\./);
-  });
-
   it('Home composes Hero inside a SectionReveal so the above-the-fold hero never starts hidden', () => {
     const body = extractFunctionBody(readPageSource(), 'Home');
     expect(body).toMatch(/<SectionReveal[^>]*index=\{0\}>\s*<Hero\s*\/>/);

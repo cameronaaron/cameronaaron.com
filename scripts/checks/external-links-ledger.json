@@ -271,6 +271,14 @@
       "src/data/education.ts"
     ]
   },
+  "https://parker-anderson.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-11-11T20:23:52.160Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
   "https://petricoregames.com/": {
     "status": "live",
     "httpCode": 200,
@@ -493,6 +501,14 @@
       "src/data/testimonials.ts"
     ]
   },
+  "https://www.dds.ca.gov/initiatives/workforce-initiatives-4/dsp-internship-program/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-11-11T20:29:39.104Z",
+    "files": [
+      "src/data/experience.ts"
+    ]
+  },
   "https://www.deac.org/": {
     "status": "live",
     "httpCode": 200,
@@ -563,6 +579,14 @@
     "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
+    ]
+  },
+  "https://www.lacc.edu/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-11-11T20:23:52.160Z",
+    "files": [
+      "src/data/experience.ts"
     ]
   },
   "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=234": {
@@ -1031,6 +1055,14 @@
     "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
+    ]
+  },
+  "https://www.sunbrewedhomestead.org/": {
+    "status": "live",
+    "httpCode": 200,
+    "lastChecked": "2026-11-11T20:23:52.160Z",
+    "files": [
+      "src/data/experience.ts"
     ]
   },
   "https://www.trilliumacademy.org/": {

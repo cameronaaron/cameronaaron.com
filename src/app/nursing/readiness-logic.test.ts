@@ -79,19 +79,19 @@ describe('READINESS_BAND_STYLES', () => {
   it('pins the exact label and className for every band', () => {
     expect(READINESS_BAND_STYLES.strong).toEqual({
       label: 'Strong',
-      className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200',
+      className: 'border-success/25 bg-success/10 text-success',
     });
     expect(READINESS_BAND_STYLES.competitive).toEqual({
       label: 'Competitive',
-      className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200',
+      className: 'border-primary/25 bg-primary/10 text-primary',
     });
     expect(READINESS_BAND_STYLES.developing).toEqual({
       label: 'Developing',
-      className: 'border-amber-400/25 bg-amber-500/10 text-amber-200',
+      className: 'border-warning/25 bg-warning/10 text-warning',
     });
     expect(READINESS_BAND_STYLES.early).toEqual({
       label: 'Early',
-      className: 'border-white/15 bg-white/5 text-muted-foreground',
+      className: 'border-foreground/15 bg-foreground/5 text-muted-foreground',
     });
   });
 });

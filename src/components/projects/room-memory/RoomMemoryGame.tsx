@@ -91,12 +91,12 @@ export default function RoomMemoryGame() {
   return (
     <div
       ref={containerRef}
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="room-memory-game"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">The Room Remembers</h3>
-        <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">The Room Remembers</h3>
+        <span className="text-xs text-muted-foreground">
           <span ref={densityRef} data-testid="room-density">
             {formatDensity(initialRoom.field)}
           </span>
@@ -110,12 +110,12 @@ export default function RoomMemoryGame() {
       </p>
 
       {animationEnabled ? (
-        <div className="relative w-full overflow-hidden rounded-xl border border-white/10 bg-black [container-type:size] aspect-[64/36]">
+        <div className="relative w-full overflow-hidden rounded-xl border border-foreground/10 bg-surface [container-type:size] aspect-[64/36]">
           <canvas
             ref={canvasRef}
             width={FIELD_WIDTH}
             height={FIELD_HEIGHT}
-            className="block h-full w-full touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70"
+            className="block h-full w-full touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
             role="application"
             tabIndex={0}
             aria-label={ROOM_ARIA_LABEL}
@@ -134,19 +134,19 @@ export default function RoomMemoryGame() {
         </div>
       ) : (
         <div
-          className="flex aspect-[64/36] w-full items-center justify-center rounded-xl border border-white/10 bg-black p-4 text-center text-xs text-muted-foreground"
+          className="flex aspect-[64/36] w-full items-center justify-center rounded-xl border border-foreground/10 bg-surface p-4 text-center text-xs text-muted-foreground"
           data-testid="room-paused"
         >
           The room is paused on this device to save battery and respect reduced motion.
         </div>
       )}
 
-      <p className="mt-3 min-h-[1.25rem] text-sm text-cyan-100/90">
+      <p className="mt-3 min-h-[1.25rem] text-sm text-foreground/90">
         <span ref={statusRef} data-testid="room-status">
           {describeBody(initialRoom.body)}
         </span>
       </p>
-      <p className="mt-4 border-t border-white/10 pt-4 text-xs text-muted-foreground/80">
+      <p className="mt-4 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80">
         The field, its deposits and its colours are the installation&rsquo;s own. The room never sees an image of you —
         only where you are and how fast you move. Time runs 900× fast here: the gallery&rsquo;s{' '}
         {GALLERY_HALF_LIFE_MINUTES}-minute memory half-life becomes {DEMO_HALF_LIFE_SECONDS} seconds.

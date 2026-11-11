@@ -188,17 +188,17 @@ describe('FULFILLMENT_STYLES', () => {
   it('pins the exact label and className for each state', () => {
     expect(FULFILLMENT_STYLES.completed).toEqual({
       label: 'Completed',
-      className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200',
+      className: 'border-success/25 bg-success/10 text-success',
       showPulse: false,
     });
     expect(FULFILLMENT_STYLES['in-progress']).toEqual({
       label: 'In progress',
-      className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200',
+      className: 'border-primary/25 bg-primary/10 text-primary',
       showPulse: true,
     });
     expect(FULFILLMENT_STYLES.missing).toEqual({
       label: 'Not started',
-      className: 'border-white/15 bg-white/5 text-muted-foreground',
+      className: 'border-foreground/15 bg-foreground/5 text-muted-foreground',
       showPulse: false,
     });
   });

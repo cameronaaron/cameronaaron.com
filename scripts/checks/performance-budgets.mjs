@@ -216,16 +216,19 @@ if (existsSync(homeHtmlPath)) {
 
 // Font preloads are high-priority requests in the first wave, so each one must
 // be a file the page's CSS can use, and only routes that paint the font in
-// their first viewport may ask for it. All six routes once preloaded the two
+// their first viewport may ask for it. All six routes once preloaded two
 // accent fonts (64KB) through the root layout while only the home page painted
 // them above the fold (measured 2026-10-03). Accent fonts are now hinted per
 // route by src/app/font-preloads.ts, whose hard-coded content-hashed names go
 // stale on a font or next/font update; the first check below catches that.
 const ROUTES_PAINTING_ACCENT_FONTS = {
-  'index.html': ['Bricolage Grotesque', 'Geist Mono'],
-  'nursing.html': ['Bricolage Grotesque'],
+  'index.html': ['Newsreader'],
+  'nursing.html': ['Newsreader'],
+  'capstone.html': ['Newsreader'],
+  'credentials.html': ['Newsreader'],
+  'internet.html': ['Newsreader'],
 };
-const BODY_FONT_FAMILY = 'Manrope';
+const BODY_FONT_FAMILY = 'Atkinson Hyperlegible Next';
 const fontFamilyByFile = new Map();
 for (const cssFile of cssFiles) {
   for (const [, block] of readFileSync(cssFile, 'utf8').matchAll(/@font-face\{([^}]*)\}/g)) {

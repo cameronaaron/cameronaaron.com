@@ -123,12 +123,12 @@ export default function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="font-mono-accent fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] left-40 z-40 hidden h-9 items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-100 backdrop-blur-md transition-colors hover:border-cyan-300/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 md:inline-flex"
+        className="font-data fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] left-40 z-40 hidden h-9 items-center gap-2 rounded-full border border-foreground/12 bg-surface px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 md:inline-flex"
         aria-haspopup="dialog"
         aria-expanded={open}
         data-testid="command-palette-trigger"
       >
-        <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] tracking-normal text-white">⌘K</kbd>
+        <kbd className="rounded bg-foreground/10 px-1.5 py-0.5 text-[10px] tracking-normal text-foreground">⌘K</kbd>
         Search
       </button>
 
@@ -140,7 +140,7 @@ export default function CommandPalette() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.16 }}
-            className="fixed inset-0 z-[95] flex items-start justify-center bg-black/60 px-4 pt-24 backdrop-blur-sm sm:pt-32"
+            className="fixed inset-0 z-[95] flex items-start justify-center bg-foreground/40 px-4 pt-24 backdrop-blur-sm sm:pt-32"
             onClick={close}
             onKeyDown={handleKeyDown}
             data-testid="command-palette-backdrop"
@@ -154,11 +154,11 @@ export default function CommandPalette() {
               animate={{ y: 0, scale: 1, opacity: 1 }}
               exit={{ y: 14, scale: 0.98, opacity: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-background/95 shadow-2xl shadow-black/50"
+              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-foreground/10 bg-surface shadow-2xl shadow-foreground/20"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-center gap-3 border-b border-white/10 px-4">
-                <span aria-hidden="true" className="text-cyan-300/80">⌕</span>
+              <div className="flex items-center gap-3 border-b border-foreground/10 px-4">
+                <span aria-hidden="true" className="text-muted-foreground">⌕</span>
                 <input
                   ref={inputRef}
                   type="text"
@@ -172,7 +172,7 @@ export default function CommandPalette() {
                   className="w-full bg-transparent py-4 text-base text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
                   data-testid="command-palette-input"
                 />
-                <kbd className="hidden rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">Esc</kbd>
+                <kbd className="hidden rounded bg-foreground/10 px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">Esc</kbd>
               </div>
 
               <ul ref={listRef} role="listbox" aria-label="Commands" className="max-h-[min(60vh,22rem)] overflow-y-auto p-2">
@@ -189,8 +189,8 @@ export default function CommandPalette() {
                         onMouseEnter={() => setActiveIndex(index)}
                         className={`flex w-full items-center justify-between gap-4 rounded-xl px-3 py-2.5 text-left transition-colors ${
                           index === activeRow
-                            ? 'bg-cyan-300/15 text-cyan-100'
-                            : 'text-foreground hover:bg-white/[0.04]'
+                            ? 'bg-primary/15 text-foreground'
+                            : 'text-foreground hover:bg-foreground/[0.04]'
                         }`}
                         data-testid="command-palette-item"
                       >
@@ -199,7 +199,7 @@ export default function CommandPalette() {
                             segment.matched ? (
                               <mark
                                 key={segmentIndex}
-                                className="bg-transparent font-semibold text-cyan-300"
+                                className="bg-transparent font-semibold text-primary"
                                 data-testid="command-palette-match"
                               >
                                 {segment.text}
@@ -209,7 +209,7 @@ export default function CommandPalette() {
                             )
                           )}
                         </span>
-                        <span className="font-mono-accent text-[10px] uppercase tracking-[0.14em] text-muted-foreground/80">
+                        <span className="font-data text-[10px] text-muted-foreground/80">
                           {match.recent ? 'Recent' : match.command.hint}
                         </span>
                       </button>

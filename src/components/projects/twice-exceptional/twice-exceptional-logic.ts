@@ -1,4 +1,4 @@
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 
 /**
  * "Who Gets Missed?" — a twice-exceptional identification task paired with the
@@ -294,10 +294,10 @@ export function getOptionAriaLabel(profile: StudentProfile): string {
 }
 
 const OPTION_STATE_CLASSES = {
-  idle: 'border-white/15 bg-white/5 hover:border-cyan-300/50',
-  correct: 'border-emerald-300 bg-emerald-500/20',
-  wrong: 'border-rose-300 bg-rose-500/20',
-  missed: 'border-white/10 bg-white/5 opacity-60',
+  idle: 'border-foreground/15 bg-foreground/5 hover:border-primary/50',
+  correct: 'border-success bg-success/20',
+  wrong: 'border-danger bg-danger/20',
+  missed: 'border-foreground/10 bg-foreground/5 opacity-60',
 } as const;
 
 export type OptionVisualState = keyof typeof OPTION_STATE_CLASSES;

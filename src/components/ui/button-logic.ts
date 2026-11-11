@@ -7,7 +7,7 @@ export const BUTTON_SPRING_CONFIG = {
 export const BUTTON_MAGNETIC_STRENGTH = 0.3;
 
 export const BUTTON_BASE_STYLES =
-  'font-semibold rounded-full transition-all duration-300 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+  'font-semibold rounded-full transition-colors duration-200 inline-block text-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
 
 export const BUTTON_SIZE_STYLES = {
   sm: 'px-4 py-2 text-sm',
@@ -16,11 +16,9 @@ export const BUTTON_SIZE_STYLES = {
 } as const;
 
 export const BUTTON_VARIANT_STYLES = {
-  primary:
-    'bg-gradient-to-b from-cyan-300 to-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/35 hover:shadow-cyan-400/55 hover:from-cyan-200 hover:to-cyan-400',
-  secondary:
-    'bg-white/[0.06] backdrop-blur-sm text-white border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:border-cyan-300/40 hover:bg-white/[0.1]',
-  outline: 'border border-cyan-300/60 text-cyan-200 hover:bg-cyan-300/10 hover:border-cyan-200',
+  primary: 'bg-primary text-primary-foreground hover:bg-secondary',
+  secondary: 'bg-surface text-foreground border border-foreground/15 hover:border-foreground/45',
+  outline: 'border border-primary/60 text-primary hover:bg-primary/10 hover:border-primary',
 } as const;
 
 export function getButtonStyles(

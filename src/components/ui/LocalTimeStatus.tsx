@@ -44,7 +44,7 @@ export default function LocalTimeStatus() {
 
   return (
     <span
-      className="font-mono-accent text-cyan-100/70"
+      className="font-data text-foreground/70"
       data-testid="local-time-status"
       // Hidden-but-present until the clock mounts: reserves the slot's exact
       // width so the availability pill wraps identically before and after.

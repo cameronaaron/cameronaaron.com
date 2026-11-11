@@ -1,4 +1,4 @@
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 
 /**
  * "Fatal Feline Attraction" — a Y-maze odor-choice task paired with the
@@ -243,9 +243,9 @@ export function getRodentLabel(infected: boolean): string {
 }
 
 const ARM_STATE_CLASSES = {
-  idle: 'border-white/15 bg-white/5 hover:border-cyan-300/50',
-  chosen: 'border-emerald-300 bg-emerald-500/20',
-  rejected: 'border-white/10 bg-white/5 opacity-60',
+  idle: 'border-foreground/15 bg-foreground/5 hover:border-primary/50',
+  chosen: 'border-success bg-success/20',
+  rejected: 'border-foreground/10 bg-foreground/5 opacity-60',
 } as const;
 
 export type ArmVisualState = keyof typeof ARM_STATE_CLASSES;

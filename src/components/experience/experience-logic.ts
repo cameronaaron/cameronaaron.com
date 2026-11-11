@@ -49,14 +49,14 @@ export function getTimelineDotAnimation(isLiteMotion: boolean, isActive: boolean
   if (isActive) {
     return {
       scale: 1.35,
-      backgroundColor: 'rgb(34 211 238)',
-      boxShadow: isLiteMotion ? '0 0 10px rgba(56, 214, 255, 0.55)' : '0 0 16px rgba(56, 214, 255, 0.85)',
+      backgroundColor: 'rgb(33 71 217)',
+      boxShadow: isLiteMotion ? '0 0 0 3px rgba(33, 71, 217, 0.16)' : '0 0 0 5px rgba(33, 71, 217, 0.16)',
     };
   }
   return {
     scale: 1,
-    backgroundColor: 'rgb(16 185 129)',
-    boxShadow: isLiteMotion ? '0 0 6px rgba(16, 212, 146, 0.35)' : '0 0 10px rgba(16, 212, 146, 0.5)',
+    backgroundColor: 'rgb(170 176 190)',
+    boxShadow: '0 0 0 0px rgba(33, 71, 217, 0)',
   };
 }
 

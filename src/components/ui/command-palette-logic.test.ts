@@ -73,7 +73,7 @@ describe('buildCommandCatalog', () => {
     for (const command of catalog) {
       expect(command.keywords).toBe(command.keywords.toLowerCase());
     }
-    // End-to-end: an uppercase query must still find a lowercase-keyword command.
+    // End-to-end: an query must still find a lowercase-keyword command.
     const home = catalog.find((c) => c.id === 'jump:#home')!;
     expect(scoreCommand(home, 'home')).not.toBeNull();
   });

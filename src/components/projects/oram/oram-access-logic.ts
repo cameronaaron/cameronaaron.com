@@ -1,4 +1,4 @@
-import { createSeededRandom } from '@/components/hero/interactive-particles/interactive-particles-engine';
+import { createSeededRandom } from '@/components/projects/simulation-math-logic';
 
 /**
  * "Whose Record Was Read?" — paired with novachannel.
@@ -274,13 +274,13 @@ export function getGuessVisualState(state: GameState, user: number): GuessVisual
 }
 
 export function getGuessClassName(visual: GuessVisualState): string {
-  if (visual === 'reader') return 'border-emerald-300/70 bg-emerald-400/15';
-  if (visual === 'wrong-guess') return 'border-rose-300/70 bg-rose-400/15';
-  return 'border-white/15 bg-white/5 hover:border-cyan-300/60';
+  if (visual === 'reader') return 'border-success/70 bg-success/15';
+  if (visual === 'wrong-guess') return 'border-danger/70 bg-danger/15';
+  return 'border-foreground/15 bg-foreground/5 hover:border-primary/60';
 }
 
 export function getModeClassName(active: boolean): string {
   return active
-    ? 'border-cyan-300/60 bg-cyan-400/15 text-cyan-100'
-    : 'border-white/15 bg-white/5 text-muted-foreground hover:border-cyan-300/40';
+    ? 'border-primary/60 bg-primary/15 text-foreground'
+    : 'border-foreground/15 bg-foreground/5 text-muted-foreground hover:border-primary/40';
 }

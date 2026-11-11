@@ -140,15 +140,15 @@ export default function PredatorPreyChase() {
   return (
     <div
       ref={containerRef}
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="predator-prey-chase"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Don&rsquo;t Get Caught</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Don&rsquo;t Get Caught</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
             Survived{' '}
-            <strong className="text-cyan-300">
+            <strong className="text-primary">
               <span ref={timerElRef} data-testid="pp-timer">
                 {formatSurvivalSeconds(initialSim.elapsedMs)}
               </span>
@@ -156,10 +156,10 @@ export default function PredatorPreyChase() {
             </strong>
           </span>
           <span>
-            Catches <strong data-testid="pp-catches" className="text-rose-300">{catches}</strong>
+            Catches <strong data-testid="pp-catches" className="text-danger">{catches}</strong>
           </span>
           <span>
-            Best <strong data-testid="pp-best" className="text-emerald-300">{bestSeconds}s</strong>
+            Best <strong data-testid="pp-best" className="text-success">{bestSeconds}s</strong>
           </span>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function PredatorPreyChase() {
         arena and use the arrow keys.
       </p>
       <p className="mb-4 text-sm text-muted-foreground">
-        The rose wedge is the predator&rsquo;s <strong className="text-rose-300">infrared cone</strong> — the only way
+        The rose wedge is the predator&rsquo;s <strong className="text-danger">infrared cone</strong> — the only way
         it can see. It brightens on contact. Slip outside the cone and it loses you, drives to your last known
         position, then sweeps to search. It turns at half your rate, so out-turning it is how you escape.
       </p>
@@ -178,7 +178,7 @@ export default function PredatorPreyChase() {
       {animationEnabled ? (
         <svg
           viewBox={`0 0 ${ARENA_SIZE} ${ARENA_SIZE}`}
-          className="aspect-square w-full max-w-xs touch-none rounded-xl border border-white/10 bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70"
+          className="aspect-square w-full max-w-xs touch-none rounded-xl border border-foreground/10 bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
           role="application"
           tabIndex={0}
           aria-label={SIMULATION_ARIA_LABEL}
@@ -204,7 +204,7 @@ export default function PredatorPreyChase() {
             cx={initialSim.predator.x}
             cy={initialSim.predator.y}
             r={PREDATOR_VISUAL_RADIUS}
-            className="fill-rose-500"
+            className="fill-danger"
           />
           <circle
             ref={preyElRef}
@@ -212,19 +212,19 @@ export default function PredatorPreyChase() {
             cx={initialSim.prey.x}
             cy={initialSim.prey.y}
             r={PREY_VISUAL_RADIUS}
-            className="fill-cyan-300"
+            className="fill-primary"
           />
         </svg>
       ) : (
         <div
-          className="flex aspect-square w-full max-w-xs items-center justify-center rounded-xl border border-white/10 bg-white/5 p-4 text-center text-xs text-muted-foreground"
+          className="flex aspect-square w-full max-w-xs items-center justify-center rounded-xl border border-foreground/10 bg-surface p-4 text-center text-xs text-muted-foreground"
           data-testid="pp-paused"
         >
           {PAUSED_CAPTION}
         </div>
       )}
 
-      <p role="status" aria-live="polite" data-testid="pp-announcement" className="mt-3 min-h-[1.25rem] text-sm font-medium text-cyan-200">
+      <p role="status" aria-live="polite" data-testid="pp-announcement" className="mt-3 min-h-[1.25rem] text-sm font-medium text-primary">
         {announcement}
       </p>
     </div>

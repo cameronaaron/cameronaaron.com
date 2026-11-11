@@ -35,14 +35,14 @@ function StatusFeedback({ info }: { info: CertificationStatusInfo }) {
     // so the magnitude here is always >= 1 — no "this month" (0-month) case is reachable.
     const months = Math.abs(info.monthsUntilExpiry);
     return (
-      <p className="text-red-300 text-xs mt-0.5" role="status">
+      <p className="text-danger text-xs mt-0.5" role="status">
         Expired {months} month{months === 1 ? '' : 's'} ago — renewal needed
       </p>
     );
   }
 
   return (
-    <p className="text-amber-300 text-xs mt-0.5" role="status">
+    <p className="text-warning text-xs mt-0.5" role="status">
       Expires in {info.monthsUntilExpiry} month{info.monthsUntilExpiry === 1 ? '' : 's'} — renew soon
     </p>
   );
@@ -74,27 +74,20 @@ export default function Certifications() {
   const now = new Date();
 
   return (
-    <section id="certifications" className="py-20 bg-background relative overflow-hidden" aria-labelledby="certifications-heading">
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-10 left-10 w-80 h-80 rounded-full bg-cyan-500/10 blur-[120px]" />
-        <div className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-emerald-500/10 blur-[120px]" />
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
+    <section id="certifications" className="py-20 md:py-28" aria-labelledby="certifications-heading">
+      <div className="container mx-auto px-6">
         <SectionHeader
           headingId="certifications-heading"
-          index="01"
           title="Clinical Certifications & Licenses"
           subtitle="Current emergency and healthcare credentials with verifiable status"
-          className="[&>h2]:font-display"
         />
 
         <div className="-mt-8 mb-8">
           <HeartbeatMonitor />
         </div>
 
-        <div className="hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="grid grid-cols-12 gap-4 px-6 py-4 text-xs uppercase tracking-wider text-muted-foreground border-b border-white/10">
+        <div className="hidden lg:block overflow-hidden rounded-2xl border border-foreground/10 bg-surface">
+          <div className="grid grid-cols-12 gap-4 px-6 py-3.5 text-sm text-muted-foreground border-b border-foreground/10">
             <p className="col-span-4">Certification</p>
             <p className="col-span-3">Issuing Organization</p>
             <p className="col-span-3">Status</p>
@@ -104,22 +97,22 @@ export default function Certifications() {
             <div
               key={`${cert.name}-${cert.credentialId}`}
               data-testid={`cert-row-${index}`}
-              className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 last:border-b-0 hover:bg-cyan-500/5 hover:border-cyan-500/10 transition-colors duration-200 cursor-default"
+              className="group grid grid-cols-12 gap-4 px-6 py-4 border-b border-foreground/10 last:border-b-0 hover:bg-background transition-colors duration-200 cursor-default"
             >
-              <p className="col-span-4 flex items-center gap-2 text-foreground font-semibold group-hover:text-cyan-50 transition-colors">
+              <p className="col-span-4 flex items-center gap-2.5 text-foreground font-semibold">
                 <StatusIcon info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
-              <p className="col-span-3 text-muted-foreground group-hover:text-foreground/70 transition-colors">{cert.issuer}</p>
+              <p className="col-span-3 text-muted-foreground">{cert.issuer}</p>
               <div className="col-span-3">
-                <p className="text-cyan-300">{cert.status}</p>
+                <p className="font-data text-foreground">{cert.status}</p>
                 <StatusFeedback info={evaluateCertificationStatus(cert.status, now)} />
               </div>
               <a
                 href={buildVerificationHref(cert)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="col-span-2 text-cyan-300/70 text-sm underline decoration-cyan-500/30 underline-offset-4 hover:text-cyan-200 group-hover:text-cyan-300 group-hover:decoration-cyan-400/60 transition-colors"
+                className="col-span-2 font-data break-all text-primary text-sm underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-colors"
                 aria-label={`Verify ${cert.name} credential ${cert.credentialId}`}
               >
                 {cert.credentialId}
@@ -133,14 +126,14 @@ export default function Certifications() {
             <article
               key={`${cert.name}-${cert.credentialId}-mobile`}
               data-testid={`cert-mobile-row-${index}`}
-              className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
+              className="rounded-2xl border border-foreground/10 bg-surface p-5"
             >
               <p className="flex items-center gap-2 text-foreground font-semibold mb-2">
                 <StatusIcon info={evaluateCertificationStatus(cert.status, now)} />
                 {cert.name}
               </p>
               <p className="text-muted-foreground text-sm mb-1">{cert.issuer}</p>
-              <p className="text-cyan-300 text-sm mb-1">{cert.status}</p>
+              <p className="font-data text-foreground text-sm mb-1">{cert.status}</p>
               <StatusFeedback info={evaluateCertificationStatus(cert.status, now)} />
               <p className="text-muted-foreground text-xs">
                 Credential:{' '}
@@ -148,7 +141,7 @@ export default function Certifications() {
                   href={buildVerificationHref(cert)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-4 hover:text-cyan-200 transition-colors"
+                  className="text-primary underline decoration-primary/40 underline-offset-4 hover:text-primary transition-colors"
                   aria-label={`Verify ${cert.name} credential ${cert.credentialId}`}
                 >
                   {cert.credentialId}
@@ -159,43 +152,43 @@ export default function Certifications() {
         </div>
 
         <div className="mt-12">
-          <h3 className="text-2xl font-bold text-foreground mb-4 font-display">Certifications In Progress</h3>
+          <h3 className="text-3xl font-medium text-foreground mb-5 font-display">Certifications in progress</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sortedInProgressCertifications.map((cert) => (
               <div
                 key={cert.name}
-                className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-5"
+                className="rounded-2xl border border-foreground/10 bg-surface p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-foreground font-semibold">{cert.name}</p>
                   <span className="relative flex h-2.5 w-2.5 flex-shrink-0 mt-1" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
                   </span>
                 </div>
-                <p className="text-emerald-300 text-sm mt-1">Expected: {cert.expectedCompletion}</p>
+                <p className="text-foreground text-sm mt-1">Expected: {cert.expectedCompletion}</p>
                 <p className="text-muted-foreground text-sm mt-1">{cert.status}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-cyan-300/25 bg-cyan-500/10 p-6">
-          <h3 className="text-xl font-bold text-foreground font-display">Need the full credential archive?</h3>
-          <p className="mt-2 text-muted-foreground">
+        <div className="mt-10 rounded-2xl bg-muted p-6 md:p-8">
+          <h3 className="text-2xl font-medium text-foreground font-display">Need the full credential archive?</h3>
+          <p className="mt-2 max-w-3xl text-muted-foreground">
             This section highlights active clinical licenses. For additional technical certificates, diploma verification,
             and public-facing credential links, use the dedicated pages below.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               href="/credentials"
-              className="inline-flex items-center rounded-lg border border-cyan-300/40 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/20"
+              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
             >
               View Full Credentials Page
             </a>
             <a
               href="/internet"
-              className="inline-flex items-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-foreground/15 bg-surface px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
             >
               View Online Features Page
             </a>

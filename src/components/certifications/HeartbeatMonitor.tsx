@@ -26,12 +26,12 @@ export default function HeartbeatMonitor() {
 
   return (
     <div
-      className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/5 px-3 py-1.5"
+      className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-surface px-3 py-1.5"
       onMouseEnter={enableHoverMotion ? () => setIsHovering(true) : undefined}
       onMouseLeave={enableHoverMotion ? () => setIsHovering(false) : undefined}
       data-testid="heartbeat-monitor"
     >
-      <svg viewBox={HEARTBEAT_VIEWBOX} className="h-4 w-12 text-emerald-400" aria-hidden="true" fill="none">
+      <svg viewBox={HEARTBEAT_VIEWBOX} className="h-4 w-12 text-success" aria-hidden="true" fill="none">
         {prefersReducedMotion ? (
           <path d={HEARTBEAT_PATH} stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
         ) : (
@@ -52,7 +52,7 @@ export default function HeartbeatMonitor() {
           />
         )}
       </svg>
-      <span className="text-xs font-medium text-emerald-300/80">Live vitals</span>
+      <span className="text-xs font-medium text-muted-foreground">Live vitals</span>
     </div>
   );
 }

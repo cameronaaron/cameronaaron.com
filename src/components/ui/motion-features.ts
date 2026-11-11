@@ -7,8 +7,10 @@
 // `m` core; the feature pack's parse/compile/execute is deferred out of the
 // critical window.
 //
-// domMax (not domAnimation): the hero's floating badges use `drag` and several
-// components use layout animation — both live in the `max` pack.
+// domMax (not domAnimation): the nav's active-link pill slides between links
+// with a shared `layoutId`, and the testimonials grid reflows with `layout` —
+// layout animation lives in the `max` pack. (The hero `drag` that also needed
+// it was removed in the 2026-11 redesign.)
 import { domMax } from 'framer-motion';
 
 export default domMax;

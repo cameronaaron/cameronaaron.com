@@ -225,8 +225,8 @@ export function getMutualityNote(start: number, target: number): string | null {
 }
 
 export function getLinkClassName(direction: Direction, onChain: boolean): string {
-  if (onChain) return 'stroke-cyan-300';
-  return direction === 3 ? 'stroke-white/30' : 'stroke-white/25';
+  if (onChain) return 'stroke-primary';
+  return direction === 3 ? 'stroke-foreground/30' : 'stroke-foreground/25';
 }
 
 export function getLinkDash(direction: Direction): string | undefined {
@@ -234,9 +234,9 @@ export function getLinkDash(direction: Direction): string | undefined {
 }
 
 export function getGroupFillClass(group: GroupId): string {
-  if (group === 'climbing') return 'fill-cyan-400/70';
+  if (group === 'climbing') return 'fill-primary/70';
   if (group === 'nursing') return 'fill-violet-400/70';
-  return 'fill-amber-400/70';
+  return 'fill-warning/70';
 }
 
 /** Order-independent key for the link between two people. */

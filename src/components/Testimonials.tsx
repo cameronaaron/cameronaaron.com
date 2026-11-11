@@ -38,13 +38,11 @@ export default function Testimonials() {
   };
 
   return (
-    <section id="testimonials" className="py-20 bg-background relative overflow-hidden" aria-labelledby="testimonials-heading">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
+    <section id="testimonials" className="py-20 md:py-28 relative" aria-labelledby="testimonials-heading">
 
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           headingId="testimonials-heading"
-          index="06"
           title="What People Say"
           subtitle="Recommendations from colleagues, managers, and mentors"
         />
@@ -55,12 +53,12 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="mx-auto mb-10 max-w-4xl"
+            className="mb-12"
           >
-            <SpotlightCard className="relative overflow-hidden rounded-2xl border-cyan-300/20 p-8 md:p-10">
+            <SpotlightCard className="relative overflow-hidden rounded-3xl p-8 md:p-12">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/90">
-                  Spotlight Recommendation
+                <p className="text-sm font-semibold text-primary">
+                  Spotlight recommendation
                 </p>
                 <div className="flex items-center gap-2">
                   <m.button
@@ -68,7 +66,7 @@ export default function Testimonials() {
                     onClick={() => cycleSpotlight(-1)}
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-cyan-300/40 hover:text-cyan-200"
+                    className="min-h-[36px] rounded-full border border-foreground/15 bg-surface px-4 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-foreground/45"
                     aria-label="Show previous testimonial"
                   >
                     Previous
@@ -78,7 +76,7 @@ export default function Testimonials() {
                     onClick={() => cycleSpotlight(1)}
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-cyan-300/40 hover:text-cyan-200"
+                    className="min-h-[36px] rounded-full border border-foreground/15 bg-surface px-4 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-foreground/45"
                     aria-label="Show next testimonial"
                   >
                     Next
@@ -94,7 +92,7 @@ export default function Testimonials() {
                   exit={{ opacity: 0, y: -10, scale: 0.98 }}
                   transition={{ duration: 0.32, ease: 'easeOut' }}
                 >
-                  <p className="mb-6 text-lg leading-relaxed text-foreground/90 md:text-xl">
+                  <p className="font-display mb-8 max-w-[62ch] text-xl leading-snug text-foreground md:text-[1.625rem] md:leading-[1.36]">
                     “{spotlightTestimonial.text}”
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -115,7 +113,7 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="mx-auto mb-8 flex max-w-6xl flex-wrap items-center justify-center gap-2"
+          className="mb-8 flex flex-wrap items-center gap-2"
         >
           {RELATIONSHIP_OPTIONS.map((option) => {
             const isActive = relationshipFilter === option.key;
@@ -127,10 +125,10 @@ export default function Testimonials() {
                 onClick={() => setRelationshipFilter(option.key)}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                   isActive
-                    ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100'
-                    : 'border-white/12 bg-white/5 text-muted-foreground hover:border-white/30 hover:text-foreground'
+                    ? 'border-transparent bg-accent text-accent-foreground'
+                    : 'border-foreground/12 bg-surface text-muted-foreground hover:border-foreground/30 hover:text-foreground'
                 }`}
                 aria-pressed={isActive}
               >
@@ -140,12 +138,12 @@ export default function Testimonials() {
           })}
         </m.div>
 
-        <m.div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8" layout>
+        <m.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8" layout>
           <AnimatePresence mode="popLayout">
             {visibleTestimonials.length === 0 ? (
               <m.div
                 key={`empty-${relationshipFilter}`}
-                className="col-span-full rounded-2xl border border-white/12 bg-white/[0.03] px-6 py-10 text-center"
+                className="col-span-full rounded-2xl border border-foreground/12 bg-surface px-6 py-10 text-center"
                 initial={{ opacity: 0, y: 12, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -8, scale: 0.98 }}

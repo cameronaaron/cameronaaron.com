@@ -40,13 +40,13 @@ export default function OramAccessGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="oram-access-game"
       role="group"
       aria-label="Whose Record Was Read: guess which user a storage access belonged to"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Whose Record Was Read?</h3>
+        <h3 className="text-lg font-bold text-foreground">Whose Record Was Read?</h3>
         <div className="flex gap-2" role="group" aria-label="Storage the server is running">
           {STORAGE_MODES.map(({ mode, label }) => (
             <button
@@ -55,7 +55,7 @@ export default function OramAccessGame() {
               aria-pressed={game.mode === mode}
               onClick={() => handleMode(mode)}
               data-testid={`oram-mode-${mode}`}
-              className={`min-h-[44px] rounded-full border px-4 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${getModeClassName(
+              className={`min-h-[44px] rounded-full border px-4 text-xs font-semibold transition-colors ${getModeClassName(
                 game.mode === mode
               )}`}
             >
@@ -70,7 +70,7 @@ export default function OramAccessGame() {
         users just read their own record, and you can see which storage it touched. Who was it?
       </p>
 
-      <div className="mb-5 rounded-xl border border-white/10 bg-white/5 p-4" data-testid="oram-view">
+      <div className="mb-5 rounded-xl border border-foreground/10 bg-surface p-4" data-testid="oram-view">
         {observation.mode === 'plain' ? (
           <ol className="grid grid-cols-8 gap-1.5" aria-label="Record slots">
             {Array.from({ length: RECORD_COUNT }, (_, slot) => (
@@ -78,10 +78,10 @@ export default function OramAccessGame() {
                 key={slot}
                 data-testid={`oram-slot-${slot}`}
                 data-touched={slot === observation.slot}
-                className={`rounded-md border py-3 text-center font-mono-accent text-xs ${
+                className={`rounded-md border py-3 text-center font-data text-xs ${
                   slot === observation.slot
-                    ? 'border-amber-300/80 bg-amber-400/25 text-amber-100'
-                    : 'border-white/10 bg-black/30 text-muted-foreground'
+                    ? 'border-warning/80 bg-warning/25 text-warning'
+                    : 'border-foreground/10 bg-surface/30 text-muted-foreground'
                 }`}
               >
                 {slot + 1}
@@ -99,7 +99,7 @@ export default function OramAccessGame() {
                   x2={nodePosition(node).x}
                   y2={nodePosition(node).y}
                   strokeWidth={0.5}
-                  className={getNodeVisualState(node, observation) === 'touched' ? 'stroke-amber-300' : 'stroke-white/15'}
+                  className={getNodeVisualState(node, observation) === 'touched' ? 'stroke-warning' : 'stroke-foreground/15'}
                 />
               )
             )}
@@ -115,8 +115,8 @@ export default function OramAccessGame() {
                 rx={1.2}
                 className={
                   getNodeVisualState(node, observation) === 'touched'
-                    ? 'fill-amber-400/40 stroke-amber-200'
-                    : 'fill-black/40 stroke-white/20'
+                    ? 'fill-warning/40 stroke-warning'
+                    : 'fill-foreground/40 stroke-foreground/20'
                 }
                 strokeWidth={0.4}
               />
@@ -136,7 +136,7 @@ export default function OramAccessGame() {
             onClick={() => handleGuess(user)}
             disabled={resolved}
             data-testid={`oram-guess-${user}`}
-            className={`min-h-[44px] rounded-xl border px-2 text-sm text-white transition-colors disabled:cursor-default ${getGuessClassName(
+            className={`min-h-[44px] rounded-xl border px-2 text-sm text-foreground transition-colors disabled:cursor-default ${getGuessClassName(
               getGuessVisualState(game, user)
             )}`}
           >
@@ -154,16 +154,16 @@ export default function OramAccessGame() {
           type="button"
           onClick={handleNext}
           data-testid="oram-next"
-          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Next read
         </button>
       ) : null}
 
-      <dl className="mt-6 grid grid-cols-1 gap-2 border-t border-white/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-2">
+      <dl className="mt-6 grid grid-cols-1 gap-2 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80 sm:grid-cols-2">
         {STORAGE_MODES.map(({ mode, label }) => (
           <div key={mode}>
-            <dt className="font-medium text-white/70">{label}</dt>
+            <dt className="font-medium text-foreground/70">{label}</dt>
             <dd data-testid={`oram-accuracy-${mode}`}>{getAccuracyText(mode, game.stats[mode])}</dd>
           </div>
         ))}

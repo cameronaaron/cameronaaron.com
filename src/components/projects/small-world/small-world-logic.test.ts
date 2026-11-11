@@ -183,13 +183,13 @@ describe('presentation', () => {
   });
 
   it('styles links by confirmation and chain membership', () => {
-    expect(getLinkClassName(3, true)).toBe('stroke-cyan-300');
-    expect(getLinkClassName(3, false)).toBe('stroke-white/30');
-    expect(getLinkClassName(1, false)).toBe('stroke-white/25');
+    expect(getLinkClassName(3, true)).toBe('stroke-primary');
+    expect(getLinkClassName(3, false)).toBe('stroke-foreground/30');
+    expect(getLinkClassName(1, false)).toBe('stroke-foreground/25');
     expect(getLinkDash(3)).toBeUndefined();
     expect(getLinkDash(2)).toBe('1.5 1.2');
-    expect(getGroupFillClass('climbing')).toBe('fill-cyan-400/70');
+    expect(getGroupFillClass('climbing')).toBe('fill-primary/70');
     expect(getGroupFillClass('nursing')).toBe('fill-violet-400/70');
-    expect(getGroupFillClass('band')).toBe('fill-amber-400/70');
+    expect(getGroupFillClass('band')).toBe('fill-warning/70');
   });
 });

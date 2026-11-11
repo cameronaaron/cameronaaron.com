@@ -21,7 +21,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import SpotlightCard from './ui/SpotlightCard';
-import InteractiveParticles from './hero/InteractiveParticles';
 import Navigation from './Navigation';
 import BackToTop from './ui/BackToTop';
 import { navItems } from '@/data/navigation';
@@ -77,36 +76,6 @@ describe('SpotlightCard — mousemove storm causes zero child re-renders', () =>
     )!;
     expect(spotlight.style.getPropertyValue('--spotlight-x')).toBe('59px');
     expect(spotlight.style.getPropertyValue('--spotlight-y')).toBe('69px');
-  });
-});
-
-describe('InteractiveParticles — animation causes zero React commits', () => {
-  it('runs pointer + burst + draw frames without a single reconciliation', () => {
-    withRafQueue((callbacks) => {
-      const commits: number[] = [];
-
-      render(
-        <Profiler id="interactive-particles" onRender={() => commits.push(commits.length)}>
-          <InteractiveParticles quality="full" />
-        </Profiler>
-      );
-      const mountCommits = commits.length;
-
-      fireEvent.mouseMove(window, { clientX: 200, clientY: 150 });
-      fireEvent.mouseDown(window, { clientX: 200, clientY: 150 });
-
-      for (let i = 0; i < 12; i += 1) {
-        act(() => {
-          callbacks[i]?.(10 + i * 20);
-        });
-      }
-      fireEvent.mouseOut(window);
-      act(() => {
-        callbacks[12]?.(400);
-      });
-
-      expect(commits.length).toBe(mountCommits);
-    });
   });
 });
 

@@ -21,14 +21,14 @@ describe('getChemistryBadge', () => {
   it('flags chemistry-required programs with the exact label and className', () => {
     expect(getChemistryBadge(true)).toEqual({
       label: 'Chemistry required',
-      className: 'border-amber-400/25 bg-amber-500/10 text-amber-200',
+      className: 'border-warning/25 bg-warning/10 text-warning',
     });
   });
 
   it('flags no-chemistry programs with the exact label and className', () => {
     expect(getChemistryBadge(false)).toEqual({
       label: 'No chemistry required',
-      className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200',
+      className: 'border-success/25 bg-success/10 text-success',
     });
   });
 });

@@ -124,17 +124,17 @@ export default function EphemeralRoomGame() {
   return (
     <div
       ref={containerRef}
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="ephemeral-room-game"
       role="group"
       aria-label={ROOM_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Keep the Room Alive</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Keep the Room Alive</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
             Alive{' '}
-            <strong className="text-cyan-300">
+            <strong className="text-primary">
               <span ref={clockRef} data-testid="room-clock">
                 {formatSeconds(0)}
               </span>
@@ -142,10 +142,10 @@ export default function EphemeralRoomGame() {
             </strong>
           </span>
           <span>
-            Messages <strong data-testid="room-messages" className="text-emerald-300">{messages}</strong>
+            Messages <strong data-testid="room-messages" className="text-success">{messages}</strong>
           </span>
           <span>
-            Best <strong data-testid="room-best" className="text-amber-300">{bestSeconds}s</strong>
+            Best <strong data-testid="room-best" className="text-warning">{bestSeconds}s</strong>
           </span>
         </div>
       </div>
@@ -158,11 +158,11 @@ export default function EphemeralRoomGame() {
 
       {animationEnabled ? (
         <>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-foreground/10" aria-hidden="true">
             <div
               ref={barRef}
               data-testid="room-decay-bar"
-              className={`h-full origin-left rounded-full ${status === 'faded' ? 'bg-rose-400' : 'bg-cyan-400'}`}
+              className={`h-full origin-left rounded-full ${status === 'faded' ? 'bg-danger' : 'bg-primary'}`}
               style={{ transform: 'scaleX(1)' }}
             />
           </div>
@@ -172,7 +172,7 @@ export default function EphemeralRoomGame() {
               type="button"
               onClick={handleSend}
               data-testid="room-send"
-              className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+              className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
             >
               {status === 'faded' ? 'Restart the room' : 'Send a message'}
             </button>
@@ -186,7 +186,7 @@ export default function EphemeralRoomGame() {
                 value={chatters}
                 onChange={(event) => handleChatters(Number(event.target.value))}
                 data-testid="room-chatters"
-                className="w-full accent-cyan-400"
+                className="w-full accent-primary"
               />
             </label>
           </div>

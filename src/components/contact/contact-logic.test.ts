@@ -1,13 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { socialPlatforms } from '@/data/contact';
 import { profile, type SocialLinks } from '@/data/profile';
-import { buildContactSocialLinks, CONTACT_REVEAL_SPRING, CONTACT_SCROLL_OFFSETS } from '@/components/contact/contact-logic';
+import { buildContactSocialLinks } from '@/components/contact/contact-logic';
 
 describe('contact logic', () => {
-  it('defines stable offsets and spring config for reveal animation', () => {
-    expect(CONTACT_SCROLL_OFFSETS).toEqual(['start 85%', 'center 40%']);
-    expect(CONTACT_REVEAL_SPRING).toEqual({ stiffness: 130, damping: 26, mass: 0.45 });
-  });
 
   it('builds social link payloads from platform metadata and profile urls', () => {
     const links = buildContactSocialLinks(socialPlatforms, profile.social);

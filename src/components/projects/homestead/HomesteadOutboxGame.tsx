@@ -67,14 +67,14 @@ export default function HomesteadOutboxGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="homestead-outbox-game"
       role="group"
       aria-label={OUTBOX_ARIA_LABEL}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Survive the Outage</h3>
-        <span className="font-mono text-xs tracking-[0.08em] text-muted-foreground" data-testid="ho-clock">
+        <h3 className="text-lg font-bold text-foreground">Survive the Outage</h3>
+        <span className="font-mono text-xs text-muted-foreground" data-testid="ho-clock">
           {getClockText(game.now)}
         </span>
       </div>
@@ -93,7 +93,7 @@ export default function HomesteadOutboxGame() {
             disabled={!canLog}
             onClick={() => handleLog(action.id)}
             data-testid={`ho-log-${action.id}`}
-            className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white transition-colors hover:border-cyan-300/50 disabled:opacity-40"
+            className="min-h-[44px] rounded-xl border border-foreground/15 bg-surface px-4 text-sm text-foreground transition-colors hover:border-primary/50 disabled:opacity-40"
           >
             {action.label}
           </button>
@@ -104,9 +104,9 @@ export default function HomesteadOutboxGame() {
         {SINKS.map((sink) => (
           <div
             key={sink.name}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-foreground/10 bg-surface p-3"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{sink.label}</p>
+            <p className="text-xs font-semibold text-muted-foreground">{sink.label}</p>
             <div className="flex min-w-[min(100%,15rem)] gap-1.5" role="group" aria-label={`${sink.label} status`}>
               {SINK_CONDITIONS.map(({ condition, label }) => (
                 <button
@@ -161,16 +161,16 @@ export default function HomesteadOutboxGame() {
 
       <ol className="mb-5 space-y-2" aria-label="Outbox" data-testid="ho-outbox">
         {game.events.length === 0 ? (
-          <li className="rounded-xl border border-dashed border-white/15 p-4 text-sm text-muted-foreground">
+          <li className="rounded-xl border border-dashed border-foreground/15 p-4 text-sm text-muted-foreground">
             The outbox is empty.
           </li>
         ) : null}
         {game.events.map((event) => (
-          <li key={event.id} className="rounded-xl border border-white/10 bg-white/5 p-3" data-testid={`ho-event-${event.id}`}>
-            <p className="text-sm text-white">
+          <li key={event.id} className="rounded-xl border border-foreground/10 bg-surface p-3" data-testid={`ho-event-${event.id}`}>
+            <p className="text-sm text-foreground">
               <span className="mr-2 font-mono text-xs text-muted-foreground">#{event.id}</span>
               {event.summary}
-              <span className="ml-2 font-mono text-xs text-cyan-200/70">{event.kind}</span>
+              <span className="ml-2 font-mono text-xs text-primary/70">{event.kind}</span>
             </p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {/* Every kind routes to at least Discord (pinned by the routing test), so each event has deliveries. */}
@@ -189,7 +189,7 @@ export default function HomesteadOutboxGame() {
                       type="button"
                       onClick={() => handleRetry(event.id, delivery.sink)}
                       data-testid={`ho-retry-${event.id}-${delivery.sink}`}
-                      className="min-h-[32px] rounded-md border border-white/20 px-2 text-white hover:border-white/50"
+                      className="min-h-[32px] rounded-md border border-foreground/20 px-2 text-foreground hover:border-foreground/50"
                     >
                       Retry
                     </button>
@@ -210,7 +210,7 @@ export default function HomesteadOutboxGame() {
           disabled={!somethingDue}
           onClick={handleWait}
           data-testid="ho-wait"
-          className="min-h-[44px] rounded-xl border border-cyan-300/50 bg-cyan-400/10 px-4 text-sm font-semibold text-white disabled:opacity-40"
+          className="min-h-[44px] rounded-xl border border-primary/50 bg-primary/10 px-4 text-sm font-semibold text-foreground disabled:opacity-40"
         >
           Wait for the next retry
         </button>
@@ -219,7 +219,7 @@ export default function HomesteadOutboxGame() {
           disabled={!somethingDue}
           onClick={handleSettle}
           data-testid="ho-settle"
-          className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white disabled:opacity-40"
+          className="min-h-[44px] rounded-xl border border-foreground/15 bg-surface px-4 text-sm text-foreground disabled:opacity-40"
         >
           Wait until everything settles
         </button>
@@ -227,14 +227,14 @@ export default function HomesteadOutboxGame() {
           type="button"
           onClick={handleReset}
           data-testid="ho-reset"
-          className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-muted-foreground"
+          className="min-h-[44px] rounded-xl border border-foreground/15 bg-surface px-4 text-sm text-muted-foreground"
         >
           Reset
         </button>
       </div>
 
-      <div className="mb-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm" data-testid="ho-linear">
-        <p className="text-white">
+      <div className="mb-4 rounded-xl border border-foreground/10 bg-surface p-4 text-sm" data-testid="ho-linear">
+        <p className="text-foreground">
           Linear issues: <strong data-testid="ho-issue-count">{linear.issues}</strong>
           {game.issues.length > 0 ? (
             <span className="ml-2 font-mono text-xs text-muted-foreground">
@@ -242,12 +242,12 @@ export default function HomesteadOutboxGame() {
             </span>
           ) : null}
         </p>
-        <p className={`mt-1 ${linear.duplicates > 0 ? 'text-rose-200' : 'text-muted-foreground'}`} data-testid="ho-linear-verdict">
+        <p className={`mt-1 ${linear.duplicates > 0 ? 'text-danger' : 'text-muted-foreground'}`} data-testid="ho-linear-verdict">
           {getLinearVerdict(linear, game.idScheme)}
         </p>
       </div>
 
-      <p className="mb-3 text-sm text-cyan-100" aria-live="polite" data-testid="ho-note">
+      <p className="mb-3 text-sm text-foreground" aria-live="polite" data-testid="ho-note">
         {game.note}
       </p>
       <p className="text-xs text-muted-foreground/80">{SCHEDULE_TEXT}</p>

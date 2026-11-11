@@ -41,22 +41,22 @@ export default function DnaSnpGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="dna-snp-game"
       role="group"
       aria-label="Read the Raw File: call a trait from a line of 23andMe raw data, the way the Genetic RefleXions mirror did"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Read the Raw File</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Read the Raw File</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
-            Score <strong data-testid="dna-game-score" className="text-cyan-300">{scoreState.score}</strong>
+            Score <strong data-testid="dna-game-score" className="text-primary">{scoreState.score}</strong>
           </span>
           <span>
-            Streak <strong data-testid="dna-game-streak" className="text-emerald-300">{scoreState.streak}</strong>
+            Streak <strong data-testid="dna-game-streak" className="text-success">{scoreState.streak}</strong>
           </span>
           <span>
-            Best <strong data-testid="dna-game-best-streak" className="text-amber-300">{scoreState.bestStreak}</strong>
+            Best <strong data-testid="dna-game-best-streak" className="text-warning">{scoreState.bestStreak}</strong>
           </span>
         </div>
       </div>
@@ -67,14 +67,14 @@ export default function DnaSnpGame() {
       </p>
 
       <pre
-        className="mb-3 overflow-x-auto rounded-xl border border-white/10 bg-black/50 p-4 font-mono-accent text-sm leading-relaxed"
+        className="mb-3 overflow-x-auto rounded-xl border border-foreground/10 bg-surface p-4 font-data text-sm leading-relaxed"
         data-testid="dna-raw-line"
       >
         <span className="text-muted-foreground/70">{RAW_FILE_HEADER}</span>
         {'\n'}
-        <span className="text-cyan-100">{round.line}</span>
+        <span className="text-foreground">{round.line}</span>
       </pre>
-      <p className="mb-5 text-sm text-white/80" data-testid="dna-association">
+      <p className="mb-5 text-sm text-foreground/80" data-testid="dna-association">
         {describeLookup(round)}
       </p>
 
@@ -86,7 +86,7 @@ export default function DnaSnpGame() {
             onClick={() => handleAnswer(option)}
             disabled={chosen !== null}
             data-testid={`dna-option-${optionIndex}`}
-            className={`min-h-[44px] rounded-xl border px-4 py-3 text-sm text-white transition-colors disabled:cursor-default ${getOptionClassName(
+            className={`min-h-[44px] rounded-xl border px-4 py-3 text-sm text-foreground transition-colors disabled:cursor-default ${getOptionClassName(
               getOptionVisualState(option, round, chosen)
             )}`}
           >
@@ -104,13 +104,13 @@ export default function DnaSnpGame() {
           type="button"
           onClick={handleNext}
           data-testid="dna-game-next-round"
-          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Next line
         </button>
       ) : null}
 
-      <p className="mt-6 border-t border-white/10 pt-4 text-xs text-muted-foreground/80">
+      <p className="mt-6 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80">
         This is the mirror&rsquo;s own code path: sort the two alleles, look the pair up in SNPedia, drop anything under
         magnitude 2. Summaries are SNPedia&rsquo;s (CC BY-NC-SA), verbatim. They are associations, not diagnoses —
         which is why the mirror could only ever guess.

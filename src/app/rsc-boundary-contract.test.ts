@@ -34,11 +34,25 @@ const SERVER_COMPONENTS = [
   'src/components/Footer.tsx',
   'src/components/Certifications.tsx',
   'src/components/SelectedWork.tsx',
+  // 2026-11 redesign: the hero, the section headers, the section wrapper, the
+  // contact section and the overlay wrapper all stopped needing the client.
+  'src/components/Hero.tsx',
+  'src/components/hero/ProfileImage.tsx',
+  'src/components/Contact.tsx',
+  'src/components/contact/SocialLink.tsx',
+  'src/components/ui/SectionHeader.tsx',
+  'src/components/ui/SectionTransitions.tsx',
+  'src/components/ui/PageChrome.tsx',
 ];
 
-// The client island that holds the page's orchestration — this one MUST be a
-// client component, or the overlays/interaction it owns would break.
-const CLIENT_ISLAND = 'src/components/ui/PageChrome.tsx';
+// The overlays PageChrome mounts each own real interaction (a dialog, a
+// palette, a scroll listener) — these MUST be client components, or the
+// server wrapper around them would render inert markup.
+const CLIENT_ISLANDS = [
+  'src/components/ui/KeyboardShortcuts.tsx',
+  'src/components/ui/CommandPalette.tsx',
+  'src/components/ui/BackToTop.tsx',
+];
 
 describe('rsc-boundary-contract — the page stays a Server Component shell', () => {
   it.each(SERVER_COMPONENTS)('%s is a Server Component (no "use client")', (rel) => {
@@ -51,8 +65,10 @@ describe('rsc-boundary-contract — the page stays a Server Component shell', ()
     ).toBe(false);
   });
 
-  it('PageChrome is the client orchestration island', () => {
-    expect(hasUseClient(CLIENT_ISLAND), `${CLIENT_ISLAND} must be a client component`).toBe(true);
+  it.each(CLIENT_ISLANDS)('%s is a client island, and PageChrome mounts it', (rel) => {
+    expect(hasUseClient(rel), `${rel} must be a client component`).toBe(true);
+    const name = rel.slice(rel.lastIndexOf('/') + 1).replace('.tsx', '');
+    expect(read('src/components/ui/PageChrome.tsx')).toContain(`<${name} />`);
   });
 
   it('page.tsx renders the PageChrome island and does not itself import client-only hooks', () => {

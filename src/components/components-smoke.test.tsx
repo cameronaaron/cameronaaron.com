@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import Certifications from './Certifications';
 import Contact from './Contact';
@@ -15,10 +15,7 @@ import StructuredData from './StructuredData';
 import Testimonials from './Testimonials';
 import SocialLink from './contact/SocialLink';
 import ExperienceCard from './experience/ExperienceCard';
-import BackgroundParticles from './hero/BackgroundParticles';
-import InteractiveParticles from './hero/InteractiveParticles';
 import ProfileImage from './hero/ProfileImage';
-import ScrollIndicator from './hero/ScrollIndicator';
 import FeaturedProject from './projects/FeaturedProject';
 import ProjectCard from './projects/ProjectCard';
 import ProjectPattern from './projects/ProjectPattern';
@@ -50,19 +47,10 @@ describe('component smoke coverage', () => {
     expect(container.querySelector('#education')).toBeTruthy();
     expect(container.querySelector('#contact')).toBeTruthy();
 
-    // End-to-end derived-motion-math check through the rendered DOM. Hero's
-    // pointer-aura opacity is dynamicAuraOpacity = min(0.5, auraOpacity +
-    // pointerSpeed·0.14): auraOpacity interpolates scroll [0,500]→[0.34,0.12]
-    // and reads 0.34 at scroll 0; pointerSpeed is 0 with the pointer at rest
-    // → exactly 0.34. The shared motion mock resolves style-bound motion
-    // values to live numbers at render, so this verifies the whole chain
-    // (useScroll → auraOpacity interpolation → pointerSpeed fn →
-    // dynamicAuraOpacity fn → DOM style). A broken formula, swapped input,
-    // or dead interpolation all fail here — not just "an element exists".
-    const auraOverlay = Array.from(container.querySelectorAll('div[aria-hidden="true"]')).find(
-      (node) => (node as HTMLElement).style.opacity === '0.34'
-    );
-    expect(auraOverlay, 'Hero pointer-aura overlay with derived opacity 0.34 not found').toBeTruthy();
+    // The hero is static HTML: its name is a real heading and its portrait is
+    // in the first paint, with nothing hidden behind an entrance animation.
+    expect(screen.getByRole('heading', { level: 1, name: profile.name })).toBeTruthy();
+    expect(container.querySelector('#home img')?.getAttribute('alt')).toBe(profile.name);
   });
 
   it('renders structured data script', () => {
@@ -74,21 +62,13 @@ describe('component smoke coverage', () => {
   });
 
   it('renders subcomponents with explicit props', () => {
-    const mockProgress = {
-      get: () => 1,
-      set: vi.fn(),
-      on: vi.fn(),
-    };
-
     render(
       <>
         <SocialLink
           name="GitHub"
           platformKey="github"
           url="https://github.com/example"
-          color="from-cyan-500 to-emerald-500"
-          index={0}
-          revealProgress={mockProgress as never}
+          color="from-primary to-success"
         />
         <ExperienceCard experience={experiences[0]} index={0} />
         <FeaturedProject project={projects[0]} index={0} />
@@ -96,9 +76,6 @@ describe('component smoke coverage', () => {
         <ProjectPattern index={1} />
         <TestimonialCard testimonial={testimonials[0]} index={0} />
         <ProfileImage src={profile.image} alt={profile.name} />
-        <BackgroundParticles />
-        <InteractiveParticles />
-        <ScrollIndicator />
       </>
     );
 

@@ -45,14 +45,12 @@ export default function Experience() {
   const handleActivate = useCallback((index: number) => setActiveExperienceIndex(index), []);
 
   return (
-    <section id="experience" className="experience-editorial py-20 bg-background relative" aria-labelledby="experience-heading">
+    <section id="experience" className="experience-editorial py-20 md:py-28 relative" aria-labelledby="experience-heading">
       <div className="container mx-auto px-6 relative z-10" ref={containerRef}>
         <SectionHeader
           headingId="experience-heading"
-          index="02"
           title="Healthcare & Technology Experience"
           subtitle="Clinical, research, and operations experience across aerospace medicine, neuroscience, and healthcare technology"
-          className="[&>h2]:font-display"
         />
 
         <div className="experience-journey">
@@ -62,7 +60,7 @@ export default function Experience() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: isLiteMotion ? 0.42 : 0.65, ease: 'easeOut' }}
-          className="experience-phases mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3 backdrop-blur-md"
+          className="experience-phases mx-auto mb-8 flex max-w-5xl flex-wrap items-center justify-center gap-3 rounded-2xl border border-foreground/10 bg-surface px-4 py-3"
           role="group"
           aria-label="Experience flow phases"
         >
@@ -73,9 +71,9 @@ export default function Experience() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: getExperiencePhaseStaggerDelay(index, isLiteMotion), duration: 0.4, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100/90"
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/80" />
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               {phase}
             </m.div>
           ))}
@@ -108,10 +106,10 @@ export default function Experience() {
                 whileTap={isLiteMotion ? undefined : { scale: 0.98 }}
                 data-testid={`experience-nav-${index}`}
                 data-latest-period={exp.latestPeriod}
-                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-300 ${
+                className={`rounded-full border px-4 py-2 text-xs font-semibold transition-colors duration-200 ${
                   isActive
-                    ? 'border-cyan-300/45 bg-cyan-300/15 text-cyan-100 shadow-lg shadow-cyan-500/20'
-                    : 'border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/25 hover:text-foreground'
+                    ? 'border-transparent bg-accent text-accent-foreground'
+                    : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
                 aria-pressed={isActive}
               >
@@ -123,10 +121,10 @@ export default function Experience() {
 
         </aside>
         <div className="experience-timeline relative">
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden md:block">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-foreground/10 -translate-x-1/2 hidden md:block">
             <m.div 
               style={{ scaleY, transformOrigin: "top" }}
-              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-400 via-emerald-400 to-cyan-400"
+              className="absolute top-0 left-0 w-full h-full bg-primary"
             />
           </div>
 

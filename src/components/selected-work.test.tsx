@@ -32,7 +32,7 @@ describe('Selected work visitor journey', () => {
 
   it('connects the primary hero action and playground link to rendered destinations', () => {
     const { container } = render(<><Hero /><SelectedWork /><Projects /></>);
-    expect(screen.getByRole('link', { name: 'Explore My Work' }).getAttribute('href')).toBe('#selected-work');
+    expect(screen.getByRole('link', { name: 'See selected work' }).getAttribute('href')).toBe('#selected-work');
     expect(container.querySelectorAll('#selected-work')).toHaveLength(1);
     expect(container.querySelectorAll('#research-playground')).toHaveLength(1);
     expect(container.querySelector('#research-playground h3')?.textContent).toBe('Play the research');

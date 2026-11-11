@@ -2325,6 +2325,37 @@ investigate that script before touching the config.
 
 ## 7. The engagement doctrine
 
+> **Amendment, 2026-11 — the "Daylight" redesign.** The owner's brief was
+> that the site "looks very heavy and space like" and should instead be fast,
+> light and modern enough that an admissions reader or hiring manager trusts
+> it on sight. That is a change to this doctrine, made by the person it
+> belongs to, so it is recorded here rather than quietly worked around.
+>
+> What changed: **reactions answer the visitor; decoration that runs unprompted
+> is gone.** Removed outright, with their logic modules and tests: the intro
+> curtain, both hero particle canvases, the hero "worlds" tab explorer and its
+> orbit rings and draggable badges, the cursor comet, tap ripple, aurora
+> easter egg, ambient orb field, film grain, section handoffs and glows, both
+> velocity marquees, the verlet ribbon band, the skill-web canvas, the section
+> rail, the quick-actions dock, hover-scramble text, the magnetic field,
+> pointer-tilt on cards and the portrait, the count-up stat cards and the
+> typewriter name. The page went from a dark theme to a light one
+> (`design-token-contract` pins the tokens and their contrast).
+>
+> What survives of the doctrine, and is still enforced by
+> `section-engagement-contract`: every section still gives something back —
+> but the cheapest reaction that does the job wins, **CSS before JavaScript**.
+> The `mark-link` highlighter (a hover/focus swipe of the hi-vis accent) is
+> the house reaction; it costs no handler and no hydration, which is what let
+> Hero, Contact and every section header become Server Components. Data that
+> reacts to time (certification expiry, the hero clock) and the playable
+> research companions are untouched — those were always the doctrine at its
+> best.
+>
+> Do not rebuild any of the removed effects without the owner asking for it:
+> they were deleted on purpose, not lost. The historical passages below and
+> in §3–§5 that name them are kept as the measurement record they are.
+
 This site is not a static résumé — it's meant to feel like stepping into the
 owner's actual world: emergency medicine, genomics research, security
 research, neuroscience, software engineering, all at once. A page that just
@@ -2619,13 +2650,13 @@ reason (§6 item 18).
 | TypeScript 7 | typescript-eslint peers `<6.1.0` | typescript-eslint ships TS7 support | pin-probe test in `dependency-freshness-contract` (fails the day the peer range moves) |
 | sharp CVE ignore (GHSA-f88m-g3jw-g9cj) | no fixed sharp release exists | patched sharp publishes | self-cleaning audit sweep — the ignore entry must be deleted the release it stops matching |
 | JS deferral / code-splitting for mobile LCP | measured no-op: Turbopack force-preloads every chunk; Lantern sums the initial wave regardless (§4.7) | the bundler stops force-preloading, or framer-motion leaves the bundle | re-measure against clean `/out` per §0.5 before believing any new deferral result |
-| Removing framer-motion (the real mobile-TBT ceiling) | product decision — §7 engagement depends on it | the engagement doctrine changes, or React-native view transitions/scroll-driven animations can express §7 without it | owner call; revisit at each React/framer major |
-| `domAnimation` (smaller framer feature pack) | hero `drag` + nav/rail `layoutId` need `domMax` (documented in `motion-features.ts`) | those interactions are redesigned away | grep is the check: no `drag`/`layoutId` usage → swap the pack same commit |
+| Removing framer-motion (the real mobile-TBT ceiling) | **Reopened 2026-11:** the reopen condition fired — §7 was amended and the hero, section headers and contact section no longer import it. Still parked only because the remaining users (nav active pill, experience/skills/testimonials entrances, the three overlay dialogs, the games) were out of scope for the redesign pass | already met; the work is finishing the removal section by section | `grep -rl "from 'framer-motion'" src --include='*.tsx'` is the remaining-work list; owner call on priority |
+| `domAnimation` (smaller framer feature pack) | the nav's active-link `layoutId` and the testimonials grid's `layout` reflow need `domMax` (documented in `motion-features.ts`); the hero `drag` and the rail that also needed it were removed 2026-11 | those two interactions are redesigned away | grep is the check: no `drag`/`layoutId`/`layout` usage → swap the pack same commit |
 | `next` patch re-cuts | pnpm patches pin exact versions | every `next` version bump | contract test asserts patch version == lockfile version *and* installed polyfill files are 0 bytes |
 | Local Lighthouse numbers | §0.5 — the ruler lied twice (dev-build-on-port-3000 incident) | never fully; PSI/CI stay the arbiters | `serve-out-warmed.mjs` refuses occupied ports and non-production responses |
 | JSON-LD flight duplication (~33KB raw in home HTML) | structural to RSC: a Server Component's rendered script content rides the flight stream too, so the structured-data block ships once as `ld+json` and once flight-escaped | Next ships JSON-LD support in the Metadata API, or flight-payload exclusion for opaque script content | the informational home-HTML report in `performance-budgets.mjs` exposes the byte cost; re-measure when framework support changes |
 | Incremental framer removal as a *load-time* win | measured no-op: removing 8 of the page's framer graphs moved mobile Lighthouse 0.86 → 0.86, every metric inside run-to-run spread (§9.5). The load floor is bundle *evaluation* + 3,301-element hydration, and neither falls until the last framer import does | framer-motion is fully removed, or the client tree shrinks materially (more RSC conversions per §5) | re-measure load with LHCI *and* scroll with `pnpm run measure:scroll-cost` per §9.5 — a load-metric no-op does not mean a no-op |
-| Declarative CSS custom properties for per-frame values | measured 6.3× worse: an *inherited* registered property on `:root` invalidates the whole document every frame (3.65ms/frame at 3,424 elements vs 0.58ms writing 8 elements directly) | the element count collapses, or browsers gain per-element custom-property invalidation | the comment block above `.velocity-lean-*` in `globals.css`; re-run the recalc probe before moving any per-frame value back into CSS |
+| Declarative CSS custom properties for per-frame values | measured 6.3× worse: an *inherited* registered property on `:root` invalidates the whole document every frame (3.65ms/frame at 3,424 elements vs 0.58ms writing 8 elements directly) | the element count collapses, or browsers gain per-element custom-property invalidation | this row — the scroll-velocity lean it was measured on was removed in the 2026-11 redesign, so there is no longer a comment block in `globals.css` to carry the warning; re-run a recalc probe before trying the pattern again |
 | Mobile Lighthouse floor at 0.80 (tightened back from 0.45, 2026-08-09) | GitHub-hosted CI's actual shared-runner capacity was unmeasured for a month (CI was off); three fresh runs on re-enabling it measured 0.53/0.59/0.56 and TBT 1401–1696ms, ~50× the prior 27.5ms baseline — a runner-capacity gap, not an app regression (ruled out via a local framer-motion v12-vs-v13 A/B test, §0.5) | three consecutive CI runs clear 0.80 with no dependency change to explain the jump (evidence the runner tier or its load genuinely improved) | `performance-regression-contract.test.ts`'s pinned `0.45` + inline history; re-measure with 3+ fresh CI runs (not local) before raising the floor back |
 | `kulturecity.org` link liveness (ledger status `unverifiable`, 2026-08-28) | the checking machine's ISP (Charter/Spectrum CUJO filter) intercepts the TLS connection — `ERR_SSL_WRONG_VERSION_NUMBER` on curl *and* node, while a plaintext `http://` probe lands on `block.charter-prod.hosted.cujo.io`, proving interception rather than a dead host (§0.5) | the link is re-checked from a network that isn't filtering it | `external-links-contract` — an `unverifiable` entry keeps its ORIGINAL `lastChecked`, so the 45-day staleness gate expires it (this one on 2026-09-02) and forces the re-check; a second assertion fails any `unverifiable` entry lacking a `note` or carrying a refreshed timestamp |
 | `Cross-Origin-Embedder-Policy: require-corp` on `/bridging-transitions` (detached 2026-09-05) | The route's entire purpose is an embedded YouTube playlist — the destination of the QR code printed on the SNS26 poster — and under `require-corp` a real Chrome never commits the `youtube-nocookie` frame at all. Measured, not reasoned: YouTube *does* send `cross-origin-resource-policy: cross-origin`, which is why this looks like it should work, but a nested **document** must assert COEP itself and YouTube sends only `cross-origin-embedder-policy-report-only`. `credentialless` fails identically (it relaxes subresources, not nested documents). The failure is silent — an empty black box, no console error — and invisible locally, because `next dev` serves none of `public/_headers` (§0.5 again). Nothing on this site uses `SharedArrayBuffer` or any other cross-origin-isolated API, so the detach costs a capability that was never claimed. | YouTube starts sending a real (non-report-only) `Cross-Origin-Embedder-Policy`, or the page stops embedding third-party video | `scripts/checks/coep-youtube-embed-probe.mjs` (`pnpm run check:coep-embed`) re-runs the three-way measurement in a real Chrome; `headers-integrity-contract` pins both the site-wide `require-corp` and the surgical two-line detach, and fails if the detach quietly widens to drop COOP/HSTS/XFO too |
@@ -2861,8 +2892,10 @@ The same final gate measured menu **48ms**, testimonials **80ms**, and skills
 **80ms**, with zero interaction long tasks. Startup tasks remain reported.
 
 The portrait now has no passive animation or filter, and only the full tier
-gets hover tilt. `profile-image-interaction.test.tsx` verifies local pointer
-response, reset/cleanup, and memoization. `animation-regression-contract`
+gets hover tilt. A dedicated interaction test verified local pointer
+response, reset/cleanup, and memoization (both the tilt and that test were
+removed in the 2026-11 redesign, when the portrait became a Server Component
+with no pointer behaviour at all — see §7's amendment). `animation-regression-contract`
 sweeps element-bound 3D tilt for whole-window pointer subscriptions; injecting
 that listener back into the portrait made the sweep fail. Production browser
 checks verify tilt on hover, exact rest after leaving, and no tilt on touch

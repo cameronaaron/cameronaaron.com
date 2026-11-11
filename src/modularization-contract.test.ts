@@ -49,13 +49,6 @@ const ALLOWED_COMPONENT_CATALOGS: Record<string, string> = {
 };
 
 describe('modularization contract', () => {
-  it('keeps InteractiveParticles wired to extracted simulation engine', () => {
-    const source = read('src/components/hero/InteractiveParticles.tsx');
-
-    expect(source).toContain("from './interactive-particles/interactive-particles-engine'");
-    expect(source).not.toContain('function createSeededRandom(');
-    expect(source).not.toContain('function createInitialParticles(');
-  });
 
   it('keeps StructuredData schema construction in builders module', () => {
     const source = read('src/components/StructuredData.tsx');
@@ -70,7 +63,6 @@ describe('modularization contract', () => {
 
     expect(source).toContain("from '@/components/ui/SectionTransitions'");
     expect(source).not.toContain('function SectionReveal(');
-    expect(source).not.toContain('function SectionHandoff(');
   });
 
   it('keeps Navigation section-tracking logic extracted', () => {
@@ -187,15 +179,6 @@ describe('modularization contract', () => {
     expect(source).not.toContain('const centerX = rect.left + rect.width / 2;');
   });
 
-  it('keeps ProfileImage pointer normalization and animation helpers extracted', () => {
-    const source = read('src/components/hero/ProfileImage.tsx');
-
-    expect(source).toContain("from '@/components/hero/profile-image-logic'");
-    expect(source).not.toContain("const springConfig = { damping: 20, stiffness: 100 };");
-    expect(source).not.toContain("const centerX = rect.left + rect.width / 2;");
-    expect(source).not.toContain("y: prefersReducedMotion ? 0 : [0, -20, 0]");
-  });
-
   it('keeps FeaturedProject spotlight math and display helpers extracted', () => {
     const source = read('src/components/projects/FeaturedProject.tsx');
 
@@ -223,29 +206,12 @@ describe('modularization contract', () => {
     expect(source).not.toContain('{testimonial.relationship} • {testimonial.date}');
   });
 
-  it('keeps BackgroundParticles engine and quality config extracted', () => {
-    const source = read('src/components/hero/BackgroundParticles.tsx');
-
-    expect(source).toContain("from '@/components/hero/background-particles/background-particles-engine'");
-    expect(source).not.toContain('const qualityConfig = {');
-    expect(source).not.toContain('particles.push({');
-    expect(source).not.toContain('const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);');
-  });
-
   it('keeps IframeTitleGuard title inference logic extracted', () => {
     const source = read('src/components/ui/IframeTitleGuard.tsx');
 
     expect(source).toContain("from '@/components/ui/iframe-title-guard-logic'");
     expect(source).not.toContain('function getIframeTitle(');
     expect(source).not.toContain('function ensureIframeTitle(');
-  });
-
-  it('keeps IntroCurtain navigation and persistence helpers extracted', () => {
-    const source = read('src/components/ui/IntroCurtain.tsx');
-
-    expect(source).toContain("from '@/components/ui/intro-curtain-logic'");
-    expect(source).not.toContain("const STORAGE_KEY = 'intro-curtain-shown';");
-    expect(source).not.toContain('function shouldSkipInitialCurtain(): boolean {');
   });
 
   it('keeps KeyboardShortcuts target/editable helpers AND the shortcut catalog extracted', () => {
@@ -259,14 +225,6 @@ describe('modularization contract', () => {
     // keyboard-shortcuts-logic.ts so the component only imports it.
     expect(source).toContain('SHORTCUTS,');
     expect(source).not.toMatch(/^export const SHORTCUTS/m);
-  });
-
-  it('keeps TypewriterEffect initial-state and persistence helpers extracted', () => {
-    const source = read('src/components/ui/TypewriterEffect.tsx');
-
-    expect(source).toContain("from '@/components/ui/typewriter-effect-logic'");
-    expect(source).not.toContain('function readInitialComplete(storageKey: string): boolean {');
-    expect(source).not.toContain('const storageKey = `typewriter-complete:${text}`;');
   });
 
   it('keeps Button style maps and magnetic offset math extracted', () => {
@@ -301,91 +259,12 @@ describe('modularization contract', () => {
     expect(logic).toContain('export function toYouTubeEmbedUrl(');
   });
 
-  it('keeps SectionTransitions glow-tone helper extracted to logic module', () => {
-    const source = read('src/components/ui/SectionTransitions.tsx');
-
-    expect(source).toContain("from './section-transitions-logic'");
-    expect(source).not.toContain("index % 2 === 0 ? 'from-cyan-400/10");
-    expect(source).not.toContain("'from-emerald-400/10 via-secondary/12 to-transparent'");
-  });
-
-  it('keeps Tilt mouse-offset math extracted to tilt-logic module', () => {
-    const source = read('src/components/ui/Tilt.tsx');
-
-    expect(source).toContain("from './tilt-logic'");
-    expect(source).not.toContain('rect.left - rect.width / 2');
-    expect(source).not.toContain('mouseXFromCenter / width');
-  });
-
-  it('keeps SectionRail most-visible entry sort AND the rail-section catalog extracted', () => {
-    const source = read('src/components/ui/SectionRail.tsx');
-
-    expect(source).toContain("from './section-rail-logic'");
-    expect(source).not.toContain('.filter((entry) => entry.isIntersecting)');
-    expect(source).not.toContain('.sort((a, b) => b.intersectionRatio - a.intersectionRatio)');
-    // RAIL_SECTIONS itself (2026-07): same escape as KeyboardShortcuts'
-    // SHORTCUTS — moved into section-rail-logic.ts.
-    expect(source).toContain('RAIL_SECTIONS');
-    expect(source).not.toMatch(/^export const RAIL_SECTIONS/m);
-  });
-
-  it('keeps AmbientBackground orb-count and animate-flag extracted to logic module', () => {
-    const source = read('src/components/ui/AmbientBackground.tsx');
-
-    expect(source).toContain("from './ambient-background-logic'");
-    expect(source).not.toContain("performanceTier === 'full'\n      ? ORBS.length");
-    expect(source).not.toContain("const animateOrbs = performanceTier === 'full'");
-  });
-
   it('keeps SpotlightCard mouse-position offset extracted to spotlight-card-logic module', () => {
     const source = read('src/components/ui/SpotlightCard.tsx');
 
     expect(source).toContain("from './spotlight-card-logic'");
     expect(source).not.toContain('e.clientX - rect.left');
     expect(source).not.toContain('e.clientY - rect.top');
-  });
-
-  it('keeps Magnetic center-distance offset extracted to magnetic-logic module', () => {
-    const source = read('src/components/ui/Magnetic.tsx');
-
-    expect(source).toContain("from './magnetic-logic'");
-    expect(source).not.toContain('rect.width / 2');
-    expect(source).not.toContain('distanceX * strength');
-  });
-
-  it('keeps InteractiveParticles draw math (sprite geometry, percent→px) in the engine', () => {
-    const source = read('src/components/hero/InteractiveParticles.tsx');
-
-    expect(source).toContain('GLOW_SPRITE_SIZE');
-    expect(source).toContain('GLOW_DIAMETER_MULTIPLIER');
-    expect(source).toContain('getGlowGradientStops');
-    expect(source).toContain('percentToPx');
-    // No inline sprite geometry or coordinate math left in the component
-    expect(source).not.toContain('const SPRITE_SIZE =');
-    expect(source).not.toMatch(/\/ 100\) \* width/);
-    expect(source).not.toMatch(/addColorStop\(0\.25/);
-  });
-
-  it('keeps BackgroundParticles mouse-pull physics and opacity tiers in the engine', () => {
-    const source = read('src/components/hero/BackgroundParticles.tsx');
-
-    expect(source).toContain('applyMousePull(');
-    expect(source).toContain('BACKGROUND_OPACITY_TIERS');
-    expect(source).toContain('MOUSE_INACTIVE_POSITION');
-    // The old inline physics and tier table must not return
-    expect(source).not.toContain('const OPACITY_TIERS');
-    expect(source).not.toContain('force * 0.5');
-    expect(source).not.toContain('mouse.x > -900');
-  });
-
-  it('keeps QuickActionsDock link catalog and motion config extracted', () => {
-    const source = read('src/components/ui/QuickActionsDock.tsx');
-
-    expect(source).toContain("from './quick-actions-dock-logic'");
-    expect(source).toContain('QUICK_DOCK_LINKS');
-    expect(source).not.toContain("{ label: 'Credentials', href: '#certifications' }");
-    expect(source).not.toContain('reduced ? { opacity: 1 } : { opacity: 0, y: 8 }');
-    expect(source).not.toContain('delay: reduced ? 0 : index * 0.03');
   });
 
   it('keeps SmoothScroll scroll-reset decision extracted', () => {
@@ -526,7 +405,7 @@ describe('modularization sweeps — every production .tsx, present and future', 
     // original pattern only matched bare `const` + array literals, missing
     // `export const metadata: Metadata = {...}` (a 190-line SEO/OpenGraph/
     // robots object sat inline in layout.tsx for months) and two exported
-    // array catalogs (SectionRail's RAIL_SECTIONS, KeyboardShortcuts'
+    // array catalogs (the old section rail's RAIL_SECTIONS, KeyboardShortcuts'
     // SHORTCUTS) that had a companion *-logic.ts sitting right next to them
     // holding only the functions, not the data. A `export const metadata =
     // buildRootMetadata()` (function call) does NOT match — only a literal

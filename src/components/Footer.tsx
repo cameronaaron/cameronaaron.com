@@ -5,24 +5,20 @@ import { socialPlatforms } from '@/data/contact';
 // Server Component (no 'use client'): the footer is pure static content —
 // links and a copyright line — so it ships zero client JS and never hydrates.
 // The former m.footer entrance fade was dropped in the RSC migration (2026-07);
-// it is below the fold and the hairline shimmer (CSS) carries the accent.
+// it is below the fold.
 // `new Date().getFullYear()` runs once at build time in a server component.
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
-  // Bottom padding clears the fixed BackToTop + QuickActionsDock stack on the
-  // right (top edge 7.75rem / 8.75rem from sm, plus the home-indicator inset);
-  // without it the stack sat on top of the copyright line at page end.
+  // Bottom padding clears the fixed BackToTop button on the right (top edge
+  // 4rem / 4.25rem from sm, plus the home-indicator inset); without it the
+  // button sat on top of the copyright line at page end.
   return (
-    <footer className="border-t border-white/5 bg-background/80 text-white pt-14 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:pb-[calc(9rem+env(safe-area-inset-bottom))] relative overflow-hidden">
-      <div
-        className="hairline-shimmer-anim pointer-events-none absolute inset-x-0 top-0 mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent"
-        aria-hidden="true"
-      />
+    <footer className="border-t border-foreground/10 bg-surface text-foreground pt-14 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] relative">
       <div className="container mx-auto px-6 relative z-10">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
-            <a href="#home" className="font-display text-2xl font-bold tracking-tight text-white transition-colors hover:text-cyan-100">
+            <a href="#home" className="font-display text-3xl font-medium text-foreground">
               Cameron Aaron
             </a>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -35,7 +31,7 @@ export default function Footer() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+                className="mark-link text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {item.name}
               </a>
@@ -49,23 +45,23 @@ export default function Footer() {
                 href={profile.social[platform.key]}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+                className="mark-link text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {platform.name}
               </a>
             ))}
             <a
               href={`mailto:${profile.email}`}
-              className="text-sm text-muted-foreground transition-colors hover:text-cyan-100"
+              className="mark-link text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               {profile.email}
             </a>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-sm text-muted-foreground md:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-foreground/10 pt-6 text-sm text-muted-foreground md:flex-row">
           <p>© {CURRENT_YEAR} Cameron Aaron. All rights reserved.</p>
-          <p className="font-mono-accent text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
+          <p className="text-sm text-muted-foreground">
             {profile.location}
           </p>
         </div>

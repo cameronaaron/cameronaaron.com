@@ -72,7 +72,7 @@ describe('ToxoplasmaMaze', () => {
     dateNowSpy.mockRestore();
 
     const indicator = screen.getByTestId('toxo-rodent').querySelector('span[aria-hidden="true"]');
-    expect(indicator?.className.includes('bg-rose-400')).toBe(!initial.infected);
-    expect(indicator?.className.includes('bg-emerald-400')).toBe(initial.infected);
+    expect(indicator?.className.includes('bg-danger')).toBe(!initial.infected);
+    expect(indicator?.className.includes('bg-success')).toBe(initial.infected);
   });
 });

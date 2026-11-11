@@ -203,8 +203,8 @@ describe('SmoothScroll anchor follow-up', () => {
 
 describe('repo-wide: every section jump goes through scrollToSection', () => {
   it('has no raw scrollIntoView or lenis.scrollTo(element) outside the helper', () => {
-    // The class this sweep closes: CommandPalette, KeyboardShortcuts,
-    // SectionRail and Experience each hand-rolled their own jump, so none of
+    // The class this sweep closes: CommandPalette, KeyboardShortcuts, the
+    // since-removed section rail and Experience each hand-rolled their own jump, so none of
     // them re-aimed and each could land thousands of px short. SmoothScroll's
     // hash-on-load jump is `immediate`, which never passes a placeholder
     // section mid-flight, so it may call Lenis directly.

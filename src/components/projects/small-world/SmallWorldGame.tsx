@@ -49,27 +49,27 @@ export default function SmallWorldGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="small-world-game"
       role="group"
       aria-label="Shortest Chain: connect two people across friend groups"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Shortest Chain</h3>
+        <h3 className="text-lg font-bold text-foreground">Shortest Chain</h3>
         <button
           type="button"
           aria-pressed={state.mutualOnly}
           onClick={handleToggle}
           data-testid="small-world-mutual"
-          className="min-h-[44px] rounded-full border border-white/15 bg-white/5 px-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-cyan-300/40 aria-pressed:border-cyan-300/60 aria-pressed:bg-cyan-400/15 aria-pressed:text-cyan-100"
+          className="min-h-[44px] rounded-full border border-foreground/15 bg-foreground/5 px-4 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 aria-pressed:border-primary/60 aria-pressed:bg-primary/15 aria-pressed:text-foreground"
         >
           Confirmed mutual only
         </button>
       </div>
 
       <p className="mb-4 text-sm text-muted-foreground" data-testid="small-world-goal">
-        Get from <strong className="text-white">{PEOPLE[start].name}</strong> to{' '}
-        <strong className="text-white">{PEOPLE[target].name}</strong> through people who know each other. Dashed links
+        Get from <strong className="text-foreground">{PEOPLE[start].name}</strong> to{' '}
+        <strong className="text-foreground">{PEOPLE[target].name}</strong> through people who know each other. Dashed links
         were only seen in one direction.
       </p>
 
@@ -92,10 +92,10 @@ export default function SmallWorldGame() {
               cx={person.x}
               cy={person.y}
               r={index === target ? 2.6 : 2}
-              className={`${getGroupFillClass(person.group)} ${onChain.has(index) || index === target ? 'stroke-white' : 'stroke-transparent'}`}
+              className={`${getGroupFillClass(person.group)} ${onChain.has(index) || index === target ? 'stroke-foreground' : 'stroke-transparent'}`}
               strokeWidth={0.5}
             />
-            <text x={person.x} y={person.y + 5.6} textAnchor="middle" className="fill-white/80 text-[3.4px]">
+            <text x={person.x} y={person.y + 5.6} textAnchor="middle" className="fill-foreground/80 text-[3.4px]">
               {person.name}
             </text>
           </g>
@@ -110,7 +110,7 @@ export default function SmallWorldGame() {
               type="button"
               onClick={() => handleChoose(person)}
               data-testid={`small-world-choose-${person}`}
-              className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white transition-colors hover:border-cyan-300/60 hover:bg-cyan-400/10"
+              className="min-h-[44px] rounded-xl border border-foreground/15 bg-surface px-4 text-sm text-foreground transition-colors hover:border-primary/60 hover:bg-primary/10"
             >
               {PEOPLE[person].name}
             </button>
@@ -123,7 +123,7 @@ export default function SmallWorldGame() {
         {complete ? getResultText(state) : `${formatHops(hops(state.chain))} so far.`}
       </p>
       {mutualityNote ? (
-        <p className="mb-3 text-sm text-amber-200/90" data-testid="small-world-note">
+        <p className="mb-3 text-sm text-warning/90" data-testid="small-world-note">
           {mutualityNote}
         </p>
       ) : null}
@@ -134,7 +134,7 @@ export default function SmallWorldGame() {
             type="button"
             onClick={handleUndo}
             data-testid="small-world-undo"
-            className="min-h-[44px] rounded-full border border-white/15 px-5 text-sm text-muted-foreground transition-colors hover:border-white/30"
+            className="min-h-[44px] rounded-full border border-foreground/15 px-5 text-sm text-muted-foreground transition-colors hover:border-foreground/30"
           >
             Undo
           </button>
@@ -144,14 +144,14 @@ export default function SmallWorldGame() {
             type="button"
             onClick={handleNext}
             data-testid="small-world-next"
-            className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+            className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
           >
             Next pair
           </button>
         ) : null}
       </div>
 
-      <p className="mt-6 border-t border-white/10 pt-4 text-xs text-muted-foreground/80">
+      <p className="mt-6 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80">
         The crawler&rsquo;s tour mode walks the true shortest path between friend groups, found by breadth-first search.
         It also records which direction each link was seen in, because Instagram caps the followers list far more than
         the following list: a link seen one way may just be the other half going unobserved.

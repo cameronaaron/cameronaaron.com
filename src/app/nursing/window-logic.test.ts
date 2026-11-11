@@ -153,19 +153,19 @@ describe('WINDOW_STATUS_STYLES', () => {
   it('pins the exact label and className for every status', () => {
     expect(WINDOW_STATUS_STYLES.open).toEqual({
       label: 'Open now',
-      className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200',
+      className: 'border-success/25 bg-success/10 text-success',
     });
     expect(WINDOW_STATUS_STYLES['closing-soon']).toEqual({
       label: 'Closing soon',
-      className: 'border-amber-400/25 bg-amber-500/10 text-amber-200',
+      className: 'border-warning/25 bg-warning/10 text-warning',
     });
     expect(WINDOW_STATUS_STYLES.closed).toEqual({
       label: 'Closed',
-      className: 'border-white/15 bg-white/5 text-muted-foreground',
+      className: 'border-foreground/15 bg-foreground/5 text-muted-foreground',
     });
     expect(WINDOW_STATUS_STYLES.upcoming).toEqual({
       label: 'Upcoming',
-      className: 'border-cyan-400/25 bg-cyan-500/10 text-cyan-200',
+      className: 'border-primary/25 bg-primary/10 text-primary',
     });
   });
 });

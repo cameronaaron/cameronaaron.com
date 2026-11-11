@@ -46,37 +46,37 @@ export default function UdsDecoderGame() {
 
   return (
     <div
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="uds-decoder-game"
       role="group"
       aria-label="Decode the Response: read a vehicle module's diagnostic reply"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Decode the Response</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Decode the Response</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
-            Score <strong data-testid="uds-score" className="text-cyan-300">{scoreState.score}</strong>
+            Score <strong data-testid="uds-score" className="text-primary">{scoreState.score}</strong>
           </span>
           <span>
-            Best streak <strong data-testid="uds-best" className="text-amber-300">{scoreState.bestStreak}</strong>
+            Best streak <strong data-testid="uds-best" className="text-warning">{scoreState.bestStreak}</strong>
           </span>
         </div>
       </div>
 
       <p className="mb-5 text-sm text-muted-foreground">
-        A tester sent <span className="font-mono-accent text-white/80">{formatRequest(challenge.did)}</span>{' '}
+        A tester sent <span className="font-data text-foreground/80">{formatRequest(challenge.did)}</span>{' '}
         (ReadDataByIdentifier). This is what came back. What does it say?
       </p>
 
-      <div className="mb-5 rounded-xl border border-white/10 bg-white/5 p-5" data-testid="uds-prompt">
-        <p className="mb-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">{MODULE_HEADER}</p>
+      <div className="mb-5 rounded-xl border border-foreground/10 bg-surface p-5" data-testid="uds-prompt">
+        <p className="mb-3 text-xs text-muted-foreground">{MODULE_HEADER}</p>
         <ol className="mb-4 flex flex-wrap gap-2" aria-label={`Response bytes ${challenge.responseHex}`}>
           {bytes.map((byte, position) => (
             <li
               key={position}
               data-testid={`uds-byte-${position}`}
               data-role={getByteRole(position)}
-              className={`rounded-lg border px-2.5 py-1.5 font-mono-accent text-base ${getByteRoleClassName(getByteRole(position))}`}
+              className={`rounded-lg border px-2.5 py-1.5 font-data text-base ${getByteRoleClassName(getByteRole(position))}`}
             >
               {byte.toString(16).toUpperCase().padStart(2, '0')}
             </li>
@@ -84,20 +84,20 @@ export default function UdsDecoderGame() {
         </ol>
         <dl className="grid grid-cols-1 gap-1 text-sm text-muted-foreground sm:grid-cols-2">
           <div>
-            <dt className="inline text-white/70">Signal </dt>
+            <dt className="inline text-foreground/70">Signal </dt>
             <dd className="inline">{challenge.label}</dd>
           </div>
           <div>
-            <dt className="inline text-white/70">Identifier </dt>
-            <dd className="inline font-mono-accent">{formatDid(challenge.did)}</dd>
+            <dt className="inline text-foreground/70">Identifier </dt>
+            <dd className="inline font-data">{formatDid(challenge.did)}</dd>
           </div>
           <div>
-            <dt className="inline text-white/70">Bits </dt>
-            <dd className="inline font-mono-accent">0:{challenge.bits}{challenge.signed ? ', signed' : ''}</dd>
+            <dt className="inline text-foreground/70">Bits </dt>
+            <dd className="inline font-data">0:{challenge.bits}{challenge.signed ? ', signed' : ''}</dd>
           </div>
           <div>
-            <dt className="inline text-white/70">Formula </dt>
-            <dd className="inline font-mono-accent">{challenge.formulaText}</dd>
+            <dt className="inline text-foreground/70">Formula </dt>
+            <dd className="inline font-data">{challenge.formulaText}</dd>
           </div>
         </dl>
       </div>
@@ -110,7 +110,7 @@ export default function UdsDecoderGame() {
             onClick={() => handleAnswer(option)}
             disabled={chosen !== null}
             data-testid={`uds-option-${option.mistake ?? 'correct'}`}
-            className={`min-h-[44px] rounded-xl border px-4 py-3 font-mono-accent text-base text-white transition-colors disabled:cursor-default ${
+            className={`min-h-[44px] rounded-xl border px-4 py-3 font-data text-base text-foreground transition-colors disabled:cursor-default ${
               getOptionClassName(getOptionVisualState(option, chosen))
             }`}
           >
@@ -128,13 +128,13 @@ export default function UdsDecoderGame() {
           type="button"
           onClick={handleNext}
           data-testid="uds-next"
-          className="min-h-[44px] rounded-full border border-cyan-300/40 bg-cyan-400/10 px-5 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-400/20"
+          className="min-h-[44px] rounded-full border border-primary/40 bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           Next response
         </button>
       ) : null}
 
-      <p className="mt-6 border-t border-white/10 pt-4 text-xs text-muted-foreground/80">
+      <p className="mt-6 border-t border-foreground/10 pt-4 text-xs text-muted-foreground/80">
         Every reply here is a test vector from Mechanic&rsquo;s F-150 PCM definition. The scalings come from community
         sources (OBDb, elm327_obd_for_mac) and are marked unverified until someone captures them on a truck; the vectors
         prove the arithmetic, which is what lets a reviewer merge a contribution without trusting its bit offsets.

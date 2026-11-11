@@ -15,8 +15,8 @@ export interface ChemistryBadge {
 
 export function getChemistryBadge(requiresChemistry: boolean): ChemistryBadge {
   return requiresChemistry
-    ? { label: 'Chemistry required', className: 'border-amber-400/25 bg-amber-500/10 text-amber-200' }
-    : { label: 'No chemistry required', className: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200' };
+    ? { label: 'Chemistry required', className: 'border-warning/25 bg-warning/10 text-warning' }
+    : { label: 'No chemistry required', className: 'border-success/25 bg-success/10 text-success' };
 }
 
 /** Completed-count / total-count for the small "x/y" badge on a program card. */

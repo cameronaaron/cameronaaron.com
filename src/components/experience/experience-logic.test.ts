@@ -26,7 +26,7 @@ describe('experience logic', () => {
 
     // Ongoing roles ("- Present") lead; source order breaks their tie.
     expect(sorted.slice(0, 3).map((experience) => experience.company)).toEqual([
-      'Creative Minds ADP',
+      'California DDS Internship, North Los Angeles County',
       'Sun Brewed Homestead',
       'National Registry of Emergency Medical Technicians',
     ]);
@@ -92,23 +92,24 @@ describe('experience logic', () => {
   });
 
   describe('getTimelineDotAnimation', () => {
-    it('returns cyan active state when isActive is true', () => {
+    it('returns the accent-blue active state when isActive is true', () => {
       const active = getTimelineDotAnimation(false, true);
       expect(active.scale).toBe(1.35);
-      expect(active.backgroundColor).toContain('34 211 238');
+      expect(active.backgroundColor).toBe('rgb(33 71 217)');
     });
 
-    it('returns emerald inactive state when isActive is false', () => {
+    it('returns a quiet grey inactive state with no ring when isActive is false', () => {
       const inactive = getTimelineDotAnimation(false, false);
       expect(inactive.scale).toBe(1);
-      expect(inactive.backgroundColor).toContain('16 185 129');
+      expect(inactive.backgroundColor).toBe('rgb(170 176 190)');
+      expect(inactive.boxShadow).toBe('0 0 0 0px rgba(33, 71, 217, 0)');
     });
 
-    it('uses dimmer boxShadow on lite motion', () => {
+    it('draws a thinner ring on lite motion', () => {
       const lite = getTimelineDotAnimation(true, true);
       const full = getTimelineDotAnimation(false, true);
-      expect(lite.boxShadow).toContain('0.55');
-      expect(full.boxShadow).toContain('0.85');
+      expect(lite.boxShadow).toBe('0 0 0 3px rgba(33, 71, 217, 0.16)');
+      expect(full.boxShadow).toBe('0 0 0 5px rgba(33, 71, 217, 0.16)');
     });
   });
 

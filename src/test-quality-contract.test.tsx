@@ -30,12 +30,15 @@
 import React from 'react';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { m, motion, useMotionValue, useTransform } from 'framer-motion';
 
-import { SectionHandoff } from '@/components/ui/SectionTransitions';
-import { LOW_HARDWARE_CORES_THRESHOLD, LOW_HARDWARE_MEMORY_GB_THRESHOLD } from '@/hooks/usePerformanceProfile';
+import {
+  LOW_HARDWARE_CORES_THRESHOLD,
+  LOW_HARDWARE_MEMORY_GB_THRESHOLD,
+  usePerformanceProfile,
+} from '@/hooks/usePerformanceProfile';
 
 const SRC = resolve(process.cwd(), 'src');
 
@@ -126,8 +129,6 @@ describe('test-quality-contract — no assertion that cannot fail', () => {
     // reason it exists. Prefer the shared mock for new files.
     const LOCAL_FRAMER_MOCKS: Record<string, string> = {
       'src/app/pages-coverage.test.tsx': 'pre-dates the shared mock; bespoke shim tailored to whole-page renders',
-      'src/components/hero-coverage.test.tsx': 'captures useMotionValue instances in call order to assert which value a mousemove wrote — needs its own factory',
-      'src/components/particles-and-engines-coverage.test.tsx': 'pre-dates the shared mock; canvas-focused shim',
       'src/components/sections-coverage.test.tsx': 'pre-dates the shared mock; bespoke shim for section-level branch coverage',
     };
 
@@ -174,12 +175,13 @@ describe('test-quality-contract — the shared motion mock stays faithful', () =
     );
   });
 
-  it('a tier-gated component renders under the default test environment (end-to-end pin)', () => {
-    // Exercises the real usePerformanceProfile hook (no per-test mock) through
-    // a real tier-gated component, reproducing the exact CI failure this
-    // guards: SectionHandoff returns null outside 'full'/'balanced'.
-    render(<SectionHandoff label="Projects" cue="transition cue" index={0} targetId="projects" />);
-    expect(screen.getByRole('link', { name: /projects/i })).toBeTruthy();
+  it('the real performance hook resolves to the full tier under the default test environment (end-to-end pin)', () => {
+    // Exercises the real usePerformanceProfile hook (no per-test mock),
+    // reproducing the exact CI failure this guards: a runner that reports low
+    // hardware flips every tier-gated branch off and the suite tests nothing.
+    const { result } = renderHook(() => usePerformanceProfile());
+    expect(result.current.performanceTier).toBe('full');
+    expect(result.current.shouldRenderHeavyEffects).toBe(true);
   });
 
   it('useTransform range form interpolates LIVE input — never a frozen snapshot', () => {

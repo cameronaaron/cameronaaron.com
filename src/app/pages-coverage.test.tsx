@@ -87,22 +87,6 @@ describe('app/page.tsx coverage (lines 52-53, 81-105)', () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it('renders with lite tier (showFloatingOverlays=false, showSectionHandoffs=false)', async () => {
-    vi.doMock('@/hooks/usePerformanceProfile', () => ({
-      usePerformanceProfile: () => ({
-        performanceTier: 'lite',
-        shouldRenderParticles: false,
-        shouldRenderAmbientEffects: false,
-        shouldRenderHeavyEffects: false,
-        prefersReducedMotion: true,
-        isCoarsePointer: true,
-      }),
-    }));
-    const { default: Home } = await import('./page');
-    const { container } = render(<Home />);
-    expect(container.firstChild).not.toBeNull();
-  });
-
   it('fires interaction event to set hasInteracted=true (covers lines 52-53)', async () => {
     vi.doMock('@/hooks/usePerformanceProfile', () => ({
       usePerformanceProfile: () => ({

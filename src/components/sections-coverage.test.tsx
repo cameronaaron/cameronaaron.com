@@ -399,17 +399,6 @@ describe('Education coverage (branches 37-49)', () => {
     expect(link.getAttribute('rel')).toBe('noopener noreferrer');
   });
 
-  it('drops the section-title velocity skew layer off the full tier', async () => {
-    vi.doMock('@/hooks/usePerformanceProfile', () => ({
-      usePerformanceProfile: () => ({ performanceTier: 'balanced' }),
-    }));
-    const { default: SectionHeader } = await import('@/components/ui/SectionHeader');
-    render(<SectionHeader title="Balanced Tier" />);
-
-    const titleMotion = screen.getByTestId('section-title-motion');
-    expect(titleMotion.getAttribute('style')).toBeNull();
-  });
-
   it('renders a prerequisite course as plain text when no url is present', async () => {
     vi.doMock('@/data/education', () => ({
       educationItems: [],

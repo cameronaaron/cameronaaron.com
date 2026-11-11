@@ -125,32 +125,32 @@ export default function ReactionTimeGame() {
   return (
     <div
       ref={containerRef}
-      className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-md"
+      className="mt-8 rounded-2xl border border-foreground/10 bg-surface p-6"
       data-testid="reaction-time-game"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-white">Catch the Lapse</h3>
-        <div className="flex items-center gap-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="text-lg font-bold text-foreground">Catch the Lapse</h3>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
             Last{' '}
-            <strong data-testid="reaction-game-last" className="text-cyan-300">
+            <strong data-testid="reaction-game-last" className="text-primary">
               {stats.lastReactionMs === null ? '—' : formatMs(stats.lastReactionMs)}
             </strong>
           </span>
           <span>
             Avg{' '}
-            <strong data-testid="reaction-game-average" className="text-emerald-300">
+            <strong data-testid="reaction-game-average" className="text-success">
               {averageMs === null ? '—' : formatMs(averageMs)}
             </strong>
           </span>
           <span>
             Best{' '}
-            <strong data-testid="reaction-game-best" className="text-fuchsia-300">
+            <strong data-testid="reaction-game-best" className="text-fuchsia-700">
               {stats.bestMs === null ? '—' : formatMs(stats.bestMs)}
             </strong>
           </span>
           <span>
-            Rounds <strong data-testid="reaction-game-rounds" className="text-white">{stats.roundsPlayed}</strong>
+            Rounds <strong data-testid="reaction-game-rounds" className="text-foreground">{stats.roundsPlayed}</strong>
           </span>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function ReactionTimeGame() {
           disabled={phase === 'result'}
           onClick={handleTargetClick}
           aria-label={getTargetAriaLabel(phase)}
-          className={`flex h-32 w-32 items-center justify-center rounded-full border-4 font-mono text-sm font-bold uppercase tracking-[0.1em] text-white transition-colors disabled:cursor-default ${getTargetClassName(phase, Boolean(prefersReducedMotion))}`}
+          className={`flex h-32 w-32 items-center justify-center rounded-full border-4 font-mono text-sm font-bold text-foreground transition-colors disabled:cursor-default ${getTargetClassName(phase, Boolean(prefersReducedMotion))}`}
         >
           {targetLabel}
         </button>
@@ -179,7 +179,7 @@ export default function ReactionTimeGame() {
           role="status"
           aria-live="polite"
           data-testid="reaction-game-message"
-          className="min-h-[1.25rem] text-sm font-medium text-cyan-200"
+          className="min-h-[1.25rem] text-sm font-medium text-primary"
         >
           {message}
         </p>
@@ -188,7 +188,7 @@ export default function ReactionTimeGame() {
             type="button"
             data-testid="reaction-game-try-again"
             onClick={handleTryAgain}
-            className="rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-primary/40 hover:bg-primary/10"
+            className="rounded-lg border border-foreground/15 bg-foreground/5 px-4 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
           >
             Try again
           </button>

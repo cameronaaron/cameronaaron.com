@@ -6,7 +6,7 @@ export interface Position {
 
 export interface Experience {
   company: string;
-  /** Omitted when no logo file exists: the card shows the company monogram. */
+  /** Omitted when no single logo exists: the card shows the company monogram. */
   logo?: string;
   websiteUrl?: string;
   positions: Position[];
@@ -14,17 +14,21 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
-    company: "Creative Minds ADP",
+    company: "California DDS Internship, North Los Angeles County",
+    logo: "/logos/dds.avif",
+    websiteUrl: "https://www.dds.ca.gov/initiatives/workforce-initiatives-4/dsp-internship-program/",
     positions: [
       {
-        title: "Direct Support Professional Intern",
+        title: "Mental Health Assistance - Care Support",
         period: "Oct 2026 - Present",
-        description: "Paid internship through the California Department of Developmental Services' DSP Internship Program, supporting adults with developmental disabilities in an adult day program in Van Nuys.",
+        description: "Paid placement at Creative Minds ADP in Van Nuys, supporting adults with developmental disabilities in an adult day program.",
       },
     ],
   },
   {
     company: "Sun Brewed Homestead",
+    logo: "/logos/sun-brewed.avif",
+    websiteUrl: "https://www.sunbrewedhomestead.org/",
     positions: [
       {
         title: "Chief Operating Officer & Board Member",
@@ -35,6 +39,7 @@ export const experiences: Experience[] = [
   },
   {
     company: "National Registry of Emergency Medical Technicians",
+    logo: "/logos/nremt.avif",
     websiteUrl: "https://www.nremt.org/",
     positions: [
       {
@@ -46,6 +51,8 @@ export const experiences: Experience[] = [
   },
   {
     company: "Los Angeles City College",
+    logo: "/logos/lacc.avif",
+    websiteUrl: "https://www.lacc.edu/",
     positions: [
       {
         title: "Founder, Human Anatomy Study Community",
@@ -56,6 +63,8 @@ export const experiences: Experience[] = [
   },
   {
     company: "Los Angeles Valley College & Los Angeles Mission College",
+    // Two colleges share this card, and each publishes its own mark.
+    // A single logo would name only one of them.
     positions: [
       {
         title: "Clinical Training: EMT, Nursing Assistant, EKG",
@@ -66,6 +75,8 @@ export const experiences: Experience[] = [
   },
   {
     company: "Parker-Anderson Enrichment",
+    logo: "/logos/parker-anderson.avif",
+    websiteUrl: "https://parker-anderson.org/",
     positions: [
       {
         title: "STEM & Robotics Instructor",
