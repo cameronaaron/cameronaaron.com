@@ -39,7 +39,8 @@ export const educationItems: EducationItem[] = [
       "Spring 2026: 4.0 GPA — Full Time Dean's Honor List (Anatomy, Child Dev, Microbiology, Physiology, Sociology — all A's)",
       "Summer 2026: 4.0 GPA — STAT 101 Statistics for the Social Sciences (A), POL SCI 019 Women in Politics (A)",
       "Certificates of Completion: Certified Nursing Assistant (CNA) & Community Health Worker (CHW) — Dec 2025; Electrocardiography (EKG) Technician — Jun 2026",
-      "Current enrollment (Fall 2026): CHEM 051 Fundamentals of Chemistry I, ENGL C1000 Academic Reading & Writing, BIOLOGY 033 Medical Terminology, PHILOS 020 Ethics, SOC 004 Sociological Analysis, CHICANO 047, ARTH C1200, KIN 246",
+      "Fall 2026: PHILOS 020 Ethics (A, first 8-week session); in progress: CHEM 051 Fundamentals of Chemistry I (with lab), ENGL C1000 Academic Reading & Writing, PSYC C1000 Intro to Psychology, PHILOS 006 Logic in Practice, CHICANO 008 Mexican-American History II",
+      "Fall 2026 standing in iLearn (Nov 11, 2026; final grades post after Dec 20): CHEM 051 97.3%, CHICANO 008 97.5%, ENGL C1000 100%, PHILOS 006 94.6%, PSYC C1000 100%",
       "Non-credit completions: Behavioral Tech Prep, Hardware & OS Networking, Digital Board Operations; Intro to Healthcare Careers in progress",
     ],
     verificationLinks: [
@@ -345,15 +346,30 @@ export const prerequisiteCourses: PrerequisiteCourse[] = [
     url: "https://www.wlac.edu/sites/wlac.edu/files/2024-08/catalog.pdf#page=212",
   },
   {
-    requirement: "English Composition",
-    course: "ENGL C1000 - Academic Reading & Writing (LAHC)",
+    requirement: "Ethics (nursing-relevant elective)",
+    course: "PHILOS 020 - Ethics (LACC)",
+    units: "3.00",
+    grade: "A",
+    gpa: "4.00",
+    status: "Completed",
+  },
+  {
+    requirement: "General Psychology (additional coursework)",
+    course: "PSYC C1000 - Intro to Psychology (LACC)",
     units: "3.00",
     grade: "In Progress",
     status: "In Progress",
   },
   {
-    requirement: "Medical Terminology (nursing-relevant elective)",
-    course: "BIOLOGY 033 - Medical Terminology (LAVC)",
+    requirement: "Critical Thinking / Logic (nursing-relevant elective)",
+    course: "PHILOS 006 - Logic in Practice (ELAC)",
+    units: "3.00",
+    grade: "In Progress",
+    status: "In Progress",
+  },
+  {
+    requirement: "English Composition",
+    course: "ENGL C1000 - Academic Reading & Writing (LAHC)",
     units: "3.00",
     grade: "In Progress",
     status: "In Progress",
@@ -392,6 +408,9 @@ export const honorsAndAffiliations: HonorItem[] = [
     url: "https://www.deac.org/discover-deac/delta-epsilon-tau-honor-society/",
   },
   {
+    label: "Provost's List (3 terms) and Dean's List, Elmbridge University (2023–2026)",
+  },
+  {
     label: "2eASD Grant Scholarship, UCONN (May 2024)",
     url: "https://giftedasd.project.uconn.edu/",
   },
@@ -414,5 +433,8 @@ export const honorsAndAffiliations: HonorItem[] = [
   {
     label: "Impact Labs Fellow (Jan 2020)",
     url: "https://www.impactlabs.io/",
+  },
+  {
+    label: "Science Leaders Program and Ammerman Center Scholar, Connecticut College (2017–2021)",
   },
 ];

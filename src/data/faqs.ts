@@ -5,11 +5,11 @@ export const faqs = [
   },
   {
     question: "What's your background?",
-    answer: "It's a mix of Neuroscience and Computer Science. I've been lucky enough to work at places like SpaceX and GitHub (now part of Microsoft), which has given me a pretty unique perspective on how software intersects with real-world problems."
+    answer: "It's a mix of Psychology (with a cognitive science minor and four years in a neuroscience lab) and Computer Science. I've been lucky enough to work at places like SpaceX and GitHub (now part of Microsoft), which has given me a pretty unique perspective on how software intersects with real-world problems."
   },
   {
     question: "What are you working on right now?",
-    answer: "Finishing my nursing prerequisite coursework at LACCD — currently in Chemistry — while applying to Nurse Practitioner programs. On the tech side I keep a few projects going, but healthcare is the main focus right now."
+    answer: "Finishing my nursing prerequisite coursework at LACCD (Fundamentals of Chemistry I this fall) while applying to entry-level MSN programs for 2027, on the way to becoming a psychiatric-mental health nurse practitioner. I also work as a Direct Support Professional intern with adults with developmental disabilities and run operations for Sun Brewed Homestead, a community farm. On the tech side I keep a few projects going, but healthcare is the main focus right now."
   },
   {
     question: "Are you open to new opportunities?",

@@ -24,7 +24,12 @@ describe('experience logic', () => {
   it('sorts experiences and nested positions by most recent period', () => {
     const sorted = sortExperiencesForTimeline(experiences);
 
-    expect(sorted[0]?.company).toBe('Bridges Academy');
+    // Ongoing roles ("- Present") lead; source order breaks their tie.
+    expect(sorted.slice(0, 3).map((experience) => experience.company)).toEqual([
+      'Creative Minds ADP',
+      'Sun Brewed Homestead',
+      'National Registry of Emergency Medical Technicians',
+    ]);
 
     const connecticutCollege = sorted.find((experience) => experience.company === 'Connecticut College');
     expect(connecticutCollege?.positions[0]?.period).toBe('Jan 2020 - May 2021');

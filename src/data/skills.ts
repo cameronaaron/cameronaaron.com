@@ -29,6 +29,7 @@ export const skills = {
     "Healthcare Technology Integration",
     "Bioinformatics",
     "Cognitive Diversity & Patient Advocacy",
+    "Developmental Disability Support (Direct Support Professional)",
   ],
   
   certifications: [
@@ -41,6 +42,8 @@ export const skills = {
     "Neonatal Resuscitation Program (NRP) Advanced Provider - Active through Nov 2027",
     "Community Health Worker Certificate - Earned Dec 2025",
     "Protecting Human Research Participants (NIH) - Active",
-    "In Progress: Certified EKG Technician (CET), Certified Phlebotomist",
+    "EKG Technician Training (Los Angeles Mission College) - Completed Jun 2026",
+    "Private Security Agent (California BSIS) - Active through Aug 2027",
+    "In Progress: Certified EKG Technician (CET) exam, Certified Phlebotomist",
   ],
 };

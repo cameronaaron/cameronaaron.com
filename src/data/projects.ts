@@ -85,6 +85,14 @@ export const projects: Project[] = [
     ...repositoryFields('cameronaaron/matrix-archive'),
   },
   {
+    title: "Bridging Transitions Poster, Stanford Neurodiversity Summit 2026",
+    description: "Presented the M.Ed. capstone as a non-research poster at the 2026 Stanford Neurodiversity Summit (Session 2, Sep 19, 2026): a strength-based video series for thrice-exceptional Black male students, with one concrete change each campus office can make.",
+    link: getPageUrl('/bridging-transitions'),
+    tags: ["Neurodiversity", "Poster", "Higher Education", "Thrice-Exceptional"],
+    period: "Sep 2026",
+    cta: "Poster Companion",
+  },
+  {
     title: "Bridging Transitions: Video-Based Educational Content on Thrice-exceptional Black Male Students' Higher Education Journey",
     description: "Graduate capstone project producing a five-part educational video series on identification challenges, transition barriers, strength-based practices, social-emotional experiences, and institutional recommendations.",
     link: getPageUrl('/capstone'),

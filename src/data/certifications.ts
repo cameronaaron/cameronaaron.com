@@ -90,12 +90,12 @@ export const certifications: Certification[] = [
 export const inProgressCertifications: InProgressCertification[] = [
   {
     name: "Certified EKG Technician (CET) - NHA",
-    expectedCompletion: "2026 (Estimated)",
+    expectedCompletion: "After the NHA exam (EKG Technician training completed Jun 2026, LA Mission College)",
     status: "In Progress",
   },
   {
     name: "Certified Phlebotomist",
-    expectedCompletion: "2026 (Estimated)",
+    expectedCompletion: "Date not yet set",
     status: "In Progress",
   },
 ];

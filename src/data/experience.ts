@@ -6,12 +6,74 @@ export interface Position {
 
 export interface Experience {
   company: string;
-  logo: string;
+  /** Omitted when no logo file exists: the card shows the company monogram. */
+  logo?: string;
   websiteUrl?: string;
   positions: Position[];
 }
 
 export const experiences: Experience[] = [
+  {
+    company: "Creative Minds ADP",
+    positions: [
+      {
+        title: "Direct Support Professional Intern",
+        period: "Oct 2026 - Present",
+        description: "Paid internship through the California Department of Developmental Services' DSP Internship Program, supporting adults with developmental disabilities in an adult day program in Van Nuys.",
+      },
+    ],
+  },
+  {
+    company: "Sun Brewed Homestead",
+    positions: [
+      {
+        title: "Chief Operating Officer & Board Member",
+        period: "Jul 2025 - Present",
+        description: "Runs operations for a 501(c)(3) community farm in Van Nuys that grows food, hosts workshops and rehomes rescue cats, and wrote the operations software it runs on.",
+      },
+    ],
+  },
+  {
+    company: "National Registry of Emergency Medical Technicians",
+    websiteUrl: "https://www.nremt.org/",
+    positions: [
+      {
+        title: "EMT Item Review Panelist",
+        period: "Jul 2026 - Oct 2026",
+        description: "Selected for two panels (Jul 2026; Sep - Oct 2026) to review and validate questions for the national EMT certification exam.",
+      },
+    ],
+  },
+  {
+    company: "Los Angeles City College",
+    positions: [
+      {
+        title: "Founder, Human Anatomy Study Community",
+        period: "Feb 2026 - Jun 2026",
+        description: "Organized a 43-member ANATOMY 001 study group with review sessions and a deadline bot during a 4.00 term on the Full-Time Dean's Honor List.",
+      },
+    ],
+  },
+  {
+    company: "Los Angeles Valley College & Los Angeles Mission College",
+    positions: [
+      {
+        title: "Clinical Training: EMT, Nursing Assistant, EKG",
+        period: "Sep 2025 - Feb 2026",
+        description: "Clinical rotations in direct patient care (vital signs, ADLs, mobility and safety), EMT training in assessment, airway, trauma and medical emergencies, and EKG acquisition.",
+      },
+    ],
+  },
+  {
+    company: "Parker-Anderson Enrichment",
+    positions: [
+      {
+        title: "STEM & Robotics Instructor",
+        period: "Aug 2024 - Aug 2025",
+        description: "Taught hands-on robotics, engineering, coding and science enrichment classes at Los Angeles schools, adapting each after-school session to mixed ages and skill levels.",
+      },
+    ],
+  },
   {
     company: "Bridges Academy",
     logo: "/logos/ba-logo.avif",
@@ -82,6 +144,11 @@ export const experiences: Experience[] = [
         title: "Computational Biology & Bioinformatics Researcher",
         period: "Jan 2020 - May 2021",
         description: "Built Apache Spark SNP analysis pipelines, DICOM imaging analysis tools, and applications integrating digital medical records with biometric and genomic data.",
+      },
+      {
+        title: "Head of Special Events, TED Club",
+        period: "2018 - May 2021",
+        description: "Ran TEDxYouth@NewLondon and gave a TED-Ed talk on artificial creativity.",
       },
       {
         title: "CameLAB Neuroscience Lab Research Assistant",
