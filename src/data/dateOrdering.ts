@@ -43,8 +43,15 @@ function toMonthKey(year: number, month: number): number {
   return year * 12 + month;
 }
 
+// An ongoing range ("Jul 2025 - Present") ends after every dated one. Read as
+// unparseable, it fell back to its start date and sorted below roles that had
+// already ended (found 2026-11, adding the Sun Brewed Homestead role).
+const PRESENT_KEY = toMonthKey(9999, 11);
+
 function parseSingleDateToken(token: string, useRangeEndMonth: boolean): number {
   const normalized = token.trim().toLowerCase();
+
+  if (useRangeEndMonth && normalized === 'present') return PRESENT_KEY;
 
   const monthYearMatch = normalized.match(ANCHORED_MONTH_YEAR_RE);
 

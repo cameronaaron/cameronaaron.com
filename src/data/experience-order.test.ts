@@ -20,6 +20,8 @@ const monthIndex: Record<string, number> = {
 function parseYearMonth(value: string, usePeriodEnd: boolean): number {
   const trimmed = value.trim().toLowerCase();
 
+  if (usePeriodEnd && trimmed === 'present') return Number.MAX_SAFE_INTEGER;
+
   const yearOnly = trimmed.match(/^(\d{4})$/);
   if (yearOnly) {
     const year = Number(yearOnly[1]);

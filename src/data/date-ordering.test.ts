@@ -18,6 +18,15 @@ describe('date ordering utility', () => {
     expect(getDateSortKey(undefined)).toBe(Number.NEGATIVE_INFINITY);
   });
 
+  it('sorts an ongoing range after every range that has ended', () => {
+    // Read as unparseable, "Present" fell back to the start date, so a role
+    // held since Jul 2025 sorted below one that ended Oct 2026.
+    expect(getDateSortKey('Jul 2025 - Present')).toBeGreaterThan(getDateSortKey('Jul 2026 - Oct 2026'));
+    expect(getDateSortKey('2025 - Present')).toBeGreaterThan(getDateSortKey('Dec 2099'));
+    // "Present" means now only as a range's end.
+    expect(getDateSortKey('Present')).toBe(Number.NEGATIVE_INFINITY);
+  });
+
   it('returns sorted copies without mutating source arrays', () => {
     const originalTestimonialOrder = testimonials.map((testimonial) => testimonial.name);
     const sortedTestimonials = sortByDateDesc(testimonials, (testimonial) => testimonial.date);
