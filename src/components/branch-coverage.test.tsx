@@ -93,6 +93,17 @@ describe('branch coverage targets', () => {
     expect(screen.getByText(withLogo.company.split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase())).toBeTruthy();
   });
 
+  it('renders no call-to-action for a featured project without a public link', () => {
+    // A private repository has no link (repoVisibility.ts); its card must not
+    // offer a button that goes nowhere. Real data stopped reaching this branch
+    // once the Homestead and Room Remembers You cards linked public repos.
+    const { link: _link, ...unlinked } = capstoneProject;
+    render(<FeaturedProject project={{ ...unlinked, cta: 'Private repository' }} index={0} />);
+
+    expect(screen.queryByRole('link', { name: /private repository/i })).toBeNull();
+    expect(screen.queryByText('Private repository')).toBeNull();
+  });
+
   it('shows the monogram, and requests no image, for a company with no logo', () => {
     render(
       <ExperienceCard

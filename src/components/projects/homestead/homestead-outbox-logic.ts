@@ -1,6 +1,6 @@
 /**
  * "Survive the Outage" — paired with Homestead, the Sun Brewed Homestead
- * operations core (cameronaaron/homestead, private).
+ * operations core (cameronaaron/homestead-core, public).
  *
  * The game is a port of that repo's integration bus, not a cartoon of one.
  * Every farm write commits an event in the same transaction; the dispatcher

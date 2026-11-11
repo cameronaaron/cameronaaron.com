@@ -43,7 +43,7 @@ export const projects: Project[] = [
     tags: ["Rust", "Postgres", "Event-Driven Architecture", "Nonprofit Operations"],
     period: "Sep 2026 - Present",
     interactiveDemo: "homestead-outbox",
-    ...repositoryFields('cameronaaron/homestead'),
+    ...repositoryFields('cameronaaron/homestead-core'),
   },
   {
     title: "The Room Remembers You",
@@ -51,7 +51,7 @@ export const projects: Project[] = [
     tags: ["Interactive Installation", "WebGL2", "Privacy by Design", "TypeScript"],
     period: "Sep 2026",
     interactiveDemo: "room-memory-field",
-    ...repositoryFields('cameronaaron/Art-Project'),
+    ...repositoryFields('cameronaaron/the-room-remembers-you'),
   },
   {
     title: "Mechanic: Open Vehicle Diagnostics",

@@ -2,7 +2,7 @@
   "https://2esymposium.com/speaker-attendee-biographies-a-f/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -11,7 +11,7 @@
   "https://archiveprogram.github.com/arctic-vault/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -19,7 +19,7 @@
   "https://bridges.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -27,7 +27,7 @@
   "https://cameronaaron.medium.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
     ]
@@ -35,7 +35,7 @@
   "https://catalog.csun.edu/academics/psy/courses/psy-345/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -43,7 +43,7 @@
   "https://conncoll.smartcatalogiq.com/en/2020-2021/catalog/courses/eas-east-asian-studies/100/eas-106": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -51,7 +51,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/bio-biology/200/bio-298": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -59,7 +59,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/hmd-human-development/100/hmd-111": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -67,7 +67,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/100/psy-100": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -75,7 +75,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-202": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -83,7 +83,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-210": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -91,7 +91,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/200/psy-214": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -99,7 +99,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-309": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -107,7 +107,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-312": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -115,7 +115,7 @@
   "https://conncoll.smartcatalogiq.com/en/2022-2023/catalog/courses/psy-psychology/300/psy-321": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -123,7 +123,7 @@
   "https://cvl.cdph.ca.gov/DetailPage.aspx?cert_holder_id=797902": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts",
       "src/data/education.ts"
@@ -132,7 +132,7 @@
   "https://doi.org/10.1167/jov.21.9.2719": {
     "status": "blocked",
     "httpCode": 403,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -141,7 +141,7 @@
   "https://dutchie.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts",
       "src/data/testimonials.ts"
@@ -150,7 +150,7 @@
   "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=5FDD8C2A-4EEC-4AAA-A39C-A31051C0112D&langId=1": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -158,7 +158,7 @@
   "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=A1B5403C-5D5D-40CA-B89B-BB660A452AE7&langId=1": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -166,7 +166,7 @@
   "https://ecards.heart.org/api/relay/v1/ecard/getfullpdf?eCardUId=D2652075-56D4-4452-9F44-AF0F20FA78B0&langId=1": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -174,7 +174,7 @@
   "https://elmbridge.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts",
       "src/data/education.ts",
@@ -184,7 +184,7 @@
   "https://emsregistry.emsa.ca.gov/caemsa?id=license_detail&sys_id=b94c1a2f1b6bb610f8e62138624bcb8d": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -192,7 +192,7 @@
   "https://giftedasd.project.uconn.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -200,7 +200,7 @@
   "https://github.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts",
       "src/data/testimonials.ts"
@@ -209,7 +209,7 @@
   "https://github.com/cameronaaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/profile.ts"
     ]
@@ -217,7 +217,7 @@
   "https://hollywoodcpr.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -225,7 +225,7 @@
   "https://jacobsinstitute.berkeley.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -233,7 +233,7 @@
   "https://med.stanford.edu/neurodiversity/SNS2021/program.html": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -242,7 +242,7 @@
   "https://music.apple.com/us/artist/cameron-aaron/1680083789": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/profile.ts"
     ]
@@ -250,7 +250,7 @@
   "https://nrplearningplatform.com/certificateAdmin/0.1/verify_certificate": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -258,7 +258,7 @@
   "https://open.spotify.com/artist/0CpLZvas7C2hpxSKkqQL7M": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/profile.ts"
     ]
@@ -266,7 +266,7 @@
   "https://pangea.app/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -274,7 +274,7 @@
   "https://petricoregames.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -282,7 +282,7 @@
   "https://phrptraining.com/login": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -290,7 +290,7 @@
   "https://search.dca.ca.gov/details/1201/G/6859700/e1facef21869287b88a72c38de0b3b3d": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts"
     ]
@@ -298,7 +298,7 @@
   "https://sites.google.com/stanford.edu/nnea/home/monthly-speaker-meetings": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
     ]
@@ -306,7 +306,7 @@
   "https://steelvalleyaccelerator.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -314,7 +314,7 @@
   "https://waystoneadvisors.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -322,7 +322,7 @@
   "https://web.archive.org/web/20201115080207/https://c19bayshield.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -330,7 +330,7 @@
   "https://www.2enews.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -338,7 +338,7 @@
   "https://www.about.pangea.app/top-emerging-talent/summer-21": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -347,7 +347,7 @@
   "https://www.apu.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/nursingPrograms.ts"
     ]
@@ -355,7 +355,7 @@
   "https://www.bardovr.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -363,7 +363,7 @@
   "https://www.conncoll.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts",
       "src/data/experience.ts",
@@ -373,7 +373,7 @@
   "https://www.conncoll.edu/academics/ammerman-center/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -381,7 +381,7 @@
   "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -389,7 +389,7 @@
   "https://www.conncoll.edu/academics/internships-student-research/student-research-projects/genetic-reflexions-a-magic-mirror-that-displays-genetic-info-about-the-person-with-their-reflection.html": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -398,7 +398,7 @@
   "https://www.conncoll.edu/academics/registrar/digital-diplomas/cediploma-validation/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts",
       "src/data/education.ts"
@@ -407,7 +407,7 @@
   "https://www.conncoll.edu/news/news-archive/2020/a-dozen-internships/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -416,7 +416,7 @@
   "https://www.coursera.org/verify/specialization/35GA4PT55P58": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -424,7 +424,7 @@
   "https://www.coursera.org/verify/specialization/56UX6XK93RUE": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -432,7 +432,7 @@
   "https://www.coursera.org/verify/specialization/AN29HKSZVTSJ": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -440,7 +440,7 @@
   "https://www.coursera.org/verify/specialization/KE556WEY57QK": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -448,7 +448,7 @@
   "https://www.coursera.org/verify/specialization/NNB9A5JV8WSA": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -456,7 +456,7 @@
   "https://www.coursera.org/verify/specialization/QBP8786KGTVK": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -464,7 +464,7 @@
   "https://www.coursera.org/verify/specialization/QU4S27ZCRDXZ": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -472,7 +472,7 @@
   "https://www.coursera.org/verify/specialization/VW7G9Y7KVBF3": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -480,7 +480,7 @@
   "https://www.coursera.org/verify/specialization/YL97H6X2CJB9": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -488,7 +488,7 @@
   "https://www.cu.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -496,7 +496,7 @@
   "https://www.deac.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -504,7 +504,7 @@
   "https://www.deac.org/discover-deac/delta-epsilon-tau-honor-society/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -512,7 +512,7 @@
   "https://www.facebook.com/": {
     "status": "blocked",
     "httpCode": 400,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -520,7 +520,7 @@
   "https://www.facebook.com/joyld1/posts/pfbid0261cux8P1tjRCUGC9WyJpk8fxzpNnxbYQeceKUNX7T6aFMy4H89XgVPcmwdd6BHGLl": {
     "status": "blocked",
     "httpCode": 400,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -528,7 +528,7 @@
   "https://www.fortrea.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -536,7 +536,7 @@
   "https://www.helpinghands.community/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -544,7 +544,7 @@
   "https://www.impactlabs.io/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -552,7 +552,7 @@
   "https://www.joinblvd.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -560,7 +560,7 @@
   "https://www.kulturecity.org/training/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts"
     ]
@@ -568,7 +568,7 @@
   "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=234": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -576,7 +576,7 @@
   "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=271": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -584,7 +584,7 @@
   "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=298": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -592,7 +592,7 @@
   "https://www.lacc.edu/sites/lacc.edu/files/2025-08/Complete%20LACC%202025-26%20College%20Catalog_0.pdf#page=313": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -600,7 +600,7 @@
   "https://www.laccd.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -608,7 +608,7 @@
   "https://www.lahc.edu/sites/lahc.edu/files/2025-12/LAHC%20Master%20Catalog%20File%202025%20Final%20Draft%C2%A0(1)%20-%20Updated%2012.17.25.pdf#page=194": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -616,7 +616,7 @@
   "https://www.lamission.edu/sites/lamc.edu/files/2024-06/LAMC-Catalog-2024-2025.pdf#page=98": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -624,7 +624,7 @@
   "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=175": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -632,7 +632,7 @@
   "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=181": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -640,7 +640,7 @@
   "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=200": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -648,7 +648,7 @@
   "https://www.lavc.edu/sites/lavc.edu/files/2025-08/LAVC%20Catalog%202025-2026.pdf#page=250": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -656,7 +656,7 @@
   "https://www.linkedin.com/in/acolombiadev/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -664,7 +664,7 @@
   "https://www.linkedin.com/in/amypeckxr": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -672,7 +672,7 @@
   "https://www.linkedin.com/in/ashley-pinales-2a012770/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -680,7 +680,7 @@
   "https://www.linkedin.com/in/chris-wiebe-a2b26778/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -688,7 +688,7 @@
   "https://www.linkedin.com/in/christine-chung-phd/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -696,7 +696,7 @@
   "https://www.linkedin.com/in/danacastner/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -704,7 +704,7 @@
   "https://www.linkedin.com/in/darin-mellor-capm-ba-msm-a09441ba/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -712,7 +712,7 @@
   "https://www.linkedin.com/in/drjoybrighttalentedblack/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -720,7 +720,7 @@
   "https://www.linkedin.com/in/dylan-arceneaux-b8b296b6/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -728,7 +728,7 @@
   "https://www.linkedin.com/in/gwendolynmhay": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -736,7 +736,7 @@
   "https://www.linkedin.com/in/h-john-schaeffer-5a66793/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -744,7 +744,7 @@
   "https://www.linkedin.com/in/joeanna-mcdonald-128681154/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -752,23 +752,23 @@
   "https://www.linkedin.com/in/kamisama": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/profile.ts"
     ]
   },
   "https://www.linkedin.com/in/karina-sinha/": {
     "status": "blocked",
-    "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 429,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
   },
   "https://www.linkedin.com/in/katelynberezo/": {
     "status": "blocked",
-    "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 429,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -776,7 +776,7 @@
   "https://www.linkedin.com/in/kcms/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -784,15 +784,15 @@
   "https://www.linkedin.com/in/kt-ellis/": {
     "status": "blocked",
     "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
   },
   "https://www.linkedin.com/in/michael-gombos-3148ba17/": {
     "status": "blocked",
-    "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 429,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -800,15 +800,15 @@
   "https://www.linkedin.com/in/nate-ledbury-707507a7/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
   },
   "https://www.linkedin.com/in/patricia-cebotari/": {
     "status": "blocked",
-    "httpCode": 999,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 429,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -816,7 +816,7 @@
   "https://www.linkedin.com/in/persephonelhall/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -824,7 +824,7 @@
   "https://www.linkedin.com/in/raymondcmartinez/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -832,7 +832,7 @@
   "https://www.linkedin.com/in/sahast/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -840,15 +840,15 @@
   "https://www.linkedin.com/in/shalandy-zhang/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
   },
   "https://www.linkedin.com/in/tinataleb/": {
     "status": "blocked",
-    "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 999,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -856,15 +856,15 @@
   "https://www.linkedin.com/in/vinicius-santanna-89113332/": {
     "status": "blocked",
     "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
   },
   "https://www.linkedin.com/in/walterama/": {
     "status": "blocked",
-    "httpCode": 429,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "httpCode": 999,
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -872,7 +872,7 @@
   "https://www.linkedin.com/posts/cameron-aaron-21-is-currently-working-as-share-6657585783760920576-dLcj/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
     ]
@@ -880,7 +880,7 @@
   "https://www.linkedin.com/pulse/behavioral-medicine-career-paperbrief-literature-review-aaron-": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -888,7 +888,7 @@
   "https://www.linkedin.com/pulse/clues-inc-tale-divergent-superhero-draft-cameron-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -896,7 +896,7 @@
   "https://www.linkedin.com/pulse/creating-perfect-fit-turning-add-asset-cameron-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -904,7 +904,7 @@
   "https://www.linkedin.com/pulse/differences-standard-japanese-tohoku-dialects-cameron-aaron-": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -912,7 +912,7 @@
   "https://www.linkedin.com/pulse/eas-101-essay-cameron-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -920,7 +920,7 @@
   "https://www.linkedin.com/pulse/my-journey-integrating-art-technology-enhance-human-experience-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -928,7 +928,7 @@
   "https://www.linkedin.com/pulse/social-intelligence-effect-team-dynamic-cameron-aaron-": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -936,7 +936,7 @@
   "https://www.linkedin.com/pulse/toxoplasma-gondii-modifies-personality-cameron-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -944,7 +944,7 @@
   "https://www.mos.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -952,7 +952,7 @@
   "https://www.msmu.edu/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/nursingPrograms.ts"
     ]
@@ -960,7 +960,7 @@
   "https://www.neche.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -968,7 +968,7 @@
   "https://www.nremt.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -976,7 +976,7 @@
   "https://www.nremt.org/verify-credentials": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/certifications.ts",
       "src/data/education.ts"
@@ -985,7 +985,7 @@
   "https://www.parchment.com/lp/award/5ed28264-10a0-4798-b16b-f94393e0b7da": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/additionalCredentials.ts",
       "src/data/certifications.ts",
@@ -996,7 +996,7 @@
   "https://www.paylocity.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -1004,7 +1004,7 @@
   "https://www.researchgate.net/profile/Cameron-Aaron-2": {
     "status": "blocked",
     "httpCode": 403,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
     ]
@@ -1012,7 +1012,7 @@
   "https://www.researchgate.net/publication/341276786_The_Real_Magical_Girls?_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6InByb2ZpbGUiLCJwYWdlIjoicHJvZmlsZSJ9fQ": {
     "status": "blocked",
     "httpCode": 403,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/projects.ts"
     ]
@@ -1020,7 +1020,7 @@
   "https://www.spacex.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -1028,7 +1028,7 @@
   "https://www.stanfordnnea.com/2023-speakers": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts"
     ]
@@ -1036,7 +1036,7 @@
   "https://www.trilliumacademy.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -1044,7 +1044,7 @@
   "https://www.umass.edu/psychological-brain-sciences/undergraduate/undergraduate-course-offerings": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -1052,7 +1052,7 @@
   "https://www.westerlyschool.org/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -1060,7 +1060,7 @@
   "https://www.wlac.edu/sites/wlac.edu/files/2024-08/catalog.pdf#page=212": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -1068,7 +1068,7 @@
   "https://www.wlac.edu/sites/wlac.edu/files/2024-08/catalog.pdf#page=223": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/education.ts"
     ]
@@ -1076,7 +1076,7 @@
   "https://www.wurrly.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/testimonials.ts"
     ]
@@ -1084,7 +1084,7 @@
   "https://www.xurrent.com/": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/experience.ts"
     ]
@@ -1092,7 +1092,7 @@
   "https://www.xurrent.com/blog/4me-welcomes-cameron-aaron": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/internetFeatures.ts",
       "src/data/projects.ts"
@@ -1101,7 +1101,7 @@
   "https://www.youtube.com/playlist?list=PLPKJAUpRXbupAzN7UaPLEewRw2up_Nyz-": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts",
       "src/data/education.ts"
@@ -1110,7 +1110,7 @@
   "https://youtu.be/3to4vDHLO_4": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts"
     ]
@@ -1118,7 +1118,7 @@
   "https://youtu.be/i4SgPsfrms0": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts"
     ]
@@ -1126,7 +1126,7 @@
   "https://youtu.be/m21bBd5EqK0": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts"
     ]
@@ -1134,7 +1134,7 @@
   "https://youtu.be/u_hXunweL1Q": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts"
     ]
@@ -1142,7 +1142,7 @@
   "https://youtu.be/zVz1OpLugZo": {
     "status": "live",
     "httpCode": 200,
-    "lastChecked": "2026-11-11T19:40:10.510Z",
+    "lastChecked": "2026-11-11T19:53:07.361Z",
     "files": [
       "src/data/capstone.ts"
     ]
