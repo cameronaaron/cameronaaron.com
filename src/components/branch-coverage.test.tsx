@@ -58,11 +58,13 @@ describe('branch coverage targets', () => {
   });
 
   it('covers experience/project hover and icon branches', () => {
+    // The logo-error branch needs a company that has a logo; some don't.
+    const withLogo = experiences.find((experience) => experience.logo)!;
     // Render with websiteUrl to cover true branch, and without to cover false branch
-    const expWithoutUrl = { ...experiences[0], websiteUrl: undefined };
+    const expWithoutUrl = { ...withLogo, websiteUrl: undefined };
     render(
       <>
-        <ExperienceCard experience={experiences[0]} index={0} />
+        <ExperienceCard experience={withLogo} index={0} />
         <ExperienceCard experience={expWithoutUrl} index={1} />
         <FeaturedProject project={capstoneProject} index={1} />
         <FeaturedProject project={capstoneProject} index={2} />
@@ -75,7 +77,7 @@ describe('branch coverage targets', () => {
     fireEvent.mouseEnter(card);
     fireEvent.mouseLeave(card);
 
-    const companyImages = screen.getAllByAltText(experiences[0].company);
+    const companyImages = screen.getAllByAltText(withLogo.company);
     fireEvent.error(companyImages[0]);
 
     const projectLinks = screen.getAllByRole('link');
@@ -88,7 +90,19 @@ describe('branch coverage targets', () => {
       fireEvent.mouseLeave(projectCardLink);
     }
 
-    expect(screen.getByText(experiences[0].company.split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase())).toBeTruthy();
+    expect(screen.getByText(withLogo.company.split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase())).toBeTruthy();
+  });
+
+  it('shows the monogram, and requests no image, for a company with no logo', () => {
+    render(
+      <ExperienceCard
+        experience={{ company: 'Sun Brewed Homestead', positions: [{ title: 'COO', period: 'Jul 2025 - Present', description: '' }] }}
+        index={0}
+      />
+    );
+
+    expect(screen.queryByAltText('Sun Brewed Homestead')).toBeNull();
+    expect(screen.getByText('SBH')).toBeTruthy();
   });
 
   it('drives UI utility motion handlers', () => {

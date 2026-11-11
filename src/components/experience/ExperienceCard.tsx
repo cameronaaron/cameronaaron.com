@@ -98,7 +98,7 @@ function ExperienceCard({
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
           <div className="w-16 h-16 rounded-xl bg-white p-2 shadow-md group-hover:shadow-xl transition-shadow relative overflow-hidden">
-            {logoError ? (
+            {logoError || !experience.logo ? (
               <div className="w-full h-full rounded-lg bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 text-foreground/90 font-bold text-xs flex items-center justify-center relative z-10">
                 {companyMonogram}
               </div>
