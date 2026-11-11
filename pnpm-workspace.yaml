@@ -5,29 +5,21 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@cloudflare/workerd-darwin-64@1.20261012.1'
-  - '@cloudflare/workerd-darwin-arm64@1.20261012.1'
-  - '@cloudflare/workerd-linux-64@1.20261012.1'
-  - '@cloudflare/workerd-linux-arm64@1.20261012.1'
-  - '@cloudflare/workerd-windows-64@1.20261012.1'
-  - miniflare@5.20261012.0-beta
-  - workerd@1.20261012.1
-  - wrangler@4.151.0
-  - "@pnpm/exe.android-arm64@12.14.0"
-  - "@pnpm/exe.android-x64@12.14.0"
-  - "@pnpm/exe.darwin-arm64@12.14.0"
-  - "@pnpm/exe.darwin-x64@12.14.0"
-  - "@pnpm/exe.freebsd-x64@12.14.0"
-  - "@pnpm/exe.linux-arm64-musl@12.14.0"
-  - "@pnpm/exe.linux-arm64@12.14.0"
-  - "@pnpm/exe.linux-ppc64@12.14.0"
-  - "@pnpm/exe.linux-riscv64@12.14.0"
-  - "@pnpm/exe.linux-s390x@12.14.0"
-  - "@pnpm/exe.linux-x64-musl@12.14.0"
-  - "@pnpm/exe.linux-x64@12.14.0"
-  - "@pnpm/exe.win32-arm64@12.14.0"
-  - "@pnpm/exe.win32-x64@12.14.0"
-  - pnpm@12.14.0
+  - "@pnpm/exe.android-arm64@12.18.0"
+  - "@pnpm/exe.android-x64@12.18.0"
+  - "@pnpm/exe.darwin-arm64@12.18.0"
+  - "@pnpm/exe.darwin-x64@12.18.0"
+  - "@pnpm/exe.freebsd-x64@12.18.0"
+  - "@pnpm/exe.linux-arm64-musl@12.18.0"
+  - "@pnpm/exe.linux-arm64@12.18.0"
+  - "@pnpm/exe.linux-ppc64@12.18.0"
+  - "@pnpm/exe.linux-riscv64@12.18.0"
+  - "@pnpm/exe.linux-s390x@12.18.0"
+  - "@pnpm/exe.linux-x64-musl@12.18.0"
+  - "@pnpm/exe.linux-x64@12.18.0"
+  - "@pnpm/exe.win32-arm64@12.18.0"
+  - "@pnpm/exe.win32-x64@12.18.0"
+  - pnpm@12.18.0
 overrides:
   postcss: ">=8.5.20"
   "@opentelemetry/core": ">=2.8.0"
@@ -91,9 +83,15 @@ overrides:
   # documents. Pulled in via markdownlint-cli2 (config parsing), build-time
   # only — nothing vulnerable ever ships to a visitor.
   smol-toml: ">=1.9.0 <2"
+  # GHSA-gg6h-894w-4m9c (high): re2js quadratic-time lookbehind matching,
+  # fixed >=2.8.7. Pulled in via markdownlint-cli2 > markdownlint, lint only.
+  re2js: ">=2.8.7"
+  # GHSA-g3hv-75wg-m249 (moderate): minimatch globparts amplification DoS,
+  # vulnerable >=7.0.0 <11.0.1. Reached through eslint and stryker (dev only);
+  # the 3.x copies predate the bug and are left alone.
+  minimatch@>=7.0.0 <11.0.1: ">=11.0.1"
 patchedDependencies:
-  '@stryker-mutator/vitest-runner@10.0.0': patches/@stryker-mutator__vitest-runner@10.0.0.patch
-  next@16.4.1: patches/next@16.4.1.patch
+  next@16.4.6: patches/next@16.4.6.patch
 auditConfig:
   ignoreGhsas:
     # GHSA-vfj7-8cjw-p6xm (high, published 2026-09-18): braces stack-exhaustion

@@ -15,8 +15,8 @@ import { preload } from 'react-dom';
 // `scripts/checks/performance-budgets.mjs` then fails the build with the
 // replacement names, because a preload pointing at a missing file is a wasted
 // request.
-export const DISPLAY_FONT_FILE = '/_next/static/media/017d9bea37084d9b-s.41rroleoq1br7.woff2';
-export const MONO_FONT_FILE = '/_next/static/media/797e433ab948586e-s.0r6juujl39pe6.woff2';
+export const DISPLAY_FONT_FILE = '/_next/static/media/8056169c9d560660-s.41rroleoq1br7.woff2';
+export const MONO_FONT_FILE = '/_next/static/media/07a39a8a4660cc7c-s.0r6juujl39pe6.woff2';
 
 // Each list names what that route paints in its first viewport. Keep these in
 // step with ROUTES_PAINTING_ACCENT_FONTS in performance-budgets.mjs, which
