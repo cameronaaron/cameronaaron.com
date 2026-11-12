@@ -26,6 +26,18 @@ describe('hero disciplines', () => {
   });
 });
 
+describe('hero disciplines copy', () => {
+  it('leaves no card with a missing title, description or action', () => {
+    // Uniqueness alone lets one empty string through (it is still distinct
+    // from the other three), which would render a headline-less card.
+    for (const discipline of HERO_DISCIPLINES) {
+      expect(discipline.title, `${discipline.name} title`).toMatch(/^[A-Z].{8,}\.$/);
+      expect(discipline.description, `${discipline.name} description`).toMatch(/^[A-Z].{40,}\.$/);
+      expect(discipline.action, `${discipline.name} action`).toMatch(/^[A-Z][a-z]+ .{6,}$/);
+    }
+  });
+});
+
 describe('splitHeroName', () => {
   it('separates the two name lines from the post-nominals and drops the comma', () => {
     expect(splitHeroName('Cameron Aaron, M.Ed.')).toEqual({
